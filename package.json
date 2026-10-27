@@ -1,0 +1,20 @@
+{
+  "name": "ek3d",
+  "version": "0.0.1",
+  "description": "",
+  "license": "MIT",
+  "author": "Elias Ku <eliasku.games@gmail.com>",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ]
+}
