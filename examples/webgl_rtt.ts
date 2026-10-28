@@ -13,6 +13,7 @@ import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { WebGLRenderTarget } from "ek3d/renderers/WebGLRenderTarget";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { phongShader } from "ek3d/renderers/shaders/PhongShader";
+import colorspace_fragment from "ek3d/renderers/shaders/ShaderChunk/colorspace_fragment.glsl";
 import { Scene } from "ek3d/scenes/Scene";
 import { disposeObject } from "./dispose-object";
 
@@ -86,6 +87,7 @@ for (let j = 0; j < 5; j++) {
 const renderer = new WebGLRenderer({
   canvas,
   shaders: { MeshBasicMaterial: basicShader, MeshPhongMaterial: phongShader },
+  shaderChunks: { colorspace_fragment },
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);

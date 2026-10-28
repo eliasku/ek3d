@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — subdivision modifier</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        z-index: 1;
+        top: 10px;
+        width: 100%;
+        text-align: center;
+        color: white;
+        pointer-events: none;
+      }
+      #info a {
+        color: white;
+        pointer-events: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="info">
+      ek3d webgl - modifier -
+      <a href="https://github.com/stevinz/three-subdivide" target="_blank" rel="noopener">subdivision</a><br />See
+      three-subdivide for more information on subdivision surfaces.
+    </div>
+    <script type="module" src="./webgl_modifier_subdivision.ts"></script>
+  </body>
+</html>

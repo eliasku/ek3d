@@ -1,0 +1,9 @@
+smoke.vdb is the unchanged OpenVDB sample referenced by the upstream three.js webgl_loader_vdb example:
+https://media.githubusercontent.com/media/AcademySoftwareFoundation/openvdb-website/master/download/models/smoke.vdb
+
+Pinned source revision: a55facfdbc0b143806b38175cb394117346b0666
+https://github.com/AcademySoftwareFoundation/openvdb-website/blob/a55facfdbc0b143806b38175cb394117346b0666/download/models/smoke.vdb
+Git LFS SHA-256: 735c22eecf8b498aa0c0c7a4098ea4f2c4ad1f63bf601c278094020301093ac9
+Size: 2594500 bytes
+
+OPENVDB-WEBSITE-LICENSE.txt is the website repository's CC BY 4.0 license at that revision. An asset-specific license and creator for smoke.vdb have not been established; do not assume that the website or OpenVDB software license grants redistribution rights for the model. Resolve rights before public hosting.

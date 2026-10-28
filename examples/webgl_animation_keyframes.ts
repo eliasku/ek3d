@@ -55,7 +55,6 @@ const renderer = new WebGLRenderer({
     MeshLambertMaterial: lambertShader,
     MeshPhongMaterial: phongShader,
     LineBasicMaterial: basicShader,
-    ShaderMaterial: standardShader,
   },
 });
 renderer.setPixelRatio(window.devicePixelRatio);

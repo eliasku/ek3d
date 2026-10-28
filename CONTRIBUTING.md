@@ -134,6 +134,11 @@ sky and panoramas. `GeometryUtils` provides Hilbert 2D/3D and Gosper curves at i
 Assets remain local with adjacent notices. Runtime coverage is recorded per exercised subset,
 not implied by a successful typecheck or build.
 
+Custom `ShaderMaterial` instances keep their own shaders; do not register a built-in shader
+under the `ShaderMaterial` key. Supply their `#include` dependencies through `shaderChunks`.
+The RTT and float-readback pages explicitly supply `colorspace_fragment`; the keyframe page
+keeps the Sky and PMREM shaders separate from its standard-material shader.
+
 The following bulk batch adds 53 pages for animation blending, convex/teapot/decal geometry,
 splines, lighting and probes, shadow techniques, advanced postprocessing, volume/array textures,
 uniform buffers and performance comparisons. `NRRDLoader` takes an optional `NRRDGzipDecoder`
@@ -158,6 +163,46 @@ matching upstream; do not reuse those textures after disposal.
 
 The main `webgl_loader_gltf` catalog remains pending: its live Khronos catalog and referenced
 models require a licensed local snapshot. Existing local glTF examples remain available.
+
+The next loader batch adds `/examples/webgl_loader_3dm.html`, `webgl_loader_ifc.html`,
+`webgl_loader_vdb.html`, `webgl_modifier_subdivision.html` and `webgl_morphtargets_webcam.html`.
+`Rhino3dmLoader` uses `setLibraryPath()` for consumer-owned rhino3dm JavaScript/WASM;
+`setZlibDecoder()` supplies compressed EXR decoding for embedded environments.
+`LWOLoader` and its LWO2/LWO3 parser chain need no vendor runtime.
+The package-owned `VDBLoader` port takes an optional `{ unzlibSync }` runtime as its
+second constructor argument; `setGridNames()` selects grids before dense texture creation.
+Its supported value types and compression follow three-vdb-loader 0.3.0, not every OpenVDB file.
+The package-owned `LoopSubdivision` port uses the canonical
+`ek3d/addons/modifiers/LoopSubdivision` path and preserves three-subdivide 1.1.5's options.
+IFC and webcam pages load local web-ifc and MediaPipe resources without package dependencies.
+Webcam tracking requires a secure context, camera permission and a supported GPU delegate.
+Asset notices and unresolved publication rights are recorded in the adjacent asset README.
+
+The remaining standalone addon batch includes lofts, animation paths, texture/view helpers,
+outline rendering, morph playback, tube painting, coaster geometry, color/scene utilities,
+UV unwrapping and MaterialX archive/interface parsing. `InteractiveGroup` supports browser
+pointer/mouse interaction only; XR controllers remain excluded. `ViewHelper` uses WebGL.
+`unwrapUVs(root, potpack, options)` and `readMtlxArchive(buffer, zipRuntime)` take caller-owned
+runtimes. MaterialX parsing and validation do not install the excluded TSL material backend.
+`RectAreaLightUniformsLib.init()` returns LTC inputs for the renderer's `ltcTextures` option;
+it does not register global uniforms. Packed geometry requires consumer shader decoding.
+`SceneOptimizer.toBatchedMesh()` destructively replaces compatible static meshes; source
+resources still used by surviving meshes are retained. Instancing conversion remains
+unsupported, matching the pinned upstream API.
+
+`/examples/webgl_postprocessing_godrays.html` uses the maintained `GodraysPass`, adapted from
+three-good-godrays 0.12.0 to the native composer and WebGL shadow layouts. The pass requires
+a rendered shadow-casting light and a scene depth texture on its input target, or one supplied
+with `setDepthTexture()`. The separate `postprocessing` package is not a dependency.
+The retained vendor license is in `GodraysShaders.ts`; example-model publication rights
+remain unresolved.
+
+`/examples/webgl_raycaster_bvh.html` uses the maintained three-mesh-bvh 0.9.10 raycaster
+closure and the existing local bunny model. Import `MeshBVH` from
+`ek3d/addons/math/bvh/core/MeshBVH` and `BVHHelper` from
+`ek3d/addons/math/bvh/objects/BVHHelper`. Direct `raycastObject3D()` integration needs no
+prototype patch or second runtime. Optional extension methods and local structural types
+live in `ek3d/addons/math/bvh/utils/ExtensionUtilities`.
 
 Open the URL printed by Vite. `/` is the English project landing page: a fullscreen, animated metallic torus knot with a short introduction, a link to `/examples/examples.html`, and a "Star on GitHub" CTA linking to [eliasku/ek3d](https://github.com/eliasku/ek3d) in a new tab. Its entrypoint is `examples/landing.ts`. A `MeshStandardMaterial` reflects a `RoomEnvironment`, baked once through `PMREMGenerator`; neutral tone mapping preserves highlight detail. The model and room are generated locally, with no external assets or runtime dependencies. The layout adapts to narrow screens. Capture resources are released after baking; navigation releases the model, environment target and DFG lookup texture while preserving back/forward-cache restores.
 
@@ -970,8 +1015,7 @@ directional lights. Import each from its defining lighting/helper module. The th
 pages include a complete local Sponza payload; its CRYENGINE license is not CC0.
 
 `Sculptor`, `SculptorMesh`, `SculptorTools` and `SculptorUtils` retain the SculptGL MIT notice
-in their source headers. The sculpt page remains pending because its GLB export requires
-the deferred `GLTFExporter`; no export-free replacement page is provided.
+in their source headers. The sculpt page includes GLB export through `GLTFExporter`.
 
 `AnimationClipCreator`, `BoxLineGeometry`, `ColorEnvironment` and `ColorConverter` use their
 canonical defining-module paths. Rotation clips preserve upstream track values (0–360),
@@ -980,3 +1024,33 @@ which are interpreted as radians by Object3D rotation tracks.
 `webgl_materials_envmaps_fasthdr` loads eight local prefiltered, compressed HDR environments.
 The textures retain the PMREM mip chain and use the existing Basis/ZSTD runtimes.
 The adjacent asset README credits the CC0 Poly Haven photographs.
+
+## Gaussian splat data and exporters
+
+`SPLATLoader`, `KSPLATLoader`, `GaussianSplatPLYLoader` and `SPZLoader` produce ordinary
+`BufferGeometry` with centers, covariance, colors and optional packed spherical harmonics.
+They do not install a splat renderer. The upstream GaussianSplat renderer and its glTF
+extension require the excluded WebGPU/TSL backend and are not provided.
+
+`SPZLoader.setGzipRuntime({ gunzipSync })` supplies decoding for versions 1–3.
+`setZSTDRuntime({ decode, init? })` supplies version 4 decoding. The consumer owns both
+runtimes. Higher-order spherical harmonics are capped at degree 3, as upstream.
+
+Import exporters from their defining `ek3d/addons/exporters/*Exporter` modules.
+OBJ, PLY and STL preserve their text/binary geometry contracts. `DRACOExporter` takes an
+initialized encoder module in its constructor; its example loads the local licensed
+Google Draco encoder rather than relying on a global or package runtime dependency.
+`WebGLTextureUtils.decompress` converts compressed textures to canvas-backed textures
+for export without importing another Three.js runtime.
+
+`EXRExporter` takes `{ zlibSync }`; `parse(texture, options)` and
+`parse(renderer, target, options)` preserve no compression, RLE, ZIPS, ZIP and PIZ.
+`KTX2Exporter` takes the typed `KTX2Writer` runtime and writes uncompressed byte,
+half-float or float 2D/3D textures and WebGL render targets.
+`USDZExporter` takes `{ zipSync }` and returns an aligned archive from `parseAsync`.
+
+`GLTFExporter` supports callback-based `parse` and promise-based `parseAsync`, JSON/GLB,
+animations and registered extension plugins. Both glTF and USDZ exporters accept
+`setTextureUtils({ decompress })` for compressed texture inputs. Examples supply
+`WebGLTextureUtils`; codec implementations remain outside package sources.
+The G-code exporter example still requires a separate Polyslice integration.

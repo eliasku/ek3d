@@ -15,6 +15,35 @@ const list: HTMLDivElement = listSel;
 /** The ported demo pages grouped by upstream section. */
 const DEMOS: Array<{ group: string; items: string[] }> = [
   {
+    group: "volumetric lighting and BVH",
+    items: ["webgl_postprocessing_godrays", "webgl_raycaster_bvh"],
+  },
+  {
+    group: "exporters and sculpting",
+    items: [
+      "misc_exporter_draco",
+      "misc_exporter_exr",
+      "misc_exporter_gltf",
+      "misc_exporter_gltf_normals",
+      "misc_exporter_ktx2",
+      "misc_exporter_obj",
+      "misc_exporter_ply",
+      "misc_exporter_stl",
+      "misc_exporter_usdz",
+      "webgl_sculpt",
+    ],
+  },
+  {
+    group: "Rhino, IFC, VDB and subdivision",
+    items: [
+      "webgl_loader_3dm",
+      "webgl_loader_ifc",
+      "webgl_loader_vdb",
+      "webgl_modifier_subdivision",
+      "webgl_morphtargets_webcam",
+    ],
+  },
+  {
     group: "Ammo physics",
     items: [
       "physics_ammo_break",

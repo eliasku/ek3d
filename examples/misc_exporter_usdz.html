@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — USDZ exporter</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #eee;
+      }
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        top: 1em;
+        width: 100%;
+        text-align: center;
+        color: #222;
+      }
+      #info a {
+        color: #00f;
+      }
+      #link {
+        position: absolute;
+        bottom: 15px;
+        left: calc(50% - 50px);
+      }
+      #link:not([href]) {
+        visibility: hidden;
+      }
+      #status {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="info">
+      ek3d — USDZ exporter<br />
+      Carbon Frame Bike by
+      <a href="https://sketchfab.com/prefrontalcortex" target="_blank" rel="noopener">prefrontal cortex</a>
+      <span id="status">Loading model…</span>
+    </div>
+    <a id="link" rel="ar" download="asset.usdz"
+      ><img width="100" src="/examples/files/arkit.png" alt="Download or view in AR"
+    /></a>
+    <script type="module" src="./misc_exporter_usdz.ts"></script>
+  </body>
+</html>

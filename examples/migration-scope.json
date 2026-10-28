@@ -1,6 +1,6 @@
 {
   "schema": "addon-scope/v2",
-  "generated_at": "2026-10-28T19:30:38.741Z",
+  "generated_at": "2026-10-28T20:49:10.819Z",
   "source": {
     "artifact": "local://addon-files.json -> .work/addon-inventory.json",
     "schema": "addon-inventory/v1",
@@ -50,21 +50,21 @@
   "totals": {
     "modules": {
       "total": 500,
-      "candidate": 48,
-      "ported": 238,
+      "candidate": 4,
+      "ported": 282,
       "excluded": 214,
       "lines_total": 222616,
-      "candidate_lines": 24561,
-      "ported_lines": 114436,
+      "candidate_lines": 1184,
+      "ported_lines": 137813,
       "excluded_lines": 83619,
       "by_category": {
         "excluded-aggregate": 1,
-        "candidate": 48,
-        "ported": 238,
+        "ported": 282,
         "excluded-backend-capability": 1,
         "excluded-backend": 51,
         "excluded-effect": 4,
         "excluded-directory": 133,
+        "candidate": 4,
         "excluded-vendor-runtime": 18,
         "excluded-deprecated": 2,
         "excluded-renderer": 4
@@ -79,7 +79,7 @@
         "examples/jsm/loaders/KTX2Loader.js"
       ],
       "dependency_edges_to_excluded": 167,
-      "edges_from_pending_candidates": 7
+      "edges_from_pending_candidates": 0
     },
     "shaders": {
       "upstream": 52,
@@ -143,18 +143,18 @@
     },
     "pages": {
       "total": 617,
-      "candidate": 19,
-      "ported": 302,
-      "excluded": 296,
+      "candidate": 11,
+      "ported": 319,
+      "excluded": 287,
       "lines_total": 157006,
-      "candidate_lines": 5210,
-      "ported_lines": 71523,
-      "excluded_lines": 80273,
+      "candidate_lines": 2926,
+      "ported_lines": 76113,
+      "excluded_lines": 77967,
       "excluded_by_category": {
         "page-css2d": 1,
         "page-css3d": 7,
-        "deferred-exporter": 10,
         "page-gallery-index": 1,
+        "deferred-exporter": 1,
         "page-backend-import": 6,
         "page-svg": 2,
         "page-stereo-ascii": 4,
@@ -164,9 +164,8 @@
       "candidates_with_dependency_issues": 0,
       "candidate_dependency_issues": [],
       "candidate_excluded_dependency_counts": {
-        "examples/jsm/libs/stats.module.js": 10,
-        "examples/jsm/libs/lil-gui.module.min.js": 9,
-        "examples/jsm/libs/meshopt_decoder.module.js": 1
+        "examples/jsm/libs/stats.module.js": 8,
+        "examples/jsm/libs/lil-gui.module.min.js": 3
       },
       "external_runtime_pages": [
         {
@@ -189,7 +188,7 @@
         }
       ]
     },
-    "progress_note": "Through iteration 27: 219 upstream addon modules and 291 upstream pages ported. This batch adds 19 addons and 18 pages: Collada/KMZ, SVG, VRML, IK, cascaded shadows, progressive lightmaps, FPS collision, offscreen workers, priority loading, random UVs, watch and four Web Audio examples. Core audio modules and AudioLoader support the audio pages. KMZ, VRML and ProgressiveLightMap use explicitly injected runtimes. Comprehensive page interactions and browser/device coverage remain deferred. Asset-specific redistribution restrictions still apply."
+    "progress_note": "Through iteration 31: 282 upstream addon modules and 319 upstream pages ported. This batch adds 25 standalone addons and MaterialX data utilities, native-composer godrays and a complete raycaster BVH dependency closure. External algorithm ports are package-owned and excluded from upstream addon counts. Three previously ported shader examples are corrected. Rapier remains deferred; Jolt, GaussianSplat renderer integration, CSG, batch LOD, 3D tiles and offline progressive/catalog glTF pages remain pending. Comprehensive browser interactions and device coverage remain deferred; asset publication rights still need review."
   },
   "module_dependency_review": [
     {
@@ -810,11 +809,11 @@
       "dependents": [
         {
           "path": "examples/jsm/exporters/EXRExporter.js",
-          "status": "candidate"
+          "status": "ported"
         },
         {
           "path": "examples/jsm/exporters/USDZExporter.js",
-          "status": "candidate"
+          "status": "ported"
         },
         {
           "path": "examples/jsm/loaders/3MFLoader.js",
@@ -838,7 +837,7 @@
         },
         {
           "path": "examples/jsm/loaders/materialx/MaterialXArchive.js",
-          "status": "candidate"
+          "status": "ported"
         },
         {
           "path": "examples/jsm/loaders/NRRDLoader.js",
@@ -846,7 +845,7 @@
         },
         {
           "path": "examples/jsm/loaders/SPZLoader.js",
-          "status": "candidate"
+          "status": "ported"
         },
         {
           "path": "examples/jsm/loaders/USDLoader.js",
@@ -864,7 +863,7 @@
       "dependents": [
         {
           "path": "examples/jsm/exporters/KTX2Exporter.js",
-          "status": "candidate"
+          "status": "ported"
         },
         {
           "path": "examples/jsm/loaders/KTX2Loader.js",
@@ -906,7 +905,7 @@
         },
         {
           "path": "examples/jsm/utils/unwrapUVs.js",
-          "status": "candidate"
+          "status": "ported"
         }
       ]
     },
@@ -930,7 +929,7 @@
         },
         {
           "path": "examples/jsm/loaders/SPZLoader.js",
-          "status": "candidate"
+          "status": "ported"
         }
       ]
     },
@@ -1658,8 +1657,11 @@
     },
     {
       "path": "examples/jsm/effects/OutlineEffect.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/effects/OutlineEffect.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/effects/ParallaxBarrierEffect.js",
@@ -1699,13 +1701,16 @@
     },
     {
       "path": "examples/jsm/exporters/DRACOExporter.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/exporters/DRACOExporter.ts",
+      "ported_iteration": 30,
+      "reason": "iteration 30: complete typed data-loader or exporter port"
     },
     {
       "path": "examples/jsm/exporters/EXRExporter.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "needs_adaptation": true,
       "adaptation": "strip-webgpu-branch",
       "adaptation_reason": "module references WebGPURenderer while remaining WebGL-usable; adapt the branch, keep WebGL behaviour",
@@ -1714,17 +1719,23 @@
           "path": "examples/jsm/libs/fflate.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_path": "src/addons/exporters/EXRExporter.ts",
+      "ported_iteration": 30,
+      "reason": "iteration 30: complete typed data-loader or exporter port"
     },
     {
       "path": "examples/jsm/exporters/GLTFExporter.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/exporters/GLTFExporter.ts",
+      "ported_iteration": 30,
+      "reason": "iteration 30: complete typed data-loader or exporter port"
     },
     {
       "path": "examples/jsm/exporters/KTX2Exporter.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "needs_adaptation": true,
       "adaptation": "strip-webgpu-branch",
       "adaptation_reason": "module references WebGPURenderer while remaining WebGL-usable; adapt the branch, keep WebGL behaviour",
@@ -1733,33 +1744,48 @@
           "path": "examples/jsm/libs/ktx-parse.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_path": "src/addons/exporters/KTX2Exporter.ts",
+      "ported_iteration": 30,
+      "reason": "iteration 30: complete typed data-loader or exporter port"
     },
     {
       "path": "examples/jsm/exporters/OBJExporter.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/exporters/OBJExporter.ts",
+      "ported_iteration": 30,
+      "reason": "iteration 30: complete typed data-loader or exporter port"
     },
     {
       "path": "examples/jsm/exporters/PLYExporter.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/exporters/PLYExporter.ts",
+      "ported_iteration": 30,
+      "reason": "iteration 30: complete typed data-loader or exporter port"
     },
     {
       "path": "examples/jsm/exporters/STLExporter.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/exporters/STLExporter.ts",
+      "ported_iteration": 30,
+      "reason": "iteration 30: complete typed data-loader or exporter port"
     },
     {
       "path": "examples/jsm/exporters/USDZExporter.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "depends_on_excluded": [
         {
           "path": "examples/jsm/libs/fflate.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_path": "src/addons/exporters/USDZExporter.ts",
+      "ported_iteration": 30,
+      "reason": "iteration 30: complete typed data-loader or exporter port"
     },
     {
       "path": "examples/jsm/generators/CityGenerator.js",
@@ -1811,8 +1837,11 @@
     },
     {
       "path": "examples/jsm/generators/city/InstancedMeshGenerator.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/generators/city/InstancedMeshGenerator.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/generators/city/PersonGenerator.js",
@@ -1882,8 +1911,11 @@
     },
     {
       "path": "examples/jsm/geometries/LoftGeometry.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/geometries/LoftGeometry.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/geometries/ParametricFunctions.js",
@@ -1934,8 +1966,11 @@
     },
     {
       "path": "examples/jsm/helpers/AnimationPathHelper.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/helpers/AnimationPathHelper.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/helpers/LightProbeGridHelper.js",
@@ -1996,8 +2031,11 @@
     },
     {
       "path": "examples/jsm/helpers/TextureHelper.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/helpers/TextureHelper.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/helpers/TextureHelperGPU.js",
@@ -2021,11 +2059,14 @@
     },
     {
       "path": "examples/jsm/helpers/ViewHelper.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "needs_adaptation": true,
       "adaptation": "strip-webgpu-branch",
-      "adaptation_reason": "module references WebGPURenderer while remaining WebGL-usable; adapt the branch, keep WebGL behaviour"
+      "adaptation_reason": "module references WebGPURenderer while remaining WebGL-usable; adapt the branch, keep WebGL behaviour",
+      "ported_path": "src/addons/helpers/ViewHelper.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/inspector/Extension.js",
@@ -2682,8 +2723,11 @@
     },
     {
       "path": "examples/jsm/interactive/InteractiveGroup.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/interactive/InteractiveGroup.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/interactive/SelectionBox.js",
@@ -2918,13 +2962,19 @@
     },
     {
       "path": "examples/jsm/lights/RectAreaLightTexturesLib.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/lights/RectAreaLightTexturesLib.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/lights/RectAreaLightUniformsLib.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/lights/RectAreaLightUniformsLib.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/lights/SunLight.js",
@@ -3028,8 +3078,11 @@
     },
     {
       "path": "examples/jsm/loaders/3DMLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/3DMLoader.ts",
+      "ported_iteration": 29,
+      "reason": "iteration 29: complete typed loader port"
     },
     {
       "path": "examples/jsm/loaders/3MFLoader.js",
@@ -3138,8 +3191,11 @@
     },
     {
       "path": "examples/jsm/loaders/GaussianSplatPLYLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/GaussianSplatPLYLoader.ts",
+      "ported_iteration": 30,
+      "reason": "iteration 30: complete typed data-loader or exporter port"
     },
     {
       "path": "examples/jsm/loaders/HDRCubeTextureLoader.js",
@@ -3186,8 +3242,11 @@
     },
     {
       "path": "examples/jsm/loaders/KSPLATLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/KSPLATLoader.ts",
+      "ported_iteration": 30,
+      "reason": "iteration 30: complete typed data-loader or exporter port"
     },
     {
       "path": "examples/jsm/loaders/KTX2Loader.js",
@@ -3244,8 +3303,11 @@
     },
     {
       "path": "examples/jsm/loaders/LWOLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/LWOLoader.ts",
+      "ported_iteration": 29,
+      "reason": "iteration 29: complete typed loader port"
     },
     {
       "path": "examples/jsm/loaders/MD2Loader.js",
@@ -3330,13 +3392,16 @@
     },
     {
       "path": "examples/jsm/loaders/SPLATLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/SPLATLoader.ts",
+      "ported_iteration": 30,
+      "reason": "iteration 30: complete typed data-loader or exporter port"
     },
     {
       "path": "examples/jsm/loaders/SPZLoader.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "depends_on_excluded": [
         {
           "path": "examples/jsm/libs/fflate.module.js",
@@ -3346,7 +3411,10 @@
           "path": "examples/jsm/libs/zstddec.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_path": "src/addons/loaders/SPZLoader.ts",
+      "ported_iteration": 30,
+      "reason": "iteration 30: complete typed data-loader or exporter port"
     },
     {
       "path": "examples/jsm/loaders/STLLoader.js",
@@ -3481,29 +3549,41 @@
     },
     {
       "path": "examples/jsm/loaders/lwo/IFFParser.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/lwo/IFFParser.ts",
+      "ported_iteration": 29,
+      "reason": "iteration 29: complete typed loader port"
     },
     {
       "path": "examples/jsm/loaders/lwo/LWO2Parser.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/lwo/LWO2Parser.ts",
+      "ported_iteration": 29,
+      "reason": "iteration 29: complete typed loader port"
     },
     {
       "path": "examples/jsm/loaders/lwo/LWO3Parser.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/lwo/LWO3Parser.ts",
+      "ported_iteration": 29,
+      "reason": "iteration 29: complete typed loader port"
     },
     {
       "path": "examples/jsm/loaders/materialx/MaterialXArchive.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "depends_on_excluded": [
         {
           "path": "examples/jsm/libs/fflate.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_path": "src/addons/loaders/materialx/MaterialXArchive.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/loaders/materialx/MaterialXDocument.js",
@@ -3519,23 +3599,35 @@
     },
     {
       "path": "examples/jsm/loaders/materialx/MaterialXInterfaceValidation.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/materialx/MaterialXInterfaceValidation.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/loaders/materialx/MaterialXLog.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/materialx/MaterialXLog.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/loaders/materialx/MaterialXNodeDefs.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/materialx/MaterialXNodeDefs.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/loaders/materialx/MaterialXNodeInterfaceRegistry.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/materialx/MaterialXNodeInterfaceRegistry.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/loaders/materialx/MaterialXNodeLibrary.js",
@@ -3563,8 +3655,11 @@
     },
     {
       "path": "examples/jsm/loaders/materialx/parse/MaterialXParser.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/materialx/parse/MaterialXParser.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/loaders/usd/USDAParser.js",
@@ -3721,8 +3816,11 @@
     },
     {
       "path": "examples/jsm/misc/MorphAnimMesh.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/MorphAnimMesh.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/misc/MorphBlendMesh.js",
@@ -3759,8 +3857,11 @@
     },
     {
       "path": "examples/jsm/misc/RollerCoaster.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/RollerCoaster.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/misc/Sculptor.js",
@@ -3796,13 +3897,19 @@
     },
     {
       "path": "examples/jsm/misc/TileCreasedNormalsPlugin.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/TileCreasedNormalsPlugin.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/misc/TubePainter.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/TubePainter.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/misc/Volume.js",
@@ -4618,8 +4725,11 @@
     },
     {
       "path": "examples/jsm/textures/FlakesTexture.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/textures/FlakesTexture.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/transpiler/AST.js",
@@ -5256,18 +5366,27 @@
     },
     {
       "path": "examples/jsm/utils/ColorUtils.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/utils/ColorUtils.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/utils/GaussianSplatUtils.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/utils/GaussianSplatUtils.ts",
+      "ported_iteration": 30,
+      "reason": "iteration 30: complete typed data-loader or exporter port"
     },
     {
       "path": "examples/jsm/utils/GeometryCompressionUtils.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/utils/GeometryCompressionUtils.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/utils/GeometryUtils.js",
@@ -5282,13 +5401,19 @@
     },
     {
       "path": "examples/jsm/utils/SceneOptimizer.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/utils/SceneOptimizer.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/utils/SceneUtils.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/utils/SceneUtils.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/utils/ShadowMapViewer.js",
@@ -5329,8 +5454,11 @@
     },
     {
       "path": "examples/jsm/utils/WebGLTextureUtils.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/utils/WebGLTextureUtils.ts",
+      "ported_iteration": 30,
+      "reason": "iteration 30: complete typed data-loader or exporter port"
     },
     {
       "path": "examples/jsm/utils/WebGPUTextureUtils.js",
@@ -5346,14 +5474,17 @@
     },
     {
       "path": "examples/jsm/utils/unwrapUVs.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "depends_on_excluded": [
         {
           "path": "examples/jsm/libs/potpack.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_path": "src/addons/utils/unwrapUVs.ts",
+      "ported_iteration": 31,
+      "reason": "iteration 31: complete typed WebGL addon or standalone data utility port"
     },
     {
       "path": "examples/jsm/webxr/ARButton.js",
@@ -5709,27 +5840,29 @@
     },
     {
       "path": "examples/misc_exporter_draco.html",
-      "status": "excluded",
-      "category": "deferred-exporter",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
       ],
-      "reason": "exporter deferred: DRACOExporter re-encodes geometry through the draco WASM encoder; encoder assets + page deferred"
+      "reason": "iteration 30: complete exporter or sculpt example with local resources",
+      "ported_iteration": 30
     },
     {
       "path": "examples/misc_exporter_exr.html",
-      "status": "excluded",
-      "category": "deferred-exporter",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
       ],
-      "reason": "exporter deferred: EXREncoder is vendor WASM runtime; consumer-supplied codec not wired yet"
+      "reason": "iteration 30: complete exporter or sculpt example with local resources",
+      "ported_iteration": 30
     },
     {
       "path": "examples/misc_exporter_gcode.html",
@@ -5748,8 +5881,8 @@
     },
     {
       "path": "examples/misc_exporter_gltf.html",
-      "status": "excluded",
-      "category": "deferred-exporter",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -5760,73 +5893,80 @@
           "category": "excluded-vendor-runtime"
         }
       ],
-      "reason": "exporter deferred: GLTFExporter needs full port of exporters/GLTFExporter.js (~2.6k lines)"
+      "reason": "iteration 30: complete exporter or sculpt example with local resources",
+      "ported_iteration": 30
     },
     {
       "path": "examples/misc_exporter_gltf_normals.html",
-      "status": "excluded",
-      "category": "deferred-exporter",
-      "reason": "exporter deferred: GLTFExporter port first (misc_exporter_gltf)"
+      "status": "ported",
+      "category": "ported",
+      "reason": "iteration 30: complete exporter or sculpt example with local resources",
+      "ported_iteration": 30
     },
     {
       "path": "examples/misc_exporter_ktx2.html",
-      "status": "excluded",
-      "category": "deferred-exporter",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
       ],
-      "reason": "exporter deferred: KTX2Exporter WASM encoder assets deferred (KTX2Loader itself ported in iteration 14)"
+      "reason": "iteration 30: complete exporter or sculpt example with local resources",
+      "ported_iteration": 30
     },
     {
       "path": "examples/misc_exporter_obj.html",
-      "status": "excluded",
-      "category": "deferred-exporter",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
       ],
-      "reason": "exporter deferred: OBJExporter (addons/exporters) port queued after loaders"
+      "reason": "iteration 30: complete exporter or sculpt example with local resources",
+      "ported_iteration": 30
     },
     {
       "path": "examples/misc_exporter_ply.html",
-      "status": "excluded",
-      "category": "deferred-exporter",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
       ],
-      "reason": "exporter deferred: PLYExporter (addons/exporters) port queued after loaders"
+      "reason": "iteration 30: complete exporter or sculpt example with local resources",
+      "ported_iteration": 30
     },
     {
       "path": "examples/misc_exporter_stl.html",
-      "status": "excluded",
-      "category": "deferred-exporter",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
       ],
-      "reason": "exporter deferred: STLExporter (addons/exporters) port queued after loaders"
+      "reason": "iteration 30: complete exporter or sculpt example with local resources",
+      "ported_iteration": 30
     },
     {
       "path": "examples/misc_exporter_usdz.html",
-      "status": "excluded",
-      "category": "deferred-exporter",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
       ],
-      "reason": "exporter deferred: USDZExporter (1489 lines) + WebGLTextureUtils + usdz zip packaging"
+      "reason": "iteration 30: complete exporter or sculpt example with local resources",
+      "ported_iteration": 30
     },
     {
       "path": "examples/misc_raycaster_helper.html",
@@ -7219,14 +7359,15 @@
     },
     {
       "path": "examples/webgl_loader_3dm.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 29
     },
     {
       "path": "examples/webgl_loader_3ds.html",
@@ -7450,8 +7591,9 @@
     },
     {
       "path": "examples/webgl_loader_ifc.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 29
     },
     {
       "path": "examples/webgl_loader_imagebitmap.html",
@@ -7702,14 +7844,15 @@
     },
     {
       "path": "examples/webgl_loader_vdb.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 29
     },
     {
       "path": "examples/webgl_loader_vox.html",
@@ -8236,14 +8379,15 @@
     },
     {
       "path": "examples/webgl_modifier_subdivision.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 29
     },
     {
       "path": "examples/webgl_modifier_tessellation.html",
@@ -8306,8 +8450,8 @@
     },
     {
       "path": "examples/webgl_morphtargets_webcam.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -8318,7 +8462,8 @@
           "category": "excluded-vendor-runtime"
         }
       ],
-      "external_runtime_specifiers": ["https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35"]
+      "external_runtime_specifiers": ["https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35"],
+      "ported_iteration": 29
     },
     {
       "path": "examples/webgl_multiple_elements.html",
@@ -8586,14 +8731,16 @@
     },
     {
       "path": "examples/webgl_postprocessing_godrays.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 31,
+      "reason": "iteration 31: maintained external algorithm integration without a second Three runtime; local example resources"
     },
     {
       "path": "examples/webgl_postprocessing_gtao.html",
@@ -8869,8 +9016,8 @@
     },
     {
       "path": "examples/webgl_raycaster_bvh.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -8880,7 +9027,9 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 31,
+      "reason": "iteration 31: maintained external algorithm integration without a second Three runtime; local example resources"
     },
     {
       "path": "examples/webgl_raycaster_sprite.html",
@@ -8960,15 +9109,16 @@
     },
     {
       "path": "examples/webgl_sculpt.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
       ],
-      "reason": "Pending deferred GLTFExporter dependency; sculpt addons are ported without a partial replacement page"
+      "reason": "iteration 30: complete exporter or sculpt example with local resources",
+      "ported_iteration": 30
     },
     {
       "path": "examples/webgl_shader.html",
@@ -13300,5 +13450,5 @@
       "dependency_issue": true
     }
   ],
-  "progress_note": "Through iteration 28: 238 upstream addon modules and 302 upstream pages ported. This batch adds 19 addons and 11 pages for Ammo physics, WebGL lightprobe grids, USD and FastHDR environments, plus photometric/native HDR loaders and animation, geometry, color and sculpt utilities. USDZLoader is excluded as a deprecated alias; the sculpt page awaits deferred GLTFExporter. Consumer runtimes and licensed assets remain explicit local resources. Comprehensive browser interactions remain deferred to the combined pass; asset-specific publication restrictions still apply."
+  "progress_note": "Through iteration 31: 282 upstream addon modules and 319 upstream pages ported. This batch adds 25 standalone addons and MaterialX data utilities, native-composer godrays and a complete raycaster BVH dependency closure. External algorithm ports are package-owned and excluded from upstream addon counts. Three previously ported shader examples are corrected. Rapier remains deferred; Jolt, GaussianSplat renderer integration, CSG, batch LOD, 3D tiles and offline progressive/catalog glTF pages remain pending. Comprehensive browser interactions and device coverage remain deferred; asset publication rights still need review."
 }

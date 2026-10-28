@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — Rhino 3DM loader</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        top: 1em;
+        width: 100%;
+        text-align: center;
+        color: white;
+        z-index: 1;
+        pointer-events: none;
+      }
+      #loader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 40px;
+        height: 40px;
+        border: 5px solid #f3f3f3;
+        border-top-color: #3d3d3d;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="info">Rhino 3DM loader</div>
+    <div id="loader" role="status" aria-label="Loading model"></div>
+    <script type="module" src="./webgl_loader_3dm.ts"></script>
+  </body>
+</html>
