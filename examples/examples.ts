@@ -191,17 +191,20 @@ window.addEventListener("keydown", (event) => {
   }
 });
 
-// A lil-gui panel controls the iframe's scale and reload, matching the demo HUD contract.
-const params = { scale: 1, reload: () => select(canvas.dataset.selected ?? "webgl_loader_draco") };
+// Scale the iframe viewport without changing its visible bounds.
+const params = { resolutionScale: 1, reload: () => select(canvas.dataset.selected ?? "webgl_loader_draco") };
 
-const gui = new GUI({ title: "demo browser" });
+const gui = new GUI({
+  title: "demo browser",
+  container: document.querySelector<HTMLDivElement>("#browser-controls")!,
+});
 gui
-  .add(params, "scale", 0.5, 2, 0.05)
-  .name("iframe scale")
+  .add(params, "resolutionScale", 0.5, 2, 0.05)
+  .name("resolution scale")
   .onChange((value) => {
-    frame.style.width = `${100 / (value as number)}%`;
-    frame.style.height = `${100 / (value as number)}%`;
-    frame.style.transform = `scale(${value as number})`;
+    frame.style.width = `${100 * (value as number)}%`;
+    frame.style.height = `${100 * (value as number)}%`;
+    frame.style.transform = `translate(-50%, -50%) scale(${1 / (value as number)})`;
   });
 gui.add(params, "reload").name("reload demo");
 

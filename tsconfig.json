@@ -12,5 +12,12 @@
     "skipLibCheck": false,
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "demo/**/*.ts", "examples/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts", "vite.config.ts"]
+  "include": [
+    "src/**/*.ts",
+    "feature-testbed/**/*.ts",
+    "examples/**/*.ts",
+    "tests/**/*.ts",
+    "scripts/**/*.ts",
+    "vite.config.ts"
+  ]
 }

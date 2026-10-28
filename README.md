@@ -1,5 +1,7 @@
 # ek3d
 
+[Live Examples](https://ek3d.netlify.app/examples/examples.html)
+
 - **What:** a lightweight, WebGL-focused TypeScript port of Three.js for canvas games and interactive 3D. Lightweight in scope, not a guaranteed bundle-size reduction.
 - **Removed:** WebGPU/TSL, WebXR, StereoCamera, barrel exports and implicit subsystem registration. Audio remains outside scope. Addons include WebGL postprocessing, controls, loaders (including EXR/FBX and RGBE via HDRLoader), sampling/simplification, reflection/refraction, water, HTMLMesh, fonts and selected utilities—not the full upstream catalog.
 - **Why:** direct module imports and explicit shaders/subsystems keep dependencies visible and avoid pulling unrelated features into your application. No runtime dependency on Three.js.

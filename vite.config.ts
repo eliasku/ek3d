@@ -10,7 +10,7 @@ const exampleEntries = existsSync("examples")
 export default defineConfig({
   publicDir: "examples/public",
   // The upstream checkout is a read-only comparison baseline, not a development entry point.
-  optimizeDeps: { entries: ["index.html", "demo/index.html", ...exampleEntries, "tests/browser*.ts"] },
+  optimizeDeps: { entries: ["index.html", "feature-testbed/index.html", ...exampleEntries, "tests/browser*.ts"] },
   test: {
     include: ["tests/**/*.test.ts"],
     environment: "node",
@@ -43,7 +43,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      input: ["index.html", "demo/index.html", ...exampleEntries],
+      input: ["index.html", "feature-testbed/index.html", ...exampleEntries],
       external: [
         // exclude transpiling source code from /upstream/ directory
         /^\/upstream\/.*/,

@@ -77,8 +77,8 @@ try {
   for (const file of ["README.md"])
     assert.deepEqual(await readFile(path.join(installed, file)), await readFile(path.join(root, file)), file);
 
-  await cp(path.join(root, "demo"), path.join(consumer, "demo"), { recursive: true });
-  const directories = ["demo"];
+  await cp(path.join(root, "feature-testbed"), path.join(consumer, "feature-testbed"), { recursive: true });
+  const directories = ["feature-testbed"];
   if ((await readdir(root)).includes("examples")) {
     await cp(path.join(root, "examples"), path.join(consumer, "examples"), { recursive: true });
     directories.push("examples");
@@ -102,7 +102,7 @@ try {
     }),
   );
   run(process.execPath, ["node_modules/typescript/bin/tsc", "--noEmit"]);
-  const entries = ["index.html", "demo/index.html"];
+  const entries = ["index.html", "feature-testbed/index.html"];
   if (directories.includes("examples")) {
     for (const name of await readdir(path.join(consumer, "examples"), { recursive: true })) {
       if (name.endsWith(".html")) entries.push(`examples/${name.split(path.sep).join("/")}`);

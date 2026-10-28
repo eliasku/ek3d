@@ -110,7 +110,7 @@ async function framebuffer(page: Page) {
 }
 
 async function verifyExample(page: Page, baseURL: string) {
-  await page.goto(new URL("demo/index.html", baseURL).href, { waitUntil: "load" });
+  await page.goto(new URL("feature-testbed/index.html", baseURL).href, { waitUntil: "load" });
   await page.waitForFunction(() => document.querySelector<HTMLCanvasElement>("#scene")?.dataset.state !== undefined);
   await framebuffer(page);
   await page.keyboard.press("Space");
@@ -853,7 +853,7 @@ async function main() {
       root,
       configFile: false,
       logLevel: "warn",
-      optimizeDeps: { entries: ["index.html", "demo/index.html", "tests/browser*.ts"] },
+      optimizeDeps: { entries: ["index.html", "feature-testbed/index.html", "tests/browser*.ts"] },
       server: { host: "127.0.0.1", port: 0 },
     });
     await dev.listen();
