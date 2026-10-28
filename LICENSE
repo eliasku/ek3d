@@ -1,6 +1,7 @@
 The MIT License
 
 Copyright © 2010-2026 three.js authors
+Copyright (c) 2025 Andrea Gargaro (@three.ez/batched-mesh-extensions 0.0.11 and @three.ez/simplify-geometry 0.0.1)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +20,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+Additional MIT notices are retained in the maintained sources:
+- three-bvh-csg 0.0.18: src/addons/math/csg/core/Brush.ts
+- cdt2d and transitive algorithms: src/addons/math/csg/triangulation/cdt2d.ts
+- bvh.js 0.0.13: src/addons/math/bvh/BatchBVH.ts
+
+The batch mesh and LOD ports are modified TypeScript implementations using native ek3d modules.
+Sources: https://github.com/agargaro/batched-mesh-extensions and https://github.com/agargaro/simplify-geometry.
 
 MaterialX 1.39.5 node-interface metadata (MaterialX project contributors).
 Adapted as TypeScript in src/addons/loaders/materialx/MaterialXNodeInterfaceRegistry.ts.

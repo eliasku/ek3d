@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — G-code exporter</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        z-index: 1;
+        top: 10px;
+        width: 100%;
+        text-align: center;
+        color: #222;
+        pointer-events: none;
+      }
+      #status {
+        position: absolute;
+        z-index: 1;
+        bottom: 10px;
+        left: 10px;
+        color: #222;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="info">ek3d — Polyslice G-code exporter</div>
+    <div id="status">Loading local slicer runtime…</div>
+    <script type="module" src="./misc_exporter_gcode.ts"></script>
+  </body>
+</html>

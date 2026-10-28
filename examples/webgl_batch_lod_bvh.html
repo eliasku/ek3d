@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>ek3d — batched mesh LOD and BVH</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      #wrapper,
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        text-align: center;
+        color: white;
+        pointer-events: none;
+      }
+      #info a {
+        pointer-events: auto;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper"><canvas id="scene"></canvas></div>
+    <div id="info">
+      <a href="https://github.com/agargaro/batched-mesh-extensions">Batched mesh extensions</a>: 10 geometries, 500,000
+      instances, five LODs; BVH-accelerated culling and raycasting.
+    </div>
+    <script type="module" src="./webgl_batch_lod_bvh.ts"></script>
+  </body>
+</html>

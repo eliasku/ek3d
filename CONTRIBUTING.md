@@ -1053,4 +1053,29 @@ half-float or float 2D/3D textures and WebGL render targets.
 animations and registered extension plugins. Both glTF and USDZ exporters accept
 `setTextureUtils({ decompress })` for compressed texture inputs. Examples supply
 `WebGLTextureUtils`; codec implementations remain outside package sources.
-The G-code exporter example still requires a separate Polyslice integration.
+The G-code page loads the local Polyslice 26.4.0 browser runtime and injects native engine
+constructors. It does not set a global Three.js namespace or bundle another engine.
+Printer, filament, infill and geometry controls retain the upstream behavior.
+Generated G-code requires review and printer-specific validation before physical use.
+
+## CSG, batch LOD and Jolt
+
+Import CSG `Brush`, `Evaluator` and operation constants from their defining
+`ek3d/addons/math/csg/core/*` modules. The three-bvh-csg 0.0.18 port uses the existing
+native mesh BVH and a local constrained-triangulation closure. Brush geometry and
+materials remain caller-owned; dispose generated result geometry separately.
+
+`EnhancedBatchedMesh` lives at `ek3d/addons/objects/EnhancedBatchedMesh`.
+It adds instance BVH culling/raycasting and shared-vertex geometry LODs without
+patching global mesh prototypes. Geometry edits invalidate affected triangle BVHs;
+call `computeBoundsTree()` again to restore acceleration. `SimplifyGeometryLOD`
+functions take a consumer-provided meshoptimizer simplifier; the example serves
+the licensed 1.1.1 runtime locally and retains 500,000 instances and five LODs.
+
+`JoltPhysics(initializedRuntime)` lives at `ek3d/addons/physics/JoltPhysics`.
+It supports boxes, spheres and icosahedra, scene physics metadata and instanced meshes.
+Positive mass selects a dynamic body, as upstream; the magnitude does not override
+Jolt's shape-derived mass. Position resets clear velocity and rotation without
+destroying the body. `setMeshVelocity()` is implemented, not the upstream no-op.
+`dispose()` stops the timer and releases owned bodies and the world, not mesh
+geometry, materials or the caller's runtime. Rapier remains deferred.

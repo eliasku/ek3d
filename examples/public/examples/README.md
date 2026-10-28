@@ -304,3 +304,22 @@ The three-good-godrays 0.12.0 zlib license and altered-source notice are retaine
 Stanford bunny FBX. The three-mesh-bvh 0.9.10 MIT notice is retained in
 `src/addons/math/bvh/core/Constants.ts`. Neither port imports another Three.js runtime.
 MaterialX 1.39.5 interface metadata retains its Apache-2.0 license in the root `LICENSE`.
+
+## CSG, batch LOD and G-code
+
+- The CSG page uses procedural geometry and local maintained three-bvh-csg 0.0.18,
+  cdt2d and native mesh BVH ports. Their source headers retain MIT notices and provenance.
+- The batch LOD page uses procedural geometry, native ports of
+  @three.ez/batched-mesh-extensions 0.0.11, bvh.js 0.0.13 and
+  @three.ez/simplify-geometry 0.0.1. Andrea Gargaro's MIT notices are retained in
+  the root license and source. `libs/meshoptimizer/` contains the licensed
+  meshoptimizer 1.1.1 simplifier, injected by the example.
+- `libs/polyslice/polyslice.js` is the Polyslice 26.4.0 browser distribution,
+  npm tarball SHA-1 `7d865e4b7c237e04bcbf072b98895468a1deba4c`.
+  Source: https://github.com/jgphilpott/polyslice.
+  The local modification wraps the distribution in `createPolyslice(engine)` and
+  replaces its Three.js imports and global lookups with explicit native constructors.
+  No slicing algorithms were changed. Adjacent notices cover Polyslice, polyconvert,
+  polytree, polygon-clipping, splaytree, robust-predicates, three-subdivide and
+  Microsoft's bundled TypeScript helpers. This is an example runtime, not a package
+  dependency. Generated G-code is not certified for physical printers.

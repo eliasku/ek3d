@@ -1,6 +1,6 @@
 {
   "schema": "addon-scope/v2",
-  "generated_at": "2026-10-28T20:49:10.819Z",
+  "generated_at": "2026-10-28T21:09:08.988Z",
   "source": {
     "artifact": "local://addon-files.json -> .work/addon-inventory.json",
     "schema": "addon-inventory/v1",
@@ -50,21 +50,21 @@
   "totals": {
     "modules": {
       "total": 500,
-      "candidate": 4,
-      "ported": 282,
+      "candidate": 3,
+      "ported": 283,
       "excluded": 214,
       "lines_total": 222616,
-      "candidate_lines": 1184,
-      "ported_lines": 137813,
+      "candidate_lines": 850,
+      "ported_lines": 138147,
       "excluded_lines": 83619,
       "by_category": {
         "excluded-aggregate": 1,
-        "ported": 282,
+        "ported": 283,
         "excluded-backend-capability": 1,
         "excluded-backend": 51,
         "excluded-effect": 4,
         "excluded-directory": 133,
-        "candidate": 4,
+        "candidate": 3,
         "excluded-vendor-runtime": 18,
         "excluded-deprecated": 2,
         "excluded-renderer": 4
@@ -143,18 +143,17 @@
     },
     "pages": {
       "total": 617,
-      "candidate": 11,
-      "ported": 319,
-      "excluded": 287,
+      "candidate": 9,
+      "ported": 322,
+      "excluded": 286,
       "lines_total": 157006,
-      "candidate_lines": 2926,
-      "ported_lines": 76113,
-      "excluded_lines": 77967,
+      "candidate_lines": 2407,
+      "ported_lines": 76934,
+      "excluded_lines": 77665,
       "excluded_by_category": {
         "page-css2d": 1,
         "page-css3d": 7,
         "page-gallery-index": 1,
-        "deferred-exporter": 1,
         "page-backend-import": 6,
         "page-svg": 2,
         "page-stereo-ascii": 4,
@@ -164,8 +163,8 @@
       "candidates_with_dependency_issues": 0,
       "candidate_dependency_issues": [],
       "candidate_excluded_dependency_counts": {
-        "examples/jsm/libs/stats.module.js": 8,
-        "examples/jsm/libs/lil-gui.module.min.js": 3
+        "examples/jsm/libs/stats.module.js": 6,
+        "examples/jsm/libs/lil-gui.module.min.js": 1
       },
       "external_runtime_pages": [
         {
@@ -188,7 +187,7 @@
         }
       ]
     },
-    "progress_note": "Through iteration 31: 282 upstream addon modules and 319 upstream pages ported. This batch adds 25 standalone addons and MaterialX data utilities, native-composer godrays and a complete raycaster BVH dependency closure. External algorithm ports are package-owned and excluded from upstream addon counts. Three previously ported shader examples are corrected. Rapier remains deferred; Jolt, GaussianSplat renderer integration, CSG, batch LOD, 3D tiles and offline progressive/catalog glTF pages remain pending. Comprehensive browser interactions and device coverage remain deferred; asset publication rights still need review."
+    "progress_note": "Through iteration 32: 283 upstream addons and 322 upstream pages ported. This batch adds JoltPhysics, complete CSG and 500k-instance batch LOD pages, and G-code export using an injected local Polyslice runtime. External algorithm ports are package-owned and outside upstream addon counts. Rapier remains deferred; GaussianSplat renderer integration, 3D tiles and offline progressive/catalog glTF remain pending. Progressive assets and the pinned library need redistribution permission clarification. Comprehensive interactions, browser/device coverage and asset publication review remain deferred."
   },
   "module_dependency_review": [
     {
@@ -4111,8 +4110,11 @@
     },
     {
       "path": "examples/jsm/physics/JoltPhysics.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/physics/JoltPhysics.ts",
+      "ported_iteration": 32,
+      "reason": "iteration 32: initialized consumer runtime, working body setters and owned simulation disposal"
     },
     {
       "path": "examples/jsm/physics/RapierPhysics.js",
@@ -5866,8 +5868,8 @@
     },
     {
       "path": "examples/misc_exporter_gcode.html",
-      "status": "excluded",
-      "category": "deferred-exporter",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -5877,7 +5879,8 @@
       "external_runtime_specifiers": [
         "https://cdn.jsdelivr.net/npm/@jgphilpott/polyslice@26.4.0/dist/index.browser.esm.js"
       ],
-      "reason": "exporter deferred: GCodeLoader chain (gcode decoder) not ported"
+      "reason": "iteration 32: full G-code page using the licensed local Polyslice runtime with native engine injection",
+      "ported_iteration": 32
     },
     {
       "path": "examples/misc_exporter_gltf.html",
@@ -6294,8 +6297,10 @@
     },
     {
       "path": "examples/webgl_batch_lod_bvh.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 32,
+      "reason": "iteration 32: native TLAS/BLAS and meshoptimizer LOD closure with all 500000 instances",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6794,8 +6799,10 @@
     },
     {
       "path": "examples/webgl_geometry_csg.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 32,
+      "reason": "iteration 32: full native BVH CSG and constrained triangulation dependency closure",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -13450,5 +13457,5 @@
       "dependency_issue": true
     }
   ],
-  "progress_note": "Through iteration 31: 282 upstream addon modules and 319 upstream pages ported. This batch adds 25 standalone addons and MaterialX data utilities, native-composer godrays and a complete raycaster BVH dependency closure. External algorithm ports are package-owned and excluded from upstream addon counts. Three previously ported shader examples are corrected. Rapier remains deferred; Jolt, GaussianSplat renderer integration, CSG, batch LOD, 3D tiles and offline progressive/catalog glTF pages remain pending. Comprehensive browser interactions and device coverage remain deferred; asset publication rights still need review."
+  "progress_note": "Through iteration 32: 283 upstream addons and 322 upstream pages ported. This batch adds JoltPhysics, complete CSG and 500k-instance batch LOD pages, and G-code export using an injected local Polyslice runtime. External algorithm ports are package-owned and outside upstream addon counts. Rapier remains deferred; GaussianSplat renderer integration, 3D tiles and offline progressive/catalog glTF remain pending. Progressive assets and the pinned library need redistribution permission clarification. Comprehensive interactions, browser/device coverage and asset publication review remain deferred."
 }
