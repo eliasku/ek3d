@@ -9,10 +9,10 @@ interface EarcutNode {
   prevZ: EarcutNode | null;
   nextZ: EarcutNode | null;
 }
-/* eslint-disable */
+
 // copy of mapbox/earcut version 3.0.2
 // https://github.com/mapbox/earcut/tree/v3.0.2
-export default function earcut(data: number[], holeIndices: number[] | null, dim: number = 2): number[] {
+export function earcut(data: number[], holeIndices: number[] | null, dim: number = 2): number[] {
   const hasHoles = holeIndices && holeIndices.length;
   const outerLen = hasHoles ? holeIndices[0] * dim : data.length;
   let outerNode = linkedList(data, 0, outerLen, dim, true);

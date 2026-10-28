@@ -2,7 +2,9 @@ import type { LoadingManager } from "./LoadingManager";
 import { LinearFilter } from "../constants";
 import { FileLoader } from "./FileLoader";
 import { CompressedTexture } from "../textures/CompressedTexture";
+import type { CompressedTextureFace } from "../textures/CompressedTexture";
 import { Loader } from "./Loader";
+import { error } from "../utils";
 /**
  * Abstract base class for loading compressed texture formats S3TC, ASTC or ETC.
  * Textures are internally loaded via {@link FileLoader}.
@@ -41,7 +43,7 @@ export abstract class CompressedTextureLoader extends Loader<CompressedTexture, 
     onProgress?: (event: ProgressEvent) => void,
     onError?: (error: unknown) => void,
   ): CompressedTexture {
-    const images: any[] = [];
+    const images: CompressedTextureFace[] = [];
     const texture = new CompressedTexture();
     const loader = new FileLoader(this.manager);
     loader.setPriority(this.priority);
@@ -51,22 +53,40 @@ export abstract class CompressedTextureLoader extends Loader<CompressedTexture, 
     loader.setRequestHeader(this.requestHeader);
     loader.setWithCredentials(this.withCredentials);
     let loaded = 0;
-    const loadTexture = (i?: any) => {
+    // Like DataTextureLoader, a parse failure is a load error: without this the throw escapes
+    // the FileLoader callback and loadAsync() never settles.
+    const reportParseError = (e: unknown) => {
+      if (onError !== undefined) onError(e);
+      else error(e);
+    };
+    const parseData = (buffer: unknown): CompressedTextureData => {
+      if (!(buffer instanceof ArrayBuffer)) {
+        throw new TypeError("CompressedTextureLoader: Expected an ArrayBuffer response.");
+      }
+      return this.parse(buffer, true);
+    };
+    const urls = Array.isArray(url) ? url : [];
+    const loadTexture = (i: number) => {
       loader.load(
-        (url as any)[i],
-        (buffer?: any) => {
-          const texDatas = this.parse(buffer, true);
+        urls[i],
+        (buffer: unknown) => {
+          let texDatas: CompressedTextureData;
+          try {
+            texDatas = parseData(buffer);
+          } catch (e) {
+            reportParseError(e);
+            return;
+          }
           images[i] = {
-            width: (texDatas as any).width,
-            height: (texDatas as any).height,
-            format: (texDatas as any).format,
-            mipmaps: (texDatas as any).mipmaps,
+            width: texDatas.width,
+            height: texDatas.height,
+            mipmaps: texDatas.mipmaps,
           };
           loaded += 1;
           if (loaded === 6) {
-            if ((texDatas as any).mipmapCount === 1) texture.minFilter = LinearFilter;
+            if (texDatas.mipmapCount === 1) texture.minFilter = LinearFilter;
             texture.image = images;
-            texture.format = (texDatas as any).format;
+            texture.format = texDatas.format;
             texture.needsUpdate = true;
             if (onLoad) onLoad(texture);
           }
@@ -76,36 +96,38 @@ export abstract class CompressedTextureLoader extends Loader<CompressedTexture, 
       );
     };
     if (Array.isArray(url)) {
-      for (let i = 0, il = url.length; i < il; ++i) {
+      for (let i = 0, il = urls.length; i < il; ++i) {
         loadTexture(i);
       }
     } else {
       // compressed cubemap texture stored in a single DDS file
       loader.load(
         url,
-        (buffer?: any) => {
-          const texDatas = this.parse(buffer, true);
-          if ((texDatas as any).isCubemap) {
-            const faces = (texDatas as any).mipmaps.length / (texDatas as any).mipmapCount;
+        (buffer: unknown) => {
+          let texDatas: CompressedTextureData;
+          try {
+            texDatas = parseData(buffer);
+          } catch (e) {
+            reportParseError(e);
+            return;
+          }
+          if (texDatas.isCubemap) {
+            const faces = texDatas.mipmaps.length / texDatas.mipmapCount;
             for (let f = 0; f < faces; f++) {
-              images[f] = { mipmaps: [] };
-              for (let i = 0; i < (texDatas as any).mipmapCount; i++) {
-                images[f].mipmaps.push((texDatas as any).mipmaps[f * (texDatas as any).mipmapCount + i]);
-                images[f].format = (texDatas as any).format;
-                images[f].width = (texDatas as any).width;
-                images[f].height = (texDatas as any).height;
+              images[f] = { mipmaps: [], width: texDatas.width, height: texDatas.height };
+              for (let i = 0; i < texDatas.mipmapCount; i++) {
+                images[f].mipmaps.push(texDatas.mipmaps[f * texDatas.mipmapCount + i]);
               }
             }
             texture.image = images;
           } else {
-            (texture.image as { width: number; height: number }).width = (texDatas as any).width;
-            (texture.image as { width: number; height: number }).height = (texDatas as any).height;
-            texture.mipmaps = (texDatas as any).mipmaps;
+            texture.image = { width: texDatas.width, height: texDatas.height };
+            texture.mipmaps = texDatas.mipmaps;
           }
-          if ((texDatas as any).mipmapCount === 1) {
+          if (texDatas.mipmapCount === 1) {
             texture.minFilter = LinearFilter;
           }
-          texture.format = (texDatas as any).format;
+          texture.format = texDatas.format;
           texture.needsUpdate = true;
           if (onLoad) onLoad(texture);
         },

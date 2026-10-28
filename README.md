@@ -7,6 +7,10 @@
 - **Why:** direct module imports and explicit shaders/subsystems keep dependencies visible and avoid pulling unrelated features into your application. No runtime dependency on Three.js.
 - **Usage:** raw TypeScript for a TS-capable bundler; import from defining modules, not `ek3d`. This implementation is not yet published—the npm `0.0.1` release is empty.
 
+This is a non-commercial project. Third-party example assets retain their own licenses;
+non-commercial use does not grant redistribution rights. See the
+[asset notices](examples/public/examples/README.md) before publishing examples or assets.
+
 ```typescript
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";

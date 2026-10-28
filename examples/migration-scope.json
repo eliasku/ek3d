@@ -50,18 +50,18 @@
   "totals": {
     "modules": {
       "total": 500,
-      "candidate": 156,
-      "ported": 131,
+      "candidate": 121,
+      "ported": 166,
       "excluded": 213,
       "lines_total": 222616,
-      "candidate_lines": 83097,
-      "ported_lines": 55916,
+      "candidate_lines": 70304,
+      "ported_lines": 68709,
       "excluded_lines": 83603,
       "by_category": {
         "excluded-aggregate": 1,
-        "candidate": 156,
+        "candidate": 121,
         "excluded-backend-capability": 1,
-        "ported": 131,
+        "ported": 166,
         "excluded-backend": 51,
         "excluded-effect": 4,
         "excluded-directory": 133,
@@ -79,7 +79,7 @@
         "examples/jsm/loaders/KTX2Loader.js"
       ],
       "dependency_edges_to_excluded": 167,
-      "edges_from_pending_candidates": 16
+      "edges_from_pending_candidates": 13
     },
     "shaders": {
       "upstream": 52,
@@ -143,12 +143,12 @@
     },
     "pages": {
       "total": 617,
-      "candidate": 256,
-      "ported": 65,
+      "candidate": 132,
+      "ported": 189,
       "excluded": 296,
       "lines_total": 157006,
-      "candidate_lines": 63167,
-      "ported_lines": 13566,
+      "candidate_lines": 37262,
+      "ported_lines": 39471,
       "excluded_lines": 80273,
       "excluded_by_category": {
         "page-css2d": 1,
@@ -164,11 +164,11 @@
       "candidates_with_dependency_issues": 1,
       "candidate_dependency_issues": ["examples/webgl_loader_pdb.html"],
       "candidate_excluded_dependency_counts": {
-        "examples/jsm/libs/lil-gui.module.min.js": 103,
-        "examples/jsm/libs/stats.module.js": 124,
-        "examples/jsm/libs/meshopt_decoder.module.js": 1,
+        "examples/jsm/libs/lil-gui.module.min.js": 68,
+        "examples/jsm/libs/stats.module.js": 66,
         "examples/jsm/libs/tween.module.js": 2,
         "examples/jsm/renderers/CSS2DRenderer.js": 1,
+        "examples/jsm/libs/meshopt_decoder.module.js": 1,
         "examples/jsm/libs/fflate.module.js": 2
       },
       "external_runtime_pages": [
@@ -192,7 +192,7 @@
         }
       ]
     },
-    "progress_note": "Through iteration 18: 131 upstream addon modules and 65 upstream pages ported. The two new WebGL Water2/HTMLMesh pages and core prerequisites are outside the upstream inventory; deprecated RGBELoader uses canonical HDRLoader instead."
+    "progress_note": "Through iteration 24: 166 upstream addon modules and 189 upstream pages ported. This batch adds GeometryUtils and fifty-two pages covering textures/materials, custom points/lines, cameras/clipping, multi-view rendering, render targets, shaders and panoramas. Comprehensive browser interactions remain deferred to the combined pass. The project is non-commercial; third-party redistribution restrictions still apply."
   },
   "module_dependency_review": [
     {
@@ -821,11 +821,11 @@
         },
         {
           "path": "examples/jsm/loaders/3MFLoader.js",
-          "status": "candidate"
+          "status": "ported"
         },
         {
           "path": "examples/jsm/loaders/AMFLoader.js",
-          "status": "candidate"
+          "status": "ported"
         },
         {
           "path": "examples/jsm/loaders/EXRLoader.js",
@@ -871,7 +871,7 @@
         },
         {
           "path": "examples/jsm/loaders/KTX2Loader.js",
-          "status": "candidate"
+          "status": "ported"
         }
       ]
     },
@@ -919,7 +919,7 @@
       "dependents": [
         {
           "path": "examples/jsm/loaders/TIFFLoader.js",
-          "status": "candidate"
+          "status": "ported"
         }
       ]
     },
@@ -929,7 +929,7 @@
       "dependents": [
         {
           "path": "examples/jsm/loaders/KTX2Loader.js",
-          "status": "candidate"
+          "status": "ported"
         },
         {
           "path": "examples/jsm/loaders/SPZLoader.js",
@@ -1601,8 +1601,10 @@
     },
     {
       "path": "examples/jsm/curves/NURBSSurface.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/curves/NURBSSurface.ts",
+      "ported_iteration": 23
     },
     {
       "path": "examples/jsm/curves/NURBSUtils.js",
@@ -1613,8 +1615,10 @@
     },
     {
       "path": "examples/jsm/curves/NURBSVolume.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/curves/NURBSVolume.ts",
+      "ported_iteration": 23
     },
     {
       "path": "examples/jsm/effects/AnaglyphEffect.js",
@@ -1658,8 +1662,10 @@
     },
     {
       "path": "examples/jsm/environments/DebugEnvironment.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/environments/DebugEnvironment.ts",
+      "ported_iteration": 23
     },
     {
       "path": "examples/jsm/environments/RoomEnvironment.js",
@@ -1848,13 +1854,17 @@
     },
     {
       "path": "examples/jsm/geometries/ParametricFunctions.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/geometries/ParametricFunctions.ts",
+      "ported_iteration": 23
     },
     {
       "path": "examples/jsm/geometries/ParametricGeometry.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/geometries/ParametricGeometry.ts",
+      "ported_iteration": 23
     },
     {
       "path": "examples/jsm/geometries/RoundedBoxGeometry.js",
@@ -1946,13 +1956,17 @@
     },
     {
       "path": "examples/jsm/helpers/VertexNormalsHelper.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/helpers/VertexNormalsHelper.ts",
+      "ported_iteration": 23
     },
     {
       "path": "examples/jsm/helpers/VertexTangentsHelper.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/helpers/VertexTangentsHelper.ts",
+      "ported_iteration": 23
     },
     {
       "path": "examples/jsm/helpers/ViewHelper.js",
@@ -2854,8 +2868,10 @@
     },
     {
       "path": "examples/jsm/lights/SunLight.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/lights/SunLight.ts",
+      "ported_iteration": 22
     },
     {
       "path": "examples/jsm/lights/SunLightNode.js",
@@ -2865,8 +2881,10 @@
     },
     {
       "path": "examples/jsm/lights/SunLightShadow.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/lights/SunLightShadow.ts",
+      "ported_iteration": 22
     },
     {
       "path": "examples/jsm/lights/SunShadowNode.js",
@@ -2934,30 +2952,36 @@
     },
     {
       "path": "examples/jsm/loaders/3MFLoader.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "depends_on_excluded": [
         {
           "path": "examples/jsm/libs/fflate.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_path": "src/addons/loaders/3MFLoader.ts",
+      "ported_iteration": 22
     },
     {
       "path": "examples/jsm/loaders/AMFLoader.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "depends_on_excluded": [
         {
           "path": "examples/jsm/libs/fflate.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_path": "src/addons/loaders/AMFLoader.ts",
+      "ported_iteration": 22
     },
     {
       "path": "examples/jsm/loaders/BVHLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/BVHLoader.ts",
+      "ported_iteration": 21
     },
     {
       "path": "examples/jsm/loaders/ColladaLoader.js",
@@ -2966,8 +2990,10 @@
     },
     {
       "path": "examples/jsm/loaders/DDSLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/DDSLoader.ts",
+      "ported_iteration": 21
     },
     {
       "path": "examples/jsm/loaders/DRACOLoader.js",
@@ -3010,8 +3036,9 @@
     },
     {
       "path": "examples/jsm/loaders/GCodeLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 20
     },
     {
       "path": "examples/jsm/loaders/GLTFGaussianSplatLoaderExtension.js",
@@ -3032,8 +3059,10 @@
     },
     {
       "path": "examples/jsm/loaders/HDRCubeTextureLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/HDRCubeTextureLoader.ts",
+      "ported_iteration": 23
     },
     {
       "path": "examples/jsm/loaders/HDRLoader.js",
@@ -3088,8 +3117,10 @@
     },
     {
       "path": "examples/jsm/loaders/KTXLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/KTXLoader.ts",
+      "ported_iteration": 21
     },
     {
       "path": "examples/jsm/loaders/LDrawLoader.js",
@@ -3099,18 +3130,24 @@
     },
     {
       "path": "examples/jsm/loaders/LUT3dlLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/LUT3dlLoader.ts",
+      "ported_iteration": 22
     },
     {
       "path": "examples/jsm/loaders/LUTCubeLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/LUTCubeLoader.ts",
+      "ported_iteration": 22
     },
     {
       "path": "examples/jsm/loaders/LUTImageLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/LUTImageLoader.ts",
+      "ported_iteration": 22
     },
     {
       "path": "examples/jsm/loaders/LWOLoader.js",
@@ -3119,18 +3156,24 @@
     },
     {
       "path": "examples/jsm/loaders/MD2Loader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/MD2Loader.ts",
+      "ported_iteration": 22
     },
     {
       "path": "examples/jsm/loaders/MDDLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/MDDLoader.ts",
+      "ported_iteration": 21
     },
     {
       "path": "examples/jsm/loaders/MTLLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/MTLLoader.ts",
+      "ported_iteration": 21
     },
     {
       "path": "examples/jsm/loaders/MaterialXLoader.js",
@@ -3157,8 +3200,10 @@
     },
     {
       "path": "examples/jsm/loaders/PCDLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/PCDLoader.ts",
+      "ported_iteration": 21
     },
     {
       "path": "examples/jsm/loaders/PDBLoader.js",
@@ -3173,8 +3218,10 @@
     },
     {
       "path": "examples/jsm/loaders/PVRLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/PVRLoader.ts",
+      "ported_iteration": 21
     },
     {
       "path": "examples/jsm/loaders/RGBELoader.js",
@@ -3215,18 +3262,24 @@
     },
     {
       "path": "examples/jsm/loaders/TDSLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/TDSLoader.ts",
+      "ported_iteration": 21
     },
     {
       "path": "examples/jsm/loaders/TGALoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/TGALoader.ts",
+      "ported_iteration": 21
     },
     {
       "path": "examples/jsm/loaders/TIFFLoader.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/TIFFLoader.ts",
+      "ported_iteration": 23,
       "depends_on_excluded": [
         {
           "path": "examples/jsm/libs/utif.module.js",
@@ -3236,8 +3289,10 @@
     },
     {
       "path": "examples/jsm/loaders/TTFLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/TTFLoader.ts",
+      "ported_iteration": 22
     },
     {
       "path": "examples/jsm/loaders/USDLoader.js",
@@ -3263,8 +3318,10 @@
     },
     {
       "path": "examples/jsm/loaders/VOXLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/VOXLoader.ts",
+      "ported_iteration": 21
     },
     {
       "path": "examples/jsm/loaders/VRMLLoader.js",
@@ -3290,8 +3347,9 @@
     },
     {
       "path": "examples/jsm/loaders/XYZLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 19
     },
     {
       "path": "examples/jsm/loaders/collada/ColladaComposer.js",
@@ -3491,18 +3549,24 @@
     },
     {
       "path": "examples/jsm/misc/Gyroscope.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/Gyroscope.ts",
+      "ported_iteration": 22
     },
     {
       "path": "examples/jsm/misc/MD2Character.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/MD2Character.ts",
+      "ported_iteration": 22
     },
     {
       "path": "examples/jsm/misc/MD2CharacterComplex.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/MD2CharacterComplex.ts",
+      "ported_iteration": 22
     },
     {
       "path": "examples/jsm/misc/MorphAnimMesh.js",
@@ -3511,8 +3575,10 @@
     },
     {
       "path": "examples/jsm/misc/MorphBlendMesh.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/MorphBlendMesh.ts",
+      "ported_iteration": 22
     },
     {
       "path": "examples/jsm/misc/ProgressiveLightMap.js",
@@ -5000,8 +5066,8 @@
     },
     {
       "path": "examples/jsm/utils/GeometryUtils.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/jsm/utils/LDrawUtils.js",
@@ -5871,29 +5937,32 @@
     },
     {
       "path": "examples/webgl_buffergeometry.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_buffergeometry_attributes_integer.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_buffergeometry_attributes_none.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_buffergeometry_custom_attributes_particles.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -5903,8 +5972,8 @@
     },
     {
       "path": "examples/webgl_buffergeometry_drawrange.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -5918,8 +5987,8 @@
     },
     {
       "path": "examples/webgl_buffergeometry_glbufferattribute.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -5929,8 +5998,8 @@
     },
     {
       "path": "examples/webgl_buffergeometry_indexed.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -5940,12 +6009,13 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_buffergeometry_instancing.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -5959,8 +6029,8 @@
     },
     {
       "path": "examples/webgl_buffergeometry_instancing_billboards.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -5970,8 +6040,8 @@
     },
     {
       "path": "examples/webgl_buffergeometry_instancing_interleaved.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -5981,52 +6051,56 @@
     },
     {
       "path": "examples/webgl_buffergeometry_lines.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_buffergeometry_lines_indexed.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_buffergeometry_points.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_buffergeometry_points_interleaved.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_buffergeometry_rawshader.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6036,8 +6110,8 @@
     },
     {
       "path": "examples/webgl_buffergeometry_selective_draw.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6047,8 +6121,8 @@
     },
     {
       "path": "examples/webgl_buffergeometry_uint.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6069,13 +6143,13 @@
     },
     {
       "path": "examples/webgl_camera_array.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_camera_logarithmicdepthbuffer.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6096,8 +6170,8 @@
     },
     {
       "path": "examples/webgl_clipping.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6111,8 +6185,8 @@
     },
     {
       "path": "examples/webgl_clipping_advanced.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6126,8 +6200,8 @@
     },
     {
       "path": "examples/webgl_clipping_intersection.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6137,8 +6211,8 @@
     },
     {
       "path": "examples/webgl_clipping_stencil.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6152,8 +6226,8 @@
     },
     {
       "path": "examples/webgl_custom_attributes.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6163,8 +6237,8 @@
     },
     {
       "path": "examples/webgl_custom_attributes_lines.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6174,8 +6248,8 @@
     },
     {
       "path": "examples/webgl_custom_attributes_points.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6185,8 +6259,8 @@
     },
     {
       "path": "examples/webgl_custom_attributes_points2.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6196,8 +6270,8 @@
     },
     {
       "path": "examples/webgl_custom_attributes_points3.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6222,8 +6296,8 @@
     },
     {
       "path": "examples/webgl_depth_texture.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6289,8 +6363,8 @@
     },
     {
       "path": "examples/webgl_framebuffer_texture.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_furnace_test.html",
@@ -6305,8 +6379,8 @@
     },
     {
       "path": "examples/webgl_geometries.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6316,8 +6390,8 @@
     },
     {
       "path": "examples/webgl_geometry_colors.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6358,8 +6432,9 @@
     },
     {
       "path": "examples/webgl_geometry_cube.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_geometry_extrude_shapes.html",
@@ -6394,8 +6469,8 @@
     },
     {
       "path": "examples/webgl_geometry_nurbs.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6449,8 +6524,8 @@
     },
     {
       "path": "examples/webgl_geometry_terrain_raycast.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6469,8 +6544,9 @@
     },
     {
       "path": "examples/webgl_geometry_text_shapes.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_geometry_text_stroke.html",
@@ -6539,8 +6615,8 @@
     },
     {
       "path": "examples/webgl_helpers.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_instancing_dynamic.html",
@@ -6556,8 +6632,8 @@
     },
     {
       "path": "examples/webgl_instancing_morph.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6582,8 +6658,8 @@
     },
     {
       "path": "examples/webgl_instancing_raycast.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6613,8 +6689,8 @@
     },
     {
       "path": "examples/webgl_interactive_buffergeometry.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6624,8 +6700,8 @@
     },
     {
       "path": "examples/webgl_interactive_cubes.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6646,8 +6722,8 @@
     },
     {
       "path": "examples/webgl_interactive_cubes_ortho.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6657,8 +6733,8 @@
     },
     {
       "path": "examples/webgl_interactive_lines.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6668,8 +6744,8 @@
     },
     {
       "path": "examples/webgl_interactive_points.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6679,8 +6755,8 @@
     },
     {
       "path": "examples/webgl_interactive_raycasting_points.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6690,8 +6766,8 @@
     },
     {
       "path": "examples/webgl_interactive_voxelpainter.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_lensflares.html",
@@ -6829,13 +6905,13 @@
     },
     {
       "path": "examples/webgl_lines_colors.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_lines_dashed.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6893,8 +6969,9 @@
     },
     {
       "path": "examples/webgl_loader_3ds.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_3dtiles.html",
@@ -6903,29 +6980,33 @@
     },
     {
       "path": "examples/webgl_loader_3mf.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_loader_3mf_materials.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_loader_amf.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_loader_bvh.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_collada.html",
@@ -6999,14 +7080,10 @@
     },
     {
       "path": "examples/webgl_loader_gcode.html",
-      "status": "candidate",
-      "category": "candidate",
-      "excluded_dependencies": [
-        {
-          "module": "examples/jsm/libs/lil-gui.module.min.js",
-          "category": "excluded-vendor-runtime"
-        }
-      ]
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 20,
+      "migration_notes": "Three local toolpaths, lil-gui asset switching and explicit line shader; orbit, resize, stale responses, load errors and disposal exercised in the standard browser."
     },
     {
       "path": "examples/webgl_loader_gltf.html",
@@ -7033,13 +7110,15 @@
     },
     {
       "path": "examples/webgl_loader_gltf_anisotropy.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_gltf_avif.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_gltf_compressed.html",
@@ -7061,13 +7140,15 @@
     },
     {
       "path": "examples/webgl_loader_gltf_instancing.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_gltf_iridescence.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_gltf_progressive_lod.html",
@@ -7093,14 +7174,15 @@
     },
     {
       "path": "examples/webgl_loader_gltf_variants.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_ifc.html",
@@ -7109,8 +7191,9 @@
     },
     {
       "path": "examples/webgl_loader_imagebitmap.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_kmz.html",
@@ -7131,8 +7214,8 @@
     },
     {
       "path": "examples/webgl_loader_md2.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7142,23 +7225,26 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_loader_md2_control.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_loader_mdd.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_nrrd.html",
@@ -7177,19 +7263,21 @@
     },
     {
       "path": "examples/webgl_loader_obj.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_pcd.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_pdb.html",
@@ -7249,8 +7337,9 @@
     },
     {
       "path": "examples/webgl_loader_texture_dds.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_texture_exr.html",
@@ -7266,24 +7355,27 @@
     },
     {
       "path": "examples/webgl_loader_texture_hdr.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_texture_ktx.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_texture_ktx2.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_texture_lottie.html",
@@ -7294,40 +7386,44 @@
     },
     {
       "path": "examples/webgl_loader_texture_pvrtc.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_texture_tga.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_texture_tiff.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_loader_texture_ultrahdr.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_ttf.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_loader_usdz.html",
@@ -7347,8 +7443,9 @@
     },
     {
       "path": "examples/webgl_loader_vox.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 21
     },
     {
       "path": "examples/webgl_loader_vrml.html",
@@ -7367,8 +7464,10 @@
     },
     {
       "path": "examples/webgl_loader_xyz.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 19,
+      "migration_notes": "Local LGPL helix data; explicit PointsMaterial shader; resize, load errors and late-response disposal verified."
     },
     {
       "path": "examples/webgl_lod.html",
@@ -7408,13 +7507,13 @@
     },
     {
       "path": "examples/webgl_materials_blending.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_materials_blending_custom.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7424,8 +7523,8 @@
     },
     {
       "path": "examples/webgl_materials_bumpmap.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7446,8 +7545,8 @@
     },
     {
       "path": "examples/webgl_materials_channels.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7461,8 +7560,8 @@
     },
     {
       "path": "examples/webgl_materials_cubemap.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -7472,8 +7571,8 @@
     },
     {
       "path": "examples/webgl_materials_cubemap_dynamic.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7487,13 +7586,13 @@
     },
     {
       "path": "examples/webgl_materials_cubemap_mipmaps.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_materials_cubemap_refraction.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -7503,13 +7602,13 @@
     },
     {
       "path": "examples/webgl_materials_cubemap_render_to_mipmaps.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_materials_displacementmap.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7523,8 +7622,8 @@
     },
     {
       "path": "examples/webgl_materials_envmaps.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7576,8 +7675,8 @@
     },
     {
       "path": "examples/webgl_materials_envmaps_hdr.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7614,8 +7713,8 @@
     },
     {
       "path": "examples/webgl_materials_normalmap.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7625,13 +7724,13 @@
     },
     {
       "path": "examples/webgl_materials_normalmap_object_space.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_materials_physical_clearcoat.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -7679,8 +7778,8 @@
     },
     {
       "path": "examples/webgl_materials_texture_anisotropy.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -7690,13 +7789,13 @@
     },
     {
       "path": "examples/webgl_materials_texture_canvas.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_materials_texture_filters.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_materials_texture_html.html",
@@ -7706,18 +7805,18 @@
     },
     {
       "path": "examples/webgl_materials_texture_manualmipmap.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_materials_texture_partialupdate.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_materials_texture_rotation.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7727,8 +7826,8 @@
     },
     {
       "path": "examples/webgl_materials_toon.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -7748,8 +7847,8 @@
     },
     {
       "path": "examples/webgl_materials_wireframe.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7770,8 +7869,8 @@
     },
     {
       "path": "examples/webgl_math_orientation_transform.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7875,8 +7974,8 @@
     },
     {
       "path": "examples/webgl_morphtargets.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7906,8 +8005,8 @@
     },
     {
       "path": "examples/webgl_morphtargets_horse.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -7917,8 +8016,8 @@
     },
     {
       "path": "examples/webgl_morphtargets_sphere.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_morphtargets_webcam.html",
@@ -7938,18 +8037,18 @@
     },
     {
       "path": "examples/webgl_multiple_elements.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_multiple_elements_text.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_multiple_rendertargets.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7959,13 +8058,13 @@
     },
     {
       "path": "examples/webgl_multiple_scenes_comparison.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_multiple_views.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -7975,8 +8074,8 @@
     },
     {
       "path": "examples/webgl_multisampled_renderbuffers.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7986,13 +8085,13 @@
     },
     {
       "path": "examples/webgl_panorama_cube.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_panorama_equirectangular.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_performance.html",
@@ -8028,8 +8127,8 @@
     },
     {
       "path": "examples/webgl_points_billboards.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -8043,8 +8142,8 @@
     },
     {
       "path": "examples/webgl_points_dynamic.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -8054,8 +8153,8 @@
     },
     {
       "path": "examples/webgl_points_sprites.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -8069,8 +8168,8 @@
     },
     {
       "path": "examples/webgl_points_waves.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -8093,14 +8192,15 @@
     },
     {
       "path": "examples/webgl_postprocessing_3dlut.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 22
     },
     {
       "path": "examples/webgl_postprocessing_advanced.html",
@@ -8487,13 +8587,13 @@
     },
     {
       "path": "examples/webgl_raycaster_sprite.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_raycaster_texture.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -8503,8 +8603,8 @@
     },
     {
       "path": "examples/webgl_read_float_buffer.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -8550,8 +8650,8 @@
     },
     {
       "path": "examples/webgl_rtt.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -8572,13 +8672,13 @@
     },
     {
       "path": "examples/webgl_shader.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_shader_lava.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_shaders_ocean.html",
@@ -8598,8 +8698,8 @@
     },
     {
       "path": "examples/webgl_shaders_sky.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -8726,8 +8826,8 @@
     },
     {
       "path": "examples/webgl_sprites.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported"
     },
     {
       "path": "examples/webgl_test_memory.html",
@@ -12872,5 +12972,5 @@
       "dependency_issue": true
     }
   ],
-  "progress_note": "Iteration 18 adds EXRLoader, FBXLoader/NURBS, MeshSurfaceSampler, SimplifyModifier, Reflector/Refractor, Water/Water2, HTMLMesh and SubsurfaceScatteringShader, with 11 upstream page ports plus two new WebGL pages. fflate/meshoptimizer remain explicit local consumer-provided runtimes. RGBE uses HDRLoader; WaterMesh/Water2Mesh stay excluded by the reaffirmed WebGL boundary. Exporters, RapierPhysics and three-mesh-bvh pages remain separate work."
+  "progress_note": "Through iteration 24: 166 upstream addon modules and 189 upstream pages ported. This batch adds GeometryUtils and fifty-two pages covering textures/materials, custom points/lines, cameras/clipping, multi-view rendering, render targets, shaders and panoramas. Comprehensive browser interactions remain deferred to the combined pass. The project is non-commercial; third-party redistribution restrictions still apply."
 }

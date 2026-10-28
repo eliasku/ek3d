@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>ek3d — webgl — GLTF loader + anisotropy</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #000;
+      }
+      #wrapper {
+        position: absolute;
+        inset: 0;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        max-width: 34em;
+        color: #fff;
+        font: 12px/1.5 sans-serif;
+      }
+      #info a {
+        color: #9cf;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper"><canvas id="scene"></canvas></div>
+    <div id="info">
+      GLTFLoader + KHR_materials_anisotropy. Anisotropy Barn Lamp from the Khronos glTF Sample Assets (CC BY 4.0,
+      Wayfair / Eric Chadwick). Royal Esplanade from HDRI Haven (CC0).
+    </div>
+    <script type="module" src="./webgl_loader_gltf_anisotropy.ts"></script>
+  </body>
+</html>

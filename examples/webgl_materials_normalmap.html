@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>ek3d — webgl — normal map</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+      }
+      #wrapper,
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        color: white;
+        text-align: center;
+        font: 13px sans-serif;
+        pointer-events: none;
+      }
+      #info a {
+        color: white;
+        pointer-events: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper">
+      <canvas id="scene"></canvas>
+      <div id="info">Normal map — <a href="https://casual-effects.com/data/">Lee Perry-Smith</a> head</div>
+    </div>
+    <script type="module" src="./webgl_materials_normalmap.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — texture manual mipmapping</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        color: #fff;
+        font-family: sans-serif;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        width: 100%;
+        padding: 1em 0;
+        text-align: center;
+      }
+      a {
+        color: #8cf;
+      }
+      .lbl {
+        position: absolute;
+        z-index: 1;
+        bottom: 0;
+        padding: 1em;
+        background: rgba(0, 0, 0, 0.85);
+        font-size: 16px;
+        font-weight: bold;
+        text-shadow: #000 1px 1px 1px;
+      }
+      #left {
+        left: 0;
+      }
+      #right {
+        right: 0;
+      }
+      .g {
+        color: #aaa;
+      }
+      .c {
+        color: #fa0;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="info">
+      <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - texture manual mipmapping example<br />painting
+      by <a href="https://en.wikipedia.org/wiki/Basket_of_Fruit_%28Caravaggio%29">Caravaggio</a>
+    </div>
+    <div id="left" class="lbl">
+      Floor <span class="g">(128x128)</span><br />mag: <span class="c">Linear</span><br />min:
+      <span class="c">LinearMipmapLinear</span><br /><br />Painting <span class="g">(748x600)</span><br />mag:
+      <span class="c">Linear</span><br />min: <span class="c">Linear</span>
+    </div>
+    <div id="right" class="lbl">
+      Floor<br />mag: <span class="c">Nearest</span><br />min: <span class="c">NearestMipmapNearestFilter</span
+      ><br /><br />Painting<br />mag: <span class="c">Nearest</span><br />min: <span class="c">Nearest</span>
+    </div>
+    <script type="module" src="./webgl_materials_texture_manualmipmap.ts"></script>
+  </body>
+</html>

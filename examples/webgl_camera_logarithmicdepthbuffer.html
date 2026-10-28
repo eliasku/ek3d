@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — logarithmic depth buffer</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        touch-action: none;
+        background: #000;
+      }
+      #wrapper {
+        position: absolute;
+        inset: 0;
+        display: flex;
+      }
+      .view {
+        position: relative;
+        height: 100%;
+        overflow: hidden;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+      }
+      .label {
+        position: absolute;
+        bottom: 1em;
+        width: 100%;
+        color: white;
+        text-align: center;
+        pointer-events: none;
+      }
+      #border {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #ccc;
+        border: 1px inset #ccc;
+        cursor: col-resize;
+        z-index: 10;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="normal" class="view">
+        <canvas id="normal-canvas"></canvas>
+        <div class="label">normal z-buffer</div>
+      </div>
+      <div id="log" class="view">
+        <canvas id="log-canvas"></canvas>
+        <div class="label">logarithmic z-buffer</div>
+      </div>
+      <div id="border"></div>
+    </div>
+    <script type="module" src="./webgl_camera_logarithmicdepthbuffer.ts"></script>
+  </body>
+</html>

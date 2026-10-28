@@ -1,4 +1,4 @@
-import earcut from "./lib/earcut";
+import { earcut } from "./lib/earcut";
 /**
  * An implementation of the earcut polygon triangulation algorithm.
  * The code is a port of [mapbox/earcut](https://github.com/mapbox/earcut).

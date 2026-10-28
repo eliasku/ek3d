@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>ek3d — webgl — GLTF loader + AVIF textures</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #bfe3dd;
+      }
+      #wrapper {
+        position: absolute;
+        inset: 0;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        color: #000;
+        font: 12px/1.5 sans-serif;
+      }
+      #info a {
+        color: #986b60;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper"><canvas id="scene"></canvas></div>
+    <div id="info">
+      GLTFLoader + EXT_texture_avif. Forest House by
+      <a href="https://sketchfab.com/peachyroyalty" target="_blank" rel="noopener">peachyroyalty</a>.
+    </div>
+    <script type="module" src="./webgl_loader_gltf_avif.ts"></script>
+  </body>
+</html>

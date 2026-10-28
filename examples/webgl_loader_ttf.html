@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — TTF loader</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        color: white;
+        font: 13px sans-serif;
+      }
+      #wrapper,
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #wrapper::after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 8px 12px;
+        pointer-events: none;
+        content: "Type to enter text, drag to spin";
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper"><canvas id="scene"></canvas></div>
+    <script src="/examples/libs/opentype-1.3.4.min.js"></script>
+    <script type="module" src="./webgl_loader_ttf.ts"></script>
+  </body>
+</html>

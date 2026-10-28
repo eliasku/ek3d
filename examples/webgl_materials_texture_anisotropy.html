@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — anisotropic texture filtering</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      #scene {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        text-align: center;
+        color: #444;
+        font: 13px sans-serif;
+      }
+      #info a {
+        color: #08f;
+      }
+      .lbl {
+        position: absolute;
+        bottom: 0;
+        color: white;
+        font: bold 16px sans-serif;
+        text-shadow: 1px 1px 1px black;
+        background: rgba(0, 0, 0, 0.85);
+        padding: 1em;
+      }
+      #lbl_left {
+        left: 0;
+      }
+      #lbl_right {
+        right: 0;
+      }
+      .value {
+        color: #fa0;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="info">
+      <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - anisotropic texture filtering example
+    </div>
+    <div id="lbl_left" class="lbl">anisotropy: <span class="value" id="val_left"></span></div>
+    <div id="lbl_right" class="lbl">anisotropy: <span class="value" id="val_right"></span></div>
+    <script type="module" src="./webgl_materials_texture_anisotropy.ts"></script>
+  </body>
+</html>

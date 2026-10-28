@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>ek3d — webgl — DDS compressed textures</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #000;
+      }
+      #wrapper {
+        position: absolute;
+        inset: 0;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #status {
+        position: absolute;
+        top: 0;
+        left: 0;
+        max-width: 40em;
+        padding: 8px 12px;
+        color: #fff;
+        background: rgb(0 0 0 / 60%);
+        font: 13px/1.4 sans-serif;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper">
+      <canvas id="scene"></canvas>
+      <div id="status" hidden></div>
+    </div>
+    <script type="module" src="./webgl_loader_texture_dds.ts"></script>
+  </body>
+</html>

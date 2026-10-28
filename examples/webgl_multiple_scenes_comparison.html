@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>ek3d — multiple scenes comparison</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      #wrapper,
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #slider {
+        position: absolute;
+        z-index: 1;
+        cursor: ew-resize;
+        width: 40px;
+        height: 40px;
+        background: #f32196;
+        opacity: 0.7;
+        border-radius: 50%;
+        top: calc(50% - 20px);
+        left: calc(50% - 20px);
+        touch-action: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper">
+      <canvas id="scene"></canvas>
+      <div id="slider"></div>
+    </div>
+    <script type="module" src="./webgl_multiple_scenes_comparison.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>ek3d — webgl — UltraHDR texture loader</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #000;
+      }
+      #wrapper {
+        position: absolute;
+        inset: 0;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        max-width: 34em;
+        color: #fff;
+        font: 12px/1.5 sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper"><canvas id="scene"></canvas></div>
+    <div id="info">
+      UltraHDR texture loader. Converted from HDR (gain-map JPEG). Spruit Sunrise from HDRI Haven (CC0).
+    </div>
+    <script type="module" src="./webgl_loader_texture_ultrahdr.ts"></script>
+  </body>
+</html>

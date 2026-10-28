@@ -17,6 +17,10 @@ Use this immutable commit as the baseline for future upstream diffs and ek3d upd
 
 The library is distributed as uncompiled TypeScript source: `exports` maps package subpaths to `src/**/*.ts`, so consumers compile it with their own bundler and no generated output is checked in. LLM documentation generation through `upstream/three.js/utils/llms/build.js` is deferred.
 
+This is a non-commercial project. Its MIT code license does not replace third-party asset
+licenses. Keep attribution and asset-specific terms; resolve missing redistribution permissions
+before publishing assets, including on a free public website.
+
 ## Project focus
 
 - **WebGL for canvas games, mobile web rendering and lightweight 3D interactions.** XR applications and adopting the newest graphics API are not targets.
@@ -36,6 +40,99 @@ npm run check
 npm test
 npm run dev
 ```
+
+`/examples/webgl_loader_xyz.html` loads and rotates the local 201-point helix using
+`ek3d/addons/loaders/XYZLoader` and explicit `PointsMaterial` shader composition.
+The loader supports XYZ and XYZRGB rows, converting byte sRGB colors to working-space colors.
+Comments and unsupported row widths are ignored, matching upstream. Use a consistent row layout
+within each file; mixed colored/uncolored rows retain upstream's unequal attribute counts.
+The page handles resize, load errors and late responses after disposal. Data attribution and
+the LGPL license are retained in `examples/public/examples/`.
+
+`/examples/webgl_loader_gcode.html` loads three local toolpaths with
+`ek3d/addons/loaders/GCodeLoader`, explicit `LineBasicMaterial` shader composition,
+OrbitControls and a lil-gui asset selector. The loader preserves upstream linear moves,
+absolute/relative positioning, extrusion overrides, position resets and `splitLayer`.
+Arc and unsupported commands are ignored. Switching assets rejects stale responses;
+page disposal releases model geometries, shared materials and controls.
+
+`/examples/webgl_loader_obj.html` loads the local male02 OBJ with its MTL materials and textures.
+Import `MTLLoader` from `ek3d/addons/loaders/MTLLoader`, then pass its material creator to
+`OBJLoader.setMaterials()`. Texture handlers use the same loading manager and must return a texture.
+MTL preserves Phong colors, map transforms, bump/displacement options and transparency precedence.
+
+`/examples/webgl_loader_imagebitmap.html` compares three image uploads with three flipped bitmap
+uploads. Bitmaps close after GPU upload; disposal cancels scheduled loads and closes unused bitmaps.
+It uses `Texture` with `needsUpdate` instead of the canvas-only `CanvasTexture` TypeScript contract.
+
+`BVHLoader` and `MDDLoader` expose typed skeleton/clip and morph-target/clip results from their
+canonical addon loader paths. `/examples/webgl_loader_bvh.html` plays the local pirouette with a
+skeleton helper; `/examples/webgl_loader_mdd.html` plays four cube morph targets. Both use the
+existing animation mixer, preserve back/forward-cache restores and release playback on disposal.
+
+`PCDLoader`, `TDSLoader` and `VOXLoader` have local examples at `/examples/webgl_loader_pcd.html`,
+`/examples/webgl_loader_3ds.html` and `/examples/webgl_loader_vox.html`. PCD supports ASCII, binary
+and LZF-compressed clouds; its GUI selects all four local samples. TDS preserves Phong materials,
+texture maps and mesh transforms. VOX exposes chunk data, scene graphs, greedy meshes and 3D textures.
+
+`DDSLoader`, `KTXLoader`, `PVRLoader` and `TGALoader` have corresponding
+`webgl_loader_texture_{dds,ktx,pvrtc,tga}` pages. Native compressed formats are capability-gated:
+unsupported maps are skipped with a visible explanation, not substituted. Malformed compressed
+data rejects `loadAsync()` and reaches `load()` error callbacks. TGA supports indexed, RGB and
+greyscale images, RLE and all four image origins.
+
+The glTF loader pages now include anisotropy, AVIF, GPU instancing, iridescence and material variants.
+HDR and UltraHDR texture pages expose exposure and format controls; the KTX2 page compares 18 local
+textures, labels unsupported GPU formats and injects the local ZSTD decoder for the HDR sample.
+All vendor runtimes remain example resources, not package runtime dependencies.
+
+`TTFLoader` takes a consumer-supplied opentype-compatible parser in its constructor.
+`/examples/webgl_loader_ttf.html` loads the local KenPixel font and supports text entry and drag
+rotation. `/examples/webgl_geometry_text_shapes.html` draws filled glyphs and contour/hole outlines.
+The example-only opentype runtime and font notices are served locally.
+
+`LUT3dlLoader`, `LUTCubeLoader` and `LUTImageLoader` produce `Data3DTexture` lookup tables from
+3DL, Cube and image-strip data. `/examples/webgl_postprocessing_3dlut.html` compares nine local LUTs
+with enable, selection and intensity controls. The loaders retain upstream LUT domain semantics;
+the pass does not add input-domain remapping.
+
+The `webgl_buffergeometry` examples now include indexed triangles, morphing lines, indexed Koch
+curves, separate/interleaved point attributes, integer shader attributes and attribute-free GLSL
+vertices. `/examples/webgl_geometry_cube.html` uses the local crate texture. These pages keep
+upstream geometry sizes, explicit shader composition, resize and page-disposal handling.
+
+`AMFLoader` and `ThreeMFLoader` use a consumer-provided `setZipRuntime({ unzipSync })` decoder.
+The canonical 3MF import is `ek3d/addons/loaders/3MFLoader`, exporting `ThreeMFLoader`.
+The AMF page loads the local rook; the 3MF pages provide seven selectable Consortium samples
+and the textured truck. Shared model resources use the existing deduplicating disposal helper.
+
+`MD2Loader` produces geometry with named morph clips. `MD2Character`, `MD2CharacterComplex`
+and `MorphBlendMesh` preserve weapon synchronization, playback and movement/animation blending.
+The two MD2 pages load local Ratamahatta and Ogro assets; the control page uses `Gyroscope`
+camera following and `SunLight` cascaded shadows. Model and LUT redistribution permissions
+remain a publication prerequisite, recorded in the asset README.
+
+`HDRCubeTextureLoader` loads six RGBE faces and forwards face parse errors through the loader
+error callback and loading manager. `TIFFLoader` takes a consumer-supplied `TIFFRuntime` in its
+constructor. The TIFF and HDR environment examples use local UTIF and texture resources.
+The cube reflection/refraction pages retain the upstream models and environment maps.
+Humus cubemap notices require written approval for commercial distribution; review these
+asset terms before publication.
+
+The bulk example set also covers custom and instanced BufferGeometry attributes, draw ranges,
+interactive mesh/line/point picking, voxel painting, geometry helpers and morph-target animation.
+`webgl_points_waves` updates point positions and sizes in a custom shader. These pages retain
+upstream controls and scene sizes, with explicit renderer composition and page-disposal handling.
+Comprehensive example interactions and the browser/device matrix are checked in a combined pass;
+per-batch verification records its exact exercised subset in `.local/PLAN.md`.
+
+The next bulk batch adds 52 pages: texture filtering/transforms and drawing, blend modes and
+material maps, dynamic cubemaps, custom point/line attributes, sprites, array/logarithmic cameras,
+clipping and stencil caps, multiple viewports, render targets/readback, procedural shaders,
+sky and panoramas. `GeometryUtils` provides Hilbert 2D/3D and Gosper curves at its canonical
+`ek3d/addons/utils/GeometryUtils` path. Pages use canonical imports and explicit renderer composition.
+Assets remain local with adjacent notices. Runtime coverage is recorded per exercised subset,
+not implied by a successful typecheck or build.
 
 Open the URL printed by Vite. `/` is the English project landing page: a fullscreen, animated metallic torus knot with a short introduction, a link to `/examples/examples.html`, and a "Star on GitHub" CTA linking to [eliasku/ek3d](https://github.com/eliasku/ek3d) in a new tab. Its entrypoint is `examples/landing.ts`. A `MeshStandardMaterial` reflects a `RoomEnvironment`, baked once through `PMREMGenerator`; neutral tone mapping preserves highlight detail. The model and room are generated locally, with no external assets or runtime dependencies. The layout adapts to narrow screens. Capture resources are released after baking; navigation releases the model, environment target and DFG lookup texture while preserving back/forward-cache restores.
 

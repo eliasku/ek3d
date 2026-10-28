@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — 3D LUT color grading</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        color: white;
+        font: 12px/1.5 sans-serif;
+      }
+      #info a {
+        color: #9cf;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="info">
+      3D LUTs — Battle Damaged Sci-fi Helmet by theblueturtle_; Royal Esplanade by HDRI Haven.<br />LUTs by
+      <a href="https://www.rocketstock.com/free-after-effects-templates/35-free-luts-for-color-grading-videos/"
+        >RocketStock</a
+      >
+      and <a href="https://www.freepresets.com/product/free-luts-cinematic/">FreePresets.com</a>.
+    </div>
+    <script type="module" src="./webgl_postprocessing_3dlut.ts"></script>
+  </body>
+</html>
