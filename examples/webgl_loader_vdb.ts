@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { VDBLoader } from "ek3d/addons/loaders/VDBLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { BackSide, GLSL3 } from "ek3d/constants";
+import { Side, GLSL } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { LoadingManager } from "ek3d/loaders/LoadingManager";
 import { RawShaderMaterial } from "ek3d/materials/RawShaderMaterial";
@@ -136,11 +136,11 @@ async function load(): Promise<void> {
     const center = grid.bbox.getCenter(new Vector3());
     const size = grid.bbox.getSize(new Vector3()).addScalar(1);
     const material = new RawShaderMaterial({
-      glslVersion: GLSL3,
+      glslVersion: GLSL.GLSL3,
       uniforms: { ...uniforms, map: { value: grid.texture } },
       vertexShader,
       fragmentShader,
-      side: BackSide,
+      side: Side.Back,
       transparent: true,
       premultipliedAlpha: true,
     });

@@ -1,3 +1,4 @@
+import { GL } from "../../GL";
 import { Pass } from "./Pass";
 import type { Camera } from "../../cameras/Camera";
 import type { Scene } from "../../scenes/Scene";
@@ -78,7 +79,6 @@ export class MaskPass extends Pass {
     _deltaTime: number,
     _maskActive: boolean,
   ): void {
-    const context = renderer.getContext();
     const state = renderer.state;
 
     // don't update color or depth
@@ -104,8 +104,8 @@ export class MaskPass extends Pass {
     }
 
     state.buffers.stencil.setTest(true);
-    state.buffers.stencil.setOp(context.REPLACE, context.REPLACE, context.REPLACE);
-    state.buffers.stencil.setFunc(context.ALWAYS, writeValue, 0xffffffff);
+    state.buffers.stencil.setOp(GL.REPLACE, GL.REPLACE, GL.REPLACE);
+    state.buffers.stencil.setFunc(GL.ALWAYS, writeValue, 0xffffffff);
     state.buffers.stencil.setClear(clearValue);
     state.buffers.stencil.setLocked(true);
 
@@ -130,8 +130,8 @@ export class MaskPass extends Pass {
     // only render where stencil is set to 1
 
     state.buffers.stencil.setLocked(false);
-    state.buffers.stencil.setFunc(context.EQUAL, 1, 0xffffffff); // draw if == 1
-    state.buffers.stencil.setOp(context.KEEP, context.KEEP, context.KEEP);
+    state.buffers.stencil.setFunc(GL.EQUAL, 1, 0xffffffff); // draw if == 1
+    state.buffers.stencil.setOp(GL.KEEP, GL.KEEP, GL.KEEP);
     state.buffers.stencil.setLocked(true);
   }
 }

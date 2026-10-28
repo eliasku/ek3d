@@ -2,7 +2,7 @@ import { Audio } from "ek3d/audio/Audio";
 import { AudioAnalyser } from "ek3d/audio/AudioAnalyser";
 import { AudioListener } from "ek3d/audio/AudioListener";
 import { Camera } from "ek3d/cameras/Camera";
-import { RedFormat } from "ek3d/constants";
+import { PixelFormat } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { AudioLoader } from "ek3d/loaders/AudioLoader";
 import { ShaderMaterial } from "ek3d/materials/ShaderMaterial";
@@ -72,7 +72,7 @@ function start(): void {
     void media.play().catch(fail);
   }
   analyser = new AudioAnalyser(audio, 128);
-  texture = new DataTexture(analyser.data, 64, 1, RedFormat);
+  texture = new DataTexture(analyser.data, 64, 1, PixelFormat.Red);
   material = new ShaderMaterial({
     uniforms: { tAudioData: { value: texture } },
     vertexShader: `varying vec2 vUv;

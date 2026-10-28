@@ -1,4 +1,4 @@
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import type { BufferAttribute } from "../../core/BufferAttribute";
 import { Color } from "../../math/Color";
 import { ColorManagement } from "../../math/ColorManagement";
@@ -169,7 +169,7 @@ function vertexColors(attribute: BufferAttribute): Float32Array {
   const array = new Float32Array(attribute.count * attribute.itemSize);
   for (let i = 0; i < attribute.count; i++) {
     color.fromBufferAttribute(attribute, i);
-    ColorManagement.workingToColorSpace(color, SRGBColorSpace);
+    ColorManagement.workingToColorSpace(color, ColorSpace.SRGB);
     const offset = i * attribute.itemSize;
     array[offset] = color.r;
     array[offset + 1] = color.g;

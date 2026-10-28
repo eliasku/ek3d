@@ -1,5 +1,5 @@
 import type { NumericAnimationBuffer } from "../Interpolant";
-import { ZeroCurvatureEnding, WrapAroundEnding, ZeroSlopeEnding } from "../../constants";
+import { EndingMode } from "../../constants";
 import { Interpolant } from "../Interpolant";
 /**
  * Fast and simple cubic spline interpolant.
@@ -35,8 +35,8 @@ export class CubicInterpolant extends Interpolant {
     this._weightNext = -0;
     this._offsetNext = -0;
     this.DefaultSettings_ = {
-      endingStart: ZeroCurvatureEnding,
-      endingEnd: ZeroCurvatureEnding,
+      endingStart: EndingMode.ZeroCurvature,
+      endingEnd: EndingMode.ZeroCurvature,
     };
   }
   intervalChanged_(i1: number, t0: number, t1: number) {
@@ -47,17 +47,17 @@ export class CubicInterpolant extends Interpolant {
       tNext = pp[iNext];
     if (tPrev === undefined) {
       switch (this.getSettings_().endingStart) {
-        case ZeroSlopeEnding:
+        case EndingMode.ZeroSlope:
           // f'(t0) = 0
           iPrev = i1;
           tPrev = 2 * t0 - t1;
           break;
-        case WrapAroundEnding:
+        case EndingMode.WrapAround:
           // use the other end of the curve
           iPrev = pp.length - 2;
           tPrev = t0 + pp[iPrev] - pp[iPrev + 1];
           break;
-        default: // ZeroCurvatureEnding
+        default: // EndingMode.ZeroCurvature
           // f''(t0) = 0 a.k.a. Natural Spline
           iPrev = i1;
           tPrev = t1;
@@ -65,17 +65,17 @@ export class CubicInterpolant extends Interpolant {
     }
     if (tNext === undefined) {
       switch (this.getSettings_().endingEnd) {
-        case ZeroSlopeEnding:
+        case EndingMode.ZeroSlope:
           // f'(tN) = 0
           iNext = i1;
           tNext = 2 * t1 - t0;
           break;
-        case WrapAroundEnding:
+        case EndingMode.WrapAround:
           // use the other end of the curve
           iNext = 1;
           tNext = t1 + pp[1] - pp[0];
           break;
-        default: // ZeroCurvatureEnding
+        default: // EndingMode.ZeroCurvature
           // f''(tN) = 0, a.k.a. Natural Spline
           iNext = i1 - 1;
           tNext = t0;

@@ -5,15 +5,7 @@ import type { WebGLRenderer } from "../renderers/WebGLRenderer";
 import chunk_common from "../renderers/shaders/ShaderChunk/common.glsl";
 import chunk_begin_vertex from "../renderers/shaders/ShaderChunk/begin_vertex.glsl";
 import chunk_project_vertex from "../renderers/shaders/ShaderChunk/project_vertex.glsl";
-import {
-  CubeReflectionMapping,
-  CubeRefractionMapping,
-  LinearMipmapLinearFilter,
-  NoBlending,
-  HalfFloatType,
-  BackSide,
-  LinearSRGBColorSpace,
-} from "../constants";
+import { Mapping, TextureFilter, Blending, TextureType, Side, ColorSpace } from "../constants";
 import { Mesh } from "../objects/Mesh";
 import { BoxGeometry } from "../geometries/BoxGeometry";
 import { CubeCamera } from "../cameras/CubeCamera";
@@ -217,7 +209,7 @@ export class PMREMGenerator {
     this._cubeSize = Math.max(MIN_SIZE, floorPowerOfTwo(cubeSize));
   }
   _fromTexture(texture: any, renderTarget?: any) {
-    if (texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping) {
+    if (texture.mapping === Mapping.CubeReflection || texture.mapping === Mapping.CubeRefraction) {
       this._setSize(texture.image.length === 0 ? MIN_SIZE : texture.image[0].width || texture.image[0].image.width);
     } else {
       // Equirectangular
@@ -282,7 +274,7 @@ export class PMREMGenerator {
   }
   _textureToCubemap(texture?: any) {
     let material: any;
-    if (texture.mapping === CubeReflectionMapping || texture.mapping === CubeRefractionMapping) {
+    if (texture.mapping === Mapping.CubeReflection || texture.mapping === Mapping.CubeRefraction) {
       if (this._cubemapMaterial === null) {
         this._cubemapMaterial = _getCubemapMaterial();
       }
@@ -361,10 +353,10 @@ export class PMREMGenerator {
 }
 function _createRenderTarget(size?: any, generateMipmaps?: any, depthBuffer?: any) {
   return new WebGLCubeRenderTarget(size, {
-    minFilter: LinearMipmapLinearFilter,
+    minFilter: TextureFilter.LinearMipmapLinear,
     generateMipmaps: generateMipmaps,
-    type: HalfFloatType,
-    colorSpace: LinearSRGBColorSpace,
+    type: TextureType.HalfFloat,
+    colorSpace: ColorSpace.LinearSRGB,
     depthBuffer: depthBuffer,
   });
 }
@@ -381,8 +373,8 @@ function _getMaterial(name?: any, uniforms?: any, fragmentShader?: any) {
       chunk_project_vertex +
       "\n\n\tgl_Position.z = gl_Position.w; // set z to camera.far\n\n}\n",
     fragmentShader: fragmentShader,
-    side: BackSide,
-    blending: NoBlending,
+    side: Side.Back,
+    blending: Blending.No,
     depthTest: false,
     depthWrite: false,
   });

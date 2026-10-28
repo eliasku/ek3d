@@ -5,7 +5,7 @@ import { Brush } from "ek3d/addons/math/csg/core/Brush";
 import { Evaluator } from "ek3d/addons/math/csg/core/Evaluator";
 import { ADDITION, INTERSECTION, SUBTRACTION, type CSGOperation } from "ek3d/addons/math/csg/core/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide, PCFShadowMap } from "ek3d/constants";
+import { Side, ShadowMap } from "ek3d/constants";
 import { CylinderGeometry } from "ek3d/geometries/CylinderGeometry";
 import { IcosahedronGeometry } from "ek3d/geometries/IcosahedronGeometry";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
@@ -57,10 +57,10 @@ renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
 if (!renderer.shadowMap) throw new Error("Shadow map unavailable");
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = PCFShadowMap;
+renderer.shadowMap.type = ShadowMap.PCF;
 const plane = new Mesh(
   new PlaneGeometry(),
-  new ShadowMaterial({ color: 0xd81b60, transparent: true, opacity: 0.075, side: DoubleSide }),
+  new ShadowMaterial({ color: 0xd81b60, transparent: true, opacity: 0.075, side: Side.Double }),
 );
 plane.position.y = -3;
 plane.rotation.x = -Math.PI / 2;

@@ -1,5 +1,6 @@
 import { existsSync, readdirSync } from "node:fs";
 import { defineConfig } from "vite-plus";
+import { constEnums } from "./scripts/const-enums";
 
 const exampleEntries = existsSync("examples")
   ? readdirSync("examples", { recursive: true })
@@ -8,15 +9,17 @@ const exampleEntries = existsSync("examples")
   : [];
 
 export default defineConfig({
-  publicDir: "examples/public",
+  publicDir: "public",
+  plugins: [constEnums()],
+  worker: { plugins: () => [constEnums()] },
   // The upstream checkout is a read-only comparison baseline, not a development entry point.
-  optimizeDeps: { entries: ["index.html", "feature-testbed/index.html", ...exampleEntries, "tests/browser*.ts"] },
+  optimizeDeps: { entries: ["index.html", "testbed/index.html", ...exampleEntries, "tests/browser*.ts"] },
   test: {
     include: ["tests/**/*.test.ts"],
     environment: "node",
   },
   lint: {
-    ignorePatterns: ["dist/**", "upstream/**", "examples/public/**"],
+    ignorePatterns: ["dist/**", "upstream/**", "public/**"],
     options: { typeAware: true, typeCheck: false },
     overrides: [
       {
@@ -37,13 +40,13 @@ export default defineConfig({
   },
   fmt: {
     // Keep copied fonts and vendor runtimes byte-identical to their licensed upstream sources.
-    ignorePatterns: ["upstream/**", "dist/**", "examples/fonts/**", "examples/public/**", "package-lock.json"],
+    ignorePatterns: ["upstream/**", "dist/**", "examples/fonts/**", "public/**", "package-lock.json"],
     printWidth: 120,
     sortPackageJson: false,
   },
   build: {
     rollupOptions: {
-      input: ["index.html", "feature-testbed/index.html", ...exampleEntries],
+      input: ["index.html", "testbed/index.html", ...exampleEntries],
       external: [
         // exclude transpiling source code from /upstream/ directory
         /^\/upstream\/.*/,

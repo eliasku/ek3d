@@ -1,7 +1,7 @@
 import { InteractionManager } from "ek3d/addons/interaction/InteractionManager";
 import { RoundedBoxGeometry } from "ek3d/addons/geometries/RoundedBoxGeometry";
 import { RoomEnvironment } from "ek3d/addons/environments/RoomEnvironment";
-import { NeutralToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { HTMLTexture } from "ek3d/textures/HTMLTexture";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
@@ -76,7 +76,7 @@ async function init(): Promise<void> {
     },
   });
 
-  renderer.toneMapping = NeutralToneMapping;
+  renderer.toneMapping = ToneMapping.Neutral;
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
 

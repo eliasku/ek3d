@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { mergeVertices } from "ek3d/addons/utils/BufferGeometryUtils";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Wrapping, ColorSpace } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { Timer } from "ek3d/core/Timer";
@@ -227,8 +227,8 @@ async function start(): Promise<void> {
         texture.dispose();
         return;
       }
-      texture.colorSpace = SRGBColorSpace;
-      texture.wrapS = texture.wrapT = RepeatWrapping;
+      texture.colorSpace = ColorSpace.SRGB;
+      texture.wrapS = texture.wrapT = Wrapping.Repeat;
       texture.repeat.set(40, 40);
       ground.material.map = texture;
       ground.material.needsUpdate = true;

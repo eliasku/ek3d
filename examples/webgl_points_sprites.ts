@@ -1,7 +1,7 @@
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { AdditiveBlending, SRGBColorSpace } from "ek3d/constants";
+import { Blending, ColorSpace } from "ek3d/constants";
 import { Float32BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
@@ -38,7 +38,7 @@ const textures = [1, 2, 3, 4, 5].map((i) => {
     (value) => {
       if (disposed) value.dispose();
       else {
-        value.colorSpace = SRGBColorSpace;
+        value.colorSpace = ColorSpace.SRGB;
         pending--;
       }
     },
@@ -63,11 +63,11 @@ const materials = parameters.map((p) => {
   const material = new PointsMaterial({
     size: p.size,
     map: p.map,
-    blending: AdditiveBlending,
+    blending: Blending.Additive,
     depthTest: false,
     transparent: true,
   });
-  material.color.setHSL(p.h, p.s, p.l, SRGBColorSpace);
+  material.color.setHSL(p.h, p.s, p.l, ColorSpace.SRGB);
   const particles = new Points(geometry, material);
   particles.rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
   scene.add(particles);
@@ -108,7 +108,7 @@ function animate(): void {
   });
   materials.forEach((material, i) => {
     const p = parameters[i];
-    material.color.setHSL(((360 * (p.h + time)) % 360) / 360, p.s, p.l, SRGBColorSpace);
+    material.color.setHSL(((360 * (p.h + time)) % 360) / 360, p.s, p.l, ColorSpace.SRGB);
   });
   renderer.render(scene, camera);
   if (!pending && canvas.dataset.state !== "error") canvas.dataset.state = "rendered";

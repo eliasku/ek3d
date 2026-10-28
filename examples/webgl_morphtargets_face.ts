@@ -21,7 +21,7 @@ import { physicalShader } from "ek3d/renderers/shaders/PhysicalShader";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { pointsShader } from "ek3d/renderers/shaders/PointsShader";
 import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
-import { ACESFilmicToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import type { Mesh } from "ek3d/objects/Mesh";
 import { Scene } from "ek3d/scenes/Scene";
 
@@ -91,7 +91,7 @@ async function init(): Promise<void> {
   });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.toneMapping = ACESFilmicToneMapping;
+  renderer.toneMapping = ToneMapping.ACESFilmic;
 
   const ktx2Loader = new KTX2Loader().detectSupport(renderer);
 

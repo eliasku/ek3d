@@ -2,7 +2,7 @@ import type { Box3 } from "./Box3";
 import type { Matrix4 } from "./Matrix4";
 import type { Object3D } from "../core/Object3D";
 import type { Sprite } from "../objects/Sprite";
-import { WebGLCoordinateSystem } from "../constants";
+import { CoordinateSystem } from "../constants";
 import { Vector2 } from "./Vector2";
 import { Vector3 } from "./Vector3";
 import { Sphere } from "./Sphere";
@@ -88,7 +88,7 @@ export class Frustum {
    */
   setFromProjectionMatrix(
     m: Matrix4,
-    coordinateSystem: number = WebGLCoordinateSystem,
+    coordinateSystem: CoordinateSystem = CoordinateSystem.WebGL,
     reversedDepth: boolean = false,
   ): Frustum {
     const planes = this.planes;
@@ -118,7 +118,7 @@ export class Frustum {
       planes[5].setComponents(me3 - me2, me7 - me6, me11 - me10, me15 - me14).normalize(); // near
     } else {
       planes[4].setComponents(me3 - me2, me7 - me6, me11 - me10, me15 - me14).normalize(); // far
-      if (coordinateSystem === WebGLCoordinateSystem) {
+      if (coordinateSystem === CoordinateSystem.WebGL) {
         planes[5].setComponents(me3 + me2, me7 + me6, me11 + me10, me15 + me14).normalize(); // near
       } else {
         throw new Error("THREE.Frustum.setFromProjectionMatrix(): Invalid coordinate system: " + coordinateSystem);

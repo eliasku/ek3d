@@ -1,5 +1,6 @@
 import type { Object3D } from "../core/Object3D";
 import { EventDispatcher } from "../core/EventDispatcher";
+import type { MOUSE, TOUCH } from "../constants";
 
 /**
  * Abstract base class for controls.
@@ -48,7 +49,7 @@ export abstract class Controls<TObject extends Object3D = Object3D> extends Even
    * This object defines what type of actions are assigned to the available mouse buttons.
    * It depends on the control implementation what kind of mouse buttons and actions are supported.
    */
-  mouseButtons: { LEFT: number | null; MIDDLE: number | null; RIGHT: number | null } = {
+  mouseButtons: { LEFT: MOUSE | null; MIDDLE: MOUSE | null; RIGHT: MOUSE | null } = {
     LEFT: null,
     MIDDLE: null,
     RIGHT: null,
@@ -58,7 +59,7 @@ export abstract class Controls<TObject extends Object3D = Object3D> extends Even
    * This object defines what type of actions are assigned to what kind of touch interaction.
    * It depends on the control implementation what kind of touch interaction and actions are supported.
    */
-  touches: { ONE: number | null; TWO: number | null } = { ONE: null, TWO: null };
+  touches: { ONE: TOUCH | null; TWO: TOUCH | null } = { ONE: null, TWO: null };
 
   /**
    * Constructs a new controls instance.

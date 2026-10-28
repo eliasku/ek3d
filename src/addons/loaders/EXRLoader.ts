@@ -1,12 +1,4 @@
-import {
-  FloatType,
-  HalfFloatType,
-  LinearFilter,
-  LinearSRGBColorSpace,
-  RedFormat,
-  RGBAFormat,
-  RGFormat,
-} from "../../constants";
+import { TextureType, TextureFilter, ColorSpace, PixelFormat } from "../../constants";
 import { DataTextureLoader } from "../../loaders/DataTextureLoader";
 import type { DataTextureData } from "../../loaders/DataTextureLoader";
 import type { LoadingManager } from "../../loaders/LoadingManager";
@@ -258,16 +250,16 @@ export class EXRLoader extends DataTextureLoader {
   /**
    * The texture type.
    *
-   * @default HalfFloatType
+   * @default TextureType.HalfFloat
    */
-  type: number;
+  type: TextureType;
 
   /**
    * Texture output format.
    *
-   * @default RGBAFormat
+   * @default PixelFormat.RGBA
    */
-  outputFormat: number;
+  outputFormat: PixelFormat;
 
   /**
    * For multi-part EXR files, the index of the part to load.
@@ -289,8 +281,8 @@ export class EXRLoader extends DataTextureLoader {
   constructor(manager?: LoadingManager) {
     super(manager);
 
-    this.type = HalfFloatType;
-    this.outputFormat = RGBAFormat;
+    this.type = TextureType.HalfFloat;
+    this.outputFormat = PixelFormat.RGBA;
     this.part = 0;
     this.zlibDecoder = null;
   }
@@ -2701,8 +2693,8 @@ export class EXRLoader extends DataTextureLoader {
         type: 0,
         uncompress: uncompressRAW,
         getter: parseUint16,
-        format: RGBAFormat,
-        colorSpace: LinearSRGBColorSpace,
+        format: PixelFormat.RGBA,
+        colorSpace: ColorSpace.LinearSRGB,
         outputChannels: 4,
         decodeChannels: {},
         byteArray: new Float32Array(0),
@@ -2800,20 +2792,20 @@ export class EXRLoader extends DataTextureLoader {
       // Setup output texture configuration
       switch (EXRDecoder.outputChannels) {
         case 4:
-          if (outputFormat == RGBAFormat) {
+          if (outputFormat == PixelFormat.RGBA) {
             fillAlpha = !channels.A;
-            EXRDecoder.format = RGBAFormat;
-            EXRDecoder.colorSpace = LinearSRGBColorSpace;
+            EXRDecoder.format = PixelFormat.RGBA;
+            EXRDecoder.colorSpace = ColorSpace.LinearSRGB;
             EXRDecoder.outputChannels = 4;
             EXRDecoder.decodeChannels = { R: 0, G: 1, B: 2, A: 3 };
-          } else if (outputFormat == RGFormat) {
-            EXRDecoder.format = RGFormat;
-            EXRDecoder.colorSpace = LinearSRGBColorSpace;
+          } else if (outputFormat == PixelFormat.RG) {
+            EXRDecoder.format = PixelFormat.RG;
+            EXRDecoder.colorSpace = ColorSpace.LinearSRGB;
             EXRDecoder.outputChannels = 2;
             EXRDecoder.decodeChannels = { R: 0, G: 1 };
-          } else if (outputFormat == RedFormat) {
-            EXRDecoder.format = RedFormat;
-            EXRDecoder.colorSpace = LinearSRGBColorSpace;
+          } else if (outputFormat == PixelFormat.Red) {
+            EXRDecoder.format = PixelFormat.Red;
+            EXRDecoder.colorSpace = ColorSpace.LinearSRGB;
             EXRDecoder.outputChannels = 1;
             EXRDecoder.decodeChannels = { R: 0 };
           } else {
@@ -2823,22 +2815,22 @@ export class EXRLoader extends DataTextureLoader {
           break;
 
         case 1:
-          if (outputFormat == RGBAFormat) {
+          if (outputFormat == PixelFormat.RGBA) {
             fillAlpha = true;
-            EXRDecoder.format = RGBAFormat;
-            EXRDecoder.colorSpace = LinearSRGBColorSpace;
+            EXRDecoder.format = PixelFormat.RGBA;
+            EXRDecoder.colorSpace = ColorSpace.LinearSRGB;
             EXRDecoder.outputChannels = 4;
             EXRDecoder.shouldExpand = true;
             EXRDecoder.decodeChannels = { Y: 0 };
-          } else if (outputFormat == RGFormat) {
-            EXRDecoder.format = RGFormat;
-            EXRDecoder.colorSpace = LinearSRGBColorSpace;
+          } else if (outputFormat == PixelFormat.RG) {
+            EXRDecoder.format = PixelFormat.RG;
+            EXRDecoder.colorSpace = ColorSpace.LinearSRGB;
             EXRDecoder.outputChannels = 2;
             EXRDecoder.shouldExpand = true;
             EXRDecoder.decodeChannels = { Y: 0 };
-          } else if (outputFormat == RedFormat) {
-            EXRDecoder.format = RedFormat;
-            EXRDecoder.colorSpace = LinearSRGBColorSpace;
+          } else if (outputFormat == PixelFormat.Red) {
+            EXRDecoder.format = PixelFormat.Red;
+            EXRDecoder.colorSpace = ColorSpace.LinearSRGB;
             EXRDecoder.outputChannels = 1;
             EXRDecoder.decodeChannels = { Y: 0 };
           } else {
@@ -2857,7 +2849,7 @@ export class EXRLoader extends DataTextureLoader {
 
       // Luminance/chroma images always decode to RGBA; override whatever the output-format switch selected.
       if (EXRDecoder.yCbCr) {
-        EXRDecoder.format = RGBAFormat;
+        EXRDecoder.format = PixelFormat.RGBA;
         EXRDecoder.outputChannels = 4;
         EXRDecoder.decodeChannels = { Y: 0, RY: 1, BY: 2 };
         fillAlpha = true;
@@ -2866,22 +2858,22 @@ export class EXRLoader extends DataTextureLoader {
       if (EXRDecoder.type == 1) {
         // half
         switch (outputType) {
-          case FloatType:
+          case TextureType.Float:
             EXRDecoder.getter = parseFloat16;
             break;
 
-          case HalfFloatType:
+          case TextureType.HalfFloat:
             EXRDecoder.getter = parseUint16;
             break;
         }
       } else if (EXRDecoder.type == 2) {
         // float
         switch (outputType) {
-          case FloatType:
+          case TextureType.Float:
             EXRDecoder.getter = parseFloat32;
             break;
 
-          case HalfFloatType:
+          case TextureType.HalfFloat:
             EXRDecoder.getter = decodeFloat32;
         }
       } else {
@@ -2894,7 +2886,7 @@ export class EXRLoader extends DataTextureLoader {
       const size = EXRDecoder.width * EXRDecoder.height * EXRDecoder.outputChannels;
 
       switch (outputType) {
-        case FloatType: {
+        case TextureType.Float: {
           const floatArray = new Float32Array(size);
 
           // Fill initially with 1s for the alpha value if the texture is not RGBA, RGB values will be overwritten
@@ -2904,7 +2896,7 @@ export class EXRLoader extends DataTextureLoader {
           break;
         }
 
-        case HalfFloatType: {
+        case TextureType.HalfFloat: {
           const halfArray = new Uint16Array(size);
 
           if (fillAlpha) halfArray.fill(0x3c00, 0, size); // Uint16Array holds half float data, 0x3C00 is 1
@@ -3031,9 +3023,9 @@ export class EXRLoader extends DataTextureLoader {
     if (EXRDecoder.shouldExpand) {
       const byteArray = EXRDecoder.byteArray;
 
-      if (this.outputFormat == RGBAFormat) {
+      if (this.outputFormat == PixelFormat.RGBA) {
         for (let i = 0; i < byteArray.length; i += 4) byteArray[i + 2] = byteArray[i + 1] = byteArray[i];
-      } else if (this.outputFormat == RGFormat) {
+      } else if (this.outputFormat == PixelFormat.RG) {
         for (let i = 0; i < byteArray.length; i += 2) byteArray[i + 1] = byteArray[i];
       }
     }
@@ -3045,7 +3037,7 @@ export class EXRLoader extends DataTextureLoader {
       const byteArray = EXRDecoder.byteArray;
       const nPixels = EXRDecoder.width * EXRDecoder.height;
 
-      if (this.type === HalfFloatType) {
+      if (this.type === TextureType.HalfFloat) {
         for (let i = 0; i < nPixels; i++) {
           const base = i * 4;
           const Y = fromHalfFloat(byteArray[base]);
@@ -3081,8 +3073,8 @@ export class EXRLoader extends DataTextureLoader {
       format: EXRDecoder.format,
       colorSpace: EXRDecoder.colorSpace,
       type: this.type,
-      minFilter: LinearFilter,
-      magFilter: LinearFilter,
+      minFilter: TextureFilter.Linear,
+      magFilter: TextureFilter.Linear,
       generateMipmaps: false,
       flipY: false,
     };
@@ -3100,7 +3092,7 @@ export class EXRLoader extends DataTextureLoader {
   }
 
   /**
-   * Sets texture output format. Defaults to `RGBAFormat`.
+   * Sets texture output format. Defaults to `PixelFormat.RGBA`.
    *
    * @param value - Texture output format.
    * @return A reference to this loader.

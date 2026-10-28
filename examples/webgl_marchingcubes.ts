@@ -4,7 +4,7 @@ import { Stats } from "ek3d/addons/libs/Stats";
 import { MarchingCubes } from "ek3d/addons/objects/MarchingCubes";
 import { ToonShader1, ToonShader2, ToonShaderHatching, ToonShaderDotted } from "ek3d/addons/shaders/ToonShader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { CubeRefractionMapping, RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Mapping, Wrapping, ColorSpace } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
@@ -64,7 +64,7 @@ const refraction = cubeLoader.load(
   undefined,
   fail,
 );
-refraction.mapping = CubeRefractionMapping;
+refraction.mapping = Mapping.CubeRefraction;
 const texture = new TextureLoader().load(
   "/examples/textures/uv_grid_opengl.jpg",
   (map) => {
@@ -74,8 +74,8 @@ const texture = new TextureLoader().load(
   undefined,
   fail,
 );
-texture.wrapS = texture.wrapT = RepeatWrapping;
-texture.colorSpace = SRGBColorSpace;
+texture.wrapS = texture.wrapT = Wrapping.Repeat;
+texture.colorSpace = ColorSpace.SRGB;
 const scene = new Scene();
 scene.background = new Color(0x050505);
 const camera = new PerspectiveCamera(45, innerWidth / innerHeight, 1, 10000);

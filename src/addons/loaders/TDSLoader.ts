@@ -1,4 +1,4 @@
-import { AdditiveBlending, DoubleSide } from "../../constants";
+import { Blending, Side } from "../../constants";
 import { Float32BufferAttribute } from "../../core/BufferAttribute";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { FileLoader } from "../../loaders/FileLoader";
@@ -176,11 +176,11 @@ export class TDSLoader extends Loader<Group, string> {
         material.wireframeLinewidth = value;
         this.debugMessage("   Wireframe Thickness: " + value);
       } else if (next.id === MAT_TWO_SIDE) {
-        material.side = DoubleSide;
+        material.side = Side.Double;
         this.debugMessage("   DoubleSided");
       } else if (next.id === MAT_ADDITIVE) {
         this.debugMessage("   Additive Blending");
-        material.blending = AdditiveBlending;
+        material.blending = Blending.Additive;
       } else if (next.id === MAT_DIFFUSE) {
         this.debugMessage("   Diffuse Color");
         material.color = this.readColor(next);

@@ -4,16 +4,7 @@ import type { AnimationObjectGroup } from "./AnimationObjectGroup";
 import type { AnimationBuffer, Interpolant } from "../math/Interpolant";
 import type { LinearInterpolant } from "../math/interpolants/LinearInterpolant";
 import type { Object3D } from "../core/Object3D";
-import {
-  WrapAroundEnding,
-  ZeroCurvatureEnding,
-  ZeroSlopeEnding,
-  LoopPingPong,
-  LoopOnce,
-  LoopRepeat,
-  NormalAnimationBlendMode,
-  AdditiveAnimationBlendMode,
-} from "../constants";
+import { EndingMode, Loop, AnimationBlendMode } from "../constants";
 /**
  * An instance of `AnimationAction` schedules the playback of an animation which is
  * stored in {@link AnimationClip}.
@@ -22,7 +13,7 @@ export class AnimationAction {
   _mixer: AnimationMixer;
   _clip: AnimationClip;
   _localRoot: Object3D | AnimationObjectGroup | null;
-  blendMode: number;
+  blendMode: AnimationBlendMode;
   _interpolantSettings: any;
   _interpolants: any[];
   _propertyBindings: any[];
@@ -31,7 +22,7 @@ export class AnimationAction {
   _timeScaleInterpolant: LinearInterpolant | null;
   _restoreTimeScale: number | null;
   _weightInterpolant: LinearInterpolant | null;
-  loop: number;
+  loop: Loop;
   _loopCount: number;
   _startTime: number | null;
   time: number;
@@ -58,7 +49,7 @@ export class AnimationAction {
     mixer: AnimationMixer,
     clip: AnimationClip,
     localRoot: Object3D | AnimationObjectGroup | null = null,
-    blendMode: number = clip.blendMode,
+    blendMode: AnimationBlendMode = clip.blendMode,
   ) {
     this._mixer = mixer;
     this._clip = clip;
@@ -73,8 +64,8 @@ export class AnimationAction {
       nTracks = tracks.length,
       interpolants = Array<Interpolant<AnimationBuffer>>(nTracks);
     const interpolantSettings: any = {
-      endingStart: ZeroCurvatureEnding,
-      endingEnd: ZeroCurvatureEnding,
+      endingStart: EndingMode.ZeroCurvature,
+      endingEnd: EndingMode.ZeroCurvature,
     };
     for (let i = 0; i !== nTracks; ++i) {
       const interpolant = tracks[i].createInterpolant(null);
@@ -93,9 +84,9 @@ export class AnimationAction {
     /**
      * The loop mode, set via {@link AnimationAction#setLoop}.
      *
-     * @default LoopRepeat
+     * @default Loop.Repeat
      */
-    this.loop = LoopRepeat;
+    this.loop = Loop.Repeat;
     this._loopCount = -1;
     // global mixer time when the action is to be started
     // it's set back to 'null' upon start of the action
@@ -131,7 +122,7 @@ export class AnimationAction {
      * Can be set via {@link AnimationAction#setLoop}.
      *
      * Setting this number has no effect if {@link AnimationAction#loop} is set to
-     * `THREE:LoopOnce`.
+     * `THREE:Loop.Once`.
      *
      * @default Infinity
      */
@@ -490,13 +481,13 @@ export class AnimationAction {
       const interpolants = this._interpolants;
       const propertyMixers = this._propertyBindings;
       switch (this.blendMode) {
-        case AdditiveAnimationBlendMode:
+        case AnimationBlendMode.Additive:
           for (let j = 0, m = interpolants.length; j !== m; ++j) {
             interpolants[j].evaluate(clipTime);
             propertyMixers[j].accumulateAdditive(weight);
           }
           break;
-        case NormalAnimationBlendMode:
+        case AnimationBlendMode.Normal:
         default:
           for (let j = 0, m = interpolants.length; j !== m; ++j) {
             interpolants[j].evaluate(clipTime);
@@ -556,12 +547,12 @@ export class AnimationAction {
     const loop = this.loop;
     let time = this.time + deltaTime;
     let loopCount = this._loopCount;
-    const pingPong = loop === LoopPingPong;
+    const pingPong = loop === Loop.PingPong;
     if (deltaTime === 0) {
       if (loopCount === -1) return time;
       return pingPong && (loopCount & 1) === 1 ? duration - time : time;
     }
-    if (loop === LoopOnce) {
+    if (loop === Loop.Once) {
       if (loopCount === -1) {
         // just started
         this._loopCount = 0;
@@ -647,19 +638,19 @@ export class AnimationAction {
   _setEndings(atStart: any, atEnd: any, pingPong?: any) {
     const settings = this._interpolantSettings;
     if (pingPong) {
-      settings.endingStart = ZeroSlopeEnding;
-      settings.endingEnd = ZeroSlopeEnding;
+      settings.endingStart = EndingMode.ZeroSlope;
+      settings.endingEnd = EndingMode.ZeroSlope;
     } else {
-      // assuming for LoopOnce atStart == atEnd == true
+      // assuming for Loop.Once atStart == atEnd == true
       if (atStart) {
-        settings.endingStart = this.zeroSlopeAtStart ? ZeroSlopeEnding : ZeroCurvatureEnding;
+        settings.endingStart = this.zeroSlopeAtStart ? EndingMode.ZeroSlope : EndingMode.ZeroCurvature;
       } else {
-        settings.endingStart = WrapAroundEnding;
+        settings.endingStart = EndingMode.WrapAround;
       }
       if (atEnd) {
-        settings.endingEnd = this.zeroSlopeAtEnd ? ZeroSlopeEnding : ZeroCurvatureEnding;
+        settings.endingEnd = this.zeroSlopeAtEnd ? EndingMode.ZeroSlope : EndingMode.ZeroCurvature;
       } else {
-        settings.endingEnd = WrapAroundEnding;
+        settings.endingEnd = EndingMode.WrapAround;
       }
     }
   }

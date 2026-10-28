@@ -8,7 +8,7 @@ import { RenderPass } from "ek3d/addons/postprocessing/RenderPass";
 import { ShaderPass } from "ek3d/addons/postprocessing/ShaderPass";
 import { FocusShader } from "ek3d/addons/shaders/FocusShader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DynamicDrawUsage } from "ek3d/constants";
+import { BufferUsage } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { Object3D } from "ek3d/core/Object3D";
@@ -91,7 +91,7 @@ const offsets = [
 ];
 function createMesh(positions: BufferAttribute, x: number, y: number, z: number, color: number): void {
   const geometry = new BufferGeometry();
-  const animated = positions.clone().setUsage(DynamicDrawUsage);
+  const animated = positions.clone().setUsage(BufferUsage.DynamicDraw);
   const initial = positions.clone();
   geometry.setAttribute("position", animated);
   geometry.setAttribute("initialPosition", initial);

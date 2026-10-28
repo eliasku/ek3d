@@ -3,7 +3,7 @@ import { Stats } from "ek3d/addons/libs/Stats";
 import { FullScreenQuad } from "ek3d/addons/postprocessing/Pass";
 import { BokehDepthShader, BokehShader } from "ek3d/addons/shaders/BokehShader2";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide, HalfFloatType } from "ek3d/constants";
+import { Side, TextureType } from "ek3d/constants";
 import { Raycaster } from "ek3d/core/Raycaster";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
@@ -60,7 +60,7 @@ const leafMaterial = new MeshPhongMaterial({
   shininess: 0.5,
   specular: 0xffffff,
   envMap: cube,
-  side: DoubleSide,
+  side: Side.Double,
   forceSinglePass: true,
 });
 const leaves: { mesh: Mesh; dx: number; dz: number; rx: number; ry: number; rz: number }[] = [];
@@ -127,8 +127,8 @@ scene.add(light1);
 const light2 = new DirectionalLight(0xffffff, 3);
 light2.position.set(-2, 1.2, -10).normalize();
 scene.add(light2);
-const colorTarget = new WebGLRenderTarget(innerWidth, innerHeight, { type: HalfFloatType });
-const depthTarget = new WebGLRenderTarget(innerWidth, innerHeight, { type: HalfFloatType });
+const colorTarget = new WebGLRenderTarget(innerWidth, innerHeight, { type: TextureType.HalfFloat });
+const depthTarget = new WebGLRenderTarget(innerWidth, innerHeight, { type: TextureType.HalfFloat });
 const uniforms = cloneUniforms(BokehShader.uniforms);
 uniforms["tColor"].value = colorTarget.texture;
 uniforms["tDepth"].value = depthTarget.texture;

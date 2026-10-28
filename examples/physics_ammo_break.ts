@@ -3,7 +3,7 @@ import { ConvexGeometry } from "ek3d/addons/geometries/ConvexGeometry";
 import { ConvexObjectBreaker } from "ek3d/addons/misc/ConvexObjectBreaker";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { RepeatWrapping } from "ek3d/constants";
+import { Wrapping } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { Timer } from "ek3d/core/Timer";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
@@ -274,7 +274,7 @@ async function start(): Promise<void> {
         texture.dispose();
         return;
       }
-      texture.wrapS = texture.wrapT = RepeatWrapping;
+      texture.wrapS = texture.wrapT = Wrapping.Repeat;
       texture.repeat.set(40, 40);
       ground.material.map = texture;
       ground.material.needsUpdate = true;

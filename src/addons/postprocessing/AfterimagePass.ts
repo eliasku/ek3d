@@ -1,4 +1,4 @@
-import { HalfFloatType, NearestFilter, NoBlending } from "../../constants";
+import { TextureType, TextureFilter, Blending } from "../../constants";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { cloneUniforms } from "../../renderers/shaders/UniformsUtils";
 import { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
@@ -60,7 +60,7 @@ export class AfterimagePass extends Pass {
       uniforms: cloneUniforms(CopyShader.uniforms),
       vertexShader: CopyShader.vertexShader,
       fragmentShader: CopyShader.fragmentShader,
-      blending: NoBlending,
+      blending: Blending.No,
       depthTest: false,
       depthWrite: false,
     });
@@ -68,14 +68,14 @@ export class AfterimagePass extends Pass {
     // internals
 
     this._textureComp = new WebGLRenderTarget(window.innerWidth, window.innerHeight, {
-      magFilter: NearestFilter,
-      type: HalfFloatType,
+      magFilter: TextureFilter.Nearest,
+      type: TextureType.HalfFloat,
       depthBuffer: false,
     });
 
     this._textureOld = new WebGLRenderTarget(window.innerWidth, window.innerHeight, {
-      magFilter: NearestFilter,
-      type: HalfFloatType,
+      magFilter: TextureFilter.Nearest,
+      type: TextureType.HalfFloat,
       depthBuffer: false,
     });
 

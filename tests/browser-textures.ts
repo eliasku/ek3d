@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { Scene } from "ek3d/scenes/Scene";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
@@ -14,18 +15,7 @@ import { FramebufferTexture } from "ek3d/textures/FramebufferTexture";
 import { CompressedTexture } from "ek3d/textures/CompressedTexture";
 import { CompressedArrayTexture } from "ek3d/textures/CompressedArrayTexture";
 import { CompressedCubeTexture } from "ek3d/textures/CompressedCubeTexture";
-import {
-  GLSL3,
-  LinearFilter,
-  LinearMipmapLinearFilter,
-  LinearSRGBColorSpace,
-  NearestFilter,
-  NearestMipmapNearestFilter,
-  NoColorSpace,
-  RepeatWrapping,
-  RGBA_S3TC_DXT1_Format,
-  SRGBColorSpace,
-} from "ek3d/constants";
+import { GLSL, TextureFilter, ColorSpace, Wrapping, PixelFormat } from "ek3d/constants";
 
 function check(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -46,7 +36,7 @@ function canvasSource() {
 function renderFixture() {
   const renderer = new WebGLRenderer({ preserveDrawingBuffer: true, shaders: { MeshBasicMaterial: basicShader } });
   renderer.setSize(16, 16);
-  renderer.outputColorSpace = LinearSRGBColorSpace;
+  renderer.outputColorSpace = ColorSpace.LinearSRGB;
   const geometry = new PlaneGeometry(2, 2);
   const material = new MeshBasicMaterial();
   const mesh = new Mesh(geometry, material);
@@ -58,8 +48,8 @@ function renderFixture() {
   const pixel = new Uint8Array(4);
   const sample = (expected: number[], label: string, tolerance = 2) => {
     renderer.render(scene, camera);
-    gl.readPixels(8, 8, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
-    check(gl.getError() === gl.NO_ERROR, `${label}: WebGL upload/render error`);
+    gl.readPixels(8, 8, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
+    check(gl.getError() === GL.NO_ERROR, `${label}: WebGL upload/render error`);
     check(
       pixel.every((value, index) => Math.abs(value - expected[index]) <= tolerance),
       `${label}: ${pixel.join(",")} != ${expected.join(",")}`,
@@ -107,28 +97,28 @@ export function verifyCanvasAndFramebufferTextures() {
     fixture.sample([255, 0, 0, 255], "canvas requires explicit needsUpdate");
     canvas.needsUpdate = true;
     fixture.sample([0, 255, 0, 255], "canvas update");
-    canvas.colorSpace = SRGBColorSpace;
+    canvas.colorSpace = ColorSpace.SRGB;
     source.fill("#808080");
     canvas.needsUpdate = true;
     fixture.sample([55, 55, 55, 255], "canvas sRGB decoding");
-    canvas.colorSpace = NoColorSpace;
+    canvas.colorSpace = ColorSpace.No;
     canvas.needsUpdate = true;
     fixture.sample([128, 128, 128, 255], "canvas untagged color");
 
     source.fill("#ff0000");
     source.context.fillStyle = "#0000ff";
     source.context.fillRect(2, 0, 2, 4);
-    canvas.wrapS = RepeatWrapping;
-    canvas.minFilter = canvas.magFilter = NearestFilter;
+    canvas.wrapS = Wrapping.Repeat;
+    canvas.minFilter = canvas.magFilter = TextureFilter.Nearest;
     canvas.repeat.set(0, 0);
     canvas.offset.set(1.125, 0.5);
     canvas.needsUpdate = true;
     fixture.sample([255, 0, 0, 255], "repeat wrapping and nearest filtering");
     canvas.offset.x = 0.5;
-    canvas.minFilter = canvas.magFilter = LinearFilter;
+    canvas.minFilter = canvas.magFilter = TextureFilter.Linear;
     canvas.needsUpdate = true;
     fixture.sample([128, 0, 128, 255], "linear filtering");
-    canvas.minFilter = LinearMipmapLinearFilter;
+    canvas.minFilter = TextureFilter.LinearMipmapLinear;
     canvas.repeat.set(64, 64);
     canvas.offset.set(0, 0);
     canvas.needsUpdate = true;
@@ -196,14 +186,14 @@ export function verifyCompressedTextures() {
       { width: 2, height: 2, data: green.slice() },
       { width: 1, height: 1, data: blue.slice() },
     ];
-    const texture = new CompressedTexture(mipmaps, 4, 4, RGBA_S3TC_DXT1_Format);
-    texture.minFilter = NearestMipmapNearestFilter;
-    texture.magFilter = NearestFilter;
+    const texture = new CompressedTexture(mipmaps, 4, 4, PixelFormat.RGBA_S3TC_DXT1);
+    texture.minFilter = TextureFilter.NearestMipmapNearest;
+    texture.magFilter = TextureFilter.Nearest;
     texture.needsUpdate = true;
     textures.push(texture);
     const shader = (map: Texture, sampler: string, coordinate: string) => {
       const material = new RawShaderMaterial({
-        glslVersion: GLSL3,
+        glslVersion: GLSL.GLSL3,
         uniforms: { map: { value: map }, level: { value: 0 }, layer: { value: 0 } },
         vertexShader: "precision highp float; in vec3 position; void main() { gl_Position = vec4(position, 1.0); }",
         fragmentShader: `precision highp float; precision highp ${sampler}; uniform ${sampler} map; uniform float level; uniform float layer; out vec4 color; void main() { color = textureLod(map, ${coordinate}, level); }`,
@@ -226,8 +216,14 @@ export function verifyCompressedTextures() {
     const layers = new Uint8Array(16);
     layers.set(red);
     layers.set(blue, 8);
-    const array = new CompressedArrayTexture([{ width: 4, height: 4, data: layers }], 4, 4, 2, RGBA_S3TC_DXT1_Format);
-    array.minFilter = array.magFilter = NearestFilter;
+    const array = new CompressedArrayTexture(
+      [{ width: 4, height: 4, data: layers }],
+      4,
+      4,
+      2,
+      PixelFormat.RGBA_S3TC_DXT1,
+    );
+    array.minFilter = array.magFilter = TextureFilter.Nearest;
     array.needsUpdate = true;
     textures.push(array);
     const arrayMaterial = shader(array, "sampler2DArray", "vec3(0.5, 0.5, layer)");
@@ -247,8 +243,8 @@ export function verifyCompressedTextures() {
       height: 4,
       mipmaps: [{ width: 4, height: 4, data: red.slice() }],
     }));
-    const cube = new CompressedCubeTexture(faces, RGBA_S3TC_DXT1_Format);
-    cube.minFilter = cube.magFilter = NearestFilter;
+    const cube = new CompressedCubeTexture(faces, PixelFormat.RGBA_S3TC_DXT1);
+    cube.minFilter = cube.magFilter = TextureFilter.Nearest;
     cube.needsUpdate = true;
     textures.push(cube);
     shader(cube, "samplerCube", "vec3(1.0, 0.0, 0.0)");

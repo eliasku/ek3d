@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { Scene } from "ek3d/scenes/Scene";
 import { Fog } from "ek3d/scenes/Fog";
@@ -16,7 +17,7 @@ import { Matrix3 } from "ek3d/math/Matrix3";
 import { Vector3 } from "ek3d/math/Vector3";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
-import { DynamicDrawUsage, GLSL3, LinearSRGBColorSpace } from "ek3d/constants";
+import { BufferUsage, GLSL, ColorSpace } from "ek3d/constants";
 
 function check(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -32,7 +33,7 @@ export function verifyFogRendering() {
   const light = new HemisphereLight(0xffffff, 0xffffff, Math.PI);
   try {
     renderer.setSize(32, 32);
-    renderer.outputColorSpace = LinearSRGBColorSpace;
+    renderer.outputColorSpace = ColorSpace.LinearSRGB;
     const scene = new Scene();
     const camera = new PerspectiveCamera(50, 1, 0.1, 20);
     const mesh = new Mesh(geometry, materials[0]);
@@ -42,8 +43,8 @@ export function verifyFogRendering() {
     const pixel = new Uint8Array(4);
     const sample = (expected: number[]) => {
       renderer.render(scene, camera);
-      gl.readPixels(16, 16, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
-      check(gl.getError() === gl.NO_ERROR, "Fog rendering produced a GL error");
+      gl.readPixels(16, 16, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
+      check(gl.getError() === GL.NO_ERROR, "Fog rendering produced a GL error");
       check(
         pixel.every((value, i) => Math.abs(value - expected[i]) <= 1),
         `Fog pixel ${pixel.join(",")} != ${expected.join(",")}`,
@@ -99,7 +100,7 @@ export async function verifyUniformGroups() {
   const unsigned = new Uniform(4);
   unsigned.type = "uint";
   const amount = new Uniform(1);
-  const group = new UniformsGroup().setName("Frame").setUsage(DynamicDrawUsage);
+  const group = new UniformsGroup().setName("Frame").setUsage(BufferUsage.DynamicDraw);
   group.add(gain).add(tint).add(transform).add(weights).add(offsets).add(signed).add(unsigned);
   const fragmentShader = `precision highp float;
 layout(std140) uniform Frame {
@@ -119,14 +120,14 @@ void main() {
 }`;
   const materials = [
     new ShaderMaterial({
-      glslVersion: GLSL3,
+      glslVersion: GLSL.GLSL3,
       uniforms: { amount },
       uniformsGroups: [group],
       vertexShader: "void main() { gl_Position = vec4(position, 1.0); }",
       fragmentShader,
     }),
     new RawShaderMaterial({
-      glslVersion: GLSL3,
+      glslVersion: GLSL.GLSL3,
       uniforms: { amount },
       uniformsGroups: [group],
       vertexShader: "precision highp float; in vec3 position; void main() { gl_Position = vec4(position, 1.0); }",
@@ -144,18 +145,18 @@ void main() {
     const pixel = new Uint8Array(4);
     const sample = (expected: number[]) => {
       renderer.render(scene, camera);
-      gl.readPixels(16, 16, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
-      check(gl.getError() === gl.NO_ERROR, "Uniform group rendering produced a GL error");
+      gl.readPixels(16, 16, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
+      check(gl.getError() === GL.NO_ERROR, "Uniform group rendering produced a GL error");
       check(
         pixel.every((value, i) => Math.abs(value - expected[i]) <= 1),
         `UBO pixel ${pixel.join(",")} != ${expected.join(",")}`,
       );
     };
     const buffer = () => {
-      const program = gl.getParameter(gl.CURRENT_PROGRAM) as WebGLProgram;
+      const program = gl.getParameter(GL.CURRENT_PROGRAM) as WebGLProgram;
       const index = gl.getUniformBlockIndex(program, "Frame");
-      const binding = gl.getActiveUniformBlockParameter(program, index, gl.UNIFORM_BLOCK_BINDING) as number;
-      const value = gl.getIndexedParameter(gl.UNIFORM_BUFFER_BINDING, binding) as WebGLBuffer;
+      const binding = gl.getActiveUniformBlockParameter(program, index, GL.UNIFORM_BLOCK_BINDING) as number;
+      const value = gl.getIndexedParameter(GL.UNIFORM_BUFFER_BINDING, binding) as WebGLBuffer;
       check(gl.isBuffer(value), "Uniform group has no GPU buffer");
       return value;
     };
@@ -201,7 +202,7 @@ void main() {
     const restored = buffer();
     group.dispose();
     check(!gl.isBuffer(restored), "Restored group leaked its GPU buffer");
-    check(gl.getError() === gl.NO_ERROR, "Restored group disposal used stale GPU handles");
+    check(gl.getError() === GL.NO_ERROR, "Restored group disposal used stale GPU handles");
     return {
       std140: true,
       sharedPrograms: true,

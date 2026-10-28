@@ -1,6 +1,6 @@
 import { HDRLoader } from "ek3d/addons/loaders/HDRLoader";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
-import { ReinhardToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import type { DataTextureData } from "ek3d/loaders/DataTextureLoader";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
@@ -33,7 +33,7 @@ const renderer = new WebGLRenderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 
-renderer.toneMapping = ReinhardToneMapping;
+renderer.toneMapping = ToneMapping.Reinhard;
 renderer.toneMappingExposure = params.exposure;
 
 let texture: DataTexture | null = null;

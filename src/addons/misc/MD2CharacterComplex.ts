@@ -1,4 +1,4 @@
-import { SRGBColorSpace, UVMapping } from "../../constants";
+import { ColorSpace, Mapping } from "../../constants";
 import type { BufferAttribute } from "../../core/BufferAttribute";
 import type { BufferGeometry } from "../../core/BufferGeometry";
 import { Object3D } from "../../core/Object3D";
@@ -154,9 +154,9 @@ export class MD2CharacterComplex {
           undefined,
           error,
         );
-        texture.mapping = UVMapping;
+        texture.mapping = Mapping.UV;
         texture.name = name;
-        texture.colorSpace = SRGBColorSpace;
+        texture.colorSpace = ColorSpace.SRGB;
         this.ownedTextures.push(texture);
         return texture;
       });

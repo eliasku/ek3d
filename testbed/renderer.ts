@@ -3,7 +3,7 @@ import { WebGLBackground } from "ek3d/renderers/webgl/WebGLBackground";
 import { WebGLEnvironments } from "ek3d/renderers/webgl/WebGLEnvironments";
 import { WebGLShadowMap } from "ek3d/renderers/webgl/WebGLShadowMap";
 import { WebGLOutput } from "ek3d/renderers/webgl/WebGLOutput";
-import { HalfFloatType, SRGBColorSpace, PCFShadowMap, ACESFilmicToneMapping } from "ek3d/constants";
+import { TextureType, ColorSpace, ShadowMap, ToneMapping } from "ek3d/constants";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
 import { depthShader } from "ek3d/renderers/shaders/DepthShader";
@@ -29,7 +29,7 @@ export function createRenderer(canvas: HTMLCanvasElement, resources: Array<{ dis
     canvas,
     antialias: false,
     preserveDrawingBuffer: true,
-    outputBufferType: HalfFloatType,
+    outputBufferType: TextureType.HalfFloat,
     createBackground: WebGLBackground,
     createEnvironments: WebGLEnvironments,
     createShadowMap: WebGLShadowMap,
@@ -58,8 +58,8 @@ export function createRenderer(canvas: HTMLCanvasElement, resources: Array<{ dis
   renderer.setPixelRatio(1);
   renderer.setClearColor(0x152238, 1);
   renderer.shadowMap!.enabled = true;
-  renderer.shadowMap!.type = PCFShadowMap;
-  renderer.toneMapping = ACESFilmicToneMapping;
-  renderer.outputColorSpace = SRGBColorSpace;
+  renderer.shadowMap!.type = ShadowMap.PCF;
+  renderer.toneMapping = ToneMapping.ACESFilmic;
+  renderer.outputColorSpace = ColorSpace.SRGB;
   return renderer;
 }

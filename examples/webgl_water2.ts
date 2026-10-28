@@ -8,7 +8,7 @@ import { MeshStandardMaterial } from "ek3d/materials/MeshStandardMaterial";
 import { Vector2 } from "ek3d/math/Vector2";
 import { Vector4 } from "ek3d/math/Vector4";
 import { Color } from "ek3d/math/Color";
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping, RepeatWrapping } from "ek3d/constants";
+import { ToneMapping, Mapping, Wrapping } from "ek3d/constants";
 import { Mesh } from "ek3d/objects/Mesh";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { WebGLEnvironments } from "ek3d/renderers/webgl/WebGLEnvironments";
@@ -48,7 +48,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 0.5;
 
 // camera
@@ -93,7 +93,7 @@ async function init(): Promise<void> {
     return;
   }
   resources.push(environmentTexture);
-  environmentTexture.mapping = EquirectangularReflectionMapping;
+  environmentTexture.mapping = Mapping.EquirectangularReflection;
   environmentTexture.needsUpdate = true;
 
   scene.background = environmentTexture;
@@ -114,8 +114,8 @@ async function init(): Promise<void> {
     return texture;
   }
 
-  normalMap0.wrapS = normalMap0.wrapT = RepeatWrapping;
-  normalMap1.wrapS = normalMap1.wrapT = RepeatWrapping;
+  normalMap0.wrapS = normalMap0.wrapT = Wrapping.Repeat;
+  normalMap1.wrapS = normalMap1.wrapT = Wrapping.Repeat;
 
   // water
 

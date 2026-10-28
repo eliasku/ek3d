@@ -1,5 +1,5 @@
 import type { NumericAnimationBuffer } from "../../math/Interpolant";
-import { InterpolateDiscrete } from "../../constants";
+import { Interpolation } from "../../constants";
 import { KeyframeTrack } from "../KeyframeTrack";
 /**
  * A track for string keyframe values.
@@ -42,9 +42,9 @@ StringKeyframeTrack.prototype.ValueBufferType = Array;
 /**
  * The default interpolation type of this keyframe track.
  *
- * @default InterpolateDiscrete
+ * @default Interpolation.Discrete
  */
-StringKeyframeTrack.prototype.DefaultInterpolation = InterpolateDiscrete;
+StringKeyframeTrack.prototype.DefaultInterpolation = Interpolation.Discrete;
 StringKeyframeTrack.prototype.InterpolantFactoryMethodLinear =
   undefined as unknown as typeof StringKeyframeTrack.prototype.InterpolantFactoryMethodLinear;
 StringKeyframeTrack.prototype.InterpolantFactoryMethodSmooth =

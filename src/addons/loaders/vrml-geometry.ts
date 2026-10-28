@@ -1,4 +1,4 @@
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import { BufferAttribute, Float32BufferAttribute } from "../../core/BufferAttribute";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { BoxGeometry } from "../../geometries/BoxGeometry";
@@ -1311,7 +1311,7 @@ function convertColorsToLinearSRGB(attribute: BufferAttribute) {
   for (let i = 0; i < attribute.count; i++) {
     color.fromBufferAttribute(attribute, i);
 
-    ColorManagement.colorSpaceToWorking(color, SRGBColorSpace);
+    ColorManagement.colorSpaceToWorking(color, ColorSpace.SRGB);
 
     attribute.setXYZ(i, color.r, color.g, color.b);
   }
@@ -1408,7 +1408,7 @@ export function paintFaces(
 
     color.copy(colorA).lerp(colorB, t);
 
-    ColorManagement.colorSpaceToWorking(color, SRGBColorSpace);
+    ColorManagement.colorSpaceToWorking(color, ColorSpace.SRGB);
 
     colorAttribute.setXYZ(index, color.r, color.g, color.b);
   }

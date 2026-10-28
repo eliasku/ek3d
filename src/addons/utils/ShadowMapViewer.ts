@@ -1,5 +1,5 @@
 import { OrthographicCamera } from "../../cameras/OrthographicCamera";
-import { DoubleSide } from "../../constants";
+import { Side } from "../../constants";
 import { PlaneGeometry } from "../../geometries/PlaneGeometry";
 import { MeshBasicMaterial } from "../../materials/MeshBasicMaterial";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
@@ -65,7 +65,7 @@ void main() {
       context.fillText(light.name, 0, 20);
       this.label = new Mesh<MeshBasicMaterial>(
         new PlaneGeometry(canvas.width, canvas.height),
-        new MeshBasicMaterial({ map: new CanvasTexture(canvas), side: DoubleSide, transparent: true }),
+        new MeshBasicMaterial({ map: new CanvasTexture(canvas), side: Side.Double, transparent: true }),
       );
       this.scene.add(this.label);
     }

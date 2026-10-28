@@ -1,7 +1,7 @@
 import type { Euler } from "./Euler";
 import type { Matrix3 } from "./Matrix3";
 import type { Quaternion } from "./Quaternion";
-import { WebGLCoordinateSystem } from "../constants";
+import { CoordinateSystem } from "../constants";
 import { Vector3 } from "./Vector3";
 /**
  * Represents a 4x4 matrix.
@@ -1014,7 +1014,7 @@ export class Matrix4 {
      * @param bottom - Bottom boundary of the viewing frustum at the near plane.
      * @param near - The distance from the camera to the near plane.
      * @param far - The distance from the camera to the far plane.
-     * @param [coordinateSystem=WebGLCoordinateSystem] - The coordinate system.
+     * @param [coordinateSystem=CoordinateSystem.WebGL] - The coordinate system.
      * @param [reversedDepth=false] - Whether to use a reversed depth.
      * @return A reference to this matrix.
      */
@@ -1025,7 +1025,7 @@ export class Matrix4 {
     bottom: number,
     near: number,
     far: number,
-    coordinateSystem: number = WebGLCoordinateSystem,
+    coordinateSystem: CoordinateSystem = CoordinateSystem.WebGL,
     reversedDepth: boolean = false,
   ): Matrix4 {
     const te = this.elements;
@@ -1038,7 +1038,7 @@ export class Matrix4 {
       c = near / (far - near);
       d = (far * near) / (far - near);
     } else {
-      if (coordinateSystem === WebGLCoordinateSystem) {
+      if (coordinateSystem === CoordinateSystem.WebGL) {
         c = -(far + near) / (far - near);
         d = (-2 * far * near) / (far - near);
       } else {
@@ -1073,7 +1073,7 @@ export class Matrix4 {
      * @param bottom - Bottom boundary of the viewing frustum at the near plane.
      * @param near - The distance from the camera to the near plane.
      * @param far - The distance from the camera to the far plane.
-     * @param [coordinateSystem=WebGLCoordinateSystem] - The coordinate system.
+     * @param [coordinateSystem=CoordinateSystem.WebGL] - The coordinate system.
      * @param [reversedDepth=false] - Whether to use a reversed depth.
      * @return A reference to this matrix.
      */
@@ -1084,7 +1084,7 @@ export class Matrix4 {
     bottom: number,
     near: number,
     far: number,
-    coordinateSystem: number = WebGLCoordinateSystem,
+    coordinateSystem: CoordinateSystem = CoordinateSystem.WebGL,
     reversedDepth: boolean = false,
   ): Matrix4 {
     const te = this.elements;
@@ -1097,7 +1097,7 @@ export class Matrix4 {
       c = 1 / (far - near);
       d = far / (far - near);
     } else {
-      if (coordinateSystem === WebGLCoordinateSystem) {
+      if (coordinateSystem === CoordinateSystem.WebGL) {
         c = -2 / (far - near);
         d = -(far + near) / (far - near);
       } else {

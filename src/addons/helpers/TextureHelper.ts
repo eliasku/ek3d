@@ -1,6 +1,6 @@
 import { BoxGeometry } from "../../geometries/BoxGeometry";
 import { BufferAttribute } from "../../core/BufferAttribute";
-import { DoubleSide } from "../../constants";
+import { Side } from "../../constants";
 import { Mesh } from "../../objects/Mesh";
 import { PlaneGeometry } from "../../geometries/PlaneGeometry";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
@@ -24,7 +24,7 @@ export class TextureHelper extends Mesh<ShaderMaterial> {
     const material = new ShaderMaterial({
       type: "TextureHelperMaterial",
 
-      side: DoubleSide,
+      side: Side.Double,
       transparent: true,
 
       uniforms: {

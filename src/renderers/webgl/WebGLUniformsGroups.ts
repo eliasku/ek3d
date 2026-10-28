@@ -1,3 +1,4 @@
+import { GL } from "../../GL";
 import { warn } from "../../utils";
 export function WebGLUniformsGroups(gl?: any, info?: any, capabilities?: any, state?: any) {
   let buffers: any = {};
@@ -30,16 +31,16 @@ export function WebGLUniformsGroups(gl?: any, info?: any, capabilities?: any, st
     const buffer = gl.createBuffer();
     const size = uniformsGroup.__size;
     const usage = uniformsGroup.usage;
-    gl.bindBuffer(gl.UNIFORM_BUFFER, buffer);
-    gl.bufferData(gl.UNIFORM_BUFFER, size, usage);
-    gl.bindBuffer(gl.UNIFORM_BUFFER, null);
+    gl.bindBuffer(GL.UNIFORM_BUFFER, buffer);
+    gl.bufferData(GL.UNIFORM_BUFFER, size, usage);
+    gl.bindBuffer(GL.UNIFORM_BUFFER, null);
     return buffer;
   }
   function updateBufferData(uniformsGroup?: any) {
     const buffer = (buffers as any)[uniformsGroup.id];
     const uniforms = uniformsGroup.uniforms;
     const cache = uniformsGroup.__cache;
-    gl.bindBuffer(gl.UNIFORM_BUFFER, buffer);
+    gl.bindBuffer(GL.UNIFORM_BUFFER, buffer);
     for (let i = 0, il = uniforms.length; i < il; i++) {
       const uniformItem = uniforms[i];
       if (Array.isArray(uniformItem)) {
@@ -50,7 +51,7 @@ export function WebGLUniformsGroups(gl?: any, info?: any, capabilities?: any, st
         updateUniform(uniformItem, i, 0, cache);
       }
     }
-    gl.bindBuffer(gl.UNIFORM_BUFFER, null);
+    gl.bindBuffer(GL.UNIFORM_BUFFER, null);
   }
   function updateUniform(uniform?: any, index?: any, indexArray?: any, cache?: any) {
     if (hasUniformChanged(uniform, index, indexArray, cache) === true) {
@@ -67,7 +68,7 @@ export function WebGLUniformsGroups(gl?: any, info?: any, capabilities?: any, st
       } else {
         writeUniformValue(value, uniform.__data, 0);
       }
-      gl.bufferSubData(gl.UNIFORM_BUFFER, offset, uniform.__data);
+      gl.bufferSubData(GL.UNIFORM_BUFFER, offset, uniform.__data);
     }
   }
   function writeUniformValue(value?: any, data?: any, offset?: any) {

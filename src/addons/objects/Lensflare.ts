@@ -1,7 +1,7 @@
 import type { Camera } from "../../cameras/Camera";
 import type { Object3D } from "../../core/Object3D";
 import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
-import { AdditiveBlending, UnsignedByteType } from "../../constants";
+import { Blending, TextureType } from "../../constants";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { InterleavedBuffer } from "../../core/InterleavedBuffer";
 import { InterleavedBufferAttribute } from "../../core/InterleavedBufferAttribute";
@@ -112,7 +112,7 @@ export class Lensflare extends Mesh<MeshBasicMaterial> {
       positionView = new Vector3();
     const tempMap = new FramebufferTexture(16, 16),
       occlusionMap = new FramebufferTexture(16, 16);
-    let currentType: number = UnsignedByteType;
+    let currentType: number = TextureType.UnsignedByte;
     const geometry = Lensflare.Geometry;
     const material1a = new RawShaderMaterial({
       uniforms: { scale: { value: null }, screenPosition: { value: null } },
@@ -165,7 +165,7 @@ export class Lensflare extends Mesh<MeshBasicMaterial> {
       },
       vertexShader: shader.vertexShader,
       fragmentShader: shader.fragmentShader,
-      blending: AdditiveBlending,
+      blending: Blending.Additive,
       transparent: true,
       depthWrite: false,
     });
@@ -180,7 +180,7 @@ export class Lensflare extends Mesh<MeshBasicMaterial> {
     this.onBeforeRender = (renderer: WebGLRenderer, _scene: Object3D, camera: Camera): void => {
       renderer.getCurrentViewport(viewport);
       const renderTarget = renderer.getRenderTarget();
-      const type = renderTarget !== null ? renderTarget.texture.type : UnsignedByteType;
+      const type = renderTarget !== null ? renderTarget.texture.type : TextureType.UnsignedByte;
       if (currentType !== type) {
         tempMap.dispose();
         occlusionMap.dispose();

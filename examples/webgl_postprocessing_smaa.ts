@@ -10,7 +10,7 @@ import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { Scene } from "ek3d/scenes/Scene";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 
 const canvas = document.querySelector<HTMLCanvasElement>("#scene")!;
 
@@ -41,7 +41,7 @@ scene.add(mesh1);
 
 const texture = await new TextureLoader().loadAsync("/examples/textures/brick_diffuse.jpg");
 texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-texture.colorSpace = SRGBColorSpace;
+texture.colorSpace = ColorSpace.SRGB;
 
 const material2 = new MeshBasicMaterial({ map: texture });
 

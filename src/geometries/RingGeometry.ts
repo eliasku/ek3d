@@ -10,12 +10,12 @@ import { Vector3 } from "../math/Vector3";
  * import { RingGeometry } from 'ek3d/geometries/RingGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
  * import { Mesh } from 'ek3d/objects/Mesh';
- * import { DoubleSide } from 'ek3d/constants';
+ * import { Side } from 'ek3d/constants';
  *
  * const scene = new Scene();
  *
  * const geometry = new RingGeometry( 1, 5, 32 );
- * const material = new MeshBasicMaterial( { color: 0xffff00, side: DoubleSide } );
+ * const material = new MeshBasicMaterial( { color: 0xffff00, side: Side.Double } );
  * const mesh = new Mesh( geometry, material );
  * scene.add( mesh );
  * ```

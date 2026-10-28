@@ -6,7 +6,7 @@ import { NEEDLE_progressive, useNeedleProgressive } from "ek3d/addons/loaders/GL
 import { HDRLoader } from "ek3d/addons/loaders/HDRLoader";
 import { KTX2Loader } from "ek3d/addons/loaders/KTX2Loader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping } from "ek3d/constants";
+import { ToneMapping, Mapping } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import type { Object3D } from "ek3d/core/Object3D";
 import { Color } from "ek3d/math/Color";
@@ -55,7 +55,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 1;
 
 const scene = new Scene();
@@ -102,7 +102,7 @@ new HDRLoader().load(
       return;
     }
     environment = texture;
-    texture.mapping = EquirectangularReflectionMapping;
+    texture.mapping = Mapping.EquirectangularReflection;
     scene.background = new Color("#192022");
     scene.backgroundBlurriness = 0.5;
     scene.environment = texture;

@@ -14,7 +14,7 @@ import { KTX2Exporter } from "../src/addons/exporters/KTX2Exporter";
 import type { KTX2Writer } from "../src/addons/exporters/KTX2Exporter";
 import { EXRLoader } from "../src/addons/loaders/EXRLoader";
 import { read as readKTX2 } from "../src/addons/loaders/KTX2Container";
-import { FloatType, HalfFloatType, RGBAFormat, SRGBColorSpace } from "../src/constants";
+import { TextureType, PixelFormat, ColorSpace } from "../src/constants";
 import { DataTexture } from "../src/textures/DataTexture";
 import { Data3DTexture } from "../src/textures/Data3DTexture";
 import type { WebGLRenderer } from "../src/renderers/WebGLRenderer";
@@ -32,11 +32,11 @@ test("EXR compression modes round-trip real scanline data", async () => {
     data[i + 2] = 0.75;
     data[i + 3] = 1;
   }
-  const texture = new DataTexture(data, width, height, RGBAFormat, FloatType);
+  const texture = new DataTexture(data, width, height, PixelFormat.RGBA, TextureType.Float);
   const exporter = new EXRExporter(zlib);
-  const loader = new EXRLoader().setZlibDecoder(zlib).setDataType(FloatType);
+  const loader = new EXRLoader().setZlibDecoder(zlib).setDataType(TextureType.Float);
   for (const compression of [NO_COMPRESSION, RLE_COMPRESSION, ZIPS_COMPRESSION, ZIP_COMPRESSION, PIZ_COMPRESSION]) {
-    for (const type of [HalfFloatType, FloatType]) {
+    for (const type of [TextureType.HalfFloat, TextureType.Float]) {
       const bytes = await exporter.parse(texture, { compression, type });
       assert.equal(new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(0, true), 20000630);
       const decoded = loader.parse(Uint8Array.from(bytes).buffer);
@@ -49,7 +49,7 @@ test("EXR compression modes round-trip real scanline data", async () => {
 });
 
 test("EXR accepts false render target kind flags and rejects true ones", async () => {
-  const target = new WebGLRenderTarget(1, 1, { type: FloatType });
+  const target = new WebGLRenderTarget(1, 1, { type: TextureType.Float });
   const flags = Object.assign(target, { isWebGLCubeRenderTarget: false });
   const renderer = {
     isWebGLRenderer: true,
@@ -66,8 +66,11 @@ test("EXR accepts false render target kind flags and rejects true ones", async (
     },
   } as unknown as WebGLRenderer;
   const exporter = new EXRExporter(zlib);
-  const bytes = await exporter.parse(renderer, flags, { type: FloatType, compression: NO_COMPRESSION });
-  const decoded = new EXRLoader().setZlibDecoder(zlib).setDataType(FloatType).parse(Uint8Array.from(bytes).buffer);
+  const bytes = await exporter.parse(renderer, flags, { type: TextureType.Float, compression: NO_COMPRESSION });
+  const decoded = new EXRLoader()
+    .setZlibDecoder(zlib)
+    .setDataType(TextureType.Float)
+    .parse(Uint8Array.from(bytes).buffer);
   assert.ok(decoded.data);
   assert.deepEqual(Array.from(decoded.data), [0.25, 0.5, 0.75, 1]);
   flags.isWebGLCubeRenderTarget = true;
@@ -75,10 +78,7 @@ test("EXR accepts false render target kind flags and rejects true ones", async (
 });
 
 test("KTX2 writer preserves byte offsets, descriptor and 3D dimensions", async () => {
-  const source = await readFile(
-    new URL("../examples/public/examples/libs/ktx-parse.module.js", import.meta.url),
-    "utf8",
-  );
+  const source = await readFile(new URL("../public/examples/libs/ktx-parse.module.js", import.meta.url), "utf8");
   // Node imports the same public runtime the browser example loads, without bundling it.
   const runtime = (await import(
     /* @vite-ignore */ `data:text/javascript;base64,${Buffer.from(source).toString("base64")}`
@@ -86,7 +86,7 @@ test("KTX2 writer preserves byte offsets, descriptor and 3D dimensions", async (
   const exporter = new KTX2Exporter(runtime);
   const backing = new Uint8Array([99, 98, 1, 2, 3, 4, 97]);
   const texture = new DataTexture(backing.subarray(2, 6), 1, 1);
-  texture.colorSpace = SRGBColorSpace;
+  texture.colorSpace = ColorSpace.SRGB;
   const bytes = await exporter.parse(texture);
   const parsed = readKTX2(bytes);
   assert.equal(parsed.vkFormat, runtime.VK_FORMAT_R8G8B8A8_SRGB);

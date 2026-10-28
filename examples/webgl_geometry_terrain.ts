@@ -1,6 +1,6 @@
 import { FirstPersonControls } from "ek3d/addons/controls/FirstPersonControls";
 import { ImprovedNoise } from "ek3d/addons/math/ImprovedNoise";
-import { SRGBColorSpace, ClampToEdgeWrapping } from "ek3d/constants";
+import { ColorSpace, Wrapping } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
@@ -43,9 +43,9 @@ for (let i = 0, j = 0, l = vertices.length; i < l; i++, j += 3) {
 }
 
 const texture = new CanvasTexture(generateTexture(data, worldWidth, worldDepth));
-texture.wrapS = ClampToEdgeWrapping;
-texture.wrapT = ClampToEdgeWrapping;
-texture.colorSpace = SRGBColorSpace;
+texture.wrapS = Wrapping.ClampToEdge;
+texture.wrapT = Wrapping.ClampToEdge;
+texture.colorSpace = ColorSpace.SRGB;
 
 const mesh = new Mesh(geometry, new MeshBasicMaterial({ map: texture }));
 scene.add(mesh);

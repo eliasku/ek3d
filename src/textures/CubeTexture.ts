@@ -1,5 +1,5 @@
 import { Texture } from "./Texture";
-import { CubeReflectionMapping } from "../constants";
+import { Mapping, Wrapping, TextureFilter } from "../constants";
 /**
  * Creates a cube texture made up of six images.
  *
@@ -25,23 +25,23 @@ export class CubeTexture extends Texture {
    * Constructs a new cube texture.
    *
    * @param [images=[]] - An array holding a image for each side of a cube.
-   * @param [mapping=CubeReflectionMapping] - The texture mapping.
-   * @param [wrapS=ClampToEdgeWrapping] - The wrapS value.
-   * @param [wrapT=ClampToEdgeWrapping] - The wrapT value.
-   * @param [magFilter=LinearFilter] - The mag filter value.
-   * @param [minFilter=LinearMipmapLinearFilter] - The min filter value.
-   * @param [format=RGBAFormat] - The texture format.
-   * @param [type=UnsignedByteType] - The texture type.
+   * @param [mapping=Mapping.CubeReflection] - The texture mapping.
+   * @param [wrapS=Wrapping.ClampToEdge] - The wrapS value.
+   * @param [wrapT=Wrapping.ClampToEdge] - The wrapT value.
+   * @param [magFilter=TextureFilter.Linear] - The mag filter value.
+   * @param [minFilter=TextureFilter.LinearMipmapLinear] - The min filter value.
+   * @param [format=PixelFormat.RGBA] - The texture format.
+   * @param [type=TextureType.UnsignedByte] - The texture type.
    * @param [anisotropy=Texture.DEFAULT_ANISOTROPY] - The anisotropy value.
-   * @param [colorSpace=NoColorSpace] - The color space value.
+   * @param [colorSpace=ColorSpace.No] - The color space value.
    */
   constructor(
     images: any[] = [],
-    mapping: number = CubeReflectionMapping,
-    wrapS?: number,
-    wrapT?: number,
-    magFilter?: number,
-    minFilter?: number,
+    mapping: Mapping = Mapping.CubeReflection,
+    wrapS?: Wrapping,
+    wrapT?: Wrapping,
+    magFilter?: TextureFilter,
+    minFilter?: TextureFilter,
     format?: number,
     type?: number,
     anisotropy?: number,

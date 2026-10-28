@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { WebGLShadowMap } from "ek3d/renderers/webgl/WebGLShadowMap";
 import { WebGLEnvironments } from "ek3d/renderers/webgl/WebGLEnvironments";
@@ -33,13 +34,7 @@ import { shadowShader } from "ek3d/renderers/shaders/ShadowShader";
 import { depthShader } from "ek3d/renderers/shaders/DepthShader";
 import { createDFGLUT } from "ek3d/renderers/shaders/DFGLUTData";
 import { createLTCTextures } from "ek3d/renderers/shaders/LTCTextures";
-import {
-  EquirectangularReflectionMapping,
-  LinearSRGBColorSpace,
-  LinearFilter,
-  NearestFilter,
-  BasicShadowMap,
-} from "ek3d/constants";
+import { Mapping, ColorSpace, TextureFilter, ShadowMap } from "ek3d/constants";
 import { createEnvironmentPixels, environmentWidth, environmentHeight } from "./browser-fixtures";
 
 function check(condition: boolean, message: string): asserts condition {
@@ -94,10 +89,10 @@ export async function verifyMaterialRendering() {
       );
     }
   const ramp = texture(rampBytes, 32, 32);
-  ramp.magFilter = ramp.minFilter = LinearFilter;
+  ramp.magFilter = ramp.minFilter = TextureFilter.Linear;
   const backdropMap = texture(backdropBytes, 32, 32);
   const environment = new DataTexture(createEnvironmentPixels(), environmentWidth, environmentHeight);
-  environment.mapping = EquirectangularReflectionMapping;
+  environment.mapping = Mapping.EquirectangularReflection;
   environment.needsUpdate = true;
   textures.push(environment);
   const dfg = createDFGLUT();
@@ -120,7 +115,7 @@ export async function verifyMaterialRendering() {
     createShadowMap: WebGLShadowMap,
   });
   renderer.setSize(size, size, false);
-  renderer.outputColorSpace = LinearSRGBColorSpace;
+  renderer.outputColorSpace = ColorSpace.LinearSRGB;
   renderer.setClearColor(0x000000, 0);
   const gl = renderer.getContext();
   const scene = new Scene();
@@ -166,11 +161,11 @@ export async function verifyMaterialRendering() {
     owner.render(scene, camera);
     const context = owner.getContext();
     const result = new Uint8Array(size * size * 4);
-    context.readPixels(0, 0, size, size, context.RGBA, context.UNSIGNED_BYTE, result);
-    check(context.getError() === context.NO_ERROR, "Material fixture produced a WebGL error");
+    context.readPixels(0, 0, size, size, GL.RGBA, GL.UNSIGNED_BYTE, result);
+    check(context.getError() === GL.NO_ERROR, "Material fixture produced a WebGL error");
     for (const program of owner.info.programs ?? [])
       check(
-        context.getProgramParameter(program.program, context.LINK_STATUS),
+        context.getProgramParameter(program.program, GL.LINK_STATUS),
         `Material shader did not link: ${program.name}`,
       );
     return result;
@@ -243,7 +238,7 @@ export async function verifyMaterialRendering() {
     mesh.material = toon;
     scene.add(directional);
     const gradient = texture([64, 0, 0, 255, 64, 0, 0, 255, 64, 0, 0, 255, 192, 0, 0, 255], 4, 1);
-    gradient.magFilter = gradient.minFilter = NearestFilter;
+    gradient.magFilter = gradient.minFilter = TextureFilter.Nearest;
     toon.gradientMap = gradient;
     near("toonBrightStep", draw(), [192 / Math.PI, 192 / Math.PI, 192 / Math.PI, 255]);
     mesh.rotation.y = Math.PI * 0.4;
@@ -311,7 +306,7 @@ export async function verifyMaterialRendering() {
     scene.add(directional, caster);
     directional.castShadow = true;
     renderer.shadowMap!.enabled = true;
-    renderer.shadowMap!.type = BasicShadowMap;
+    renderer.shadowMap!.type = ShadowMap.Basic;
     const shadowed = draw();
     const shadowPixel = sample(shadowed);
     check(shadowPixel[3] >= 150 && shadowPixel[3] <= 155, `Shadow alpha did not use opacity: ${shadowPixel.join(",")}`);
@@ -391,7 +386,7 @@ export async function verifyMaterialRendering() {
       name === "OES_texture_float_linear" ? false : originalHas.call(halfRenderer.extensions, name);
     try {
       halfRenderer.setSize(size, size, false);
-      halfRenderer.outputColorSpace = LinearSRGBColorSpace;
+      halfRenderer.outputColorSpace = ColorSpace.LinearSRGB;
       halfRenderer.setClearColor(0x000000, 0);
       const halfFrame = draw(halfRenderer);
       handle(ltc.LTC_HALF_1, halfRenderer);
@@ -1081,7 +1076,7 @@ export async function verifyMaterialRendering() {
     const alternate = own(new MeshPhysicalMaterial({ roughness: 0.9, metalness: 1, color: 0x2040ff }));
     try {
       other.setSize(size, size, false);
-      other.outputColorSpace = LinearSRGBColorSpace;
+      other.outputColorSpace = ColorSpace.LinearSRGB;
       other.setClearColor(0x000000, 0);
       const primary = draw();
       mesh.material = alternate;
@@ -1109,7 +1104,7 @@ export async function verifyMaterialRendering() {
       });
       try {
         candidate.setSize(size, size, false);
-        candidate.outputColorSpace = LinearSRGBColorSpace;
+        candidate.outputColorSpace = ColorSpace.LinearSRGB;
         candidate.setClearColor(0x000000, 0);
         reject(() => candidate.render(scene, camera), "No explicit shader selected");
         candidate.shaders = shaders;
@@ -1125,7 +1120,7 @@ export async function verifyMaterialRendering() {
       reject(() => missingDFG.render(scene, camera), "getDFGLUT");
       mesh.material = normal;
       missingDFG.setSize(size, size, false);
-      missingDFG.outputColorSpace = LinearSRGBColorSpace;
+      missingDFG.outputColorSpace = ColorSpace.LinearSRGB;
       const recovered = draw(missingDFG);
       near("missingDFGRecovery", recovered, sample(draw()));
     } finally {
@@ -1140,7 +1135,7 @@ export async function verifyMaterialRendering() {
       scene.remove(area);
       scene.add(directional);
       missingLTC.setSize(size, size, false);
-      missingLTC.outputColorSpace = LinearSRGBColorSpace;
+      missingLTC.outputColorSpace = ColorSpace.LinearSRGB;
       near("missingLTCRecovery", draw(missingLTC), sample(draw()));
     } finally {
       missingLTC.dispose();
@@ -1151,7 +1146,7 @@ export async function verifyMaterialRendering() {
       reject(() => missingEnvironment.render(scene, camera), "createEnvironments");
       scene.environment = null;
       missingEnvironment.setSize(size, size, false);
-      missingEnvironment.outputColorSpace = LinearSRGBColorSpace;
+      missingEnvironment.outputColorSpace = ColorSpace.LinearSRGB;
       near("missingEnvironmentRecovery", draw(missingEnvironment), sample(draw()));
     } finally {
       missingEnvironment.dispose();
@@ -1170,7 +1165,7 @@ export async function verifyMaterialRendering() {
     matcap.dispose();
     check(!gl.isTexture(oldTexture), "Texture.dispose did not delete material GPU storage");
     check(
-      oldPrograms.every((program) => !gl.isProgram(program) || gl.getProgramParameter(program, gl.DELETE_STATUS)),
+      oldPrograms.every((program) => !gl.isProgram(program) || gl.getProgramParameter(program, GL.DELETE_STATUS)),
       "Material.dispose retained an unreferenced GPU program",
     );
     same(draw(), beforeDispose, "Material/texture disposal recreation");
@@ -1253,9 +1248,9 @@ export async function verifyMaterialRendering() {
       "Material fixture leaked caller-owned textures",
     );
     check(
-      programs.every((program) => !gl.isProgram(program) || gl.getProgramParameter(program, gl.DELETE_STATUS)),
+      programs.every((program) => !gl.isProgram(program) || gl.getProgramParameter(program, GL.DELETE_STATUS)),
       "Material fixture leaked programs",
     );
-    check(gl.getError() === gl.NO_ERROR, "Material fixture cleanup produced a WebGL error");
+    check(gl.getError() === GL.NO_ERROR, "Material fixture cleanup produced a WebGL error");
   }
 }

@@ -1,14 +1,6 @@
+import { GL } from "./GL";
 import type { Matrix4 } from "./math/Matrix4";
-import {
-  AlwaysDepth,
-  EqualDepth,
-  GreaterDepth,
-  GreaterEqualDepth,
-  LessDepth,
-  LessEqualDepth,
-  NeverDepth,
-  NotEqualDepth,
-} from "./constants";
+import { DepthFunc } from "./constants";
 /**
  * Finds the minimum value in an array.
  *
@@ -283,11 +275,11 @@ export function yieldToMain() {
 export function probeAsync(gl: WebGL2RenderingContext, sync: WebGLSync, interval: number) {
   return new Promise<void>(function (resolve: () => void, reject: (reason?: any) => void) {
     function probe() {
-      switch (gl.clientWaitSync(sync, gl.SYNC_FLUSH_COMMANDS_BIT, 0)) {
-        case gl.WAIT_FAILED:
+      switch (gl.clientWaitSync(sync, GL.SYNC_FLUSH_COMMANDS_BIT, 0)) {
+        case GL.WAIT_FAILED:
           reject();
           break;
-        case gl.TIMEOUT_EXPIRED:
+        case GL.TIMEOUT_EXPIRED:
           setTimeout(probe, interval);
           break;
         default:
@@ -351,12 +343,12 @@ export function toReversedProjectionMatrix(projectionMatrix: Matrix4) {
  * @private
  */
 export const ReversedDepthFuncs: any = {
-  [NeverDepth]: AlwaysDepth,
-  [LessDepth]: GreaterDepth,
-  [EqualDepth]: NotEqualDepth,
-  [LessEqualDepth]: GreaterEqualDepth,
-  [AlwaysDepth]: NeverDepth,
-  [GreaterDepth]: LessDepth,
-  [NotEqualDepth]: EqualDepth,
-  [GreaterEqualDepth]: LessEqualDepth,
+  [DepthFunc.Never]: DepthFunc.Always,
+  [DepthFunc.Less]: DepthFunc.Greater,
+  [DepthFunc.Equal]: DepthFunc.NotEqual,
+  [DepthFunc.LessEqual]: DepthFunc.GreaterEqual,
+  [DepthFunc.Always]: DepthFunc.Never,
+  [DepthFunc.Greater]: DepthFunc.Less,
+  [DepthFunc.NotEqual]: DepthFunc.Equal,
+  [DepthFunc.GreaterEqual]: DepthFunc.LessEqual,
 };

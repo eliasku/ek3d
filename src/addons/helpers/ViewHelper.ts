@@ -10,7 +10,7 @@ import { Quaternion } from "../../math/Quaternion";
 import { Raycaster } from "../../core/Raycaster";
 import { Sprite } from "../../objects/Sprite";
 import { SpriteMaterial } from "../../materials/SpriteMaterial";
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import { Vector2 } from "../../math/Vector2";
 import { Vector3 } from "../../math/Vector3";
 import { Vector4 } from "../../math/Vector4";
@@ -375,7 +375,7 @@ export class ViewHelper extends Object3D {
       }
 
       const texture = new CanvasTexture(canvas);
-      texture.colorSpace = SRGBColorSpace;
+      texture.colorSpace = ColorSpace.SRGB;
 
       return new SpriteMaterial({ map: texture, toneMapped: false });
     }

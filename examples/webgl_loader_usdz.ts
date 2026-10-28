@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { HDRLoader } from "ek3d/addons/loaders/HDRLoader";
 import { USDLoader } from "ek3d/addons/loaders/USDLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping } from "ek3d/constants";
+import { ToneMapping, Mapping } from "ek3d/constants";
 import { LoadingManager } from "ek3d/loaders/LoadingManager";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { createDFGLUT } from "ek3d/renderers/shaders/DFGLUTData";
@@ -34,7 +34,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 2;
 const controls = new OrbitControls(camera, canvas);
 controls.minDistance = 1;
@@ -59,7 +59,7 @@ new HDRLoader(manager).setPath("/examples/textures/equirectangular/").load(
       return;
     }
     environment = texture;
-    texture.mapping = EquirectangularReflectionMapping;
+    texture.mapping = Mapping.EquirectangularReflection;
     scene.background = texture;
     scene.backgroundBlurriness = 0.5;
     scene.environment = texture;

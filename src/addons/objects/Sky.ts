@@ -1,4 +1,4 @@
-import { BackSide } from "../../constants";
+import { Side } from "../../constants";
 import { BoxGeometry } from "../../geometries/BoxGeometry";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { cloneUniforms } from "../../renderers/shaders/UniformsUtils";
@@ -332,7 +332,7 @@ export class Sky extends Mesh<ShaderMaterial> {
       uniforms: cloneUniforms(shader.uniforms) as never,
       vertexShader: shader.vertexShader,
       fragmentShader: shader.fragmentShader,
-      side: BackSide,
+      side: Side.Back,
       depthWrite: false,
     } as never);
 

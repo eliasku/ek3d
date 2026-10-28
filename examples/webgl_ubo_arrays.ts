@@ -10,7 +10,7 @@ import { RawShaderMaterial } from "ek3d/materials/RawShaderMaterial";
 import { Mesh } from "ek3d/objects/Mesh";
 import { Color } from "ek3d/math/Color";
 import { Vector4 } from "ek3d/math/Vector4";
-import { GLSL3 } from "ek3d/constants";
+import { GLSL } from "ek3d/constants";
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
@@ -129,7 +129,7 @@ void main()  {
 
 }
     `,
-  glslVersion: GLSL3,
+  glslVersion: GLSL.GLSL3,
 });
 function addMesh(shape: SphereGeometry | PlaneGeometry): Mesh<RawShaderMaterial> {
   const mesh = new Mesh<RawShaderMaterial>(shape, material.clone());

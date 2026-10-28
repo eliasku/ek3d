@@ -1,3 +1,4 @@
+import { Mapping, Wrapping, TextureFilter } from "../constants";
 import { Texture } from "./Texture";
 export interface CompressedTextureMipmap {
   data:
@@ -34,15 +35,15 @@ export class CompressedTexture extends Texture<CompressedTextureMipmap> {
    * the data and dimensions.
    * @param width - The width of the texture.
    * @param height - The height of the texture.
-   * @param [format=RGBAFormat] - The texture format.
-   * @param [type=UnsignedByteType] - The texture type.
+   * @param [format=PixelFormat.RGBA] - The texture format.
+   * @param [type=TextureType.UnsignedByte] - The texture type.
    * @param [mapping=Texture.DEFAULT_MAPPING] - The texture mapping.
-   * @param [wrapS=ClampToEdgeWrapping] - The wrapS value.
-   * @param [wrapT=ClampToEdgeWrapping] - The wrapT value.
-   * @param [magFilter=LinearFilter] - The mag filter value.
-   * @param [minFilter=LinearMipmapLinearFilter] - The min filter value.
+   * @param [wrapS=Wrapping.ClampToEdge] - The wrapS value.
+   * @param [wrapT=Wrapping.ClampToEdge] - The wrapT value.
+   * @param [magFilter=TextureFilter.Linear] - The mag filter value.
+   * @param [minFilter=TextureFilter.LinearMipmapLinear] - The min filter value.
    * @param [anisotropy=Texture.DEFAULT_ANISOTROPY] - The anisotropy value.
-   * @param [colorSpace=NoColorSpace] - The color space.
+   * @param [colorSpace=ColorSpace.No] - The color space.
    */
   constructor(
     mipmaps: CompressedTextureMipmap[] = [],
@@ -50,11 +51,11 @@ export class CompressedTexture extends Texture<CompressedTextureMipmap> {
     height?: number,
     format?: number,
     type?: number,
-    mapping?: number,
-    wrapS?: number,
-    wrapT?: number,
-    magFilter?: number,
-    minFilter?: number,
+    mapping?: Mapping,
+    wrapS?: Wrapping,
+    wrapT?: Wrapping,
+    magFilter?: TextureFilter,
+    minFilter?: TextureFilter,
     anisotropy?: number,
     colorSpace?: string,
   ) {

@@ -46,7 +46,7 @@ export class MeshDistanceMaterial extends Material {
      *
      * `map` represents color data, and the texture must be assigned a
      * {@link Texture#colorSpace}. Most `map` textures set
-     * `texture.colorSpace = SRGBColorSpace`.
+     * `texture.colorSpace = ColorSpace.SRGB`.
      *
      * @default null
      */
@@ -62,7 +62,7 @@ export class MeshDistanceMaterial extends Material {
      * luminance/alpha textures will also still work as expected.
      *
      * `alphaMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -76,7 +76,7 @@ export class MeshDistanceMaterial extends Material {
      * repositions, the vertices of the mesh.
      *
      * `displacementMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */

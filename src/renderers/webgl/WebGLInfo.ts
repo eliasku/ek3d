@@ -1,3 +1,4 @@
+import { GL } from "../../GL";
 import { error } from "../../utils";
 import type { WebGLProgramInfo } from "./WebGLProgram";
 export interface WebGLInfoState {
@@ -29,7 +30,7 @@ export interface WebGLInfoState {
   reset(): void;
   update(count: number, mode: number, instanceCount: number): void;
 }
-export function WebGLInfo(gl: WebGL2RenderingContext): WebGLInfoState {
+export function WebGLInfo(): WebGLInfoState {
   const memory: WebGLInfoState["memory"] = {
     geometries: 0,
     textures: 0,
@@ -44,19 +45,19 @@ export function WebGLInfo(gl: WebGL2RenderingContext): WebGLInfoState {
   function update(count: number, mode: number, instanceCount: number) {
     render.calls++;
     switch (mode) {
-      case gl.TRIANGLES:
+      case GL.TRIANGLES:
         render.triangles += instanceCount * (count / 3);
         break;
-      case gl.LINES:
+      case GL.LINES:
         render.lines += instanceCount * (count / 2);
         break;
-      case gl.LINE_STRIP:
+      case GL.LINE_STRIP:
         render.lines += instanceCount * (count - 1);
         break;
-      case gl.LINE_LOOP:
+      case GL.LINE_LOOP:
         render.lines += instanceCount * count;
         break;
-      case gl.POINTS:
+      case GL.POINTS:
         render.points += instanceCount * count;
         break;
       default:

@@ -1,43 +1,4 @@
-import {
-  RGBAFormat,
-  RGBFormat,
-  RGFormat,
-  RedFormat,
-  RGBA_ASTC_4x4_Format,
-  RGBA_ASTC_6x6_Format,
-  RGB_ETC1_Format,
-  RGB_ETC2_Format,
-  RGBA_ETC2_EAC_Format,
-  RGB_PVRTC_4BPPV1_Format,
-  RGBA_PVRTC_4BPPV1_Format,
-  RGBA_PVRTC_2BPPV1_Format,
-  RGB_BPTC_UNSIGNED_Format,
-  RGBA_BPTC_Format,
-  RGBA_S3TC_DXT1_Format,
-  RGBA_S3TC_DXT5_Format,
-  RGB_S3TC_DXT1_Format,
-  RED_RGTC1_Format,
-  SIGNED_RED_RGTC1_Format,
-  RED_GREEN_RGTC2_Format,
-  SIGNED_RED_GREEN_RGTC2_Format,
-  R11_EAC_Format,
-  SIGNED_R11_EAC_Format,
-  RG11_EAC_Format,
-  SIGNED_RG11_EAC_Format,
-  SRGBColorSpace,
-  LinearSRGBColorSpace,
-  NoColorSpace,
-  FloatType,
-  HalfFloatType,
-  UnsignedByteType,
-  UnsignedShortType,
-  UnsignedInt5999Type,
-  UnsignedInt101111Type,
-  NearestMipmapNearestFilter,
-  NearestFilter,
-  LinearMipmapLinearFilter,
-  LinearFilter,
-} from "../../constants";
+import { PixelFormat, ColorSpace, TextureType, TextureFilter } from "../../constants";
 import { CompressedTexture } from "../../textures/CompressedTexture";
 import { CompressedArrayTexture } from "../../textures/CompressedArrayTexture";
 import { CompressedCubeTexture } from "../../textures/CompressedCubeTexture";
@@ -494,8 +455,8 @@ export class KTX2Loader extends Loader<
             )
           : new CompressedTexture(mipmaps as never, width, height, format as never, type as never);
     }
-    texture.minFilter = faces[0].mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
-    texture.magFilter = LinearFilter;
+    texture.minFilter = faces[0].mipmaps.length === 1 ? TextureFilter.Linear : TextureFilter.LinearMipmapLinear;
+    texture.magFilter = TextureFilter.Linear;
     texture.generateMipmaps = false;
     texture.needsUpdate = true;
     texture.colorSpace = parseColorSpace(container);
@@ -599,23 +560,23 @@ const KTX2Loader_TranscoderFormat = {
 } as const;
 
 const KTX2Loader_EngineFormat = {
-  RGBAFormat,
-  RGBA_ASTC_4x4_Format,
-  RGB_BPTC_UNSIGNED_Format,
-  RGBA_BPTC_Format,
-  RGBA_ETC2_EAC_Format,
-  RGBA_PVRTC_4BPPV1_Format,
-  RGBA_S3TC_DXT5_Format,
-  RGB_ETC1_Format,
-  RGB_ETC2_Format,
-  RGB_PVRTC_4BPPV1_Format,
-  RGBA_S3TC_DXT1_Format,
+  RGBAFormat: PixelFormat.RGBA,
+  RGBA_ASTC_4x4_Format: PixelFormat.RGBA_ASTC_4x4,
+  RGB_BPTC_UNSIGNED_Format: PixelFormat.RGB_BPTC_UNSIGNED,
+  RGBA_BPTC_Format: PixelFormat.RGBA_BPTC,
+  RGBA_ETC2_EAC_Format: PixelFormat.RGBA_ETC2_EAC,
+  RGBA_PVRTC_4BPPV1_Format: PixelFormat.RGBA_PVRTC_4BPPV1,
+  RGBA_S3TC_DXT5_Format: PixelFormat.RGBA_S3TC_DXT5,
+  RGB_ETC1_Format: PixelFormat.RGB_ETC1,
+  RGB_ETC2_Format: PixelFormat.RGB_ETC2,
+  RGB_PVRTC_4BPPV1_Format: PixelFormat.RGB_PVRTC_4BPPV1,
+  RGBA_S3TC_DXT1_Format: PixelFormat.RGBA_S3TC_DXT1,
 } as const;
 
 const KTX2Loader_EngineType = {
-  UnsignedByteType,
-  HalfFloatType,
-  FloatType,
+  UnsignedByteType: TextureType.UnsignedByte,
+  HalfFloatType: TextureType.HalfFloat,
+  FloatType: TextureType.Float,
 } as const;
 
 /* WEB WORKER */
@@ -1029,124 +990,124 @@ const KTX2Loader_BasisWorker = function (): void {
 // Parsing for non-Basis textures. These textures may have supercompression
 // like Zstd, but they do not require transcoding.
 
-const UNCOMPRESSED_FORMATS = new Set([RGBAFormat, RGBFormat, RGFormat, RedFormat]);
+const UNCOMPRESSED_FORMATS = new Set([PixelFormat.RGBA, PixelFormat.RGB, PixelFormat.RG, PixelFormat.Red]);
 
 const NORMALIZED_VK_FORMATS = new Set([VK_FORMAT_R16G16B16A16_UNORM]);
 
 const FORMAT_MAP: Record<number, number> = {
-  [VK_FORMAT_R32G32B32A32_SFLOAT]: RGBAFormat,
-  [VK_FORMAT_R32G32_SFLOAT]: RGFormat,
-  [VK_FORMAT_R32_SFLOAT]: RedFormat,
+  [VK_FORMAT_R32G32B32A32_SFLOAT]: PixelFormat.RGBA,
+  [VK_FORMAT_R32G32_SFLOAT]: PixelFormat.RG,
+  [VK_FORMAT_R32_SFLOAT]: PixelFormat.Red,
 
-  [VK_FORMAT_R16G16B16A16_SFLOAT]: RGBAFormat,
-  [VK_FORMAT_R16G16_SFLOAT]: RGFormat,
-  [VK_FORMAT_R16_SFLOAT]: RedFormat,
+  [VK_FORMAT_R16G16B16A16_SFLOAT]: PixelFormat.RGBA,
+  [VK_FORMAT_R16G16_SFLOAT]: PixelFormat.RG,
+  [VK_FORMAT_R16_SFLOAT]: PixelFormat.Red,
 
-  [VK_FORMAT_R16G16B16A16_UNORM]: RGBAFormat,
+  [VK_FORMAT_R16G16B16A16_UNORM]: PixelFormat.RGBA,
 
-  [VK_FORMAT_R8G8B8A8_SRGB]: RGBAFormat,
-  [VK_FORMAT_R8G8B8A8_UNORM]: RGBAFormat,
-  [VK_FORMAT_R8G8_SRGB]: RGFormat,
-  [VK_FORMAT_R8G8_UNORM]: RGFormat,
-  [VK_FORMAT_R8_SRGB]: RedFormat,
-  [VK_FORMAT_R8_UNORM]: RedFormat,
+  [VK_FORMAT_R8G8B8A8_SRGB]: PixelFormat.RGBA,
+  [VK_FORMAT_R8G8B8A8_UNORM]: PixelFormat.RGBA,
+  [VK_FORMAT_R8G8_SRGB]: PixelFormat.RG,
+  [VK_FORMAT_R8G8_UNORM]: PixelFormat.RG,
+  [VK_FORMAT_R8_SRGB]: PixelFormat.Red,
+  [VK_FORMAT_R8_UNORM]: PixelFormat.Red,
 
-  [VK_FORMAT_E5B9G9R9_UFLOAT_PACK32]: RGBFormat,
-  [VK_FORMAT_B10G11R11_UFLOAT_PACK32]: RGBFormat,
+  [VK_FORMAT_E5B9G9R9_UFLOAT_PACK32]: PixelFormat.RGB,
+  [VK_FORMAT_B10G11R11_UFLOAT_PACK32]: PixelFormat.RGB,
 
-  [VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK]: RGBA_ETC2_EAC_Format,
-  [VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK]: RGB_ETC2_Format,
-  [VK_FORMAT_EAC_R11_UNORM_BLOCK]: R11_EAC_Format,
-  [VK_FORMAT_EAC_R11_SNORM_BLOCK]: SIGNED_R11_EAC_Format,
-  [VK_FORMAT_EAC_R11G11_UNORM_BLOCK]: RG11_EAC_Format,
-  [VK_FORMAT_EAC_R11G11_SNORM_BLOCK]: SIGNED_RG11_EAC_Format,
+  [VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK]: PixelFormat.RGBA_ETC2_EAC,
+  [VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK]: PixelFormat.RGB_ETC2,
+  [VK_FORMAT_EAC_R11_UNORM_BLOCK]: PixelFormat.R11_EAC,
+  [VK_FORMAT_EAC_R11_SNORM_BLOCK]: PixelFormat.SIGNED_R11_EAC,
+  [VK_FORMAT_EAC_R11G11_UNORM_BLOCK]: PixelFormat.RG11_EAC,
+  [VK_FORMAT_EAC_R11G11_SNORM_BLOCK]: PixelFormat.SIGNED_RG11_EAC,
 
-  [VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT]: RGBA_ASTC_4x4_Format,
-  [VK_FORMAT_ASTC_4x4_SRGB_BLOCK]: RGBA_ASTC_4x4_Format,
-  [VK_FORMAT_ASTC_4x4_UNORM_BLOCK]: RGBA_ASTC_4x4_Format,
-  [VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT]: RGBA_ASTC_6x6_Format,
-  [VK_FORMAT_ASTC_6x6_SRGB_BLOCK]: RGBA_ASTC_6x6_Format,
-  [VK_FORMAT_ASTC_6x6_UNORM_BLOCK]: RGBA_ASTC_6x6_Format,
+  [VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT]: PixelFormat.RGBA_ASTC_4x4,
+  [VK_FORMAT_ASTC_4x4_SRGB_BLOCK]: PixelFormat.RGBA_ASTC_4x4,
+  [VK_FORMAT_ASTC_4x4_UNORM_BLOCK]: PixelFormat.RGBA_ASTC_4x4,
+  [VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT]: PixelFormat.RGBA_ASTC_6x6,
+  [VK_FORMAT_ASTC_6x6_SRGB_BLOCK]: PixelFormat.RGBA_ASTC_6x6,
+  [VK_FORMAT_ASTC_6x6_UNORM_BLOCK]: PixelFormat.RGBA_ASTC_6x6,
 
-  [VK_FORMAT_BC1_RGBA_SRGB_BLOCK]: RGBA_S3TC_DXT1_Format,
-  [VK_FORMAT_BC1_RGBA_UNORM_BLOCK]: RGBA_S3TC_DXT1_Format,
-  [VK_FORMAT_BC1_RGB_SRGB_BLOCK]: RGB_S3TC_DXT1_Format,
-  [VK_FORMAT_BC1_RGB_UNORM_BLOCK]: RGB_S3TC_DXT1_Format,
+  [VK_FORMAT_BC1_RGBA_SRGB_BLOCK]: PixelFormat.RGBA_S3TC_DXT1,
+  [VK_FORMAT_BC1_RGBA_UNORM_BLOCK]: PixelFormat.RGBA_S3TC_DXT1,
+  [VK_FORMAT_BC1_RGB_SRGB_BLOCK]: PixelFormat.RGB_S3TC_DXT1,
+  [VK_FORMAT_BC1_RGB_UNORM_BLOCK]: PixelFormat.RGB_S3TC_DXT1,
 
-  [VK_FORMAT_BC3_SRGB_BLOCK]: RGBA_S3TC_DXT5_Format,
-  [VK_FORMAT_BC3_UNORM_BLOCK]: RGBA_S3TC_DXT5_Format,
+  [VK_FORMAT_BC3_SRGB_BLOCK]: PixelFormat.RGBA_S3TC_DXT5,
+  [VK_FORMAT_BC3_UNORM_BLOCK]: PixelFormat.RGBA_S3TC_DXT5,
 
-  [VK_FORMAT_BC4_SNORM_BLOCK]: SIGNED_RED_RGTC1_Format,
-  [VK_FORMAT_BC4_UNORM_BLOCK]: RED_RGTC1_Format,
+  [VK_FORMAT_BC4_SNORM_BLOCK]: PixelFormat.SIGNED_RED_RGTC1,
+  [VK_FORMAT_BC4_UNORM_BLOCK]: PixelFormat.RED_RGTC1,
 
-  [VK_FORMAT_BC5_SNORM_BLOCK]: SIGNED_RED_GREEN_RGTC2_Format,
-  [VK_FORMAT_BC5_UNORM_BLOCK]: RED_GREEN_RGTC2_Format,
+  [VK_FORMAT_BC5_SNORM_BLOCK]: PixelFormat.SIGNED_RED_GREEN_RGTC2,
+  [VK_FORMAT_BC5_UNORM_BLOCK]: PixelFormat.RED_GREEN_RGTC2,
 
-  [VK_FORMAT_BC7_SRGB_BLOCK]: RGBA_BPTC_Format,
-  [VK_FORMAT_BC7_UNORM_BLOCK]: RGBA_BPTC_Format,
+  [VK_FORMAT_BC7_SRGB_BLOCK]: PixelFormat.RGBA_BPTC,
+  [VK_FORMAT_BC7_UNORM_BLOCK]: PixelFormat.RGBA_BPTC,
 
-  [VK_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG]: RGBA_PVRTC_4BPPV1_Format,
-  [VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG]: RGBA_PVRTC_4BPPV1_Format,
-  [VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG]: RGBA_PVRTC_2BPPV1_Format,
-  [VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG]: RGBA_PVRTC_2BPPV1_Format,
+  [VK_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG]: PixelFormat.RGBA_PVRTC_4BPPV1,
+  [VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG]: PixelFormat.RGBA_PVRTC_4BPPV1,
+  [VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG]: PixelFormat.RGBA_PVRTC_2BPPV1,
+  [VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG]: PixelFormat.RGBA_PVRTC_2BPPV1,
 };
 
 const TYPE_MAP: Record<number, number> = {
-  [VK_FORMAT_R32G32B32A32_SFLOAT]: FloatType,
-  [VK_FORMAT_R32G32_SFLOAT]: FloatType,
-  [VK_FORMAT_R32_SFLOAT]: FloatType,
+  [VK_FORMAT_R32G32B32A32_SFLOAT]: TextureType.Float,
+  [VK_FORMAT_R32G32_SFLOAT]: TextureType.Float,
+  [VK_FORMAT_R32_SFLOAT]: TextureType.Float,
 
-  [VK_FORMAT_R16G16B16A16_SFLOAT]: HalfFloatType,
-  [VK_FORMAT_R16G16_SFLOAT]: HalfFloatType,
-  [VK_FORMAT_R16_SFLOAT]: HalfFloatType,
+  [VK_FORMAT_R16G16B16A16_SFLOAT]: TextureType.HalfFloat,
+  [VK_FORMAT_R16G16_SFLOAT]: TextureType.HalfFloat,
+  [VK_FORMAT_R16_SFLOAT]: TextureType.HalfFloat,
 
-  [VK_FORMAT_R16G16B16A16_UNORM]: UnsignedShortType,
+  [VK_FORMAT_R16G16B16A16_UNORM]: TextureType.UnsignedShort,
 
-  [VK_FORMAT_R8G8B8A8_SRGB]: UnsignedByteType,
-  [VK_FORMAT_R8G8B8A8_UNORM]: UnsignedByteType,
-  [VK_FORMAT_R8G8_SRGB]: UnsignedByteType,
-  [VK_FORMAT_R8G8_UNORM]: UnsignedByteType,
-  [VK_FORMAT_R8_SRGB]: UnsignedByteType,
-  [VK_FORMAT_R8_UNORM]: UnsignedByteType,
+  [VK_FORMAT_R8G8B8A8_SRGB]: TextureType.UnsignedByte,
+  [VK_FORMAT_R8G8B8A8_UNORM]: TextureType.UnsignedByte,
+  [VK_FORMAT_R8G8_SRGB]: TextureType.UnsignedByte,
+  [VK_FORMAT_R8G8_UNORM]: TextureType.UnsignedByte,
+  [VK_FORMAT_R8_SRGB]: TextureType.UnsignedByte,
+  [VK_FORMAT_R8_UNORM]: TextureType.UnsignedByte,
 
-  [VK_FORMAT_E5B9G9R9_UFLOAT_PACK32]: UnsignedInt5999Type,
-  [VK_FORMAT_B10G11R11_UFLOAT_PACK32]: UnsignedInt101111Type,
+  [VK_FORMAT_E5B9G9R9_UFLOAT_PACK32]: TextureType.UnsignedInt5999,
+  [VK_FORMAT_B10G11R11_UFLOAT_PACK32]: TextureType.UnsignedInt101111,
 
-  [VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK]: UnsignedByteType,
-  [VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK]: UnsignedByteType,
-  [VK_FORMAT_EAC_R11_UNORM_BLOCK]: UnsignedByteType,
-  [VK_FORMAT_EAC_R11_SNORM_BLOCK]: UnsignedByteType,
-  [VK_FORMAT_EAC_R11G11_UNORM_BLOCK]: UnsignedByteType,
-  [VK_FORMAT_EAC_R11G11_SNORM_BLOCK]: UnsignedByteType,
+  [VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK]: TextureType.UnsignedByte,
+  [VK_FORMAT_ETC2_R8G8B8_SRGB_BLOCK]: TextureType.UnsignedByte,
+  [VK_FORMAT_EAC_R11_UNORM_BLOCK]: TextureType.UnsignedByte,
+  [VK_FORMAT_EAC_R11_SNORM_BLOCK]: TextureType.UnsignedByte,
+  [VK_FORMAT_EAC_R11G11_UNORM_BLOCK]: TextureType.UnsignedByte,
+  [VK_FORMAT_EAC_R11G11_SNORM_BLOCK]: TextureType.UnsignedByte,
 
-  [VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT]: HalfFloatType,
-  [VK_FORMAT_ASTC_4x4_SRGB_BLOCK]: UnsignedByteType,
-  [VK_FORMAT_ASTC_4x4_UNORM_BLOCK]: UnsignedByteType,
-  [VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT]: HalfFloatType,
-  [VK_FORMAT_ASTC_6x6_SRGB_BLOCK]: UnsignedByteType,
-  [VK_FORMAT_ASTC_6x6_UNORM_BLOCK]: UnsignedByteType,
+  [VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT]: TextureType.HalfFloat,
+  [VK_FORMAT_ASTC_4x4_SRGB_BLOCK]: TextureType.UnsignedByte,
+  [VK_FORMAT_ASTC_4x4_UNORM_BLOCK]: TextureType.UnsignedByte,
+  [VK_FORMAT_ASTC_6x6_SFLOAT_BLOCK_EXT]: TextureType.HalfFloat,
+  [VK_FORMAT_ASTC_6x6_SRGB_BLOCK]: TextureType.UnsignedByte,
+  [VK_FORMAT_ASTC_6x6_UNORM_BLOCK]: TextureType.UnsignedByte,
 
-  [VK_FORMAT_BC1_RGBA_SRGB_BLOCK]: UnsignedByteType,
-  [VK_FORMAT_BC1_RGBA_UNORM_BLOCK]: UnsignedByteType,
-  [VK_FORMAT_BC1_RGB_SRGB_BLOCK]: UnsignedByteType,
-  [VK_FORMAT_BC1_RGB_UNORM_BLOCK]: UnsignedByteType,
+  [VK_FORMAT_BC1_RGBA_SRGB_BLOCK]: TextureType.UnsignedByte,
+  [VK_FORMAT_BC1_RGBA_UNORM_BLOCK]: TextureType.UnsignedByte,
+  [VK_FORMAT_BC1_RGB_SRGB_BLOCK]: TextureType.UnsignedByte,
+  [VK_FORMAT_BC1_RGB_UNORM_BLOCK]: TextureType.UnsignedByte,
 
-  [VK_FORMAT_BC3_SRGB_BLOCK]: UnsignedByteType,
-  [VK_FORMAT_BC3_UNORM_BLOCK]: UnsignedByteType,
+  [VK_FORMAT_BC3_SRGB_BLOCK]: TextureType.UnsignedByte,
+  [VK_FORMAT_BC3_UNORM_BLOCK]: TextureType.UnsignedByte,
 
-  [VK_FORMAT_BC4_SNORM_BLOCK]: UnsignedByteType,
-  [VK_FORMAT_BC4_UNORM_BLOCK]: UnsignedByteType,
+  [VK_FORMAT_BC4_SNORM_BLOCK]: TextureType.UnsignedByte,
+  [VK_FORMAT_BC4_UNORM_BLOCK]: TextureType.UnsignedByte,
 
-  [VK_FORMAT_BC5_SNORM_BLOCK]: UnsignedByteType,
-  [VK_FORMAT_BC5_UNORM_BLOCK]: UnsignedByteType,
+  [VK_FORMAT_BC5_SNORM_BLOCK]: TextureType.UnsignedByte,
+  [VK_FORMAT_BC5_UNORM_BLOCK]: TextureType.UnsignedByte,
 
-  [VK_FORMAT_BC7_SRGB_BLOCK]: UnsignedByteType,
-  [VK_FORMAT_BC7_UNORM_BLOCK]: UnsignedByteType,
+  [VK_FORMAT_BC7_SRGB_BLOCK]: TextureType.UnsignedByte,
+  [VK_FORMAT_BC7_UNORM_BLOCK]: TextureType.UnsignedByte,
 
-  [VK_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG]: UnsignedByteType,
-  [VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG]: UnsignedByteType,
-  [VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG]: UnsignedByteType,
-  [VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG]: UnsignedByteType,
+  [VK_FORMAT_PVRTC1_4BPP_SRGB_BLOCK_IMG]: TextureType.UnsignedByte,
+  [VK_FORMAT_PVRTC1_4BPP_UNORM_BLOCK_IMG]: TextureType.UnsignedByte,
+  [VK_FORMAT_PVRTC1_2BPP_SRGB_BLOCK_IMG]: TextureType.UnsignedByte,
+  [VK_FORMAT_PVRTC1_2BPP_UNORM_BLOCK_IMG]: TextureType.UnsignedByte,
 };
 
 async function createRawTexture(
@@ -1204,19 +1165,22 @@ async function createRawTexture(
 
     let data;
 
-    if (TYPE_MAP[vkFormat] === FloatType) {
+    if (TYPE_MAP[vkFormat] === TextureType.Float) {
       data = new Float32Array(
         levelData.buffer,
         levelData.byteOffset,
         levelData.byteLength / Float32Array.BYTES_PER_ELEMENT,
       );
-    } else if (TYPE_MAP[vkFormat] === HalfFloatType || TYPE_MAP[vkFormat] === UnsignedShortType) {
+    } else if (TYPE_MAP[vkFormat] === TextureType.HalfFloat || TYPE_MAP[vkFormat] === TextureType.UnsignedShort) {
       data = new Uint16Array(
         levelData.buffer,
         levelData.byteOffset,
         levelData.byteLength / Uint16Array.BYTES_PER_ELEMENT,
       );
-    } else if (TYPE_MAP[vkFormat] === UnsignedInt5999Type || TYPE_MAP[vkFormat] === UnsignedInt101111Type) {
+    } else if (
+      TYPE_MAP[vkFormat] === TextureType.UnsignedInt5999 ||
+      TYPE_MAP[vkFormat] === TextureType.UnsignedInt101111
+    ) {
       data = new Uint32Array(
         levelData.buffer,
         levelData.byteOffset,
@@ -1245,8 +1209,8 @@ async function createRawTexture(
         ? new DataTexture(mipmaps[0].data, container.pixelWidth, container.pixelHeight)
         : new Data3DTexture(mipmaps[0].data, container.pixelWidth, container.pixelHeight, container.pixelDepth);
     texture.mipmaps = mipmaps;
-    texture.minFilter = useMipmaps ? NearestMipmapNearestFilter : NearestFilter;
-    texture.magFilter = NearestFilter;
+    texture.minFilter = useMipmaps ? TextureFilter.NearestMipmapNearest : TextureFilter.Nearest;
+    texture.magFilter = TextureFilter.Nearest;
     texture.generateMipmaps = container.levelCount === 0;
     texture.normalized = NORMALIZED_VK_FORMATS.has(vkFormat);
   } else {
@@ -1276,8 +1240,8 @@ async function createRawTexture(
       texture = new CompressedTexture(mipmaps as never, container.pixelWidth, container.pixelHeight);
     }
 
-    texture.minFilter = useMipmaps ? LinearMipmapLinearFilter : LinearFilter;
-    texture.magFilter = LinearFilter;
+    texture.minFilter = useMipmaps ? TextureFilter.LinearMipmapLinear : TextureFilter.Linear;
+    texture.magFilter = TextureFilter.Linear;
   }
 
   texture.type = TYPE_MAP[vkFormat] as never;
@@ -1292,14 +1256,14 @@ function parseColorSpace(container: KTX2Container): string {
   const dfd = container.dataFormatDescriptor[0];
 
   if (dfd.colorPrimaries === KHR_DF_PRIMARIES_BT709) {
-    return dfd.transferFunction === KHR_DF_TRANSFER_SRGB ? SRGBColorSpace : LinearSRGBColorSpace;
+    return dfd.transferFunction === KHR_DF_TRANSFER_SRGB ? ColorSpace.SRGB : ColorSpace.LinearSRGB;
   } else if (dfd.colorPrimaries === KHR_DF_PRIMARIES_DISPLAYP3) {
     return dfd.transferFunction === KHR_DF_TRANSFER_SRGB ? DisplayP3ColorSpace : LinearDisplayP3ColorSpace;
   } else if (dfd.colorPrimaries === KHR_DF_PRIMARIES_UNSPECIFIED) {
-    return NoColorSpace;
+    return ColorSpace.No;
   } else {
     console.warn(`THREE.KTX2Loader: Unsupported color primaries, "${dfd.colorPrimaries}"`);
-    return NoColorSpace;
+    return ColorSpace.No;
   }
 }
 

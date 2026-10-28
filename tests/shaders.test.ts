@@ -5,7 +5,7 @@ import { RawShaderMaterial } from "../src/materials/RawShaderMaterial";
 import { Vector3 } from "../src/math/Vector3";
 import { Matrix4 } from "../src/math/Matrix4";
 import { DataTexture } from "../src/textures/DataTexture";
-import { GLSL3 } from "../src/constants";
+import { GLSL } from "../src/constants";
 
 test("custom material clone preserves upload flags and upstream value ownership boundaries", () => {
   for (const Material of [ShaderMaterial, RawShaderMaterial]) {
@@ -13,7 +13,7 @@ test("custom material clone preserves upload flags and upstream value ownership 
     const structure = { tint: new Vector3(1, 0, 0) };
     const packed = new Float32Array([0.25, 0.75]);
     const material = new Material({
-      glslVersion: GLSL3,
+      glslVersion: GLSL.GLSL3,
       defines: { CUSTOM: 1 },
       vertexShader: "void main() {}",
       fragmentShader: "void main() {}",
@@ -28,7 +28,7 @@ test("custom material clone preserves upload flags and upstream value ownership 
     });
     const clone = material.clone();
     assert.equal(clone.type, material.type);
-    assert.equal(clone.glslVersion, GLSL3);
+    assert.equal(clone.glslVersion, GLSL.GLSL3);
     assert.equal(clone.vertexShader, material.vertexShader);
     assert.equal(clone.fragmentShader, material.fragmentShader);
     assert.notEqual(clone.defines, material.defines);

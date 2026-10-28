@@ -10,7 +10,7 @@ import { Raycaster, type Intersection } from "../src/core/Raycaster";
 import { Mesh } from "../src/objects/Mesh";
 import { MeshBasicMaterial } from "../src/materials/MeshBasicMaterial";
 import { BoxGeometry } from "../src/geometries/BoxGeometry";
-import { DoubleSide } from "../src/constants";
+import { Side } from "../src/constants";
 import { Ray } from "../src/math/Ray";
 import { Vector3 } from "../src/math/Vector3";
 
@@ -21,22 +21,22 @@ test("BVH raycasts and serialization preserve direct and indirect geometry", () 
     const tree = new MeshBVH(geometry, { indirect, maxLeafSize: 2 });
     if (indirect) assert.deepEqual(geometry.index!.array, originalIndex);
     const ray = new Ray(new Vector3(0.2, 0.1, 5), new Vector3(0, 0, -1));
-    const hits = tree.raycast(ray, DoubleSide).sort((a, b) => a.distance - b.distance);
-    const first = tree.raycastFirst(ray, DoubleSide);
+    const hits = tree.raycast(ray, Side.Double).sort((a, b) => a.distance - b.distance);
+    const first = tree.raycastFirst(ray, Side.Double);
     assert.equal(hits.length, 2);
     assert.ok(first);
     assert.equal(first.distance, 4);
     assert.equal(hits[0].distance, first.distance);
     const restored = MeshBVH.deserialize(MeshBVH.serialize(tree), geometry.clone());
-    assert.equal(restored.raycastFirst(ray, DoubleSide)?.distance, 4);
-    assert.equal(restored.raycast(new Ray(new Vector3(5, 5, 5), new Vector3(1, 0, 0)), DoubleSide).length, 0);
+    assert.equal(restored.raycastFirst(ray, Side.Double)?.distance, 4);
+    assert.equal(restored.raycast(new Ray(new Vector3(5, 5, 5), new Vector3(1, 0, 0)), Side.Double).length, 0);
     geometry.dispose();
   }
 });
 
 test("accelerated raycast returns world-space hits and falls back without a tree", () => {
   const geometry: BVHGeometry = new BoxGeometry(2, 2, 2);
-  const material = new MeshBasicMaterial({ side: DoubleSide });
+  const material = new MeshBasicMaterial({ side: Side.Double });
   const mesh = new Mesh(geometry, material);
   mesh.position.z = 2;
   mesh.updateMatrixWorld();

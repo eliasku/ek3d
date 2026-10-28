@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ReinhardToneMapping, RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { ToneMapping, Wrapping, ColorSpace } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
@@ -86,11 +86,11 @@ function loadTexture(
     }
     map.anisotropy = 4;
     if (repeat) {
-      map.wrapS = RepeatWrapping;
-      map.wrapT = RepeatWrapping;
+      map.wrapS = Wrapping.Repeat;
+      map.wrapT = Wrapping.Repeat;
       map.repeat.set(...repeat);
     }
-    if (color) map.colorSpace = SRGBColorSpace;
+    if (color) map.colorSpace = ColorSpace.SRGB;
     material[slot] = map;
     material.needsUpdate = true;
   });
@@ -143,7 +143,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 const shadowMap = renderer.shadowMap;
 if (shadowMap === null) throw new Error("The shadow map system failed to install");
 shadowMap.enabled = true;
-renderer.toneMapping = ReinhardToneMapping;
+renderer.toneMapping = ToneMapping.Reinhard;
 const controls = new OrbitControls(camera, canvas);
 controls.minDistance = 1;
 controls.maxDistance = 20;

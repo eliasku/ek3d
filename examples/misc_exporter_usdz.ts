@@ -8,7 +8,7 @@ import { KTX2Loader } from "ek3d/addons/loaders/KTX2Loader";
 import * as WebGLTextureUtils from "ek3d/addons/utils/WebGLTextureUtils";
 import { AnimationMixer } from "ek3d/animation/AnimationMixer";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping, LoopRepeat } from "ek3d/constants";
+import { ToneMapping, Loop } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
 import { Color } from "ek3d/math/Color";
@@ -51,7 +51,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 
 const camera = new PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.25, 20);
 camera.position.set(-2.5, 1.6, 3);
@@ -102,7 +102,7 @@ async function load(): Promise<void> {
   scene.add(gltf.scene);
   if (gltf.animations.length > 0) {
     mixer = new AnimationMixer(gltf.scene);
-    mixer.clipAction(gltf.animations[0]!).setLoop(LoopRepeat, Infinity).play();
+    mixer.clipAction(gltf.animations[0]!).setLoop(Loop.Repeat, Infinity).play();
   }
   status.textContent = "Exporting USDZ…";
   const zip = await loadExporterRuntime<USDZZipRuntime>("/examples/libs/fflate.module.js", ["zipSync"]);

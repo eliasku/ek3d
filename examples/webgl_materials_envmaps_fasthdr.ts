@@ -3,7 +3,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { KTX2Loader } from "ek3d/addons/loaders/KTX2Loader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { LoadingManager } from "ek3d/loaders/LoadingManager";
 import { MeshPhysicalMaterial } from "ek3d/materials/MeshPhysicalMaterial";
@@ -36,7 +36,7 @@ const renderer = new WebGLRenderer({
   getDFGLUT: () => dfg,
   shaders: { MeshPhysicalMaterial: physicalShader, MeshStandardMaterial: standardShader },
 });
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
 const geometry = new SphereGeometry(0.45, 64, 32);

@@ -2,22 +2,7 @@ import type { MaterialConstructors } from "./MaterialLoader";
 import type { CurveFactory } from "../extras/core/Curve";
 import type { Vector2 } from "../math/Vector2";
 import type { BufferGeometry } from "../core/BufferGeometry";
-import {
-  UVMapping,
-  CubeReflectionMapping,
-  CubeRefractionMapping,
-  EquirectangularReflectionMapping,
-  EquirectangularRefractionMapping,
-  RepeatWrapping,
-  ClampToEdgeWrapping,
-  MirroredRepeatWrapping,
-  NearestFilter,
-  NearestMipmapNearestFilter,
-  NearestMipmapLinearFilter,
-  LinearFilter,
-  LinearMipmapNearestFilter,
-  LinearMipmapLinearFilter,
-} from "../constants";
+import { Mapping, Wrapping, TextureFilter } from "../constants";
 import { InstancedBufferAttribute } from "../core/InstancedBufferAttribute";
 import { Color } from "../math/Color";
 import { Vector3 } from "../math/Vector3";
@@ -828,22 +813,22 @@ export class ObjectLoader extends Loader<Object3D> {
   }
 }
 const TEXTURE_MAPPING = {
-  UVMapping: UVMapping,
-  CubeReflectionMapping: CubeReflectionMapping,
-  CubeRefractionMapping: CubeRefractionMapping,
-  EquirectangularReflectionMapping: EquirectangularReflectionMapping,
-  EquirectangularRefractionMapping: EquirectangularRefractionMapping,
+  UVMapping: Mapping.UV,
+  CubeReflectionMapping: Mapping.CubeReflection,
+  CubeRefractionMapping: Mapping.CubeRefraction,
+  EquirectangularReflectionMapping: Mapping.EquirectangularReflection,
+  EquirectangularRefractionMapping: Mapping.EquirectangularRefraction,
 };
 const TEXTURE_WRAPPING = {
-  RepeatWrapping: RepeatWrapping,
-  ClampToEdgeWrapping: ClampToEdgeWrapping,
-  MirroredRepeatWrapping: MirroredRepeatWrapping,
+  RepeatWrapping: Wrapping.Repeat,
+  ClampToEdgeWrapping: Wrapping.ClampToEdge,
+  MirroredRepeatWrapping: Wrapping.MirroredRepeat,
 };
 const TEXTURE_FILTER = {
-  NearestFilter: NearestFilter,
-  NearestMipmapNearestFilter: NearestMipmapNearestFilter,
-  NearestMipmapLinearFilter: NearestMipmapLinearFilter,
-  LinearFilter: LinearFilter,
-  LinearMipmapNearestFilter: LinearMipmapNearestFilter,
-  LinearMipmapLinearFilter: LinearMipmapLinearFilter,
+  NearestFilter: TextureFilter.Nearest,
+  NearestMipmapNearestFilter: TextureFilter.NearestMipmapNearest,
+  NearestMipmapLinearFilter: TextureFilter.NearestMipmapLinear,
+  LinearFilter: TextureFilter.Linear,
+  LinearMipmapNearestFilter: TextureFilter.LinearMipmapNearest,
+  LinearMipmapLinearFilter: TextureFilter.LinearMipmapLinear,
 };

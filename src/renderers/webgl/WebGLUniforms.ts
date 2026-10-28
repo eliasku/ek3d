@@ -1,10 +1,11 @@
+import { GL } from "../../GL";
 import { CubeTexture } from "../../textures/CubeTexture";
 import { Texture } from "../../textures/Texture";
 import { DataArrayTexture } from "../../textures/DataArrayTexture";
 import { Data3DTexture } from "../../textures/Data3DTexture";
 import { DepthTexture } from "../../textures/DepthTexture";
 import { CubeDepthTexture } from "../../textures/CubeDepthTexture";
-import { AlwaysCompare } from "../../constants";
+import { Compare } from "../../constants";
 const emptyTexture = /*@__PURE__*/ new Texture();
 const emptyShadowTexture = /*@__PURE__*/ new DepthTexture(1, 1);
 const emptyCubeShadowTexture = /*@__PURE__*/ new CubeDepthTexture(1);
@@ -278,7 +279,7 @@ function setValueV4ui(this: any, gl?: any, v?: any) {
 }
 function initShadowTexture(texture?: any) {
   if (texture.version === 0) {
-    texture.compareFunction = AlwaysCompare;
+    texture.compareFunction = Compare.Always;
     texture.needsUpdate = true;
   }
   return texture;
@@ -292,7 +293,7 @@ function setValueT1(this: any, gl?: any, v?: any, textures?: any) {
     cache[0] = unit;
   }
   let emptyTexture2D: any;
-  if (this.type === gl.SAMPLER_2D_SHADOW) {
+  if (this.type === GL.SAMPLER_2D_SHADOW) {
     emptyTexture2D = initShadowTexture(emptyShadowTexture);
   } else {
     emptyTexture2D = emptyTexture;
@@ -316,7 +317,7 @@ function setValueT6(this: any, gl?: any, v?: any, textures?: any) {
     cache[0] = unit;
   }
   let emptyTextureCube: any;
-  if (this.type === gl.SAMPLER_CUBE_SHADOW) {
+  if (this.type === GL.SAMPLER_CUBE_SHADOW) {
     emptyTextureCube = initShadowTexture(emptyCubeShadowTexture);
   } else {
     emptyTextureCube = emptyCubeTexture;
@@ -459,7 +460,7 @@ function setValueT1Array(this: any, gl?: any, v?: any, textures?: any) {
     copyArray(cache, units);
   }
   let emptyTexture2D: any;
-  if (this.type === gl.SAMPLER_2D_SHADOW) {
+  if (this.type === GL.SAMPLER_2D_SHADOW) {
     emptyTexture2D = initShadowTexture(emptyShadowTexture);
   } else {
     emptyTexture2D = emptyTexture;
@@ -489,7 +490,7 @@ function setValueT6Array(this: any, gl?: any, v?: any, textures?: any) {
     copyArray(cache, units);
   }
   let emptyTextureCube: any;
-  if (this.type === gl.SAMPLER_CUBE_SHADOW) {
+  if (this.type === GL.SAMPLER_CUBE_SHADOW) {
     emptyTextureCube = initShadowTexture(emptyCubeShadowTexture);
   } else {
     emptyTextureCube = emptyCubeTexture;
@@ -676,7 +677,7 @@ export class WebGLUniforms {
   constructor(gl: any, program?: any) {
     this.seq = [];
     this.map = {};
-    const n = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+    const n = gl.getProgramParameter(program, GL.ACTIVE_UNIFORMS);
     for (let i = 0; i < n; ++i) {
       const info = gl.getActiveUniform(program, i),
         addr = gl.getUniformLocation(program, info.name);
@@ -687,9 +688,9 @@ export class WebGLUniforms {
     const otherUniforms: any[] = [];
     for (const u of this.seq) {
       if (
-        u.type === gl.SAMPLER_2D_SHADOW ||
-        u.type === gl.SAMPLER_CUBE_SHADOW ||
-        u.type === gl.SAMPLER_2D_ARRAY_SHADOW
+        u.type === GL.SAMPLER_2D_SHADOW ||
+        u.type === GL.SAMPLER_CUBE_SHADOW ||
+        u.type === GL.SAMPLER_2D_ARRAY_SHADOW
       ) {
         shadowSamplers.push(u);
       } else {

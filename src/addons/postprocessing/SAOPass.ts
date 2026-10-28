@@ -1,15 +1,4 @@
-import {
-  AddEquation,
-  CustomBlending,
-  DepthStencilFormat,
-  DstAlphaFactor,
-  DstColorFactor,
-  HalfFloatType,
-  NearestFilter,
-  NoBlending,
-  UnsignedInt248Type,
-  ZeroFactor,
-} from "../../constants";
+import { Equation, Blending, PixelFormat, Factor, TextureType, TextureFilter } from "../../constants";
 import { Color } from "../../math/Color";
 import { Vector2 } from "../../math/Vector2";
 import { DepthTexture } from "../../textures/DepthTexture";
@@ -140,7 +129,7 @@ export class SAOPass extends Pass {
     this.resolution = new Vector2(resolution.x, resolution.y);
 
     this.saoRenderTarget = new WebGLRenderTarget(this.resolution.x, this.resolution.y, {
-      type: HalfFloatType,
+      type: TextureType.HalfFloat,
       depthBuffer: false,
     });
     this.blurIntermediateRenderTarget = this.saoRenderTarget.clone();
@@ -148,27 +137,27 @@ export class SAOPass extends Pass {
     const depthTexture = new DepthTexture(
       this.resolution.x,
       this.resolution.y,
-      UnsignedInt248Type,
+      TextureType.UnsignedInt248,
       undefined,
       undefined,
       undefined,
-      NearestFilter,
-      NearestFilter,
+      TextureFilter.Nearest,
+      TextureFilter.Nearest,
       undefined,
-      DepthStencilFormat,
+      PixelFormat.DepthStencil,
     );
-    depthTexture.format = DepthStencilFormat;
-    depthTexture.type = UnsignedInt248Type;
+    depthTexture.format = PixelFormat.DepthStencil;
+    depthTexture.type = TextureType.UnsignedInt248;
 
     this.normalRenderTarget = new WebGLRenderTarget(this.resolution.x, this.resolution.y, {
-      minFilter: NearestFilter,
-      magFilter: NearestFilter,
-      type: HalfFloatType,
+      minFilter: TextureFilter.Nearest,
+      magFilter: TextureFilter.Nearest,
+      type: TextureType.HalfFloat,
       depthTexture: depthTexture,
     });
 
     this.normalMaterial = new MeshNormalMaterial();
-    this.normalMaterial.blending = NoBlending;
+    this.normalMaterial.blending = Blending.No;
 
     this.saoMaterial = new ShaderMaterial({
       defines: { ...SAOShader.defines },
@@ -182,7 +171,7 @@ export class SAOPass extends Pass {
     this.saoMaterial.uniforms!["size"].value.set(this.resolution.x, this.resolution.y);
     this.saoMaterial.uniforms!["cameraInverseProjectionMatrix"].value.copy(this.camera.projectionMatrixInverse);
     this.saoMaterial.uniforms!["cameraProjectionMatrix"].value = this.camera.projectionMatrix;
-    this.saoMaterial.blending = NoBlending;
+    this.saoMaterial.blending = Blending.No;
 
     this.vBlurMaterial = new ShaderMaterial({
       uniforms: cloneUniforms(DepthLimitedBlurShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
@@ -195,7 +184,7 @@ export class SAOPass extends Pass {
     this.vBlurMaterial.uniforms!["tDiffuse"].value = this.saoRenderTarget.texture;
     this.vBlurMaterial.uniforms!["tDepth"].value = depthTexture;
     this.vBlurMaterial.uniforms!["size"].value.set(this.resolution.x, this.resolution.y);
-    this.vBlurMaterial.blending = NoBlending;
+    this.vBlurMaterial.blending = Blending.No;
 
     this.hBlurMaterial = new ShaderMaterial({
       uniforms: cloneUniforms(DepthLimitedBlurShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
@@ -208,24 +197,24 @@ export class SAOPass extends Pass {
     this.hBlurMaterial.uniforms!["tDiffuse"].value = this.blurIntermediateRenderTarget.texture;
     this.hBlurMaterial.uniforms!["tDepth"].value = depthTexture;
     this.hBlurMaterial.uniforms!["size"].value.set(this.resolution.x, this.resolution.y);
-    this.hBlurMaterial.blending = NoBlending;
+    this.hBlurMaterial.blending = Blending.No;
 
     this.materialCopy = new ShaderMaterial({
       uniforms: cloneUniforms(CopyShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
       vertexShader: CopyShader.vertexShader,
       fragmentShader: CopyShader.fragmentShader,
-      blending: NoBlending,
+      blending: Blending.No,
     });
     this.materialCopy.transparent = true;
     this.materialCopy.depthTest = false;
     this.materialCopy.depthWrite = false;
-    this.materialCopy.blending = CustomBlending;
-    this.materialCopy.blendSrc = DstColorFactor;
-    this.materialCopy.blendDst = ZeroFactor;
-    this.materialCopy.blendEquation = AddEquation;
-    this.materialCopy.blendSrcAlpha = DstAlphaFactor;
-    this.materialCopy.blendDstAlpha = ZeroFactor;
-    this.materialCopy.blendEquationAlpha = AddEquation;
+    this.materialCopy.blending = Blending.Custom;
+    this.materialCopy.blendSrc = Factor.DstColor;
+    this.materialCopy.blendDst = Factor.Zero;
+    this.materialCopy.blendEquation = Equation.Add;
+    this.materialCopy.blendSrcAlpha = Factor.DstAlpha;
+    this.materialCopy.blendDstAlpha = Factor.Zero;
+    this.materialCopy.blendEquationAlpha = Equation.Add;
 
     this.fsQuad = new FullScreenQuad(null);
   }
@@ -244,7 +233,7 @@ export class SAOPass extends Pass {
   render(renderer: WebGLRenderer, writeBuffer: RT, readBuffer: RT, _deltaTime: number, _maskActive: boolean): void {
     // Rendering readBuffer first when rendering to screen
     if (this.renderToScreen) {
-      this.materialCopy.blending = NoBlending;
+      this.materialCopy.blending = Blending.No;
       this.materialCopy.uniforms["tDiffuse"].value = readBuffer.texture;
       this.materialCopy.needsUpdate = true;
       this._renderPass(renderer, this.materialCopy, null);
@@ -316,9 +305,9 @@ export class SAOPass extends Pass {
 
     // Blending depends on output
     if (this.params.output === SAOPass.OUTPUT.Default) {
-      outputMaterial.blending = CustomBlending;
+      outputMaterial.blending = Blending.Custom;
     } else {
-      outputMaterial.blending = NoBlending;
+      outputMaterial.blending = Blending.No;
     }
 
     // Rendering SAOPass result on top of previous pass

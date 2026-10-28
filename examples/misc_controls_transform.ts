@@ -1,6 +1,6 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { TransformControls } from "ek3d/addons/controls/TransformControls";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
@@ -57,7 +57,7 @@ light.position.set(1, 1, 1);
 scene.add(light);
 
 const texture = await new TextureLoader().loadAsync("/examples/textures/crate.gif");
-texture.colorSpace = SRGBColorSpace;
+texture.colorSpace = ColorSpace.SRGB;
 texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
 const geometry = new BoxGeometry();

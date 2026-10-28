@@ -8,7 +8,7 @@ import { Box3 } from "../../math/Box3";
 import { PlaneGeometry } from "../../geometries/PlaneGeometry";
 import { MeshBasicMaterial } from "../../materials/MeshBasicMaterial";
 import { BufferAttribute } from "../../core/BufferAttribute";
-import { DoubleSide } from "../../constants";
+import { Side } from "../../constants";
 import type { CSM } from "./CSM";
 /**
  * A helper for visualizing the cascades of a CSM instance.
@@ -133,7 +133,7 @@ export class CSMHelper extends Group {
 
     while (cascadeLines.length < cascades) {
       const cascadeLine = new Box3Helper(new Box3(), 0xffffff);
-      const planeMat = new MeshBasicMaterial({ transparent: true, opacity: 0.1, depthWrite: false, side: DoubleSide });
+      const planeMat = new MeshBasicMaterial({ transparent: true, opacity: 0.1, depthWrite: false, side: Side.Double });
       const cascadePlane = new Mesh<MeshBasicMaterial>(new PlaneGeometry(), planeMat);
       const shadowLineGroup = new Group();
       const shadowLine = new Box3Helper(new Box3(), 0xffff00);

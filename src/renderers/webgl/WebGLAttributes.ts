@@ -1,3 +1,4 @@
+import { GL } from "../../GL";
 export function WebGLAttributes(gl?: any) {
   const buffers = new WeakMap<any, any>();
   function createBuffer(attribute?: any, bufferType?: any) {
@@ -10,27 +11,27 @@ export function WebGLAttributes(gl?: any) {
     attribute.onUploadCallback();
     let type: any;
     if (array instanceof Float32Array) {
-      type = gl.FLOAT;
+      type = GL.FLOAT;
     } else if (typeof Float16Array !== "undefined" && array instanceof Float16Array) {
-      type = gl.HALF_FLOAT;
+      type = GL.HALF_FLOAT;
     } else if (array instanceof Uint16Array) {
       if (attribute.isFloat16BufferAttribute) {
-        type = gl.HALF_FLOAT;
+        type = GL.HALF_FLOAT;
       } else {
-        type = gl.UNSIGNED_SHORT;
+        type = GL.UNSIGNED_SHORT;
       }
     } else if (array instanceof Int16Array) {
-      type = gl.SHORT;
+      type = GL.SHORT;
     } else if (array instanceof Uint32Array) {
-      type = gl.UNSIGNED_INT;
+      type = GL.UNSIGNED_INT;
     } else if (array instanceof Int32Array) {
-      type = gl.INT;
+      type = GL.INT;
     } else if (array instanceof Int8Array) {
-      type = gl.BYTE;
+      type = GL.BYTE;
     } else if (array instanceof Uint8Array) {
-      type = gl.UNSIGNED_BYTE;
+      type = GL.UNSIGNED_BYTE;
     } else if (array instanceof Uint8ClampedArray) {
-      type = gl.UNSIGNED_BYTE;
+      type = GL.UNSIGNED_BYTE;
     } else {
       throw new Error("THREE.WebGLAttributes: Unsupported buffer data format: " + array);
     }

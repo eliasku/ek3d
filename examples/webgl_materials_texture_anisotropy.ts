@@ -1,6 +1,6 @@
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Wrapping, ColorSpace } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
@@ -64,9 +64,9 @@ function makeScene(anisotropy: number): Scene {
       console.error(error);
     },
   );
-  texture.colorSpace = SRGBColorSpace;
+  texture.colorSpace = ColorSpace.SRGB;
   texture.anisotropy = anisotropy;
-  texture.wrapS = texture.wrapT = RepeatWrapping;
+  texture.wrapS = texture.wrapT = Wrapping.Repeat;
   texture.repeat.set(512, 512);
   const mesh = new Mesh(new PlaneGeometry(100, 100), new MeshPhongMaterial({ color: 0xffffff, map: texture }));
   mesh.rotation.x = -Math.PI / 2;

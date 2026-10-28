@@ -1,6 +1,6 @@
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { SpriteMaterial } from "ek3d/materials/SpriteMaterial";
 import { Group } from "ek3d/objects/Group";
@@ -43,7 +43,7 @@ const hudTexture = loader.load(
       return;
     }
     pending--;
-    texture.colorSpace = SRGBColorSpace;
+    texture.colorSpace = ColorSpace.SRGB;
     const material = new SpriteMaterial({ map: texture });
     const image = texture.image as HTMLImageElement;
     for (const [x, y] of [
@@ -82,7 +82,7 @@ const mapC = loader.load(
   undefined,
   fail,
 );
-mapB.colorSpace = mapC.colorSpace = SRGBColorSpace;
+mapB.colorSpace = mapC.colorSpace = ColorSpace.SRGB;
 const materialB = new SpriteMaterial({ map: mapB, color: 0xffffff, fog: true });
 const materialC = new SpriteMaterial({ map: mapC, color: 0xffffff, fog: true });
 const sprites: Sprite[] = [];

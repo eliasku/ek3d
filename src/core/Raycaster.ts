@@ -174,7 +174,7 @@ export class Raycaster {
    * Note that for meshes, faces must be pointed towards the origin of the ray in order
    * to be detected; intersections of the ray passing through the back of a face will not
    * be detected. To raycast against both faces of an object, you'll want to set  {@link Material#side}
-   * to `THREE.DoubleSide`.
+   * to `THREE.Side.Double`.
    *
    * Note that a ray hitting a triangle mesh exactly along an edge shared by two faces may be
    * reported by both faces, resulting in two coincident intersections (identical point and

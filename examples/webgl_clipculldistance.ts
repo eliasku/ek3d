@@ -6,7 +6,7 @@ import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { Float32BufferAttribute, Uint8BufferAttribute } from "ek3d/core/BufferAttribute";
 import { ShaderMaterial } from "ek3d/materials/ShaderMaterial";
 import { Mesh } from "ek3d/objects/Mesh";
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { Stats } from "ek3d/addons/libs/Stats";
 
@@ -55,7 +55,7 @@ void main() {
 }
     `,
   fragmentShader: "varying vec4 vColor;\n\n\t\t\tvoid main() {\n\n\t\t\t\tgl_FragColor = vColor;\n\n\t\t\t}",
-  side: DoubleSide,
+  side: Side.Double,
   transparent: true,
   vertexColors: true,
 });

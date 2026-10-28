@@ -1,4 +1,4 @@
-import { HalfFloatType, NearestFilter } from "../../constants";
+import { TextureType, TextureFilter } from "../../constants";
 import { DepthTexture } from "../../textures/DepthTexture";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { Vector2 } from "../../math/Vector2";
@@ -95,15 +95,15 @@ export class RenderPixelatedPass extends Pass {
     this._normalMaterial = new MeshNormalMaterial();
 
     this._beautyRenderTarget = new WebGLRenderTarget();
-    this._beautyRenderTarget.texture.minFilter = NearestFilter;
-    this._beautyRenderTarget.texture.magFilter = NearestFilter;
-    this._beautyRenderTarget.texture.type = HalfFloatType;
+    this._beautyRenderTarget.texture.minFilter = TextureFilter.Nearest;
+    this._beautyRenderTarget.texture.magFilter = TextureFilter.Nearest;
+    this._beautyRenderTarget.texture.type = TextureType.HalfFloat;
     this._beautyRenderTarget.depthTexture = new DepthTexture(1, 1);
 
     this._normalRenderTarget = new WebGLRenderTarget();
-    this._normalRenderTarget.texture.minFilter = NearestFilter;
-    this._normalRenderTarget.texture.magFilter = NearestFilter;
-    this._normalRenderTarget.texture.type = HalfFloatType;
+    this._normalRenderTarget.texture.minFilter = TextureFilter.Nearest;
+    this._normalRenderTarget.texture.magFilter = TextureFilter.Nearest;
+    this._normalRenderTarget.texture.type = TextureType.HalfFloat;
 
     this._fsQuad = new FullScreenQuad(this.pixelatedMaterial);
   }

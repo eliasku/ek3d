@@ -1,6 +1,6 @@
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { AdditiveBlending } from "ek3d/constants";
+import { Blending } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
@@ -60,7 +60,7 @@ const material = new ShaderMaterial({
     void main() { vColor = customColor; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_PointSize = size * (300.0 / -mvPosition.z); gl_Position = projectionMatrix * mvPosition; }`,
   fragmentShader: `uniform vec3 color; uniform sampler2D pointTexture; varying vec3 vColor;
     void main() { gl_FragColor = vec4(color * vColor, 1.0) * texture2D(pointTexture, gl_PointCoord); }`,
-  blending: AdditiveBlending,
+  blending: Blending.Additive,
   depthTest: false,
   transparent: true,
 });

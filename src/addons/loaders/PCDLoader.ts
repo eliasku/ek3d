@@ -1,4 +1,4 @@
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import { Float32BufferAttribute, Int32BufferAttribute } from "../../core/BufferAttribute";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { FileLoader } from "../../loaders/FileLoader";
@@ -286,7 +286,7 @@ export class PCDLoader extends Loader<Points, string> {
             ((rgb >> 16) & 0x0000ff) / 255,
             ((rgb >> 8) & 0x0000ff) / 255,
             (rgb & 0x0000ff) / 255,
-            SRGBColorSpace,
+            ColorSpace.SRGB,
           );
           color.push(c.r, c.g, c.b);
         }
@@ -355,7 +355,7 @@ export class PCDLoader extends Loader<Points, string> {
             dataview.getUint8(base + 2) / 255,
             dataview.getUint8(base + 1) / 255,
             dataview.getUint8(base + 0) / 255,
-            SRGBColorSpace,
+            ColorSpace.SRGB,
           );
           color.push(c.r, c.g, c.b);
         }

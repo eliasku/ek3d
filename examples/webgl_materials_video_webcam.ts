@@ -1,6 +1,6 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 import { Mesh } from "ek3d/objects/Mesh";
@@ -17,7 +17,7 @@ const video = document.createElement("video");
 video.muted = true;
 video.playsInline = true;
 const texture = new VideoTexture(video);
-texture.colorSpace = SRGBColorSpace;
+texture.colorSpace = ColorSpace.SRGB;
 const camera = new PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100);
 camera.position.z = 0.01;
 const scene = new Scene();

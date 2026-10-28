@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { WebGLShadowMap } from "ek3d/renderers/webgl/WebGLShadowMap";
 import { Scene } from "ek3d/scenes/Scene";
@@ -20,7 +21,7 @@ import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
 import { depthShader } from "ek3d/renderers/shaders/DepthShader";
 import { distanceShader } from "ek3d/renderers/shaders/DistanceShader";
-import { LinearSRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { configureShadowScene } from "./browser-fixtures";
 
 function check(condition: boolean, message: string) {
@@ -69,8 +70,8 @@ export async function verifyBatchingRendering() {
     batch.setColorAt(id, tint.setRGB(r, g, b));
   const readPixels = (width = 64, height = 64) => {
     const pixels = new Uint8Array(width * height * 4);
-    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-    check(gl.getError() === gl.NO_ERROR, "Batching produced a GL error");
+    gl.readPixels(0, 0, width, height, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+    check(gl.getError() === GL.NO_ERROR, "Batching produced a GL error");
     return pixels;
   };
   const draw = (...objects: Object3D[]) => {
@@ -93,20 +94,20 @@ export async function verifyBatchingRendering() {
     );
   const allocation = (batch: BatchedMesh): Allocation => {
     draw(batch);
-    const program = gl.getParameter(gl.CURRENT_PROGRAM) as WebGLProgram;
+    const program = gl.getParameter(GL.CURRENT_PROGRAM) as WebGLProgram;
     const position = gl.getAttribLocation(program, "position");
     check(position >= 0, "Missing batching position attribute");
-    const buffers = [gl.getVertexAttrib(position, gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING) as WebGLBuffer];
-    const index = gl.getParameter(gl.ELEMENT_ARRAY_BUFFER_BINDING) as WebGLBuffer | null;
+    const buffers = [gl.getVertexAttrib(position, GL.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING) as WebGLBuffer];
+    const index = gl.getParameter(GL.ELEMENT_ARRAY_BUFFER_BINDING) as WebGLBuffer | null;
     if (index !== null) buffers.push(index);
-    const vao = gl.getParameter(gl.VERTEX_ARRAY_BINDING) as WebGLVertexArrayObject;
-    const active = gl.getParameter(gl.ACTIVE_TEXTURE) as number;
+    const vao = gl.getParameter(GL.VERTEX_ARRAY_BINDING) as WebGLVertexArrayObject;
+    const active = gl.getParameter(GL.ACTIVE_TEXTURE) as number;
     const textures = ["batchingTexture", "batchingIdTexture", "batchingColorTexture"].map((name) => {
       const location = gl.getUniformLocation(program, name);
       if (location === null) throw new Error(`Missing ${name} sampler`);
       const unit = gl.getUniform(program, location) as number;
-      gl.activeTexture(gl.TEXTURE0 + unit);
-      return gl.getParameter(gl.TEXTURE_BINDING_2D) as WebGLTexture;
+      gl.activeTexture(GL.TEXTURE0 + unit);
+      return gl.getParameter(GL.TEXTURE_BINDING_2D) as WebGLTexture;
     });
     gl.activeTexture(active);
     check(
@@ -164,7 +165,7 @@ export async function verifyBatchingRendering() {
   try {
     renderer.setPixelRatio(1);
     renderer.setSize(64, 64, false);
-    renderer.outputColorSpace = LinearSRGBColorSpace;
+    renderer.outputColorSpace = ColorSpace.LinearSRGB;
     renderer.setClearColor(0x000000, 1);
     for (let variant = 0; variant < batches.length; variant++) {
       const batch = batches[variant];
@@ -315,12 +316,12 @@ export async function verifyBatchingRendering() {
     const shadowVaos = new Set<WebGLVertexArrayObject>();
     const shadowBuffers = new Set<WebGLBuffer>();
     caster.onAfterShadow = () => {
-      shadowVaos.add(gl.getParameter(gl.VERTEX_ARRAY_BINDING) as WebGLVertexArrayObject);
-      const program = gl.getParameter(gl.CURRENT_PROGRAM) as WebGLProgram;
+      shadowVaos.add(gl.getParameter(GL.VERTEX_ARRAY_BINDING) as WebGLVertexArrayObject);
+      const program = gl.getParameter(GL.CURRENT_PROGRAM) as WebGLProgram;
       shadowBuffers.add(
         gl.getVertexAttrib(
           gl.getAttribLocation(program, "position"),
-          gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING,
+          GL.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING,
         ) as WebGLBuffer,
       );
     };
@@ -401,7 +402,7 @@ export async function verifyBatchingRendering() {
     renderer.dispose();
     deleted(restored[1], "Renderer disposal with live batch");
     const glError = gl.getError();
-    check(glError === gl.NO_ERROR, "Batch GPU lifecycle produced a GL error");
+    check(glError === GL.NO_ERROR, "Batch GPU lifecycle produced a GL error");
 
     // Hide only optional capability discovery on a second, real context; never replace GL draw calls.
     const canvas = document.createElement("canvas");
@@ -415,7 +416,7 @@ export async function verifyBatchingRendering() {
       fallback.setPixelRatio(1);
       fallback.setSize(64, 64, false);
       fallback.setClearColor(0x000000, 1);
-      fallback.outputColorSpace = LinearSRGBColorSpace;
+      fallback.outputColorSpace = ColorSpace.LinearSRGB;
       const geometryId = fallbackIndexed.addGeometry(square);
       const left = fallbackIndexed.addInstance(geometryId);
       const right = fallbackIndexed.addInstance(geometryId);
@@ -428,7 +429,7 @@ export async function verifyBatchingRendering() {
         scene.add(batch);
         fallback.render(scene, camera);
         const pixels = new Uint8Array(64 * 64 * 4);
-        fallbackGL.readPixels(0, 0, 64, 64, fallbackGL.RGBA, fallbackGL.UNSIGNED_BYTE, pixels);
+        fallbackGL.readPixels(0, 0, 64, 64, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
         if (batch === fallbackIndexed) {
           color(pixels, 16, 32, [255, 0, 0], "Indexed fallback first draw ID");
           color(pixels, 48, 32, [0, 255, 0], "Indexed fallback second draw ID");
@@ -436,7 +437,7 @@ export async function verifyBatchingRendering() {
           same(pixels, snapshots[1], "Nonindexed multi-draw fallback pixels");
         }
         check(fallback.info.render.calls === 2, "Fallback did not issue individual draws");
-        check(fallbackGL.getError() === fallbackGL.NO_ERROR, "Fallback produced a GL error");
+        check(fallbackGL.getError() === GL.NO_ERROR, "Fallback produced a GL error");
       }
     } finally {
       fallbackIndexed.dispose();

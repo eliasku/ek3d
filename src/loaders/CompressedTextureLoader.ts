@@ -1,5 +1,5 @@
 import type { LoadingManager } from "./LoadingManager";
-import { LinearFilter } from "../constants";
+import { TextureFilter } from "../constants";
 import { FileLoader } from "./FileLoader";
 import { CompressedTexture } from "../textures/CompressedTexture";
 import type { CompressedTextureFace } from "../textures/CompressedTexture";
@@ -84,7 +84,7 @@ export abstract class CompressedTextureLoader extends Loader<CompressedTexture, 
           };
           loaded += 1;
           if (loaded === 6) {
-            if (texDatas.mipmapCount === 1) texture.minFilter = LinearFilter;
+            if (texDatas.mipmapCount === 1) texture.minFilter = TextureFilter.Linear;
             texture.image = images;
             texture.format = texDatas.format;
             texture.needsUpdate = true;
@@ -125,7 +125,7 @@ export abstract class CompressedTextureLoader extends Loader<CompressedTexture, 
             texture.mipmaps = texDatas.mipmaps;
           }
           if (texDatas.mipmapCount === 1) {
-            texture.minFilter = LinearFilter;
+            texture.minFilter = TextureFilter.Linear;
           }
           texture.format = texDatas.format;
           texture.needsUpdate = true;

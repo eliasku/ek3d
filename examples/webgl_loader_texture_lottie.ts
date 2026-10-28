@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { RoomEnvironment } from "ek3d/addons/environments/RoomEnvironment";
 import { RoundedBoxGeometry } from "ek3d/addons/geometries/RoundedBoxGeometry";
-import { ACESFilmicToneMapping, NearestFilter, SRGBColorSpace } from "ek3d/constants";
+import { ToneMapping, TextureFilter, ColorSpace } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { FileLoader } from "ek3d/loaders/FileLoader";
 import { CanvasTexture } from "ek3d/textures/CanvasTexture";
@@ -84,7 +84,7 @@ function init(): void {
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setAnimationLoop(animate);
-  renderer.toneMapping = ACESFilmicToneMapping;
+  renderer.toneMapping = ToneMapping.ACESFilmic;
 
   const environment = new RoomEnvironment();
   const pmremGenerator = new PMREMGenerator(renderer);
@@ -141,9 +141,9 @@ function init(): void {
       });
 
       const texture = new CanvasTexture(animation.container as unknown as HTMLCanvasElement);
-      texture.minFilter = NearestFilter;
+      texture.minFilter = TextureFilter.Nearest;
       texture.generateMipmaps = false;
-      texture.colorSpace = SRGBColorSpace;
+      texture.colorSpace = ColorSpace.SRGB;
 
       animation.addEventListener("enterFrame", function () {
         texture.needsUpdate = true;

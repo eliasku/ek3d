@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { WebGLShadowMap } from "ek3d/renderers/webgl/WebGLShadowMap";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
@@ -11,7 +12,7 @@ import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { SpotLight } from "ek3d/lights/SpotLight";
 import { DataTexture } from "ek3d/textures/DataTexture";
 import type { Texture } from "ek3d/textures/Texture";
-import { BasicShadowMap, PCFShadowMap, VSMShadowMap, LinearSRGBColorSpace } from "ek3d/constants";
+import { ShadowMap, ColorSpace } from "ek3d/constants";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
 import { depthShader } from "ek3d/renderers/shaders/DepthShader";
@@ -64,19 +65,19 @@ export async function verifyLightRendering() {
   receiver.receiveShadow = true;
   scene.add(receiver, ambient);
   renderer.setSize(size, size, false);
-  renderer.outputColorSpace = LinearSRGBColorSpace;
+  renderer.outputColorSpace = ColorSpace.LinearSRGB;
   renderer.setClearColor(0x000000, 1);
   renderer.shadowMap!.enabled = true;
-  renderer.shadowMap!.type = PCFShadowMap;
+  renderer.shadowMap!.type = ShadowMap.PCF;
   const gl = renderer.getContext();
   const evidence: Record<string, number[]> = {};
   const draw = () => {
     renderer.render(scene, camera);
     const pixels = new Uint8Array(size * size * 4);
-    gl.readPixels(0, 0, size, size, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-    check(gl.getError() === gl.NO_ERROR, "Light fixture produced a WebGL error");
+    gl.readPixels(0, 0, size, size, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+    check(gl.getError() === GL.NO_ERROR, "Light fixture produced a WebGL error");
     for (const program of renderer.info.programs ?? [])
-      check(gl.getProgramParameter(program.program, gl.LINK_STATUS), `Light program did not link: ${program.name}`);
+      check(gl.getProgramParameter(program.program, GL.LINK_STATUS), `Light program did not link: ${program.name}`);
     return pixels;
   };
   const sample = (frame: Uint8Array, x = 48, y = 48) =>
@@ -156,7 +157,7 @@ export async function verifyLightRendering() {
       });
       try {
         candidate.setSize(16, 16, false);
-        candidate.outputColorSpace = LinearSRGBColorSpace;
+        candidate.outputColorSpace = ColorSpace.LinearSRGB;
         if (candidate.shadowMap !== null) candidate.shadowMap.enabled = true;
         const expected = missing === "factory" ? "createShadowMap" : "No explicit shader selected";
         let rejected = false;
@@ -174,15 +175,15 @@ export async function verifyLightRendering() {
         const context = recovered.getContext();
         const pixel = new Uint8Array(4);
         const center = missing === "depth" ? 8 : size / 2;
-        context.readPixels(center, center, 1, 1, context.RGBA, context.UNSIGNED_BYTE, pixel);
+        context.readPixels(center, center, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
         check(
           pixel[0] > 200 && pixel[0] < 206 && pixel[1] === pixel[0] && pixel[2] === pixel[0] && pixel[3] === 255,
           `Spot ${missing} recovery did not draw Lambert pixels: ${pixel.join(",")}`,
         );
-        check(context.getError() === context.NO_ERROR, `Spot ${missing} recovery produced a GL error`);
+        check(context.getError() === GL.NO_ERROR, `Spot ${missing} recovery produced a GL error`);
         for (const program of recovered.info.programs ?? [])
           check(
-            context.getProgramParameter(program.program, context.LINK_STATUS),
+            context.getProgramParameter(program.program, GL.LINK_STATUS),
             "Recovered spot depth program did not link",
           );
       } finally {
@@ -333,7 +334,7 @@ export async function verifyLightRendering() {
     caster.position.x = 0;
 
     const modes: { type: number; occludedPixels: number; gpuTextures: number }[] = [];
-    for (const type of [BasicShadowMap, VSMShadowMap, PCFShadowMap]) {
+    for (const type of [ShadowMap.Basic, ShadowMap.VSM, ShadowMap.PCF]) {
       const oldHandles = handles(spot, false);
       renderer.shadowMap!.type = type;
       const frame = draw();
@@ -346,7 +347,7 @@ export async function verifyLightRendering() {
         "Shadow mode change retained old GPU storage",
       );
       check(current.length > 0 && current.every((handle) => gl.isTexture(handle)), "Shadow mode has no GPU storage");
-      if (type === VSMShadowMap) check(spot.shadow.mapPass !== null, "Spot VSM did not allocate its blur target");
+      if (type === ShadowMap.VSM) check(spot.shadow.mapPass !== null, "Spot VSM did not allocate its blur target");
       modes.push({ type, occludedPixels: occluded(frame, unobstructed), gpuTextures: current.length });
     }
 
@@ -463,9 +464,9 @@ export async function verifyLightRendering() {
       "Light fixture cleanup retained shadow GPU handles",
     );
     check(
-      programs.every((program) => !gl.isProgram(program) || gl.getProgramParameter(program, gl.DELETE_STATUS) === true),
+      programs.every((program) => !gl.isProgram(program) || gl.getProgramParameter(program, GL.DELETE_STATUS) === true),
       "Light fixture cleanup retained GPU programs",
     );
-    check(gl.getError() === gl.NO_ERROR, "Light fixture cleanup produced a WebGL error");
+    check(gl.getError() === GL.NO_ERROR, "Light fixture cleanup produced a WebGL error");
   }
 }

@@ -3,7 +3,7 @@ import { EffectComposer } from "ek3d/addons/postprocessing/EffectComposer";
 import { RenderPass } from "ek3d/addons/postprocessing/RenderPass";
 import { FlyControls } from "ek3d/addons/controls/FlyControls";
 import { Stats } from "ek3d/addons/libs/Stats";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
@@ -94,7 +94,7 @@ function init() {
     // y scale is negated to compensate for normal map handedness.
     normalScale: new Vector2(0.85, -0.85),
   });
-  materialNormalMap.map!.colorSpace = SRGBColorSpace;
+  materialNormalMap.map!.colorSpace = ColorSpace.SRGB;
 
   // planet
 
@@ -109,7 +109,7 @@ function init() {
     map: textureLoader.load("earth_clouds_1024.png"),
     transparent: true,
   });
-  materialClouds.map!.colorSpace = SRGBColorSpace;
+  materialClouds.map!.colorSpace = ColorSpace.SRGB;
 
   meshClouds = new Mesh(geometry, materialClouds);
   meshClouds.scale.set(cloudsScale, cloudsScale, cloudsScale);
@@ -121,7 +121,7 @@ function init() {
   const materialMoon = new MeshPhongMaterial({
     map: textureLoader.load("moon_1024.jpg"),
   });
-  materialMoon.map!.colorSpace = SRGBColorSpace;
+  materialMoon.map!.colorSpace = ColorSpace.SRGB;
 
   meshMoon = new Mesh(geometry, materialMoon);
   meshMoon.position.set(radius * 5, 0, 0);

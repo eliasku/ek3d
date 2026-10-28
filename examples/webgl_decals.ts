@@ -4,7 +4,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
@@ -73,7 +73,7 @@ const onTextureLoad = (texture: Texture): void => {
 };
 canvas.dataset.state = "loading";
 const diffuse = textures.load("/examples/textures/decal/decal-diffuse.png", onTextureLoad, undefined, onError);
-diffuse.colorSpace = SRGBColorSpace;
+diffuse.colorSpace = ColorSpace.SRGB;
 const normal = textures.load("/examples/textures/decal/decal-normal.jpg", onTextureLoad, undefined, onError);
 const decalMaterial = new MeshPhongMaterial({
   specular: 0x444444,
@@ -90,7 +90,7 @@ const decalMaterial = new MeshPhongMaterial({
 });
 const base = "/examples/models/gltf/LeePerrySmith/";
 const map = textures.load(base + "Map-COL.jpg", onTextureLoad, undefined, onError);
-map.colorSpace = SRGBColorSpace;
+map.colorSpace = ColorSpace.SRGB;
 const specularMap = textures.load(base + "Map-SPEC.jpg", onTextureLoad, undefined, onError);
 const normalMap = textures.load(base + "Infinite-Level_02_Tangent_SmoothUV.jpg", onTextureLoad, undefined, onError);
 const headMaterial = new MeshPhongMaterial({ specular: 0x111111, map, specularMap, normalMap, shininess: 25 });

@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DynamicDrawUsage } from "ek3d/constants";
+import { BufferUsage } from "ek3d/constants";
 import { BufferAttribute, Float32BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { LineBasicMaterial } from "ek3d/materials/LineBasicMaterial";
@@ -59,7 +59,7 @@ const positions = new Float32BufferAttribute(points, 3);
 geometry.setAttribute("position", positions);
 geometry.center();
 const colors = new BufferAttribute(new Float32Array(positions.array.length), 3);
-colors.setUsage(DynamicDrawUsage);
+colors.setUsage(BufferUsage.DynamicDraw);
 geometry.setAttribute("color", colors);
 const line = new Line(geometry, new LineBasicMaterial({ vertexColors: true }));
 line.scale.setScalar(0.05);

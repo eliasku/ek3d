@@ -1,4 +1,4 @@
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import { Float32BufferAttribute } from "../../core/BufferAttribute";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { FileLoader } from "../../loaders/FileLoader";
@@ -199,7 +199,7 @@ export class PDBLoader extends Loader<PDBResult> {
     const color = new Color();
     for (const atom of atoms) {
       positions.push(atom[0], atom[1], atom[2]);
-      color.setRGB(atom[3][0] / 255, atom[3][1] / 255, atom[3][2] / 255, SRGBColorSpace);
+      color.setRGB(atom[3][0] / 255, atom[3][1] / 255, atom[3][2] / 255, ColorSpace.SRGB);
       colors.push(color.r, color.g, color.b);
     }
     for (const [start, end] of bonds) {

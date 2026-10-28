@@ -1,4 +1,4 @@
-import { AdditiveBlending, HalfFloatType } from "../../constants";
+import { Blending, TextureType } from "../../constants";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { cloneUniforms } from "../../renderers/shaders/UniformsUtils";
 import { Vector2 } from "../../math/Vector2";
@@ -62,7 +62,7 @@ export class BloomPass extends Pass {
       uniforms: this.combineUniforms,
       vertexShader: CombineShader.vertexShader,
       fragmentShader: CombineShader.fragmentShader,
-      blending: AdditiveBlending,
+      blending: Blending.Additive,
       transparent: true,
     });
 
@@ -101,9 +101,9 @@ export class BloomPass extends Pass {
 
     // internals
 
-    this._renderTargetX = new WebGLRenderTarget(1, 1, { type: HalfFloatType, depthBuffer: false }); // will be resized later
+    this._renderTargetX = new WebGLRenderTarget(1, 1, { type: TextureType.HalfFloat, depthBuffer: false }); // will be resized later
     this._renderTargetX.texture.name = "BloomPass.x";
-    this._renderTargetY = new WebGLRenderTarget(1, 1, { type: HalfFloatType, depthBuffer: false }); // will be resized later
+    this._renderTargetY = new WebGLRenderTarget(1, 1, { type: TextureType.HalfFloat, depthBuffer: false }); // will be resized later
     this._renderTargetY.texture.name = "BloomPass.y";
 
     this._fsQuad = new FullScreenQuad(null);

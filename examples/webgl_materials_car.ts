@@ -5,7 +5,7 @@ import { DRACOLoader, DRACO_GLTF_CONFIG } from "ek3d/addons/loaders/DRACOLoader"
 import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { HDRLoader } from "ek3d/addons/loaders/HDRLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping, MultiplyBlending } from "ek3d/constants";
+import { ToneMapping, Mapping, Blending } from "ek3d/constants";
 import type { Object3D } from "ek3d/core/Object3D";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { GridHelper } from "ek3d/helpers/GridHelper";
@@ -50,7 +50,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 0.85;
 const controls = new OrbitControls(camera, canvas);
 controls.maxDistance = 9;
@@ -103,7 +103,7 @@ const env = new HDRLoader(manager).load(
       texture.dispose();
       return;
     }
-    texture.mapping = EquirectangularReflectionMapping;
+    texture.mapping = Mapping.EquirectangularReflection;
     scene.environment = texture;
   },
   undefined,
@@ -160,7 +160,7 @@ new GLTFLoader(manager).setDRACOLoader(draco).load(
       new PlaneGeometry(0.655 * 4, 1.3 * 4),
       new MeshBasicMaterial({
         map: shadow,
-        blending: MultiplyBlending,
+        blending: Blending.Multiply,
         toneMapped: false,
         transparent: true,
         premultipliedAlpha: true,

@@ -11,7 +11,7 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  *
  * ```typescript
  * const texture = new TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' );
- * texture.colorSpace = SRGBColorSpace;
+ * texture.colorSpace = ColorSpace.SRGB;
  *
  * const texturePass = new TexturePass( texture );
  * composer.addPass( texturePass );

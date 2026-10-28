@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Wrapping, ColorSpace } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
@@ -48,9 +48,9 @@ new TextureLoader()
       texture.dispose();
       return;
     }
-    texture.wrapS = texture.wrapT = RepeatWrapping;
+    texture.wrapS = texture.wrapT = Wrapping.Repeat;
     texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-    texture.colorSpace = SRGBColorSpace;
+    texture.colorSpace = ColorSpace.SRGB;
     scene.add(new Mesh(new BoxGeometry(10, 10, 10), new MeshBasicMaterial({ map: texture })));
     function updateUvTransform(): void {
       if (texture.matrixAutoUpdate) {

@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { BasicShadowMap } from "ek3d/constants";
+import { ShadowMap } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
@@ -135,7 +135,7 @@ renderer.setSize(innerWidth, innerHeight);
 renderer.setClearColor(scene.fog.color);
 if (!renderer.shadowMap) throw new Error("Shadow map system unavailable");
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = BasicShadowMap;
+renderer.shadowMap.type = ShadowMap.Basic;
 const controls = new OrbitControls(camera, canvas);
 controls.maxPolarAngle = Math.PI * 0.5;
 controls.minDistance = 10;

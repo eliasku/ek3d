@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { Raycaster } from "ek3d/core/Raycaster";
@@ -163,7 +163,7 @@ loadExporterRuntime<{ createPolyslice(engine: object): PolysliceRuntime }>("/exa
       Ray,
       Raycaster,
       Mesh,
-      DoubleSide,
+      DoubleSide: Side.Double,
       BufferGeometry,
       BufferAttribute,
       Plane,

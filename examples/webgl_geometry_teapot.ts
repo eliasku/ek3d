@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { TeapotGeometry } from "ek3d/addons/geometries/TeapotGeometry";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide, RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Side, Wrapping, ColorSpace } from "ek3d/constants";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
 import { CubeTextureLoader } from "ek3d/loaders/CubeTextureLoader";
@@ -70,9 +70,9 @@ const texture = new TextureLoader(manager).load(
   undefined,
   assetError,
 );
-texture.wrapS = texture.wrapT = RepeatWrapping;
+texture.wrapS = texture.wrapT = Wrapping.Repeat;
 texture.anisotropy = 16;
-texture.colorSpace = SRGBColorSpace;
+texture.colorSpace = ColorSpace.SRGB;
 const cube = new CubeTextureLoader(manager).setPath("/examples/textures/cube/pisa/").load(
   ["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"],
   (value) => {
@@ -84,11 +84,11 @@ const cube = new CubeTextureLoader(manager).setPath("/examples/textures/cube/pis
 );
 const materials = {
   wireframe: new MeshBasicMaterial({ wireframe: true }),
-  flat: new MeshPhongMaterial({ specular: 0x000000, flatShading: true, side: DoubleSide }),
-  smooth: new MeshLambertMaterial({ side: DoubleSide }),
-  glossy: new MeshPhongMaterial({ color: 0xc0c0c0, specular: 0x404040, shininess: 300, side: DoubleSide }),
-  textured: new MeshPhongMaterial({ map: texture, side: DoubleSide }),
-  reflective: new MeshPhongMaterial({ envMap: cube, side: DoubleSide }),
+  flat: new MeshPhongMaterial({ specular: 0x000000, flatShading: true, side: Side.Double }),
+  smooth: new MeshLambertMaterial({ side: Side.Double }),
+  glossy: new MeshPhongMaterial({ color: 0xc0c0c0, specular: 0x404040, shininess: 300, side: Side.Double }),
+  textured: new MeshPhongMaterial({ map: texture, side: Side.Double }),
+  reflective: new MeshPhongMaterial({ envMap: cube, side: Side.Double }),
 };
 type Shading = keyof typeof materials;
 const params: {

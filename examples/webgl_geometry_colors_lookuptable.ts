@@ -1,4 +1,4 @@
-import { DoubleSide, SRGBColorSpace } from "ek3d/constants";
+import { Side, ColorSpace } from "ek3d/constants";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { BufferAttribute, Float32BufferAttribute } from "ek3d/core/BufferAttribute";
@@ -32,12 +32,12 @@ const uiCamera = new OrthographicCamera(-1, 1, 1, -1, 1, 2);
 uiCamera.position.set(0.5, 0, 1);
 const lut = new Lut();
 const map = new CanvasTexture(lut.createCanvas());
-map.colorSpace = SRGBColorSpace;
+map.colorSpace = ColorSpace.SRGB;
 const spriteMaterial = new SpriteMaterial({ map });
 const sprite = new Sprite(spriteMaterial);
 sprite.scale.x = 0.125;
 uiScene.add(sprite);
-const material = new MeshLambertMaterial({ side: DoubleSide, color: 0xf5f5f5, vertexColors: true });
+const material = new MeshLambertMaterial({ side: Side.Double, color: 0xf5f5f5, vertexColors: true });
 const mesh = new Mesh(new BufferGeometry(), material);
 scene.add(mesh);
 const renderer = new WebGLRenderer({

@@ -1,6 +1,6 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { BackSide, DynamicDrawUsage } from "ek3d/constants";
+import { Side, BufferUsage } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { TorusKnotGeometry } from "ek3d/geometries/TorusKnotGeometry";
@@ -25,7 +25,7 @@ const torus = new Mesh(geometry, new MeshBasicMaterial({ vertexColors: true }));
 scene.add(torus);
 const roomMaterials = Array.from(
   { length: 8 },
-  () => new MeshBasicMaterial({ color: Math.random() * 0xffffff, side: BackSide }),
+  () => new MeshBasicMaterial({ color: Math.random() * 0xffffff, side: Side.Back }),
 );
 scene.add(new Mesh(new BoxGeometry(3, 3, 3), roomMaterials));
 const renderer = new WebGLRenderer({ canvas, shaders: { MeshBasicMaterial: basicShader } });
@@ -52,7 +52,7 @@ if (!(positionAttribute instanceof BufferAttribute) || !(normalAttribute instanc
   throw new Error("Missing torus attributes");
 const positions: BufferAttribute = positionAttribute;
 const normals: BufferAttribute = normalAttribute;
-const colors = new BufferAttribute(new Float32Array(positions.count * 3), 3).setUsage(DynamicDrawUsage);
+const colors = new BufferAttribute(new Float32Array(positions.count * 3), 3).setUsage(BufferUsage.DynamicDraw);
 geometry.setAttribute("color", colors);
 let vertex = 0,
   bounces = 0,

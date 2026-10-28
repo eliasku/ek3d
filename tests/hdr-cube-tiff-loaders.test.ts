@@ -3,7 +3,7 @@ import { afterEach, test, vi } from "vite-plus/test";
 import { HDRCubeTextureLoader } from "../src/addons/loaders/HDRCubeTextureLoader";
 import { TIFFLoader } from "../src/addons/loaders/TIFFLoader";
 import type { TIFFRuntime } from "../src/addons/loaders/TIFFLoader";
-import { FloatType, LinearSRGBColorSpace } from "../src/constants";
+import { TextureType, ColorSpace } from "../src/constants";
 import { LoadingManager } from "../src/loaders/LoadingManager";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -46,7 +46,7 @@ test("HDR cube loader creates six float faces and reports invalid RGBE", async (
     data.set([10 * (i + 1), 64, 32, 128], header.length);
     return `data:application/octet-stream;base64,${Buffer.from(data).toString("base64")}`;
   });
-  const loader = new HDRCubeTextureLoader().setDataType(FloatType);
+  const loader = new HDRCubeTextureLoader().setDataType(TextureType.Float);
   const cube = await loader.loadAsync(urls);
   for (let i = 0; i < 6; i++) {
     const face = cube.images[i];
@@ -54,13 +54,13 @@ test("HDR cube loader creates six float faces and reports invalid RGBE", async (
     assert.equal(face.image.height, 1);
     assert.ok(Math.abs(face.image.data[0] - (10 * (i + 1)) / 255) < 1e-7);
   }
-  assert.equal(cube.type, FloatType);
-  assert.equal(cube.colorSpace, LinearSRGBColorSpace);
+  assert.equal(cube.type, TextureType.Float);
+  assert.equal(cube.colorSpace, ColorSpace.LinearSRGB);
   assert.equal(cube.generateMipmaps, false);
   assert.ok(
     cube.images.every(
       (face: { image: { data: unknown }; type: number }) =>
-        face.image.data instanceof Float32Array && face.type === FloatType,
+        face.image.data instanceof Float32Array && face.type === TextureType.Float,
     ),
   );
   const manager = new LoadingManager();

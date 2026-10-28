@@ -1,4 +1,4 @@
-import { FloatType, HalfFloatType, LinearSRGBColorSpace, NoColorSpace, SRGBColorSpace } from "../../constants";
+import { TextureType, ColorSpace } from "../../constants";
 import { LightProbe } from "../../lights/LightProbe";
 import { Color } from "../../math/Color";
 import { fromHalfFloat } from "../../extras/DataUtils";
@@ -33,15 +33,22 @@ export class LightProbeGenerator {
     const faces: (Float32Array | Uint16Array | Uint8Array)[] = [];
     for (let face = 0; face < 6; face++) {
       const data =
-        type === FloatType
+        type === TextureType.Float
           ? new Float32Array(width * width * 4)
-          : type === HalfFloatType
+          : type === TextureType.HalfFloat
             ? new Uint16Array(width * width * 4)
             : new Uint8Array(width * width * 4);
       await renderer.readRenderTargetPixelsAsync(target, 0, 0, width, width, data, face);
       faces.push(data);
     }
-    return generate(faces, width, target.texture.colorSpace, true, type === HalfFloatType, type === FloatType);
+    return generate(
+      faces,
+      width,
+      target.texture.colorSpace,
+      true,
+      type === TextureType.HalfFloat,
+      type === TextureType.Float,
+    );
   }
 }
 
@@ -75,8 +82,8 @@ function generate(
         b /= 255;
       }
       color.setRGB(r, g, b);
-      if (colorSpace === SRGBColorSpace) color.convertSRGBToLinear();
-      else if (colorSpace !== LinearSRGBColorSpace && colorSpace !== NoColorSpace) {
+      if (colorSpace === ColorSpace.SRGB) color.convertSRGBToLinear();
+      else if (colorSpace !== ColorSpace.LinearSRGB && colorSpace !== ColorSpace.No) {
         console.warn("WARNING: LightProbeGenerator convertColorToLinear() encountered an unsupported color space.");
       }
       const pixel = i / 4;

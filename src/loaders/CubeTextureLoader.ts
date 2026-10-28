@@ -2,7 +2,7 @@ import type { LoadingManager } from "./LoadingManager";
 import { ImageLoader } from "./ImageLoader";
 import { CubeTexture } from "../textures/CubeTexture";
 import { Loader } from "./Loader";
-import { SRGBColorSpace } from "../constants";
+import { ColorSpace } from "../constants";
 /**
  * Class for loading cube textures. Images are internally loaded via {@link ImageLoader}.
  *
@@ -17,7 +17,7 @@ import { SRGBColorSpace } from "../constants";
  * have pos-x and neg-x swapped.
  *
  * The loaded cube texture is in sRGB color space. Meaning {@link Texture#colorSpace}
- * is set to `SRGBColorSpace` by default.
+ * is set to `ColorSpace.SRGB` by default.
  *
  * ```typescript
  * import { CubeTextureLoader } from 'ek3d/loaders/CubeTextureLoader';
@@ -62,7 +62,7 @@ export class CubeTextureLoader extends Loader<CubeTexture, string[]> {
     onError?: (error: unknown) => void,
   ): CubeTexture {
     const texture = new CubeTexture();
-    texture.colorSpace = SRGBColorSpace;
+    texture.colorSpace = ColorSpace.SRGB;
     const loader = new ImageLoader(this.manager);
     loader.setPriority(this.priority);
     loader.setCache(this.cache);

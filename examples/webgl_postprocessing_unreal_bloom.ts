@@ -14,7 +14,7 @@ import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { standardShader } from "ek3d/renderers/shaders/StandardShader";
 import { createDFGLUT } from "ek3d/renderers/shaders/DFGLUTData";
 import { createLTCTextures } from "ek3d/renderers/shaders/LTCTextures";
-import { ACESFilmicToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { Scene } from "ek3d/scenes/Scene";
 
@@ -63,7 +63,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 
 const renderScene = new RenderPass(scene, camera);
 

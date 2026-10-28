@@ -1,4 +1,4 @@
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import { Float32BufferAttribute } from "../../core/BufferAttribute";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { FileLoader } from "../../loaders/FileLoader";
@@ -67,7 +67,7 @@ export class XYZLoader extends Loader<BufferGeometry, string> {
           parseFloat(values[3]) / 255,
           parseFloat(values[4]) / 255,
           parseFloat(values[5]) / 255,
-          SRGBColorSpace,
+          ColorSpace.SRGB,
         );
         colors.push(color.r, color.g, color.b);
       }

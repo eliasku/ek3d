@@ -1,4 +1,4 @@
-import { ClampToEdgeWrapping, DoubleSide, LinearFilter, SRGBColorSpace } from "../../constants";
+import { Wrapping, Side, TextureFilter, ColorSpace } from "../../constants";
 import { PlaneGeometry } from "../../geometries/PlaneGeometry";
 import { MeshBasicMaterial } from "../../materials/MeshBasicMaterial";
 import { Matrix4 } from "../../math/Matrix4";
@@ -44,13 +44,13 @@ export class VolumeSlice {
     this.ctxBuffer = ctxBuffer;
     this.geometry = new PlaneGeometry(extracted.planeWidth, extracted.planeHeight);
     const canvasMap = new Texture(this.canvas);
-    canvasMap.minFilter = LinearFilter;
+    canvasMap.minFilter = TextureFilter.Linear;
     canvasMap.generateMipmaps = false;
-    canvasMap.wrapS = canvasMap.wrapT = ClampToEdgeWrapping;
-    canvasMap.colorSpace = SRGBColorSpace;
+    canvasMap.wrapS = canvasMap.wrapT = Wrapping.ClampToEdge;
+    canvasMap.colorSpace = ColorSpace.SRGB;
     this.mesh = new Mesh<MeshBasicMaterial>(
       this.geometry,
-      new MeshBasicMaterial({ map: canvasMap, side: DoubleSide, transparent: true }),
+      new MeshBasicMaterial({ map: canvasMap, side: Side.Double, transparent: true }),
     );
     this.mesh.matrixAutoUpdate = false;
     this.repaint();

@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import path from "node:path";
@@ -85,11 +86,11 @@ async function framebuffer(page: Page) {
     if (gl.isContextLost()) throw new Error("Scene lost its WebGL context");
     gl.finish();
     const pixels = new Uint8Array(canvas.width * canvas.height * 4);
-    const previous = gl.getParameter(gl.READ_FRAMEBUFFER_BINDING) as WebGLFramebuffer | null;
-    gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
-    gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-    gl.bindFramebuffer(gl.READ_FRAMEBUFFER, previous);
-    if (gl.getError() !== gl.NO_ERROR) throw new Error("Framebuffer read failed");
+    const previous = gl.getParameter(GL.READ_FRAMEBUFFER_BINDING) as WebGLFramebuffer | null;
+    gl.bindFramebuffer(GL.READ_FRAMEBUFFER, null);
+    gl.readPixels(0, 0, canvas.width, canvas.height, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+    gl.bindFramebuffer(GL.READ_FRAMEBUFFER, previous);
+    if (gl.getError() !== GL.NO_ERROR) throw new Error("Framebuffer read failed");
     let varied = false;
     for (let i = 4; i < pixels.length; i += 4) {
       if (pixels[i] !== pixels[0] || pixels[i + 1] !== pixels[1] || pixels[i + 2] !== pixels[2]) {
@@ -110,7 +111,7 @@ async function framebuffer(page: Page) {
 }
 
 async function verifyExample(page: Page, baseURL: string) {
-  await page.goto(new URL("feature-testbed/index.html", baseURL).href, { waitUntil: "load" });
+  await page.goto(new URL("testbed/index.html", baseURL).href, { waitUntil: "load" });
   await page.waitForFunction(() => document.querySelector<HTMLCanvasElement>("#scene")?.dataset.state !== undefined);
   await framebuffer(page);
   await page.keyboard.press("Space");
@@ -853,7 +854,7 @@ async function main() {
       root,
       configFile: false,
       logLevel: "warn",
-      optimizeDeps: { entries: ["index.html", "feature-testbed/index.html", "tests/browser*.ts"] },
+      optimizeDeps: { entries: ["index.html", "testbed/index.html", "tests/browser*.ts"] },
       server: { host: "127.0.0.1", port: 0 },
     });
     await dev.listen();

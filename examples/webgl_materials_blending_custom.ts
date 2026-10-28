@@ -1,23 +1,5 @@
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
-import {
-  AddEquation,
-  CustomBlending,
-  DstAlphaFactor,
-  DstColorFactor,
-  MaxEquation,
-  MinEquation,
-  OneFactor,
-  OneMinusDstAlphaFactor,
-  OneMinusDstColorFactor,
-  OneMinusSrcAlphaFactor,
-  OneMinusSrcColorFactor,
-  ReverseSubtractEquation,
-  SrcAlphaFactor,
-  SrcAlphaSaturateFactor,
-  SrcColorFactor,
-  SubtractEquation,
-  ZeroFactor,
-} from "ek3d/constants";
+import { Equation, Blending, Factor } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 import { Mesh } from "ek3d/objects/Mesh";
@@ -25,18 +7,18 @@ import { blendingScene, labelMaterial } from "./materials-blending-common";
 
 const { scene, load, cleanup } = blendingScene(80, 700);
 const dst = [
-  { name: "Zero", constant: ZeroFactor },
-  { name: "One", constant: OneFactor },
-  { name: "SrcColor", constant: SrcColorFactor },
-  { name: "OneMinusSrcColor", constant: OneMinusSrcColorFactor },
-  { name: "SrcAlpha", constant: SrcAlphaFactor },
-  { name: "OneMinusSrcAlpha", constant: OneMinusSrcAlphaFactor },
-  { name: "DstAlpha", constant: DstAlphaFactor },
-  { name: "OneMinusDstAlpha", constant: OneMinusDstAlphaFactor },
-  { name: "DstColor", constant: DstColorFactor },
-  { name: "OneMinusDstColor", constant: OneMinusDstColorFactor },
+  { name: "Zero", constant: Factor.Zero },
+  { name: "One", constant: Factor.One },
+  { name: "SrcColor", constant: Factor.SrcColor },
+  { name: "OneMinusSrcColor", constant: Factor.OneMinusSrcColor },
+  { name: "SrcAlpha", constant: Factor.SrcAlpha },
+  { name: "OneMinusSrcAlpha", constant: Factor.OneMinusSrcAlpha },
+  { name: "DstAlpha", constant: Factor.DstAlpha },
+  { name: "OneMinusDstAlpha", constant: Factor.OneMinusDstAlpha },
+  { name: "DstColor", constant: Factor.DstColor },
+  { name: "OneMinusDstColor", constant: Factor.OneMinusDstColor },
 ];
-const src = [...dst, { name: "SrcAlphaSaturate", constant: SrcAlphaSaturateFactor }];
+const src = [...dst, { name: "SrcAlphaSaturate", constant: Factor.SrcAlphaSaturate }];
 const imageGeometry = new PlaneGeometry(100, 100);
 const labelGeometry = new PlaneGeometry(100, 25);
 const texture = load("lensflare/lensflare0_alpha.png");
@@ -46,10 +28,10 @@ for (let i = 0; i < dst.length; i++) {
     const material = new MeshBasicMaterial({
       map: texture,
       transparent: true,
-      blending: CustomBlending,
+      blending: Blending.Custom,
       blendSrc: src[j].constant,
       blendDst: dst[i].constant,
-      blendEquation: AddEquation,
+      blendEquation: Equation.Add,
     });
     const mesh = new Mesh(imageGeometry, material);
     mesh.position.set((j - src.length / 2) * 110, -((i - dst.length / 2) * 110 + 50), 0);
@@ -73,13 +55,13 @@ for (let i = 0; i < dst.length; i++) {
   mesh.updateMatrix();
   scene.add(mesh);
 }
-const params = { blendEquation: AddEquation };
+const params = { blendEquation: Equation.Add };
 const equations = {
-  Add: AddEquation,
-  Subtract: SubtractEquation,
-  ReverseSubtract: ReverseSubtractEquation,
-  Min: MinEquation,
-  Max: MaxEquation,
+  Add: Equation.Add,
+  Subtract: Equation.Subtract,
+  ReverseSubtract: Equation.ReverseSubtract,
+  Min: Equation.Min,
+  Max: Equation.Max,
 };
 const gui = new GUI({ width: 300 });
 gui.add(params, "blendEquation", equations).onChange(() => {

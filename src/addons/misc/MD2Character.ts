@@ -1,7 +1,7 @@
 import { MD2Loader, type MD2Geometry } from "../loaders/MD2Loader";
 import type { AnimationAction } from "../../animation/AnimationAction";
 import { AnimationMixer } from "../../animation/AnimationMixer";
-import { SRGBColorSpace, UVMapping } from "../../constants";
+import { ColorSpace, Mapping } from "../../constants";
 import type { BufferAttribute } from "../../core/BufferAttribute";
 import { Object3D } from "../../core/Object3D";
 import { TextureLoader } from "../../loaders/TextureLoader";
@@ -78,9 +78,9 @@ export class MD2Character {
     const loadTextures = (names: string[]): Texture[] =>
       names.map((name) => {
         const texture = textureLoader.load(config.baseUrl + "skins/" + name, complete, undefined, error);
-        texture.mapping = UVMapping;
+        texture.mapping = Mapping.UV;
         texture.name = name;
-        texture.colorSpace = SRGBColorSpace;
+        texture.colorSpace = ColorSpace.SRGB;
         return texture;
       });
     this.skinsBody = loadTextures(config.skins);

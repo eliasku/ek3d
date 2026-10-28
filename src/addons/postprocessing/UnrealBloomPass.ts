@@ -1,4 +1,4 @@
-import { AdditiveBlending, HalfFloatType } from "../../constants";
+import { Blending, TextureType } from "../../constants";
 import { Color } from "../../math/Color";
 import { Vector2 } from "../../math/Vector2";
 import { Vector3 } from "../../math/Vector3";
@@ -116,19 +116,25 @@ export class UnrealBloomPass extends Pass {
     let resx = Math.round(this.resolution.x / 2);
     let resy = Math.round(this.resolution.y / 2);
 
-    this.renderTargetBright = new WebGLRenderTarget(resx, resy, { type: HalfFloatType, depthBuffer: false });
+    this.renderTargetBright = new WebGLRenderTarget(resx, resy, { type: TextureType.HalfFloat, depthBuffer: false });
     this.renderTargetBright.texture.name = "UnrealBloomPass.bright";
     this.renderTargetBright.texture.generateMipmaps = false;
 
     for (let i = 0; i < this.nMips; i++) {
-      const renderTargetHorizontal = new WebGLRenderTarget(resx, resy, { type: HalfFloatType, depthBuffer: false });
+      const renderTargetHorizontal = new WebGLRenderTarget(resx, resy, {
+        type: TextureType.HalfFloat,
+        depthBuffer: false,
+      });
 
       renderTargetHorizontal.texture.name = "UnrealBloomPass.h" + i;
       renderTargetHorizontal.texture.generateMipmaps = false;
 
       this.renderTargetsHorizontal.push(renderTargetHorizontal);
 
-      const renderTargetVertical = new WebGLRenderTarget(resx, resy, { type: HalfFloatType, depthBuffer: false });
+      const renderTargetVertical = new WebGLRenderTarget(resx, resy, {
+        type: TextureType.HalfFloat,
+        depthBuffer: false,
+      });
 
       renderTargetVertical.texture.name = "UnrealBloomPass.v" + i;
       renderTargetVertical.texture.generateMipmaps = false;
@@ -204,7 +210,7 @@ export class UnrealBloomPass extends Pass {
       vertexShader: CopyShader.vertexShader,
       fragmentShader: CopyShader.fragmentShader,
       premultipliedAlpha: true,
-      blending: AdditiveBlending,
+      blending: Blending.Additive,
       depthTest: false,
       depthWrite: false,
       transparent: true,

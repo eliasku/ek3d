@@ -1,3 +1,4 @@
+import { GL } from "../../GL";
 export function WebGLObjects(gl?: any, geometries?: any, attributes?: any, bindingStates?: any, info?: any) {
   let updateMap = new WeakMap<any, any>();
   const instancedMeshes = new Set<any>();
@@ -16,9 +17,9 @@ export function WebGLObjects(gl?: any, geometries?: any, attributes?: any, bindi
         instancedMeshes.add(object);
       }
       if (updateMap.get(object) !== frame) {
-        attributes.update(object.instanceMatrix, gl.ARRAY_BUFFER);
+        attributes.update(object.instanceMatrix, GL.ARRAY_BUFFER);
         if (object.instanceColor !== null) {
-          attributes.update(object.instanceColor, gl.ARRAY_BUFFER);
+          attributes.update(object.instanceColor, GL.ARRAY_BUFFER);
         }
         updateMap.set(object, frame);
       }

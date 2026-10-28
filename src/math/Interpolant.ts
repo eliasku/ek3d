@@ -1,3 +1,4 @@
+import { EndingMode } from "../constants";
 export type NumericAnimationBuffer =
   | number[]
   | Int8Array
@@ -15,8 +16,8 @@ export interface AnimationBufferConstructor {
   BYTES_PER_ELEMENT?: number;
 }
 export interface InterpolantSettings {
-  endingStart?: number;
-  endingEnd?: number;
+  endingStart?: EndingMode;
+  endingEnd?: EndingMode;
   inTangents?: NumericAnimationBuffer;
   outTangents?: NumericAnimationBuffer;
 }

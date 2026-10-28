@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test, vi } from "vite-plus/test";
 import { decompress } from "../src/addons/utils/WebGLTextureUtils";
-import { RepeatWrapping, SRGBColorSpace } from "../src/constants";
+import { Wrapping, ColorSpace } from "../src/constants";
 import type { Mesh } from "../src/objects/Mesh";
 import type { WebGLRenderer } from "../src/renderers/WebGLRenderer";
 import type { Scene } from "../src/scenes/Scene";
@@ -13,8 +13,8 @@ test("decompress preserves texture metadata without disposing the input or suppl
   vi.stubGlobal("document", { createElement: () => canvas });
   const texture = new CompressedTexture([], 32, 16);
   texture.name = "compressed";
-  texture.colorSpace = SRGBColorSpace;
-  texture.wrapS = RepeatWrapping;
+  texture.colorSpace = ColorSpace.SRGB;
+  texture.wrapS = Wrapping.Repeat;
   let textureDisposed = false;
   texture.addEventListener("dispose", () => {
     textureDisposed = true;

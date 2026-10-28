@@ -5,7 +5,7 @@ import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { DRACOLoader } from "ek3d/addons/loaders/DRACOLoader";
 import { DRACO_GLTF_CONFIG } from "ek3d/addons/loaders/DRACOLoader";
 import { HDRLoader } from "ek3d/addons/loaders/HDRLoader";
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping, MultiplyBlending } from "ek3d/constants";
+import { ToneMapping, Mapping, Blending } from "ek3d/constants";
 import { degToRad } from "ek3d/math/MathUtils";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
@@ -59,7 +59,7 @@ async function init(): Promise<void> {
 
   const hdrLoader = new HDRLoader().setPath("/examples/textures/equirectangular/");
   const envMap: DataTexture = await hdrLoader.loadAsync("blouberg_sunrise_2_1k.hdr");
-  envMap.mapping = EquirectangularReflectionMapping;
+  envMap.mapping = Mapping.EquirectangularReflection;
 
   skybox = new GroundedSkybox(envMap, params.height, params.radius);
   skybox.position.y = params.height - 0.01;
@@ -113,7 +113,7 @@ async function init(): Promise<void> {
       new PlaneGeometry(0.655 * 4, 1.3 * 4),
       new MeshBasicMaterial({
         map: shadow,
-        blending: MultiplyBlending,
+        blending: Blending.Multiply,
         toneMapped: false,
         transparent: true,
         premultipliedAlpha: true,
@@ -152,7 +152,7 @@ async function init(): Promise<void> {
   });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.toneMapping = ACESFilmicToneMapping;
+  renderer.toneMapping = ToneMapping.ACESFilmic;
 
   controls = new OrbitControls<PerspectiveCamera>(camera, canvas);
   controls.addEventListener("change", render);

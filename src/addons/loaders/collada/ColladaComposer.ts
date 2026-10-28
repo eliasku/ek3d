@@ -28,15 +28,7 @@ import { Triangle } from "../../../math/Triangle";
 import { Vector2 } from "../../../math/Vector2";
 import { Vector3 } from "../../../math/Vector3";
 import { VectorKeyframeTrack } from "../../../animation/tracks/VectorKeyframeTrack";
-import {
-  ClampToEdgeWrapping,
-  DoubleSide,
-  FrontSide,
-  InterpolateBezier,
-  InterpolateDiscrete,
-  RepeatWrapping,
-  SRGBColorSpace,
-} from "../../../constants";
+import { Wrapping, Side, Interpolation, ColorSpace } from "../../../constants";
 import * as MathUtils from "../../../math/MathUtils";
 import { ShapeUtils } from "../../../extras/ShapeUtils";
 import type { TextureLoader } from "../../../loaders/TextureLoader";
@@ -720,12 +712,12 @@ export class ColladaComposer {
     channelData: AnimationChannels | null = null,
   ) {
     if (interpolationInfo.type === "STEP" && interpolationInfo.uniform) {
-      track.setInterpolation(InterpolateDiscrete);
+      track.setInterpolation(Interpolation.Discrete);
     } else if (interpolationInfo.type === "BEZIER" && interpolationInfo.uniform && channelData) {
       const data = channelData.default;
 
       if (data && data.inTangent && data.outTangent) {
-        track.setInterpolation(InterpolateBezier);
+        track.setInterpolation(Interpolation.Bezier);
         track.settings = {
           inTangents: new Float32Array(data.inTangent),
           outTangents: new Float32Array(data.outTangent),
@@ -1086,7 +1078,7 @@ export class ColladaComposer {
 
     material.name = data.name || "";
 
-    const getTexture = (textureObject: ColladaTexture, colorSpace: string | null = null) => {
+    const getTexture = (textureObject: ColladaTexture, colorSpace: ColorSpace | null = null) => {
       const sampler = effect.profile.samplers[textureObject.id];
       let image = null;
 
@@ -1113,14 +1105,14 @@ export class ColladaComposer {
           if (extra !== undefined && extra.technique !== undefined && this.isEmpty(extra.technique) === false) {
             const technique = extra.technique;
 
-            texture.wrapS = technique.wrapU ? RepeatWrapping : ClampToEdgeWrapping;
-            texture.wrapT = technique.wrapV ? RepeatWrapping : ClampToEdgeWrapping;
+            texture.wrapS = technique.wrapU ? Wrapping.Repeat : Wrapping.ClampToEdge;
+            texture.wrapT = technique.wrapV ? Wrapping.Repeat : Wrapping.ClampToEdge;
 
             texture.offset.set(technique.offsetU || 0, technique.offsetV || 0);
             texture.repeat.set(technique.repeatU || 1, technique.repeatV || 1);
           } else {
-            texture.wrapS = RepeatWrapping;
-            texture.wrapT = RepeatWrapping;
+            texture.wrapS = Wrapping.Repeat;
+            texture.wrapT = Wrapping.Repeat;
           }
 
           if (colorSpace !== null) {
@@ -1148,7 +1140,7 @@ export class ColladaComposer {
       switch (key) {
         case "diffuse":
           if (parameter.color) material.color.fromArray(parameter.color);
-          if (parameter.texture) material.map = getTexture(parameter.texture, SRGBColorSpace);
+          if (parameter.texture) material.map = getTexture(parameter.texture, ColorSpace.SRGB);
           break;
         case "specular":
           if (parameter.color && material.specular) material.specular.fromArray(parameter.color);
@@ -1158,21 +1150,21 @@ export class ColladaComposer {
           if (parameter.texture) material.normalMap = getTexture(parameter.texture);
           break;
         case "ambient":
-          if (parameter.texture) material.lightMap = getTexture(parameter.texture, SRGBColorSpace);
+          if (parameter.texture) material.lightMap = getTexture(parameter.texture, ColorSpace.SRGB);
           break;
         case "shininess":
           if (parameter.float && material.shininess) material.shininess = parameter.float;
           break;
         case "emission":
           if (parameter.color && material.emissive) material.emissive.fromArray(parameter.color);
-          if (parameter.texture) material.emissiveMap = getTexture(parameter.texture, SRGBColorSpace);
+          if (parameter.texture) material.emissiveMap = getTexture(parameter.texture, ColorSpace.SRGB);
           break;
       }
     }
 
-    ColorManagement.colorSpaceToWorking(material.color, SRGBColorSpace);
-    if (material.specular) ColorManagement.colorSpaceToWorking(material.specular, SRGBColorSpace);
-    if (material.emissive) ColorManagement.colorSpaceToWorking(material.emissive, SRGBColorSpace);
+    ColorManagement.colorSpaceToWorking(material.color, ColorSpace.SRGB);
+    if (material.specular) ColorManagement.colorSpaceToWorking(material.specular, ColorSpace.SRGB);
+    if (material.emissive) ColorManagement.colorSpaceToWorking(material.emissive, ColorSpace.SRGB);
 
     //
 
@@ -1239,7 +1231,7 @@ export class ColladaComposer {
 
         switch (k) {
           case "double_sided":
-            material.side = v === 1 ? DoubleSide : FrontSide;
+            material.side = v === 1 ? Side.Double : Side.Front;
             break;
 
           case "bump":
@@ -1625,7 +1617,7 @@ export class ColladaComposer {
       if (isColor) {
         // convert the vertex colors from srgb to linear if present
         const startIndex = array.length - sourceStride;
-        tempColor.setRGB(array[startIndex + 0], array[startIndex + 1], array[startIndex + 2], SRGBColorSpace);
+        tempColor.setRGB(array[startIndex + 0], array[startIndex + 1], array[startIndex + 2], ColorSpace.SRGB);
 
         array[startIndex + 0] = tempColor.r;
         array[startIndex + 1] = tempColor.g;

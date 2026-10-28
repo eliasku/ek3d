@@ -13,7 +13,7 @@ import { Ray } from "../math/Ray";
 import { Matrix4 } from "../math/Matrix4";
 import { Object3D } from "../core/Object3D";
 import { Triangle } from "../math/Triangle";
-import { BackSide, FrontSide } from "../constants";
+import { Side } from "../constants";
 const _inverseMatrix = /*@__PURE__*/ new Matrix4();
 const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
@@ -326,10 +326,10 @@ function checkIntersection(
   point?: any,
 ) {
   let intersect: any;
-  if (material.side === BackSide) {
+  if (material.side === Side.Back) {
     intersect = ray.intersectTriangle(pC, pB, pA, true, point);
   } else {
-    intersect = ray.intersectTriangle(pA, pB, pC, material.side === FrontSide, point);
+    intersect = ray.intersectTriangle(pA, pB, pC, material.side === Side.Front, point);
   }
   if (intersect === null) return null;
   _intersectionPointWorld.copy(point);

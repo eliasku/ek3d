@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { LoopSubdivision } from "ek3d/addons/modifiers/LoopSubdivision";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide, FrontSide, RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Side, Wrapping, ColorSpace } from "ek3d/constants";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { CapsuleGeometry } from "ek3d/geometries/CapsuleGeometry";
@@ -95,8 +95,8 @@ const texture = new TextureLoader().load(
       map.dispose();
       return;
     }
-    map.wrapS = map.wrapT = RepeatWrapping;
-    map.colorSpace = SRGBColorSpace;
+    map.wrapS = map.wrapT = Wrapping.Repeat;
+    map.colorSpace = ColorSpace.SRGB;
     loaded = true;
     render();
   },
@@ -169,7 +169,7 @@ function updateMaterial(): void {
     polygonOffset: true,
     polygonOffsetFactor: 1,
     polygonOffsetUnits: 1,
-    side: ["Circle", "Lathe", "Plane", "Ring"].includes(params.geometry) ? DoubleSide : FrontSide,
+    side: ["Circle", "Lathe", "Plane", "Ring"].includes(params.geometry) ? Side.Double : Side.Front,
   });
   meshNormal.material = meshSmooth.material = material;
   render();

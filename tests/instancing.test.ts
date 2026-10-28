@@ -15,7 +15,7 @@ import { Color } from "../src/math/Color";
 import { Vector3 } from "../src/math/Vector3";
 import { Frustum } from "../src/math/Frustum";
 import { OrthographicCamera } from "../src/cameras/OrthographicCamera";
-import { DynamicDrawUsage, FloatType, RedFormat } from "../src/constants";
+import { BufferUsage, TextureType, PixelFormat } from "../src/constants";
 import { InstancedMesh as UpstreamInstancedMesh } from "../upstream/three.js/src/objects/InstancedMesh.js";
 import { Mesh as UpstreamMesh } from "../upstream/three.js/src/objects/Mesh.js";
 import { BufferGeometry as UpstreamGeometry } from "../upstream/three.js/src/core/BufferGeometry.js";
@@ -127,7 +127,7 @@ test("instance matrices and lazy colors retain capacity and require explicit upl
   assert.deepEqual(actual.getMatrixAt(2, matrix).elements, expected.getMatrixAt(2, new Matrix4()).elements);
   assert.equal(actual.instanceMatrix.version, 0);
   assert.equal(actual.instanceColor!.version, 0);
-  actual.instanceMatrix.setUsage(DynamicDrawUsage).addUpdateRange(32, 16);
+  actual.instanceMatrix.setUsage(BufferUsage.DynamicDraw).addUpdateRange(32, 16);
   actual.instanceColor!.addUpdateRange(6, 3);
   actual.instanceMatrix.needsUpdate = true;
   actual.instanceColor!.needsUpdate = true;
@@ -395,8 +395,8 @@ test("low-level morph rows preserve relative and absolute base weights and expli
     ]);
     assert.equal(texture.image.width, 3);
     assert.equal(texture.image.height, 2);
-    assert.equal(texture.format, RedFormat);
-    assert.equal(texture.type, FloatType);
+    assert.equal(texture.format, PixelFormat.Red);
+    assert.equal(texture.type, TextureType.Float);
     const version = texture.version;
     weights.morphTargetInfluences = [0, 0];
     actual.getMorphAt(1, weights);

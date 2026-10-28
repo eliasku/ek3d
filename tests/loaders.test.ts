@@ -6,7 +6,7 @@ import { LoadingManager } from "../src/loaders/LoadingManager";
 import { FileLoader } from "../src/loaders/FileLoader";
 import { DataTextureLoader } from "../src/loaders/DataTextureLoader";
 import { CompressedTextureLoader } from "../src/loaders/CompressedTextureLoader";
-import { LinearFilter, RepeatWrapping, RGBA_S3TC_DXT1_Format, SRGBColorSpace } from "../src/constants";
+import { TextureFilter, Wrapping, PixelFormat, ColorSpace } from "../src/constants";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -231,8 +231,8 @@ test("data texture parser application preserves bytes and sampler metadata", asy
         width: 1,
         height: 1,
         data: new Uint8Array(buffer),
-        wrapS: RepeatWrapping,
-        colorSpace: SRGBColorSpace,
+        wrapS: Wrapping.Repeat,
+        colorSpace: ColorSpace.SRGB,
         flipY: true,
         generateMipmaps: false,
       };
@@ -242,9 +242,9 @@ test("data texture parser application preserves bytes and sampler metadata", asy
   const texture = loader.createDataTexture(bytes.buffer);
   assert.equal(texture.image.data?.buffer, bytes.buffer);
   assert.equal(texture.image.width, 1);
-  assert.equal(texture.wrapS, RepeatWrapping);
-  assert.equal(texture.minFilter, LinearFilter);
-  assert.equal(texture.colorSpace, SRGBColorSpace);
+  assert.equal(texture.wrapS, Wrapping.Repeat);
+  assert.equal(texture.minFilter, TextureFilter.Linear);
+  assert.equal(texture.colorSpace, ColorSpace.SRGB);
   assert.equal(texture.flipY, true);
   assert.equal(texture.version, 1);
   vi.stubGlobal("fetch", async () => new Response(bytes));
@@ -261,7 +261,7 @@ test("compressed texture loading preserves 2D and six-face payloads without a fo
       return {
         width: 4,
         height: 4,
-        format: RGBA_S3TC_DXT1_Format,
+        format: PixelFormat.RGBA_S3TC_DXT1,
         mipmapCount: 1,
         mipmaps: [{ data: new Uint8Array(buffer), width: 4, height: 4 }],
       };
@@ -271,8 +271,8 @@ test("compressed texture loading preserves 2D and six-face payloads without a fo
   vi.stubGlobal("fetch", async () => new Response(bytes));
   const loader = new Blocks();
   const texture = await loader.loadAsync("https://example.test/blocks");
-  assert.equal(texture.format, RGBA_S3TC_DXT1_Format);
-  assert.equal(texture.minFilter, LinearFilter);
+  assert.equal(texture.format, PixelFormat.RGBA_S3TC_DXT1);
+  assert.equal(texture.minFilter, TextureFilter.Linear);
   assert.equal(texture.mipmaps.length, 1);
   assert.equal(texture.version, 1);
   const cube = await loader.loadAsync(Array.from({ length: 6 }, (_, i) => `https://example.test/face-${i}`));

@@ -3,7 +3,7 @@ import { LightProbeGridHelperWebGL } from "ek3d/addons/helpers/LightProbeGridHel
 import { LightProbeGridWebGL } from "ek3d/addons/lighting/LightProbeGridWebGL";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
@@ -94,7 +94,7 @@ const renderer = new WebGLRenderer({
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap!.enabled = true;
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 2.5, 0);
 controls.update();

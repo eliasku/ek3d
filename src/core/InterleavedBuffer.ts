@@ -1,5 +1,5 @@
 import { generateUUID } from "../math/MathUtils";
-import { StaticDrawUsage } from "../constants";
+import { BufferUsage } from "../constants";
 
 export interface InterleavedBufferCloneData {
   arrayBuffers?: Record<string, ArrayBuffer>;
@@ -14,7 +14,7 @@ export interface InterleavedBufferSerializationData {
       buffer: string;
       type: string;
       stride: number;
-      usage: number;
+      usage: BufferUsage;
       isInstancedInterleavedBuffer?: boolean;
       meshPerAttribute?: number;
     }
@@ -40,7 +40,7 @@ export class InterleavedBuffer {
     | Float64Array;
   stride: number;
   count: number;
-  usage: number;
+  usage: BufferUsage;
   updateRanges: { start: number; count: number }[];
   version: number;
   uuid: string;
@@ -93,9 +93,9 @@ export class InterleavedBuffer {
      * Note: After the initial use of a buffer, its usage cannot be changed. Instead,
      * instantiate a new one and set the desired usage before the next render.
      *
-     * @default StaticDrawUsage
+     * @default BufferUsage.StaticDraw
      */
-    this.usage = StaticDrawUsage;
+    this.usage = BufferUsage.StaticDraw;
     /**
      * This can be used to only update some components of stored vectors (for example, just the
      * component related to color). Use the `addUpdateRange()` function to add ranges to this array.

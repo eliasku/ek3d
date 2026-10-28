@@ -1,17 +1,7 @@
 import type { RenderTarget } from "../core/RenderTarget";
 import type { WebGLRenderTarget } from "../renderers/WebGLRenderTarget";
 import { EventDispatcher } from "../core/EventDispatcher";
-import {
-  MirroredRepeatWrapping,
-  ClampToEdgeWrapping,
-  RepeatWrapping,
-  UnsignedByteType,
-  RGBAFormat,
-  LinearMipmapLinearFilter,
-  LinearFilter,
-  UVMapping,
-  NoColorSpace,
-} from "../constants";
+import { Wrapping, TextureType, PixelFormat, TextureFilter, Mapping, ColorSpace } from "../constants";
 import { generateUUID } from "../math/MathUtils";
 import { Vector2 } from "../math/Vector2";
 import { Vector3 } from "../math/Vector3";
@@ -33,16 +23,16 @@ export class Texture<TMipmap = any> extends EventDispatcher {
   name: string;
   source: TextureSource;
   mipmaps: TMipmap[];
-  mapping: number;
+  mapping: Mapping;
   channel: number;
-  wrapS: number;
-  wrapT: number;
-  magFilter: number;
-  minFilter: number;
+  wrapS: Wrapping;
+  wrapT: Wrapping;
+  magFilter: TextureFilter;
+  minFilter: TextureFilter;
   anisotropy: number;
-  format: number;
+  format: PixelFormat;
   internalFormat: string | null;
-  type: number;
+  type: TextureType;
   offset: Vector2;
   repeat: Vector2;
   center: Vector2;
@@ -67,7 +57,7 @@ export class Texture<TMipmap = any> extends EventDispatcher {
   normalized: boolean;
   readonly id: number;
   static DEFAULT_IMAGE: null;
-  static DEFAULT_MAPPING: number;
+  static DEFAULT_MAPPING: Mapping;
   static DEFAULT_ANISOTROPY: number;
 
   /**
@@ -75,26 +65,26 @@ export class Texture<TMipmap = any> extends EventDispatcher {
    *
    * @param [image=Texture.DEFAULT_IMAGE] - The image holding the texture data.
    * @param [mapping=Texture.DEFAULT_MAPPING] - The texture mapping.
-   * @param [wrapS=ClampToEdgeWrapping] - The wrapS value.
-   * @param [wrapT=ClampToEdgeWrapping] - The wrapT value.
-   * @param [magFilter=LinearFilter] - The mag filter value.
-   * @param [minFilter=LinearMipmapLinearFilter] - The min filter value.
-   * @param [format=RGBAFormat] - The texture format.
-   * @param [type=UnsignedByteType] - The texture type.
+   * @param [wrapS=Wrapping.ClampToEdge] - The wrapS value.
+   * @param [wrapT=Wrapping.ClampToEdge] - The wrapT value.
+   * @param [magFilter=TextureFilter.Linear] - The mag filter value.
+   * @param [minFilter=TextureFilter.LinearMipmapLinear] - The min filter value.
+   * @param [format=PixelFormat.RGBA] - The texture format.
+   * @param [type=TextureType.UnsignedByte] - The texture type.
    * @param [anisotropy=Texture.DEFAULT_ANISOTROPY] - The anisotropy value.
-   * @param [colorSpace=NoColorSpace] - The color space.
+   * @param [colorSpace=ColorSpace.No] - The color space.
    */
   constructor(
     image: any = Texture.DEFAULT_IMAGE,
-    mapping: number = Texture.DEFAULT_MAPPING,
-    wrapS: number = ClampToEdgeWrapping,
-    wrapT: number = ClampToEdgeWrapping,
-    magFilter: number = LinearFilter,
-    minFilter: number = LinearMipmapLinearFilter,
-    format: number = RGBAFormat,
-    type: number = UnsignedByteType,
+    mapping: Mapping = Texture.DEFAULT_MAPPING,
+    wrapS: Wrapping = Wrapping.ClampToEdge,
+    wrapT: Wrapping = Wrapping.ClampToEdge,
+    magFilter: TextureFilter = TextureFilter.Linear,
+    minFilter: TextureFilter = TextureFilter.LinearMipmapLinear,
+    format: PixelFormat = PixelFormat.RGBA,
+    type: TextureType = TextureType.UnsignedByte,
     anisotropy: number = Texture.DEFAULT_ANISOTROPY,
-    colorSpace: string = NoColorSpace,
+    colorSpace: string = ColorSpace.No,
   ) {
     super();
     /**
@@ -141,10 +131,10 @@ export class Texture<TMipmap = any> extends EventDispatcher {
      */
     this.mipmaps = [];
     /**
-     * How the texture is applied to the object. The value `UVMapping`
+     * How the texture is applied to the object. The value `Mapping.UV`
      * is the default, where texture or uv coordinates are used to apply the map.
      *
-     * @default UVMapping
+     * @default Mapping.UV
      */
     this.mapping = mapping;
     /**
@@ -158,26 +148,26 @@ export class Texture<TMipmap = any> extends EventDispatcher {
      * This defines how the texture is wrapped horizontally and corresponds to
      * *U* in UV mapping.
      *
-     * @default ClampToEdgeWrapping
+     * @default Wrapping.ClampToEdge
      */
     this.wrapS = wrapS;
     /**
      * This defines how the texture is wrapped horizontally and corresponds to
      * *V* in UV mapping.
      *
-     * @default ClampToEdgeWrapping
+     * @default Wrapping.ClampToEdge
      */
     this.wrapT = wrapT;
     /**
      * How the texture is sampled when a texel covers more than one pixel.
      *
-     * @default LinearFilter
+     * @default TextureFilter.Linear
      */
     this.magFilter = magFilter;
     /**
      * How the texture is sampled when a texel covers less than one pixel.
      *
-     * @default LinearMipmapLinearFilter
+     * @default TextureFilter.LinearMipmapLinear
      */
     this.minFilter = minFilter;
     /**
@@ -192,7 +182,7 @@ export class Texture<TMipmap = any> extends EventDispatcher {
     /**
      * The format of the texture.
      *
-     * @default RGBAFormat
+     * @default PixelFormat.RGBA
      */
     this.format = format;
     /**
@@ -207,7 +197,7 @@ export class Texture<TMipmap = any> extends EventDispatcher {
     /**
      * The data type of the texture.
      *
-     * @default UnsignedByteType
+     * @default TextureType.UnsignedByte
      */
     this.type = type;
     /**
@@ -220,8 +210,8 @@ export class Texture<TMipmap = any> extends EventDispatcher {
     /**
      * How many times the texture is repeated across the surface, in each
      * direction U and V. If repeat is set greater than `1` in either direction,
-     * the corresponding wrap parameter should also be set to `RepeatWrapping`
-     * or `MirroredRepeatWrapping` to achieve the desired tiling effect.
+     * the corresponding wrap parameter should also be set to `Wrapping.Repeat`
+     * or `Wrapping.MirroredRepeat` to achieve the desired tiling effect.
      *
      * @default (1,1)
      */
@@ -301,9 +291,9 @@ export class Texture<TMipmap = any> extends EventDispatcher {
      */
     this.unpackAlignment = 4; // valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
     /**
-     * Textures containing color data should be annotated with `SRGBColorSpace` or `LinearSRGBColorSpace`.
+     * Textures containing color data should be annotated with `ColorSpace.SRGB` or `ColorSpace.LinearSRGB`.
      *
-     * @default NoColorSpace
+     * @default ColorSpace.No
      */
     this.colorSpace = colorSpace;
     /**
@@ -583,17 +573,17 @@ export class Texture<TMipmap = any> extends EventDispatcher {
    * @return The transformed uv vector.
    */
   transformUv(uv: Vector2): Vector2 {
-    if (this.mapping !== UVMapping) return uv;
+    if (this.mapping !== Mapping.UV) return uv;
     uv.applyMatrix3(this.matrix);
     if (uv.x < 0 || uv.x > 1) {
       switch (this.wrapS) {
-        case RepeatWrapping:
+        case Wrapping.Repeat:
           uv.x = uv.x - Math.floor(uv.x);
           break;
-        case ClampToEdgeWrapping:
+        case Wrapping.ClampToEdge:
           uv.x = uv.x < 0 ? 0 : 1;
           break;
-        case MirroredRepeatWrapping:
+        case Wrapping.MirroredRepeat:
           if (Math.abs(Math.floor(uv.x) % 2) === 1) {
             uv.x = Math.ceil(uv.x) - uv.x;
           } else {
@@ -604,13 +594,13 @@ export class Texture<TMipmap = any> extends EventDispatcher {
     }
     if (uv.y < 0 || uv.y > 1) {
       switch (this.wrapT) {
-        case RepeatWrapping:
+        case Wrapping.Repeat:
           uv.y = uv.y - Math.floor(uv.y);
           break;
-        case ClampToEdgeWrapping:
+        case Wrapping.ClampToEdge:
           uv.y = uv.y < 0 ? 0 : 1;
           break;
-        case MirroredRepeatWrapping:
+        case Wrapping.MirroredRepeat:
           if (Math.abs(Math.floor(uv.y) % 2) === 1) {
             uv.y = Math.ceil(uv.y) - uv.y;
           } else {
@@ -662,9 +652,9 @@ Texture.DEFAULT_IMAGE = null;
  * The default mapping for all textures.
  *
  * @static
- * @default UVMapping
+ * @default Mapping.UV
  */
-Texture.DEFAULT_MAPPING = UVMapping;
+Texture.DEFAULT_MAPPING = Mapping.UV;
 /**
  * The default anisotropy value for all textures.
  *

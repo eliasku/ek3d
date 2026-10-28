@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GLTFExporter } from "ek3d/addons/exporters/GLTFExporter";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { MeshStandardMaterial } from "ek3d/materials/MeshStandardMaterial";
@@ -56,7 +56,7 @@ const material = new MeshStandardMaterial({
   color: 0x636389,
   roughness: 0.3,
   normalScale: new Vector2(0.5, 0.5),
-  side: DoubleSide,
+  side: Side.Double,
 });
 const mesh1 = new Mesh<MeshStandardMaterial>(geometry, material.clone());
 mesh1.material.normalMap = openGL;

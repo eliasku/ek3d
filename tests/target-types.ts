@@ -7,14 +7,14 @@ import type { DataArrayTexture } from "ek3d/textures/DataArrayTexture";
 import type { Data3DTexture } from "ek3d/textures/Data3DTexture";
 import type { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { DepthTexture } from "ek3d/textures/DepthTexture";
-import { NearestFilter, RepeatWrapping } from "ek3d/constants";
+import { TextureFilter, Wrapping } from "ek3d/constants";
 
 const options: RenderTargetOptions = {
   depthBuffer: true,
   depthTexture: new DepthTexture(8, 4),
-  minFilter: NearestFilter,
-  magFilter: NearestFilter,
-  wrapR: RepeatWrapping,
+  minFilter: TextureFilter.Nearest,
+  magFilter: TextureFilter.Nearest,
+  wrapR: Wrapping.Repeat,
   flipY: false,
 };
 const array = new WebGLArrayRenderTarget(8, 4, 3, options);

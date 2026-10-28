@@ -3,7 +3,7 @@ import { Scene } from "ek3d/scenes/Scene";
 import { Color } from "ek3d/math/Color";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { Float32BufferAttribute, Uint8BufferAttribute } from "ek3d/core/BufferAttribute";
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { RawShaderMaterial } from "ek3d/materials/RawShaderMaterial";
 import { Mesh } from "ek3d/objects/Mesh";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
@@ -53,7 +53,7 @@ void main() {
   color.r += sin(vPosition.x * 10.0 + time) * 0.5;
   gl_FragColor = color;
 }`,
-  side: DoubleSide,
+  side: Side.Double,
   transparent: true,
 });
 const mesh = new Mesh(geometry, material);

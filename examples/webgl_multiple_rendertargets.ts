@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { GLSL3, NearestFilter, RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { GLSL, TextureFilter, Wrapping, ColorSpace } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { TorusKnotGeometry } from "ek3d/geometries/TorusKnotGeometry";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
@@ -26,8 +26,8 @@ const renderTarget = new WebGLRenderTarget(
   window.innerHeight * window.devicePixelRatio,
   {
     count: 2,
-    minFilter: NearestFilter,
-    magFilter: NearestFilter,
+    minFilter: TextureFilter.Nearest,
+    magFilter: TextureFilter.Nearest,
   },
 );
 renderTarget.textures[0].name = "diffuse";
@@ -51,9 +51,9 @@ const diffuse = new TextureLoader().load(
     console.error(error);
   },
 );
-diffuse.wrapS = RepeatWrapping;
-diffuse.wrapT = RepeatWrapping;
-diffuse.colorSpace = SRGBColorSpace;
+diffuse.wrapS = Wrapping.Repeat;
+diffuse.wrapT = Wrapping.Repeat;
+diffuse.colorSpace = ColorSpace.SRGB;
 const material = new RawShaderMaterial({
   name: "G-Buffer Shader",
   vertexShader: `in vec3 position;
@@ -84,7 +84,7 @@ void main() {
   gNormal = vec4(normalize(vNormal), 0.0);
 }`,
   uniforms: { tDiffuse: { value: diffuse }, repeat: { value: new Vector2(5, 0.5) } },
-  glslVersion: GLSL3,
+  glslVersion: GLSL.GLSL3,
 });
 scene.add(new Mesh(new TorusKnotGeometry(1, 0.3, 128, 32), material));
 const postScene = new Scene();
@@ -117,7 +117,7 @@ void main() {
   pc_FragColor = LinearTosRGB(pc_FragColor);
 }`,
       uniforms: { tDiffuse: { value: renderTarget.textures[0] }, tNormal: { value: renderTarget.textures[1] } },
-      glslVersion: GLSL3,
+      glslVersion: GLSL.GLSL3,
     }),
   ),
 );

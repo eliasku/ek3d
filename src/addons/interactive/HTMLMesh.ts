@@ -4,7 +4,7 @@ import { MeshBasicMaterial } from "../../materials/MeshBasicMaterial";
 import { Color } from "../../math/Color";
 import { Mesh } from "../../objects/Mesh";
 import { Vector2 } from "../../math/Vector2";
-import { LinearFilter, SRGBColorSpace } from "../../constants";
+import { TextureFilter, ColorSpace } from "../../constants";
 
 interface Clip {
   x: number;
@@ -489,9 +489,9 @@ class HTMLCanvasTexture extends CanvasTexture {
     this.dom = dom;
 
     this.anisotropy = 16;
-    this.colorSpace = SRGBColorSpace;
-    this.minFilter = LinearFilter;
-    this.magFilter = LinearFilter;
+    this.colorSpace = ColorSpace.SRGB;
+    this.minFilter = TextureFilter.Linear;
+    this.magFilter = TextureFilter.Linear;
     this.generateMipmaps = false;
 
     this.scheduleUpdate = undefined;

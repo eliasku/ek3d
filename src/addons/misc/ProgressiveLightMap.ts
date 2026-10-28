@@ -1,5 +1,5 @@
 import type { Camera } from "../../cameras/Camera";
-import { DoubleSide, FloatType, HalfFloatType } from "../../constants";
+import { Side, TextureType } from "../../constants";
 import { BufferAttribute } from "../../core/BufferAttribute";
 import { InterleavedBufferAttribute } from "../../core/InterleavedBufferAttribute";
 import type { Object3D } from "../../core/Object3D";
@@ -50,8 +50,8 @@ export class ProgressiveLightMap {
   ) {
     const format =
       typeof navigator !== "undefined" && /(Android|iPad|iPhone|iPod)/g.test(navigator.userAgent)
-        ? HalfFloatType
-        : FloatType;
+        ? TextureType.HalfFloat
+        : TextureType.Float;
     this.progressiveLightMap1 = new WebGLRenderTarget(res, res, { type: format });
     this.progressiveLightMap2 = new WebGLRenderTarget(res, res, { type: format });
     this.progressiveLightMap2.texture.channel = 1;
@@ -167,7 +167,7 @@ export class ProgressiveLightMap {
     if (!this.labelMesh) {
       this.labelMesh = new Mesh(
         new PlaneGeometry(100, 100),
-        new MeshBasicMaterial({ map: this.progressiveLightMap1.texture, side: DoubleSide }),
+        new MeshBasicMaterial({ map: this.progressiveLightMap1.texture, side: Side.Double }),
       );
       this.labelMesh.position.y = 250;
       this.lightMapContainers[0].object.parent?.add(this.labelMesh);

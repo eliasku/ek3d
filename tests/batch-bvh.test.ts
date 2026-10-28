@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "vite-plus/test";
 import { BatchBVH, type BatchBVHNode } from "../src/addons/math/bvh/BatchBVH";
-import { WebGLCoordinateSystem } from "../src/constants";
+import { CoordinateSystem } from "../src/constants";
 import { EnhancedBatchedMesh } from "../src/addons/objects/EnhancedBatchedMesh";
 import { OrthographicCamera } from "../src/cameras/OrthographicCamera";
 import { PerspectiveCamera } from "../src/cameras/PerspectiveCamera";
@@ -51,7 +51,7 @@ test("batch BVH builds, moves, inserts and deletes leaves", () => {
 });
 
 test("batch BVH clips rays and frusta including accurate margins", () => {
-  const bvh = new BatchBVH(WebGLCoordinateSystem);
+  const bvh = new BatchBVH(CoordinateSystem.WebGL);
   bvh.insert(1, new Float32Array([-0.5, 0.5, -0.5, 0.5, -0.5, 0.5]));
   bvh.insert(2, new Float32Array([2, 3, 0, 1, 0, 1]), 1.5);
   const rayHits: number[] = [];
@@ -125,7 +125,7 @@ test("mesh perspective zoom selects the same LOD with and without BVH", () => {
   const camera = new PerspectiveCamera(60, 1, 0.1, 100);
   camera.updateMatrixWorld();
   for (const withBVH of [false, true]) {
-    if (withBVH) mesh.computeBVH(WebGLCoordinateSystem);
+    if (withBVH) mesh.computeBVH(CoordinateSystem.WebGL);
     for (const [zoom, expectedLOD] of [
       [1, 1],
       [3, 0],
@@ -162,7 +162,7 @@ test("mesh reversed-depth culling agrees with and without BVH", () => {
   camera.updateProjectionMatrix();
   camera.updateMatrixWorld();
   for (const withBVH of [false, true]) {
-    if (withBVH) mesh.computeBVH(WebGLCoordinateSystem);
+    if (withBVH) mesh.computeBVH(CoordinateSystem.WebGL);
     mesh._updateDrawParameters(camera, mesh.geometry, material);
     assert.equal(mesh._multiDrawCount, 1);
     assert.equal(mesh._indirectTexture!.image.data![0], 1);

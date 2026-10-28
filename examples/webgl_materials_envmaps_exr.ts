@@ -2,7 +2,7 @@ import { EXRLoader } from "ek3d/addons/loaders/EXRLoader";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping, SRGBColorSpace } from "ek3d/constants";
+import { ToneMapping, Mapping, ColorSpace } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
 import { TorusKnotGeometry } from "ek3d/geometries/TorusKnotGeometry";
@@ -86,7 +86,7 @@ async function init(): Promise<void> {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setAnimationLoop(animate);
 
-  renderer.toneMapping = ACESFilmicToneMapping;
+  renderer.toneMapping = ToneMapping.ACESFilmic;
 
   const torusGeometry = new TorusKnotGeometry(18, 8, 150, 20);
   const torusMaterial = new MeshStandardMaterial({
@@ -171,12 +171,12 @@ async function init(): Promise<void> {
 
   exrTexture = exrLoaded;
 
-  exrTexture.mapping = EquirectangularReflectionMapping;
+  exrTexture.mapping = Mapping.EquirectangularReflection;
   exrCubeRenderTarget = pmremGenerator.fromEquirectangular(exrTexture);
   exrBackground = exrTexture;
 
-  pngLoaded.mapping = EquirectangularReflectionMapping;
-  pngLoaded.colorSpace = SRGBColorSpace;
+  pngLoaded.mapping = Mapping.EquirectangularReflection;
+  pngLoaded.colorSpace = ColorSpace.SRGB;
 
   pngCubeRenderTarget = pmremGenerator.fromEquirectangular(pngLoaded);
   pngBackground = pngLoaded;

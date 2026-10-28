@@ -1,4 +1,4 @@
-import { LinearFilter, NearestFilter, RedFormat, SRGBColorSpace } from "../../constants";
+import { TextureFilter, PixelFormat, ColorSpace } from "../../constants";
 import { Float32BufferAttribute } from "../../core/BufferAttribute";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { FileLoader } from "../../loaders/FileLoader";
@@ -326,7 +326,7 @@ export function buildMesh(chunk: VOXChunk): Mesh<MeshStandardMaterial> {
 
           if (r > 0 || g > 0 || b > 0) hasColors = true;
 
-          color.setRGB(r, g, b, SRGBColorSpace);
+          color.setRGB(r, g, b, ColorSpace.SRGB);
 
           // Convert VOX coordinates (X right, Y forward, Z up) to Three.js (Y up).
           const toThree = (p: number[]): number[] => [p[0] - sx / 2, p[2] - sz / 2, -p[1] + sy / 2];
@@ -413,9 +413,9 @@ export function buildData3DTexture(chunk: VOXChunk): Data3DTexture {
   }
 
   const texture = new Data3DTexture(array, size.x, size.y, size.z);
-  texture.format = RedFormat;
-  texture.minFilter = NearestFilter;
-  texture.magFilter = LinearFilter;
+  texture.format = PixelFormat.Red;
+  texture.minFilter = TextureFilter.Nearest;
+  texture.magFilter = TextureFilter.Linear;
   texture.unpackAlignment = 1;
   texture.needsUpdate = true;
 

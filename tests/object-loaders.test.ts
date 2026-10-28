@@ -36,7 +36,7 @@ import { ShapeGeometry } from "../src/geometries/ShapeGeometry";
 import { Shape } from "../src/extras/core/Shape";
 import { LineCurve } from "../src/extras/curves/LineCurve";
 import { Matrix4 } from "../src/math/Matrix4";
-import { RepeatWrapping, SRGBColorSpace, DynamicDrawUsage } from "../src/constants";
+import { Wrapping, ColorSpace, BufferUsage } from "../src/constants";
 
 function triangle() {
   return new BufferGeometry().setAttribute("position", new Float32BufferAttribute([0, 0, 0, 1, 0, 0, 0, 1, 0], 3));
@@ -51,7 +51,7 @@ const factories = {
 test("BufferGeometryLoader preserves interleaved ownership, morphs, index, groups and UUID", () => {
   const geometry = triangle();
   const shared = new InterleavedBuffer(new Float32Array([0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1]), 6);
-  shared.setUsage(DynamicDrawUsage);
+  shared.setUsage(BufferUsage.DynamicDraw);
   geometry.setAttribute("position", new InterleavedBufferAttribute(shared, 3, 0));
   geometry.setAttribute("normal", new InterleavedBufferAttribute(shared, 3, 3));
   geometry.setIndex([0, 1]);
@@ -68,7 +68,7 @@ test("BufferGeometryLoader preserves interleaved ownership, morphs, index, group
   assert(normal instanceof InterleavedBufferAttribute);
   assert.equal(position.data, normal.data);
   assert.equal(position.data.uuid, shared.uuid);
-  assert.equal(position.data.usage, DynamicDrawUsage);
+  assert.equal(position.data.usage, BufferUsage.DynamicDraw);
   assert.equal(parsed.uuid, geometry.uuid);
   assert.deepEqual(Array.from(position.data.array), Array.from(shared.array));
   assert.deepEqual(parsed.index!.array, geometry.index!.array);
@@ -137,8 +137,8 @@ test("shader material JSON retains uniforms and GLSL source", () => {
 
 test("ObjectLoader round trip preserves resource identity, UUIDs, textures and animations", async () => {
   const texture = new DataTexture(new Uint8Array([1, 2, 3, 255]), 1, 1);
-  texture.wrapS = RepeatWrapping;
-  texture.colorSpace = SRGBColorSpace;
+  texture.wrapS = Wrapping.Repeat;
+  texture.colorSpace = ColorSpace.SRGB;
   texture.repeat.set(2, 3);
   const material = new MeshBasicMaterial({ map: texture });
   const geometry = triangle();
@@ -165,8 +165,8 @@ test("ObjectLoader round trip preserves resource identity, UUIDs, textures and a
     assert(a.material.map instanceof DataTexture);
     assert.equal(a.material.map.uuid, texture.uuid);
     assert.equal(a.material.map.source.uuid, texture.source.uuid);
-    assert.equal(a.material.map.wrapS, RepeatWrapping);
-    assert.equal(a.material.map.colorSpace, SRGBColorSpace);
+    assert.equal(a.material.map.wrapS, Wrapping.Repeat);
+    assert.equal(a.material.map.colorSpace, ColorSpace.SRGB);
     assert.deepEqual(a.material.map.repeat.toArray(), [2, 3]);
     assert.deepEqual(Array.from(a.material.map.image.data!), [1, 2, 3, 255]);
     assert.equal(a.animations[0], b.animations[0]);

@@ -3,7 +3,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { NRRDLoader } from "ek3d/addons/loaders/NRRDLoader";
 import { VolumeRenderShader1 } from "ek3d/addons/shaders/VolumeShader";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
-import { BackSide, FloatType, LinearFilter, RedFormat } from "ek3d/constants";
+import { Side, TextureType, TextureFilter, PixelFormat } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { ShaderMaterial } from "ek3d/materials/ShaderMaterial";
@@ -79,10 +79,10 @@ async function init(): Promise<void> {
     const volume = await loader.loadAsync("/examples/models/nrrd/stent.nrrd");
     if (disposed) return;
     texture = new Data3DTexture(volume.data, volume.xLength, volume.yLength, volume.zLength);
-    texture.format = RedFormat;
-    texture.type = FloatType;
-    texture.minFilter = LinearFilter;
-    texture.magFilter = LinearFilter;
+    texture.format = PixelFormat.Red;
+    texture.type = TextureType.Float;
+    texture.minFilter = TextureFilter.Linear;
+    texture.magFilter = TextureFilter.Linear;
     texture.unpackAlignment = 1;
     texture.needsUpdate = true;
     const imageLoader = new TextureLoader();
@@ -104,7 +104,7 @@ async function init(): Promise<void> {
       uniforms,
       vertexShader: VolumeRenderShader1.vertexShader,
       fragmentShader: VolumeRenderShader1.fragmentShader,
-      side: BackSide,
+      side: Side.Back,
     });
     geometry = new BoxGeometry(volume.xLength, volume.yLength, volume.zLength);
     geometry.translate(volume.xLength / 2 - 0.5, volume.yLength / 2 - 0.5, volume.zLength / 2 - 0.5);

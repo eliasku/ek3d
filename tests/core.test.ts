@@ -24,7 +24,7 @@ import { Line3 } from "../src/math/Line3";
 import { Matrix2 } from "../src/math/Matrix2";
 import { Spherical } from "../src/math/Spherical";
 import { Cylindrical } from "../src/math/Cylindrical";
-import { DynamicDrawUsage } from "../src/constants";
+import { BufferUsage } from "../src/constants";
 import { InterleavedBuffer as UpstreamBuffer } from "../upstream/three.js/src/core/InterleavedBuffer.js";
 import { InterleavedBufferAttribute as UpstreamAttribute } from "../upstream/three.js/src/core/InterleavedBufferAttribute.js";
 import { Raycaster as UpstreamRaycaster } from "../upstream/three.js/src/core/Raycaster.js";
@@ -103,8 +103,8 @@ test("base cloning preserves concrete subclass contracts", () => {
 
 test("normalized interleaved transforms preserve adjacent data and agree with upstream", () => {
   for (const ArrayType of [Int8Array, Uint8Array, Int16Array, Uint16Array]) {
-    const actual = new InterleavedBuffer(new ArrayType(12), 6).setUsage(DynamicDrawUsage);
-    const expected = new UpstreamBuffer(new ArrayType(12), 6).setUsage(DynamicDrawUsage);
+    const actual = new InterleavedBuffer(new ArrayType(12), 6).setUsage(BufferUsage.DynamicDraw);
+    const expected = new UpstreamBuffer(new ArrayType(12), 6).setUsage(BufferUsage.DynamicDraw);
     const position = new InterleavedBufferAttribute(actual, 3, 0, true);
     const reference = new UpstreamAttribute(expected, 3, 0, true);
     actual.array.set([9, 8, 7], 3);
@@ -468,7 +468,7 @@ test("uniform and group clones preserve upstream value ownership through shader 
   const array = new Uniform([1, 2]);
   const scalar = new Uniform(0.5);
   const elements = [new Uniform(new Vector3(4, 5, 6)), new Uniform(new Vector3(7, 8, 9))];
-  const group = new UniformsGroup().setName("Shared").setUsage(DynamicDrawUsage);
+  const group = new UniformsGroup().setName("Shared").setUsage(BufferUsage.DynamicDraw);
   group.add(vector).add(array).add(scalar).add(elements);
   const material = new ShaderMaterial({ uniformsGroups: [group], uniforms: { amount: scalar } });
   const clone = material.clone();
@@ -478,7 +478,7 @@ test("uniform and group clones preserve upstream value ownership through shader 
   const copiedElements = copiedGroup.uniforms[3] as Uniform<Vector3>[];
   assert.notEqual(copiedGroup.id, group.id);
   assert.equal(copiedGroup.name, "Shared");
-  assert.equal(copiedGroup.usage, DynamicDrawUsage);
+  assert.equal(copiedGroup.usage, BufferUsage.DynamicDraw);
   copiedVector.value.x = 10;
   copiedElements[0].value.y = 20;
   assert.deepEqual(vector.value.toArray(), [1, 2, 3]);

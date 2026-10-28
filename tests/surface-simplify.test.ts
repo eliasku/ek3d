@@ -22,7 +22,7 @@ let runtime: Promise<MeshoptSimplifierLike> | undefined;
 
 function loadSimplifier(): Promise<MeshoptSimplifierLike> {
   runtime ??= (async () => {
-    const source = readFileSync("examples/public/examples/libs/meshopt_simplifier.module.js", "utf8");
+    const source = readFileSync("public/examples/libs/meshopt_simplifier.module.js", "utf8");
     const url = "data:text/javascript;base64," + Buffer.from(source).toString("base64");
     const module = (await import(/* @vite-ignore */ url)) as { MeshoptSimplifier: MeshoptSimplifierLike };
     return module.MeshoptSimplifier;

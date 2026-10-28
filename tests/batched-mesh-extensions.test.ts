@@ -5,7 +5,7 @@ import {
   createRadixSort,
   getBatchedMeshLODCount,
 } from "../src/addons/objects/EnhancedBatchedMesh";
-import { WebGLCoordinateSystem } from "../src/constants";
+import { CoordinateSystem } from "../src/constants";
 import { PerspectiveCamera } from "../src/cameras/PerspectiveCamera";
 import { Raycaster, type Intersection } from "../src/core/Raycaster";
 import { BoxGeometry } from "../src/geometries/BoxGeometry";
@@ -44,7 +44,7 @@ test("LOD indices, reservation, sorting and culling agree with and without BVH",
   assert.equal(mesh._multiDrawCount, 1);
   assert.equal(mesh._indirectTexture!.image.data![0], a);
   const start = mesh._multiDrawStarts[0];
-  mesh.computeBVH(WebGLCoordinateSystem);
+  mesh.computeBVH(CoordinateSystem.WebGL);
   mesh._updateDrawParameters(camera, mesh.geometry, material);
   assert.equal(mesh._multiDrawCount, 1);
   assert.equal(mesh._indirectTexture!.image.data![0], a);
@@ -68,7 +68,7 @@ test("batch BVH and linear raycasts return world-space hits with BLAS", () => {
   assert.ok(linear.length > 0);
   assert.equal(linear[0].batchId, a);
   assert.equal(linear[0].distance, 9);
-  mesh.computeBVH(WebGLCoordinateSystem);
+  mesh.computeBVH(CoordinateSystem.WebGL);
   const accelerated: Intersection[] = [];
   mesh.raycast(raycaster, accelerated);
   assert.deepEqual(
@@ -89,7 +89,7 @@ test("batch BVH and linear raycasts return world-space hits with BLAS", () => {
 
 test("instance mutations keep the hierarchy synchronized, including reused ids", () => {
   const { mesh, geometry, material, camera, id, a, b } = fixture();
-  mesh.computeBVH(WebGLCoordinateSystem);
+  mesh.computeBVH(CoordinateSystem.WebGL);
   const raycaster = new Raycaster(new Vector3(), new Vector3(0, 0, -1));
   const ids = () => {
     const result: Intersection[] = [];
@@ -124,7 +124,7 @@ test("geometry replacement, deletion, reuse and optimization invalidate derived 
   const instance = mesh.addInstance(second);
   mesh.setMatrixAt(instance, new Matrix4().makeTranslation(0, 0, -10));
   mesh.updateMatrixWorld();
-  mesh.computeBVH(WebGLCoordinateSystem);
+  mesh.computeBVH(CoordinateSystem.WebGL);
   mesh.computeBoundsTree();
   const raycaster = new Raycaster(new Vector3(), new Vector3(0, 0, -1));
   const distance = () => {
@@ -173,7 +173,7 @@ test("geometry replacement, deletion, reuse and optimization invalidate derived 
 
 test("copy and clone keep independent LOD data without stale acceleration", () => {
   const { mesh, geometry, material, id } = fixture();
-  mesh.computeBVH(WebGLCoordinateSystem);
+  mesh.computeBVH(CoordinateSystem.WebGL);
   mesh.computeBoundsTree();
   const clone = mesh.clone();
   assert.equal(clone.bvh, null);

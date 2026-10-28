@@ -1,4 +1,4 @@
-import { HalfFloatType, LinearFilter, LinearSRGBColorSpace, RGBAFormat } from "../../constants";
+import { TextureType, TextureFilter, ColorSpace, PixelFormat } from "../../constants";
 import { FileLoader } from "../../loaders/FileLoader";
 import { Loader } from "../../loaders/Loader";
 import { DataTexture } from "../../textures/DataTexture";
@@ -36,7 +36,7 @@ export class JXLLoader extends Loader<DataTexture> {
     onProgress?: (event: ProgressEvent) => void,
     onError?: (error: unknown) => void,
   ): DataTexture {
-    const texture = new DataTexture(null, 0, 0, RGBAFormat, HalfFloatType);
+    const texture = new DataTexture(null, 0, 0, PixelFormat.RGBA, TextureType.HalfFloat);
     const loader = new FileLoader(this.manager);
     loader.setPriority(this.priority);
     loader.setCache(this.cache);
@@ -89,11 +89,11 @@ export class JXLLoader extends Loader<DataTexture> {
 
   _applyData(texture: DataTexture, data: DecodedImage): void {
     texture.image = data;
-    texture.format = RGBAFormat;
-    texture.type = HalfFloatType;
-    texture.colorSpace = LinearSRGBColorSpace;
-    texture.minFilter = LinearFilter;
-    texture.magFilter = LinearFilter;
+    texture.format = PixelFormat.RGBA;
+    texture.type = TextureType.HalfFloat;
+    texture.colorSpace = ColorSpace.LinearSRGB;
+    texture.minFilter = TextureFilter.Linear;
+    texture.magFilter = TextureFilter.Linear;
     texture.flipY = true;
     texture.needsUpdate = true;
   }

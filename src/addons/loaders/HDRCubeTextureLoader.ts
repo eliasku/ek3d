@@ -1,4 +1,4 @@
-import { FloatType, HalfFloatType, LinearFilter, LinearSRGBColorSpace } from "../../constants";
+import { TextureType, TextureFilter, ColorSpace } from "../../constants";
 import { FileLoader } from "../../loaders/FileLoader";
 import { Loader } from "../../loaders/Loader";
 import type { LoadingManager } from "../../loaders/LoadingManager";
@@ -10,12 +10,12 @@ import { HDRLoader } from "./HDRLoader";
 /** Loads six RGBE images into an HDR cube texture. */
 export class HDRCubeTextureLoader extends Loader<CubeTexture, string[]> {
   hdrLoader: HDRLoader;
-  type: number;
+  type: TextureType;
 
   constructor(manager?: LoadingManager) {
     super(manager);
     this.hdrLoader = new HDRLoader(this.manager);
-    this.type = HalfFloatType;
+    this.type = TextureType.HalfFloat;
   }
 
   load(
@@ -26,10 +26,10 @@ export class HDRCubeTextureLoader extends Loader<CubeTexture, string[]> {
   ): CubeTexture {
     const texture = new CubeTexture();
     texture.type = this.type;
-    if (texture.type === FloatType || texture.type === HalfFloatType) {
-      texture.colorSpace = LinearSRGBColorSpace;
-      texture.minFilter = LinearFilter;
-      texture.magFilter = LinearFilter;
+    if (texture.type === TextureType.Float || texture.type === TextureType.HalfFloat) {
+      texture.colorSpace = ColorSpace.LinearSRGB;
+      texture.minFilter = TextureFilter.Linear;
+      texture.magFilter = TextureFilter.Linear;
       texture.generateMipmaps = false;
     }
     let loaded = 0;

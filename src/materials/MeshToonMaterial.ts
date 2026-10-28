@@ -1,5 +1,5 @@
 import type { Texture } from "../textures/Texture";
-import { TangentSpaceNormalMap } from "../constants";
+import { NormalMap } from "../constants";
 import { Material } from "./Material";
 import { Vector2 } from "../math/Vector2";
 import { Color } from "../math/Color";
@@ -109,7 +109,7 @@ export class MeshToonMaterial extends Material {
   bumpMap: Texture | null;
   bumpScale: number;
   normalMap: Texture | null;
-  normalMapType: number;
+  normalMapType: NormalMap;
   normalScale: Vector2;
   displacementMap: Texture | null;
   displacementScale: number;
@@ -154,18 +154,18 @@ export class MeshToonMaterial extends Material {
      *
      * `map` represents color data, and the texture must be assigned a
      * {@link Texture#colorSpace}. Most `map` textures set
-     * `texture.colorSpace = SRGBColorSpace`.
+     * `texture.colorSpace = ColorSpace.SRGB`.
      *
      * @default null
      */
     this.map = null;
     /**
      * Gradient map for toon shading. It's required to set
-     * {@link Texture#minFilter} and {@link Texture#magFilter} to {@link NearestFilter}
+     * {@link Texture#minFilter} and {@link Texture#magFilter} to {@link TextureFilter.Nearest}
      * when using this type of texture.
      *
      * `gradientMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -175,7 +175,7 @@ export class MeshToonMaterial extends Material {
      *
      * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
      * a {@link Texture#colorSpace}. Most `lightMap` textures set
-     * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+     * `texture.colorSpace = ColorSpace.LinearSRGB` and use float-type formats
      * such as `.exr` or `.hdr`.
      *
      * @default null
@@ -192,7 +192,7 @@ export class MeshToonMaterial extends Material {
      * Requires a second set of UVs.
      *
      * `aoMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -225,7 +225,7 @@ export class MeshToonMaterial extends Material {
      *
      * `emissiveMap` represents color data, and the texture must be assigned a
      * {@link Texture#colorSpace}. Most `emissiveMap` textures set
-     * `texture.colorSpace = SRGBColorSpace`.
+     * `texture.colorSpace = ColorSpace.SRGB`.
      *
      * @default null
      */
@@ -237,7 +237,7 @@ export class MeshToonMaterial extends Material {
      * this will be ignored.
      *
      * `bumpMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -257,7 +257,7 @@ export class MeshToonMaterial extends Material {
      * for the different handedness.
      *
      * `normalMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -265,9 +265,9 @@ export class MeshToonMaterial extends Material {
     /**
      * The type of normal map.
      *
-     * @default TangentSpaceNormalMap
+     * @default NormalMap.TangentSpace
      */
-    this.normalMapType = TangentSpaceNormalMap;
+    this.normalMapType = NormalMap.TangentSpace;
     /**
      * How much the normal map affects the material. Typical value range is `[0,1]`.
      *
@@ -285,7 +285,7 @@ export class MeshToonMaterial extends Material {
      * not recompute surface normals from the displaced vertices.
      *
      * `displacementMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -317,7 +317,7 @@ export class MeshToonMaterial extends Material {
      * luminance/alpha textures will also still work as expected.
      *
      * `alphaMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */

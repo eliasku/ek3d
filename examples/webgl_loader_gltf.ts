@@ -7,7 +7,7 @@ import { KTX2Loader } from "ek3d/addons/loaders/KTX2Loader";
 import { UltraHDRLoader } from "ek3d/addons/loaders/UltraHDRLoader";
 import { AnimationMixer } from "ek3d/animation/AnimationMixer";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping } from "ek3d/constants";
+import { ToneMapping, Mapping } from "ek3d/constants";
 import type { Object3D } from "ek3d/core/Object3D";
 import { Timer } from "ek3d/core/Timer";
 import { Box3 } from "ek3d/math/Box3";
@@ -63,7 +63,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 const scene = new Scene();
 const camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.25, 20);
 camera.position.set(-1.8, 0.6, 2.7);
@@ -203,7 +203,7 @@ const environmentReady = new UltraHDRLoader()
       texture.dispose();
     } else {
       environment = texture;
-      texture.mapping = EquirectangularReflectionMapping;
+      texture.mapping = Mapping.EquirectangularReflection;
       scene.background = texture;
       scene.environment = texture;
     }

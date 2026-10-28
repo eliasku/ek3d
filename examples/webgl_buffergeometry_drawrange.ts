@@ -12,7 +12,7 @@ import { Vector3 } from "ek3d/math/Vector3";
 import { PointsMaterial } from "ek3d/materials/PointsMaterial";
 import { LineBasicMaterial } from "ek3d/materials/LineBasicMaterial";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
-import { AdditiveBlending, DynamicDrawUsage } from "ek3d/constants";
+import { Blending, BufferUsage } from "ek3d/constants";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { pointsShader } from "ek3d/renderers/shaders/PointsShader";
@@ -49,7 +49,7 @@ const helper = new BoxHelper(box);
 boxGeometry.dispose();
 boxMaterial.dispose();
 helper.material.color.setHex(0x474747);
-helper.material.blending = AdditiveBlending;
+helper.material.blending = Blending.Additive;
 helper.material.transparent = true;
 group.add(helper);
 const positions = new Float32Array(maxParticleCount * maxParticleCount * 3);
@@ -67,29 +67,29 @@ for (let i = 0; i < maxParticleCount; i++) {
 }
 const particles = new BufferGeometry();
 particles.setDrawRange(0, settings.particleCount);
-const particleAttribute = new BufferAttribute(particlePositions, 3).setUsage(DynamicDrawUsage);
+const particleAttribute = new BufferAttribute(particlePositions, 3).setUsage(BufferUsage.DynamicDraw);
 particles.setAttribute("position", particleAttribute);
 const pointCloud = new Points(
   particles,
   new PointsMaterial({
     color: 0xffffff,
     size: 3,
-    blending: AdditiveBlending,
+    blending: Blending.Additive,
     transparent: true,
     sizeAttenuation: false,
   }),
 );
 group.add(pointCloud);
 const geometry = new BufferGeometry();
-const positionAttribute = new BufferAttribute(positions, 3).setUsage(DynamicDrawUsage);
-const colorAttribute = new BufferAttribute(colors, 3).setUsage(DynamicDrawUsage);
+const positionAttribute = new BufferAttribute(positions, 3).setUsage(BufferUsage.DynamicDraw);
+const colorAttribute = new BufferAttribute(colors, 3).setUsage(BufferUsage.DynamicDraw);
 geometry.setAttribute("position", positionAttribute);
 geometry.setAttribute("color", colorAttribute);
 geometry.computeBoundingSphere();
 geometry.setDrawRange(0, 0);
 const lines = new LineSegments(
   geometry,
-  new LineBasicMaterial({ vertexColors: true, blending: AdditiveBlending, transparent: true }),
+  new LineBasicMaterial({ vertexColors: true, blending: Blending.Additive, transparent: true }),
 );
 group.add(lines);
 const renderer = new WebGLRenderer({

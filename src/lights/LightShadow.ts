@@ -6,7 +6,7 @@ import { Vector2 } from "../math/Vector2";
 import { Vector3 } from "../math/Vector3";
 import { Vector4 } from "../math/Vector4";
 import { Frustum } from "../math/Frustum";
-import { UnsignedByteType } from "../constants";
+import { TextureType } from "../constants";
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
 const _lookTarget = /*@__PURE__*/ new Vector3();
@@ -24,7 +24,7 @@ export class LightShadow<TCamera extends Camera = Camera> {
   radius: number;
   blurSamples: number;
   mapSize: Vector2;
-  mapType: number;
+  mapType: TextureType;
   map: RenderTarget | null;
   mapPass: RenderTarget | null;
   matrix: Matrix4;
@@ -78,7 +78,7 @@ export class LightShadow<TCamera extends Camera = Camera> {
      * map size will allow for a higher value to be used here before these effects
      * become visible.
      *
-     * The property has no effect when the shadow map type is `BasicShadowMap`.
+     * The property has no effect when the shadow map type is `ShadowMap.Basic`.
      *
      * @default 1
      */
@@ -97,11 +97,11 @@ export class LightShadow<TCamera extends Camera = Camera> {
      */
     this.mapSize = new Vector2(512, 512);
     /**
-     * The type of shadow texture. The default is `UnsignedByteType`.
+     * The type of shadow texture. The default is `TextureType.UnsignedByte`.
      *
-     * @default UnsignedByteType
+     * @default TextureType.UnsignedByte
      */
-    this.mapType = UnsignedByteType;
+    this.mapType = TextureType.UnsignedByte;
     /**
      * The depth map generated using the internal camera; a location beyond a
      * pixel's depth is in shadow. Computed internally during rendering.

@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { Scene } from "ek3d/scenes/Scene";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
@@ -7,19 +8,7 @@ import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 import { Texture } from "ek3d/textures/Texture";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { DataTexture } from "ek3d/textures/DataTexture";
-import {
-  RGBAFormat,
-  UnsignedByteType,
-  UnsignedIntType,
-  RepeatWrapping,
-  SRGBColorSpace,
-  UVMapping,
-  EquirectangularReflectionMapping,
-  EquirectangularRefractionMapping,
-  CubeReflectionMapping,
-  CubeRefractionMapping,
-  NearestFilter,
-} from "ek3d/constants";
+import { PixelFormat, TextureType, Wrapping, ColorSpace, Mapping, TextureFilter } from "ek3d/constants";
 import { MeshLambertMaterial } from "ek3d/materials/MeshLambertMaterial";
 import { HemisphereLight } from "ek3d/lights/HemisphereLight";
 import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
@@ -43,7 +32,7 @@ import { InstancedInterleavedBuffer } from "ek3d/core/InstancedInterleavedBuffer
 import { InstancedBufferGeometry } from "ek3d/core/InstancedBufferGeometry";
 import { GLBufferAttribute } from "ek3d/core/GLBufferAttribute";
 import { RawShaderMaterial } from "ek3d/materials/RawShaderMaterial";
-import { DynamicDrawUsage } from "ek3d/constants";
+import { BufferUsage } from "ek3d/constants";
 
 // Run in an actual browser served by Vite: await (await import('/tests/browser.ts')).verifyRenderingBoundaries().
 export async function verifyRenderingBoundaries() {
@@ -108,7 +97,7 @@ export async function verifyRenderingBoundaries() {
     scene.background = texture;
     reject(() => renderer.render(scene, camera), "Textured backgrounds require");
     scene.background = null;
-    texture.mapping = EquirectangularReflectionMapping;
+    texture.mapping = Mapping.EquirectangularReflection;
     material.envMap = texture;
     reject(() => renderer.render(scene, camera), "Environment maps require");
     material.envMap = null;
@@ -116,8 +105,8 @@ export async function verifyRenderingBoundaries() {
     renderer.render(scene, camera);
     const gl = renderer.getContext();
     const pixel = new Uint8Array(4);
-    gl.readPixels(16, 16, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
-    if (pixel.join(",") !== "255,136,51,255" || gl.getError() !== gl.NO_ERROR)
+    gl.readPixels(16, 16, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
+    if (pixel.join(",") !== "255,136,51,255" || gl.getError() !== GL.NO_ERROR)
       throw new Error("Rendering did not recover after configuration errors");
     if (depths.some((depth) => depth !== 0)) throw new Error(`Failed render leaked stack entries: ${depths.join(",")}`);
     const animationFrames = [await animate()];
@@ -170,7 +159,7 @@ export async function verifyRenderingBoundaries() {
     });
     animationFrames.push(await animate());
     const restoredPixel = new Uint8Array(4);
-    gl.readPixels(16, 16, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, restoredPixel);
+    gl.readPixels(16, 16, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, restoredPixel);
     check(
       restoredPixel.every((value, index) => value === pixel[index]),
       "Window rendering changed after context restore",
@@ -179,21 +168,23 @@ export async function verifyRenderingBoundaries() {
     const externalColor = gl.createTexture();
     const externalDepth = gl.createTexture();
     if (externalColor === null || externalDepth === null) throw new Error("Unable to allocate external GPU textures");
-    const externalTarget = new WebGLRenderTarget(8, 8, { depthTexture: new DepthTexture(8, 8, UnsignedIntType) });
+    const externalTarget = new WebGLRenderTarget(8, 8, {
+      depthTexture: new DepthTexture(8, 8, TextureType.UnsignedInt),
+    });
     const initialTextures = renderer.info.memory.textures;
     try {
-      gl.bindTexture(gl.TEXTURE_2D, externalColor);
-      gl.texStorage2D(gl.TEXTURE_2D, 1, gl.RGBA8, 8, 8);
-      gl.bindTexture(gl.TEXTURE_2D, externalDepth);
-      gl.texStorage2D(gl.TEXTURE_2D, 1, gl.DEPTH_COMPONENT24, 8, 8);
-      gl.bindTexture(gl.TEXTURE_2D, null);
+      gl.bindTexture(GL.TEXTURE_2D, externalColor);
+      gl.texStorage2D(GL.TEXTURE_2D, 1, GL.RGBA8, 8, 8);
+      gl.bindTexture(GL.TEXTURE_2D, externalDepth);
+      gl.texStorage2D(GL.TEXTURE_2D, 1, GL.DEPTH_COMPONENT24, 8, 8);
+      gl.bindTexture(GL.TEXTURE_2D, null);
       renderer.resetState();
       renderer.setRenderTargetTextures(externalTarget, externalColor, externalDepth);
       renderer.setRenderTarget(externalTarget);
       const framebuffer: WebGLFramebuffer = renderer.properties.get(externalTarget).__webglFramebuffer;
       check(gl.isFramebuffer(framebuffer), "External target did not allocate its framebuffer");
       check(
-        gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE,
+        gl.checkFramebufferStatus(GL.FRAMEBUFFER) === GL.FRAMEBUFFER_COMPLETE,
         "External target framebuffer is incomplete",
       );
       renderer.setRenderTarget(null);
@@ -220,7 +211,7 @@ export async function verifyRenderingBoundaries() {
     await nextFrame();
     check(renderer.info.render.frame === disposedFrame, "Renderer disposal did not cancel window animation");
     check(
-      programs.every((program) => !gl.isProgram(program) || gl.getProgramParameter(program, gl.DELETE_STATUS) === true),
+      programs.every((program) => !gl.isProgram(program) || gl.getProgramParameter(program, GL.DELETE_STATUS) === true),
       "Disposal retained GPU programs",
     );
     check(
@@ -229,7 +220,7 @@ export async function verifyRenderingBoundaries() {
         renderer.info.programs?.length === 0,
       "Disposal retained GPU resource accounting",
     );
-    check(gl.getError() === gl.NO_ERROR, "Window lifecycle or external target cleanup produced a WebGL error");
+    check(gl.getError() === GL.NO_ERROR, "Window lifecycle or external target cleanup produced a WebGL error");
     return {
       rejections,
       renderListDepths: depths,
@@ -259,9 +250,9 @@ export function verifyTextureLifecycle() {
   const camera = new PerspectiveCamera(50, 1, 0.1, 100);
   const geometry = new BoxGeometry();
   const data = new Uint8Array([255, 64, 32, 255, 32, 192, 64, 255, 64, 96, 255, 255, 224, 176, 32, 255]);
-  const texture = new DataTexture(data, 2, 2, RGBAFormat, UnsignedByteType);
-  texture.colorSpace = SRGBColorSpace;
-  texture.wrapS = RepeatWrapping;
+  const texture = new DataTexture(data, 2, 2, PixelFormat.RGBA, TextureType.UnsignedByte);
+  texture.colorSpace = ColorSpace.SRGB;
+  texture.wrapS = Wrapping.Repeat;
   const material = new MeshBasicMaterial({ map: texture });
   const gl = renderer.getContext();
   const check = (condition: boolean, message: string) => {
@@ -276,10 +267,10 @@ export function verifyTextureLifecycle() {
       [20, 20],
     ].map(([x, y]) => {
       const pixel = new Uint8Array(4);
-      gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+      gl.readPixels(x, y, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
       return Array.from(pixel);
     });
-    check(gl.getError() === gl.NO_ERROR, "Texture path produced a WebGL error");
+    check(gl.getError() === GL.NO_ERROR, "Texture path produced a WebGL error");
     return pixels;
   };
   try {
@@ -393,12 +384,12 @@ export function verifyLambertLighting() {
     renderer.render(scene, camera);
     const samples = [33, 63].map((x) => {
       const pixel = new Uint8Array(4);
-      gl.readPixels(x, 24, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+      gl.readPixels(x, 24, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
       return Array.from(pixel);
     });
-    check(gl.getError() === gl.NO_ERROR, "Lambert path produced a WebGL error");
+    check(gl.getError() === GL.NO_ERROR, "Lambert path produced a WebGL error");
     for (const program of renderer.info.programs ?? []) {
-      check(gl.getProgramParameter(program.program, gl.LINK_STATUS), "Lambert program did not link");
+      check(gl.getProgramParameter(program.program, GL.LINK_STATUS), "Lambert program did not link");
     }
     return samples;
   };
@@ -504,9 +495,9 @@ export async function verifyBackgroundLifecycle() {
   const material = new MeshBasicMaterial({ color: 0xff8833 });
   const mesh = new Mesh(geometry, material);
   const data = new Uint8Array([255, 64, 32, 255, 32, 192, 64, 255, 64, 96, 255, 255, 224, 176, 32, 255]);
-  const texture = new DataTexture(data, 2, 2, RGBAFormat, UnsignedByteType);
-  texture.colorSpace = SRGBColorSpace;
-  texture.wrapS = RepeatWrapping;
+  const texture = new DataTexture(data, 2, 2, PixelFormat.RGBA, TextureType.UnsignedByte);
+  texture.colorSpace = ColorSpace.SRGB;
+  texture.wrapS = Wrapping.Repeat;
   texture.needsUpdate = true;
   const faceColors = [
     [255, 0, 0],
@@ -518,8 +509,8 @@ export async function verifyBackgroundLifecycle() {
   ];
   const faces = faceColors.map((color) => new DataTexture(new Uint8Array([...color, 255]), 1, 1));
   const cube = new CubeTexture(faces);
-  cube.colorSpace = SRGBColorSpace;
-  cube.minFilter = cube.magFilter = NearestFilter;
+  cube.colorSpace = ColorSpace.SRGB;
+  cube.minFilter = cube.magFilter = TextureFilter.Nearest;
   cube.generateMipmaps = false;
   cube.needsUpdate = true;
   const gl = renderer.getContext();
@@ -534,7 +525,7 @@ export async function verifyBackgroundLifecycle() {
     );
   const readPixel = (x: number, y: number) => {
     const pixel = new Uint8Array(4);
-    gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+    gl.readPixels(x, y, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
     return Array.from(pixel);
   };
   const draw = () => {
@@ -545,9 +536,9 @@ export async function verifyBackgroundLifecycle() {
       [4, 28],
       [28, 28],
     ].map(([x, y]) => readPixel(x, y));
-    check(gl.getError() === gl.NO_ERROR, "Background produced a WebGL error");
+    check(gl.getError() === GL.NO_ERROR, "Background produced a WebGL error");
     for (const program of renderer.info.programs ?? []) {
-      check(gl.getProgramParameter(program.program, gl.LINK_STATUS), "Background program did not link");
+      check(gl.getProgramParameter(program.program, GL.LINK_STATUS), "Background program did not link");
     }
     return pixels;
   };
@@ -653,9 +644,9 @@ export async function verifyBackgroundLifecycle() {
     const restoredGPU: WebGLTexture = renderer.properties.get(texture).__webglTexture;
     check(restoredGPU !== gpuTexture && gl.isTexture(restoredGPU), "Background texture was not reallocated");
 
-    texture.mapping = EquirectangularReflectionMapping;
+    texture.mapping = Mapping.EquirectangularReflection;
     reject(() => renderer.render(scene, camera), "createEnvironments");
-    texture.mapping = UVMapping;
+    texture.mapping = Mapping.UV;
     near(draw(), updated, "Recovery from missing conversion");
     scene.background = cube;
     scene.remove(mesh);
@@ -755,7 +746,7 @@ export async function verifyBackgroundLifecycle() {
         renderer.info.programs?.length === 0,
       "Final background disposal leaked resources",
     );
-    check(gl.getError() === gl.NO_ERROR, "Background cleanup produced a WebGL error");
+    check(gl.getError() === GL.NO_ERROR, "Background cleanup produced a WebGL error");
     return {
       initial,
       updated,
@@ -811,11 +802,11 @@ export async function verifyEnvironmentLifecycle() {
       createEnvironmentPixels(),
       environmentWidth,
       environmentHeight,
-      RGBAFormat,
-      UnsignedByteType,
+      PixelFormat.RGBA,
+      TextureType.UnsignedByte,
     );
-    texture.mapping = EquirectangularReflectionMapping;
-    texture.colorSpace = SRGBColorSpace;
+    texture.mapping = Mapping.EquirectangularReflection;
+    texture.colorSpace = ColorSpace.SRGB;
     texture.needsUpdate = true;
     return texture;
   };
@@ -849,11 +840,11 @@ export async function verifyEnvironmentLifecycle() {
   const gpu = (texture: Texture): WebGLTexture => renderer.properties.get(texture).__webglTexture;
   const frame = () => {
     const pixels = new Uint8Array(32 * 32 * 4);
-    gl.readPixels(0, 0, 32, 32, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-    check(gl.getError() === gl.NO_ERROR, "Environment rendering produced a WebGL error");
+    gl.readPixels(0, 0, 32, 32, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+    check(gl.getError() === GL.NO_ERROR, "Environment rendering produced a WebGL error");
     for (const program of renderer.info.programs ?? []) {
       check(
-        gl.getProgramParameter(program.program, gl.LINK_STATUS),
+        gl.getProgramParameter(program.program, GL.LINK_STATUS),
         `Environment program did not link: ${program.name}`,
       );
     }
@@ -899,7 +890,7 @@ export async function verifyEnvironmentLifecycle() {
     const initial = draw();
     const cube = environments.get(texture)!;
     check(
-      cube !== texture && cube instanceof CubeTexture && cube.mapping === CubeReflectionMapping,
+      cube !== texture && cube instanceof CubeTexture && cube.mapping === Mapping.CubeReflection,
       "Equirectangular reflection was not converted to a cube",
     );
     const cubeGPU = gpu(cube);
@@ -911,15 +902,15 @@ export async function verifyEnvironmentLifecycle() {
       "Cube cache did not reuse its allocation",
     );
     check(environments.get(cube) === cube, "Native cube was converted again");
-    texture.mapping = EquirectangularRefractionMapping;
+    texture.mapping = Mapping.EquirectangularRefraction;
     material.needsUpdate = true;
     check(
-      environments.get(texture) === cube && cube.mapping === CubeRefractionMapping,
+      environments.get(texture) === cube && cube.mapping === Mapping.CubeRefraction,
       "Refraction mapping did not reuse/remap the cached cube",
     );
     const refracted = draw();
     different(refracted, initial, "Refraction mapping did not affect rendering");
-    texture.mapping = EquirectangularReflectionMapping;
+    texture.mapping = Mapping.EquirectangularReflection;
     material.needsUpdate = true;
     same(draw(), initial, "Reflection mapping failed to recover");
 
@@ -1113,9 +1104,9 @@ export async function verifyEnvironmentLifecycle() {
       withoutFactory.render(scene, camera);
       const missingGL = withoutFactory.getContext();
       const pixel = new Uint8Array(4);
-      missingGL.readPixels(16, 16, 1, 1, missingGL.RGBA, missingGL.UNSIGNED_BYTE, pixel);
+      missingGL.readPixels(16, 16, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
       same(Array.from(pixel), [255, 255, 255, 255], "Missing-factory renderer did not recover");
-      check(missingGL.getError() === missingGL.NO_ERROR, "Missing-factory recovery produced a GL error");
+      check(missingGL.getError() === GL.NO_ERROR, "Missing-factory recovery produced a GL error");
     } finally {
       withoutFactory.dispose();
       material.envMap = texture;
@@ -1172,7 +1163,7 @@ export async function verifyEnvironmentLifecycle() {
         renderer.info.programs?.length === 0,
       `Final environment disposal leaked resources: textures=${renderer.info.memory.textures}, geometries=${renderer.info.memory.geometries}, programs=${renderer.info.programs?.length}, live=${restoredGPU.map((handle) => gl.isTexture(handle)).join(",")}`,
     );
-    check(gl.getError() === gl.NO_ERROR, "Environment cleanup produced a WebGL error");
+    check(gl.getError() === GL.NO_ERROR, "Environment cleanup produced a WebGL error");
     return {
       initial: sample(initial),
       refracted: sample(refracted),
@@ -1245,7 +1236,7 @@ void main() { gl_FragColor = vec4(vColor, 1.0); }`,
     position.setXYZ(1, 0.2, -0.4, 0);
     position.setXYZ(2, 0, 0.4, 0);
     const colorData = new InstancedInterleavedBuffer(new Uint8Array([255, 0, 0, 91, 0, 255, 0, 92]), 4, 2);
-    colorData.setUsage(DynamicDrawUsage);
+    colorData.setUsage(BufferUsage.DynamicDraw);
     const color = new InterleavedBufferAttribute(colorData, 3, 0, true);
     geometry.setAttribute("position", position);
     geometry.setAttribute("offset", new InstancedBufferAttribute(new Float32Array([-0.5, 0, 0.5, 0]), 2, false, 2));
@@ -1256,12 +1247,12 @@ void main() { gl_FragColor = vec4(vColor, 1.0); }`,
     scene.add(mesh);
     const sample = (x: number) => {
       const pixel = new Uint8Array(4);
-      gl.readPixels(x, 28, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+      gl.readPixels(x, 28, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
       return Array.from(pixel).join(",");
     };
     const draw = () => {
       renderer.render(scene, camera);
-      check(gl.getError() === gl.NO_ERROR, "Buffer rendering produced a GL error");
+      check(gl.getError() === GL.NO_ERROR, "Buffer rendering produced a GL error");
     };
     draw();
     check(
@@ -1288,10 +1279,10 @@ void main() { gl_FragColor = vec4(vColor, 1.0); }`,
 
     const native = gl.createBuffer();
     if (!native) throw new Error("Native VBO allocation failed");
-    gl.bindBuffer(gl.ARRAY_BUFFER, native);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-0.2, -0.4, 0, 0.2, -0.4, 0, 0, 0.4, 0]), gl.STATIC_DRAW);
+    gl.bindBuffer(GL.ARRAY_BUFFER, native);
+    gl.bufferData(GL.ARRAY_BUFFER, new Float32Array([-0.2, -0.4, 0, 0.2, -0.4, 0, 0, 0.4, 0]), GL.STATIC_DRAW);
     nativeGeometry = geometry.clone();
-    nativeGeometry.setAttribute("position", new GLBufferAttribute(native, gl.FLOAT, 3, 4, 3));
+    nativeGeometry.setAttribute("position", new GLBufferAttribute(native, GL.FLOAT, 3, 4, 3));
     mesh.geometry = nativeGeometry;
     draw();
     check(sample(16) === "0,0,255,255" && sample(48) === "0,0,0,255", "Native VBO rendering changed geometry");

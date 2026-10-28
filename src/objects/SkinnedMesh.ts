@@ -12,7 +12,7 @@ import { Sphere } from "../math/Sphere";
 import { Vector3 } from "../math/Vector3";
 import { Vector4 } from "../math/Vector4";
 import { Ray } from "../math/Ray";
-import { AttachedBindMode, DetachedBindMode } from "../constants";
+import { BindMode } from "../constants";
 import { warn } from "../utils";
 const _baseVector = /*@__PURE__*/ new Vector4();
 const _skinIndex = /*@__PURE__*/ new Vector4();
@@ -39,7 +39,7 @@ const _ray = /*@__PURE__*/ new Ray();
 export class SkinnedMesh extends Mesh {
   isSkinnedMesh: boolean;
 
-  bindMode: typeof AttachedBindMode | typeof DetachedBindMode;
+  bindMode: BindMode.Attached | BindMode.Detached;
   bindMatrix: Matrix4;
   bindMatrixInverse: Matrix4;
   boundingBox: Box3 | null;
@@ -64,13 +64,13 @@ export class SkinnedMesh extends Mesh {
     this.isSkinnedMesh = true;
     this.type = "SkinnedMesh";
     /**
-     * `AttachedBindMode` means the skinned mesh shares the same world space as the skeleton.
-     * This is not true when using `DetachedBindMode` which is useful when sharing a skeleton
+     * `BindMode.Attached` means the skinned mesh shares the same world space as the skeleton.
+     * This is not true when using `BindMode.Detached` which is useful when sharing a skeleton
      * across multiple skinned meshes.
      *
-     * @default AttachedBindMode
+     * @default BindMode.Attached
      */
-    this.bindMode = AttachedBindMode;
+    this.bindMode = BindMode.Attached;
     /**
      * The base matrix that is used for the bound bone transforms.
      *
@@ -208,9 +208,9 @@ export class SkinnedMesh extends Mesh {
   }
   updateMatrixWorld(force?: boolean) {
     super.updateMatrixWorld(force);
-    if (this.bindMode === AttachedBindMode) {
+    if (this.bindMode === BindMode.Attached) {
       this.bindMatrixInverse.copy(this.matrixWorld).invert();
-    } else if (this.bindMode === DetachedBindMode) {
+    } else if (this.bindMode === BindMode.Detached) {
       this.bindMatrixInverse.copy(this.bindMatrix).invert();
     } else {
       warn("SkinnedMesh: Unrecognized bindMode: " + this.bindMode);

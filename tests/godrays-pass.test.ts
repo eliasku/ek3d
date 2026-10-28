@@ -48,6 +48,7 @@ test("godrays selects the shadow layout and accepts only basic scene depth", () 
     disposed = true;
   });
   assert.equal(directional.depthTexture, depth);
+  // @ts-expect-error Exercise rejection of an invalid depth packing value.
   assert.throws(() => directional.setDepthTexture(depth, -1), /BasicDepthPacking/);
   point.dispose();
   directional.dispose();

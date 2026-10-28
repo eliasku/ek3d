@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { TGALoader } from "ek3d/addons/loaders/TGALoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
@@ -66,7 +66,7 @@ function addTexturedBox(url: string, label: string, x: number): void {
         loaded.dispose();
         return;
       }
-      loaded.colorSpace = SRGBColorSpace;
+      loaded.colorSpace = ColorSpace.SRGB;
       pending.delete(label);
     },
     undefined,

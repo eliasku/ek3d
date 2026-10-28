@@ -14,7 +14,7 @@ import { MeshStandardMaterial } from "ek3d/materials/MeshStandardMaterial";
 import { degToRad } from "ek3d/math/MathUtils";
 import { Vector2 } from "ek3d/math/Vector2";
 import { Vector3 } from "ek3d/math/Vector3";
-import { ACESFilmicToneMapping, RepeatWrapping } from "ek3d/constants";
+import { ToneMapping, Wrapping } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
@@ -49,7 +49,7 @@ const renderer = new WebGLRenderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setAnimationLoop(animate);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 0.1;
 
 const bloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
@@ -85,7 +85,7 @@ const waterNormals = new TextureLoader().load(
   "/examples/textures/waternormals.jpg",
   (texture) => {
     if (disposed) return;
-    texture.wrapS = texture.wrapT = RepeatWrapping;
+    texture.wrapS = texture.wrapT = Wrapping.Repeat;
     canvas.dataset.loaded = "true";
   },
   undefined,

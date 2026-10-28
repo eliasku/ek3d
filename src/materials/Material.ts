@@ -7,14 +7,16 @@ import type { Texture } from "../textures/Texture";
 import { Color } from "../math/Color";
 import { EventDispatcher } from "../core/EventDispatcher";
 import {
-  FrontSide,
-  NormalBlending,
-  LessEqualDepth,
-  AddEquation,
-  OneMinusSrcAlphaFactor,
-  SrcAlphaFactor,
-  AlwaysStencilFunc,
-  KeepStencilOp,
+  Side,
+  Blending,
+  DepthFunc,
+  Equation,
+  Factor,
+  StencilFunc,
+  StencilOp,
+  Combine,
+  DepthPacking,
+  NormalMap,
 } from "../constants";
 import { generateUUID } from "../math/MathUtils";
 import { warn } from "../utils";
@@ -38,8 +40,8 @@ export interface MaterialProperties {
   anisotropyRotation?: number;
   fog?: boolean;
   flatShading?: boolean;
-  combine?: number;
-  depthPacking?: number;
+  combine?: Combine;
+  depthPacking?: DepthPacking;
   wireframe?: boolean;
   wireframeLinewidth?: number;
   wireframeLinecap?: string;
@@ -59,7 +61,7 @@ export interface MaterialProperties {
   bumpMap?: Texture | null;
   bumpScale?: number;
   normalMap?: Texture | null;
-  normalMapType?: number;
+  normalMapType?: NormalMap;
   normalScale?: Vector2;
   displacementMap?: Texture | null;
   displacementScale?: number;
@@ -114,35 +116,35 @@ export class Material extends EventDispatcher {
   uuid: string;
   name: string;
   type: string;
-  blending: number;
-  side: number;
+  blending: Blending;
+  side: Side;
   vertexColors: boolean;
   opacity: number;
   transparent: boolean;
   alphaHash: boolean;
-  blendSrc: number;
-  blendDst: number;
-  blendEquation: number;
-  blendSrcAlpha: number | null;
-  blendDstAlpha: number | null;
-  blendEquationAlpha: number | null;
+  blendSrc: Factor;
+  blendDst: Factor;
+  blendEquation: Equation;
+  blendSrcAlpha: Factor | null;
+  blendDstAlpha: Factor | null;
+  blendEquationAlpha: Equation | null;
   blendColor: Color;
   blendAlpha: number;
-  depthFunc: number;
+  depthFunc: DepthFunc;
   depthTest: boolean;
   depthWrite: boolean;
   stencilWriteMask: number;
-  stencilFunc: number;
+  stencilFunc: StencilFunc;
   stencilRef: number;
   stencilFuncMask: number;
-  stencilFail: number;
-  stencilZFail: number;
-  stencilZPass: number;
+  stencilFail: StencilOp;
+  stencilZFail: StencilOp;
+  stencilZPass: StencilOp;
   stencilWrite: boolean;
   clippingPlanes: Plane[] | null;
   clipIntersection: boolean;
   clipShadows: boolean;
-  shadowSide: number | null;
+  shadowSide: Side | null;
   colorWrite: boolean;
   precision: string | null;
   polygonOffset: boolean;
@@ -206,19 +208,19 @@ export class Material extends EventDispatcher {
     /**
      * Defines the blending type of the material.
      *
-     * It must be set to `CustomBlending` if custom blending properties like
+     * It must be set to `Blending.Custom` if custom blending properties like
      * {@link Material#blendSrc}, {@link Material#blendDst} or {@link Material#blendEquation}
      * should have any effect.
      *
-     * @default NormalBlending
+     * @default Blending.Normal
      */
-    this.blending = NormalBlending;
+    this.blending = Blending.Normal;
     /**
      * Defines which side of faces will be rendered - front, back or both.
      *
-     * @default FrontSide
+     * @default Side.Front
      */
-    this.side = FrontSide;
+    this.side = Side.Front;
     /**
      * If set to `true`, vertex colors should be used.
      *
@@ -261,21 +263,21 @@ export class Material extends EventDispatcher {
     /**
      * Defines the blending source factor.
      *
-     * @default SrcAlphaFactor
+     * @default Factor.SrcAlpha
      */
-    this.blendSrc = SrcAlphaFactor;
+    this.blendSrc = Factor.SrcAlpha;
     /**
      * Defines the blending destination factor.
      *
-     * @default OneMinusSrcAlphaFactor
+     * @default Factor.OneMinusSrcAlpha
      */
-    this.blendDst = OneMinusSrcAlphaFactor;
+    this.blendDst = Factor.OneMinusSrcAlpha;
     /**
      * Defines the blending equation.
      *
-     * @default AddEquation
+     * @default Equation.Add
      */
-    this.blendEquation = AddEquation;
+    this.blendEquation = Equation.Add;
     /**
      * Defines the blending source alpha factor.
      *
@@ -313,9 +315,9 @@ export class Material extends EventDispatcher {
     /**
      * Defines the depth function.
      *
-     * @default LessEqualDepth
+     * @default DepthFunc.LessEqual
      */
-    this.depthFunc = LessEqualDepth;
+    this.depthFunc = DepthFunc.LessEqual;
     /**
      * Whether to have depth test enabled when rendering this material.
      * When the depth test is disabled, the depth write will also be implicitly disabled.
@@ -341,9 +343,9 @@ export class Material extends EventDispatcher {
     /**
      * The stencil comparison function to use.
      *
-     * @default AlwaysStencilFunc
+     * @default StencilFunc.Always
      */
-    this.stencilFunc = AlwaysStencilFunc;
+    this.stencilFunc = StencilFunc.Always;
     /**
      * The value to use when performing stencil comparisons or stencil operations.
      *
@@ -359,23 +361,23 @@ export class Material extends EventDispatcher {
     /**
      * Which stencil operation to perform when the comparison function returns `false`.
      *
-     * @default KeepStencilOp
+     * @default StencilOp.Keep
      */
-    this.stencilFail = KeepStencilOp;
+    this.stencilFail = StencilOp.Keep;
     /**
      * Which stencil operation to perform when the comparison function returns
      * `true` but the depth test fails.
      *
-     * @default KeepStencilOp
+     * @default StencilOp.Keep
      */
-    this.stencilZFail = KeepStencilOp;
+    this.stencilZFail = StencilOp.Keep;
     /**
      * Which stencil operation to perform when the comparison function returns
      * `true` and the depth test passes.
      *
-     * @default KeepStencilOp
+     * @default StencilOp.Keep
      */
-    this.stencilZPass = KeepStencilOp;
+    this.stencilZPass = StencilOp.Keep;
     /**
      * Whether stencil operations are performed against the stencil buffer. In
      * order to perform writes or comparisons against the stencil buffer this
@@ -412,9 +414,9 @@ export class Material extends EventDispatcher {
      * Defines which side of faces cast shadows. If `null`, the side casting shadows
      * is determined as follows:
      *
-     * - When {@link Material#side} is set to `FrontSide`, the back side cast shadows.
-     * - When {@link Material#side} is set to `BackSide`, the front side cast shadows.
-     * - When {@link Material#side} is set to `DoubleSide`, both sides cast shadows.
+     * - When {@link Material#side} is set to `Side.Front`, the back side cast shadows.
+     * - When {@link Material#side} is set to `Side.Back`, the front side cast shadows.
+     * - When {@link Material#side} is set to `Side.Double`, both sides cast shadows.
      *
      * @default null
      */

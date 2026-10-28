@@ -1,4 +1,4 @@
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import type { BufferAttribute } from "../../core/BufferAttribute";
 import type { BufferGeometry } from "../../core/BufferGeometry";
 import type { InterleavedBufferAttribute } from "../../core/InterleavedBufferAttribute";
@@ -360,7 +360,7 @@ export class PLYExporter {
             if (colors != null) {
               tempColor.fromBufferAttribute(colors, i);
 
-              ColorManagement.workingToColorSpace(tempColor, SRGBColorSpace);
+              ColorManagement.workingToColorSpace(tempColor, ColorSpace.SRGB);
 
               const r = colorIsFloat ? tempColor.r : Math.round(tempColor.r * colorScale);
               const g = colorIsFloat ? tempColor.g : Math.round(tempColor.g * colorScale);
@@ -518,7 +518,7 @@ export class PLYExporter {
             if (colors != null) {
               tempColor.fromBufferAttribute(colors, i);
 
-              ColorManagement.workingToColorSpace(tempColor, SRGBColorSpace);
+              ColorManagement.workingToColorSpace(tempColor, ColorSpace.SRGB);
 
               const r = colorIsFloat ? tempColor.r : Math.round(tempColor.r * colorScale);
               const g = colorIsFloat ? tempColor.g : Math.round(tempColor.g * colorScale);

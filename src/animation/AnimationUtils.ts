@@ -3,7 +3,7 @@ import type { AnimationBufferConstructor } from "../math/Interpolant";
 import type { AnimationClip } from "./AnimationClip";
 import type { NumericAnimationBuffer } from "../math/Interpolant";
 import { Quaternion } from "../math/Quaternion";
-import { AdditiveAnimationBlendMode } from "../constants";
+import { AnimationBlendMode } from "../constants";
 /**
  * Converts an array to a specific type.
  *
@@ -268,7 +268,7 @@ export function makeClipAdditive(
       }
     }
   }
-  targetClip.blendMode = AdditiveAnimationBlendMode;
+  targetClip.blendMode = AnimationBlendMode.Additive;
   return targetClip;
 }
 /**

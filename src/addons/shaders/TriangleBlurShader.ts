@@ -40,7 +40,7 @@ ${chunk_common}
 
 		#define ITERATIONS 10.0
 
-		// Resolve the builtin before the legacy uniform shadows its GLSL3 name.
+		// Resolve the builtin before the legacy uniform shadows its GLSL.GLSL3 name.
 		vec4 sampleTriangleTexture( sampler2D source, vec2 coord ) {
 			return texture2D( source, coord );
 		}

@@ -3,7 +3,7 @@ import { LDrawLoader } from "../src/addons/loaders/LDrawLoader";
 import { LDrawConditionalLineMaterial } from "../src/addons/materials/LDrawConditionalLineMaterial";
 import fs from "node:fs";
 
-const carPath = "examples/public/examples/models/ldraw/officialLibrary/models/car.ldr_Packed.mpd";
+const carPath = "public/examples/models/ldraw/officialLibrary/models/car.ldr_Packed.mpd";
 const carText = fs.readFileSync(carPath, "utf8");
 
 /** Reads the position attribute of a mesh-like object without DOM. */

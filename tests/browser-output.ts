@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { WebGLOutput } from "ek3d/renderers/webgl/WebGLOutput";
 import type { WebGLOutputEffect, WebGLOutputSystem } from "ek3d/renderers/webgl/WebGLOutput";
@@ -10,14 +11,7 @@ import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { Mesh } from "ek3d/objects/Mesh";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
-import {
-  FloatType,
-  LinearToneMapping,
-  ReinhardToneMapping,
-  NoToneMapping,
-  SRGBColorSpace,
-  LinearSRGBColorSpace,
-} from "ek3d/constants";
+import { TextureType, ToneMapping, ColorSpace } from "ek3d/constants";
 
 // Run in a real browser served by Vite: (await import('/tests/browser-output.ts')).verifyOutputLifecycle().
 export async function verifyOutputLifecycle() {
@@ -45,7 +39,7 @@ export async function verifyOutputLifecycle() {
         canvas: boundary.domElement,
         context: boundary.getContext(),
         shaders,
-        outputBufferType: FloatType,
+        outputBufferType: TextureType.Float,
       });
       unexpected.dispose();
     }, "createOutput");
@@ -74,7 +68,7 @@ export async function verifyOutputLifecycle() {
   const renderer = new WebGLRenderer({
     shaders,
     createOutput,
-    outputBufferType: FloatType,
+    outputBufferType: TextureType.Float,
     antialias: false,
     depth: true,
     preserveDrawingBuffer: true,
@@ -125,13 +119,13 @@ export async function verifyOutputLifecycle() {
       Math.floor(gl.drawingBufferHeight / 2),
       1,
       1,
-      gl.RGBA,
-      gl.UNSIGNED_BYTE,
+      GL.RGBA,
+      GL.UNSIGNED_BYTE,
       result,
     );
-    check(gl.getError() === gl.NO_ERROR, "Output produced a WebGL error");
+    check(gl.getError() === GL.NO_ERROR, "Output produced a WebGL error");
     for (const program of renderer.info.programs ?? [])
-      check(gl.getProgramParameter(program.program, gl.LINK_STATUS), `Output shader did not link: ${program.name}`);
+      check(gl.getProgramParameter(program.program, GL.LINK_STATUS), `Output shader did not link: ${program.name}`);
     return Array.from(result);
   };
   const draw = () => {
@@ -147,8 +141,8 @@ export async function verifyOutputLifecycle() {
   const expectedPixel = (tone: number, exposure: number, srgb: boolean) =>
     [4, 1, 0.25]
       .map((value) => {
-        if (tone === ReinhardToneMapping) value = (value * exposure) / (1 + value * exposure);
-        else if (tone === LinearToneMapping) value *= exposure;
+        if (tone === ToneMapping.Reinhard) value = (value * exposure) / (1 + value * exposure);
+        else if (tone === ToneMapping.Linear) value *= exposure;
         value = Math.min(1, value);
         if (srgb) value = value <= 0.0031308 ? value * 12.92 : 1.055 * value ** (1 / 2.4) - 0.055;
         return Math.round(value * 255);
@@ -166,7 +160,7 @@ export async function verifyOutputLifecycle() {
     owner.setRenderTarget(write);
     owner.render(copyScene, camera);
   };
-  const transitions: { toneMapping: number; exposure: number; colorSpace: string; pixel: number[] }[] = [];
+  const transitions: { toneMapping: ToneMapping; exposure: number; colorSpace: string; pixel: number[] }[] = [];
   const effectCalls: string[] = [];
   const sizes: number[][] = [];
   let depthTexture: DepthTexture | null = null;
@@ -213,35 +207,35 @@ export async function verifyOutputLifecycle() {
   try {
     check(gl.getExtension("EXT_color_buffer_float") !== null, "Float output smoke requires EXT_color_buffer_float");
     renderer.setSize(32, 24, false);
-    renderer.toneMapping = ReinhardToneMapping;
-    renderer.outputColorSpace = LinearSRGBColorSpace;
+    renderer.toneMapping = ToneMapping.Reinhard;
+    renderer.outputColorSpace = ColorSpace.LinearSRGB;
     trackDepths();
     const initial = draw();
-    nearPixel(initial, expectedPixel(ReinhardToneMapping, 1, false), "Reinhard output");
+    nearPixel(initial, expectedPixel(ToneMapping.Reinhard, 1, false), "Reinhard output");
     const hdr = new Float32Array(4);
     renderer.readRenderTargetPixels(currentSceneTarget(), 16, 12, 1, 1, hdr);
     check(
       hdr.every((value, index) => Math.abs(value - [4, 1, 0.25, 1][index]) < 0.01),
       `HDR was clamped or tone mapped before output: ${hdr.join(",")}`,
     );
-    check(gl.getError() === gl.NO_ERROR, "HDR readback produced a WebGL error");
+    check(gl.getError() === GL.NO_ERROR, "HDR readback produced a WebGL error");
     for (const [tone, exposure, colorSpace] of [
-      [ReinhardToneMapping, 0.5, LinearSRGBColorSpace],
-      [ReinhardToneMapping, 2, SRGBColorSpace],
-      [LinearToneMapping, 0.125, LinearSRGBColorSpace],
-      [LinearToneMapping, 0.125, SRGBColorSpace],
-      [NoToneMapping, 0.125, LinearSRGBColorSpace],
-      [NoToneMapping, 2, SRGBColorSpace],
-      [ReinhardToneMapping, 1, LinearSRGBColorSpace],
+      [ToneMapping.Reinhard, 0.5, ColorSpace.LinearSRGB],
+      [ToneMapping.Reinhard, 2, ColorSpace.SRGB],
+      [ToneMapping.Linear, 0.125, ColorSpace.LinearSRGB],
+      [ToneMapping.Linear, 0.125, ColorSpace.SRGB],
+      [ToneMapping.No, 0.125, ColorSpace.LinearSRGB],
+      [ToneMapping.No, 2, ColorSpace.SRGB],
+      [ToneMapping.Reinhard, 1, ColorSpace.LinearSRGB],
     ] as const) {
       renderer.toneMapping = tone;
       renderer.toneMappingExposure = exposure;
       renderer.outputColorSpace = colorSpace;
       const before = beginCount;
       const result = draw();
-      nearPixel(result, expectedPixel(tone, exposure, colorSpace === SRGBColorSpace), "Output setting transition");
+      nearPixel(result, expectedPixel(tone, exposure, colorSpace === ColorSpace.SRGB), "Output setting transition");
       check(
-        beginCount - before === Number(tone !== NoToneMapping),
+        beginCount - before === Number(tone !== ToneMapping.No),
         "No-tone/no-effects output did not bypass compositing",
       );
       transitions.push({ toneMapping: tone, exposure, colorSpace, pixel: result });
@@ -293,13 +287,13 @@ export async function verifyOutputLifecycle() {
       "Logical resize missed ping-pong targets",
     );
 
-    renderer.toneMapping = NoToneMapping;
+    renderer.toneMapping = ToneMapping.No;
     renderer.toneMappingExposure = 0.125;
     const beforeNoTone = beginCount;
     const noToneWithEffects = draw();
-    nearPixel(noToneWithEffects, expectedPixel(NoToneMapping, 0.125, false), "No-tone effects output");
+    nearPixel(noToneWithEffects, expectedPixel(ToneMapping.No, 0.125, false), "No-tone effects output");
     check(beginCount === beforeNoTone + 1, "No-tone effects skipped compositing");
-    renderer.toneMapping = ReinhardToneMapping;
+    renderer.toneMapping = ToneMapping.Reinhard;
     renderer.toneMappingExposure = 1;
     let sceneDraws = 0;
     mesh.onBeforeRender = () => {
@@ -335,7 +329,7 @@ export async function verifyOutputLifecycle() {
       "Aborted output transaction lost target/face/mip",
     );
     check(
-      renderer.toneMapping === ReinhardToneMapping && !currentOutput().isCompositing(),
+      renderer.toneMapping === ToneMapping.Reinhard && !currentOutput().isCompositing(),
       "Aborted transaction lost tone mapping or compositing state",
     );
     renderer.setRenderTarget(null);
@@ -363,7 +357,7 @@ export async function verifyOutputLifecycle() {
           `${phase}/${failure} did not restore the canvas target/face/mip`,
         );
         check(
-          renderer.toneMapping === ReinhardToneMapping && !currentOutput().isCompositing(),
+          renderer.toneMapping === ToneMapping.Reinhard && !currentOutput().isCompositing(),
           `${phase}/${failure} leaked output transaction state`,
         );
         scene.onBeforeRender = () => {};
@@ -434,9 +428,9 @@ export async function verifyOutputLifecycle() {
       "Context restore did not replace output GPU handles",
     );
     check(
-      renderer.toneMapping === ReinhardToneMapping &&
+      renderer.toneMapping === ToneMapping.Reinhard &&
         renderer.toneMappingExposure === 1 &&
-        renderer.outputColorSpace === LinearSRGBColorSpace,
+        renderer.outputColorSpace === ColorSpace.LinearSRGB,
       "Context restore lost output settings",
     );
 
@@ -453,7 +447,7 @@ export async function verifyOutputLifecycle() {
       "Renderer disposal retained output textures",
     );
     check(
-      programs.every((program) => !gl.isProgram(program) || gl.getProgramParameter(program, gl.DELETE_STATUS) === true),
+      programs.every((program) => !gl.isProgram(program) || gl.getProgramParameter(program, GL.DELETE_STATUS) === true),
       "Renderer disposal retained output programs",
     );
     check(
@@ -462,7 +456,7 @@ export async function verifyOutputLifecycle() {
         renderer.info.programs?.length === 0,
       `Output disposal leaked resources: textures=${renderer.info.memory.textures}, geometries=${renderer.info.memory.geometries}, programs=${renderer.info.programs?.length}`,
     );
-    check(gl.getError() === gl.NO_ERROR, "Output cleanup produced a WebGL error");
+    check(gl.getError() === GL.NO_ERROR, "Output cleanup produced a WebGL error");
     return {
       hdrPixel: Array.from(hdr),
       initial,

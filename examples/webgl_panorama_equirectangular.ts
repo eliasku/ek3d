@@ -1,5 +1,5 @@
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
@@ -43,7 +43,7 @@ const texture = new TextureLoader().load(
     console.error(error);
   },
 );
-texture.colorSpace = SRGBColorSpace;
+texture.colorSpace = ColorSpace.SRGB;
 scene.add(new Mesh(geometry, new MeshBasicMaterial({ map: texture })));
 const renderer = new WebGLRenderer({
   canvas,

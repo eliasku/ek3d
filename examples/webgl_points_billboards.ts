@@ -1,7 +1,7 @@
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { Float32BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
@@ -45,7 +45,7 @@ const sprite = new TextureLoader().load(
     console.error(error);
   },
 );
-sprite.colorSpace = SRGBColorSpace;
+sprite.colorSpace = ColorSpace.SRGB;
 const material = new PointsMaterial({
   size: 35,
   sizeAttenuation: true,
@@ -53,7 +53,7 @@ const material = new PointsMaterial({
   alphaTest: 0.5,
   transparent: true,
 });
-material.color.setHSL(1, 0.3, 0.7, SRGBColorSpace);
+material.color.setHSL(1, 0.3, 0.7, ColorSpace.SRGB);
 scene.add(new Points(geometry, material));
 const renderer = new WebGLRenderer({ canvas, preserveDrawingBuffer: true, shaders: { PointsMaterial: pointsShader } });
 renderer.setPixelRatio(devicePixelRatio);

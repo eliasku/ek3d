@@ -3,7 +3,7 @@ import { Scene } from "ek3d/scenes/Scene";
 import { Color } from "ek3d/math/Color";
 import { Fog } from "ek3d/scenes/Fog";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { InterleavedBuffer } from "ek3d/core/InterleavedBuffer";
 import { InterleavedBufferAttribute } from "ek3d/core/InterleavedBufferAttribute";
 import { PointsMaterial } from "ek3d/materials/PointsMaterial";
@@ -72,7 +72,7 @@ function init(): void {
     const vy = y / n + 0.5;
     const vz = z / n + 0.5;
 
-    color.setRGB(vx, vy, vz, SRGBColorSpace);
+    color.setRGB(vx, vy, vz, ColorSpace.SRGB);
 
     const j = (i + 3) * 4;
 

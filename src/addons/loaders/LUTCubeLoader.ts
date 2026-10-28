@@ -1,4 +1,4 @@
-import { ClampToEdgeWrapping, FloatType, LinearFilter, UnsignedByteType } from "../../constants";
+import { Wrapping, TextureType, TextureFilter } from "../../constants";
 import { FileLoader } from "../../loaders/FileLoader";
 import { Loader } from "../../loaders/Loader";
 import { Vector3 } from "../../math/Vector3";
@@ -15,9 +15,9 @@ export interface LUTCube {
 
 /** Loads Adobe Cube color lookup tables. */
 export class LUTCubeLoader extends Loader<LUTCube> {
-  type: typeof UnsignedByteType | typeof FloatType = UnsignedByteType;
+  type: TextureType.UnsignedByte | TextureType.Float = TextureType.UnsignedByte;
 
-  setType(type: typeof UnsignedByteType | typeof FloatType): this {
+  setType(type: TextureType.UnsignedByte | TextureType.Float): this {
     this.type = type;
     return this;
   }
@@ -58,7 +58,8 @@ export class LUTCubeLoader extends Loader<LUTCube> {
     const sizeMatch = /LUT_3D_SIZE +(\d+)/.exec(input);
     if (sizeMatch === null) throw new Error("LUTCubeLoader: Missing LUT_3D_SIZE information");
     const size = Number(sizeMatch[1]);
-    const data = this.type === UnsignedByteType ? new Uint8Array(size ** 3 * 4) : new Float32Array(size ** 3 * 4);
+    const data =
+      this.type === TextureType.UnsignedByte ? new Uint8Array(size ** 3 * 4) : new Float32Array(size ** 3 * 4);
     const domainMin = new Vector3(0, 0, 0);
     const domainMax = new Vector3(1, 1, 1);
     const min = /DOMAIN_MIN +([\d.e+-]+) +([\d.e+-]+) +([\d.e+-]+)/.exec(input);
@@ -67,7 +68,7 @@ export class LUTCubeLoader extends Loader<LUTCube> {
     if (max) domainMax.set(Number(max[1]), Number(max[2]), Number(max[3]));
     if (domainMin.x > domainMax.x || domainMin.y > domainMax.y || domainMin.z > domainMax.z)
       throw new Error("LUTCubeLoader: Invalid input domain");
-    const scale = this.type === UnsignedByteType ? 255 : 1;
+    const scale = this.type === TextureType.UnsignedByte ? 255 : 1;
     const points = /^([\d.e+-]+) +([\d.e+-]+) +([\d.e+-]+) *$/gm;
     let match: RegExpExecArray | null;
     let i = 0;
@@ -79,8 +80,8 @@ export class LUTCubeLoader extends Loader<LUTCube> {
     }
     const texture3D = new Data3DTexture(data, size, size, size);
     texture3D.type = this.type;
-    texture3D.magFilter = texture3D.minFilter = LinearFilter;
-    texture3D.wrapS = texture3D.wrapT = texture3D.wrapR = ClampToEdgeWrapping;
+    texture3D.magFilter = texture3D.minFilter = TextureFilter.Linear;
+    texture3D.wrapS = texture3D.wrapT = texture3D.wrapR = Wrapping.ClampToEdge;
     texture3D.generateMipmaps = false;
     texture3D.needsUpdate = true;
     return { title, size, domainMin, domainMax, texture3D };

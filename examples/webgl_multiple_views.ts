@@ -1,6 +1,6 @@
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { IcosahedronGeometry } from "ek3d/geometries/IcosahedronGeometry";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
@@ -56,11 +56,11 @@ const colors = geometries.map((geometry) => {
 const color = new Color();
 for (let i = 0; i < count; i++) {
   const y = (positions.getY(i) / radius + 1) / 2;
-  color.setHSL(y, 1, 0.5, SRGBColorSpace);
+  color.setHSL(y, 1, 0.5, ColorSpace.SRGB);
   colors[0].setXYZ(i, color.r, color.g, color.b);
-  color.setHSL(0, y, 0.5, SRGBColorSpace);
+  color.setHSL(0, y, 0.5, ColorSpace.SRGB);
   colors[1].setXYZ(i, color.r, color.g, color.b);
-  color.setRGB(1, 0.8 - y, 0, SRGBColorSpace);
+  color.setRGB(1, 0.8 - y, 0, ColorSpace.SRGB);
   colors[2].setXYZ(i, color.r, color.g, color.b);
 }
 const material = new MeshPhongMaterial({ color: 0xffffff, flatShading: true, vertexColors: true, shininess: 0 });
@@ -79,7 +79,7 @@ const views = [
     bottom: 0,
     width: 0.5,
     height: 1,
-    background: new Color().setRGB(0.5, 0.5, 0.7, SRGBColorSpace),
+    background: new Color().setRGB(0.5, 0.5, 0.7, ColorSpace.SRGB),
     eye: [0, 300, 1800],
     up: [0, 1, 0],
     fov: 30,
@@ -89,7 +89,7 @@ const views = [
     bottom: 0,
     width: 0.5,
     height: 0.5,
-    background: new Color().setRGB(0.7, 0.5, 0.5, SRGBColorSpace),
+    background: new Color().setRGB(0.7, 0.5, 0.5, ColorSpace.SRGB),
     eye: [0, 1800, 0],
     up: [0, 0, 1],
     fov: 45,
@@ -99,7 +99,7 @@ const views = [
     bottom: 0.5,
     width: 0.5,
     height: 0.5,
-    background: new Color().setRGB(0.5, 0.7, 0.7, SRGBColorSpace),
+    background: new Color().setRGB(0.5, 0.7, 0.7, ColorSpace.SRGB),
     eye: [1400, 800, 1400],
     up: [0, 1, 0],
     fov: 60,

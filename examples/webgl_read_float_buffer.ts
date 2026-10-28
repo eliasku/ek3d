@@ -1,6 +1,6 @@
 import { Stats } from "ek3d/addons/libs/Stats";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
-import { FloatType, LinearFilter, NearestFilter, RGBAFormat } from "ek3d/constants";
+import { TextureType, TextureFilter, PixelFormat } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { TorusGeometry } from "ek3d/geometries/TorusGeometry";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
@@ -47,10 +47,10 @@ const light2 = new DirectionalLight(0xffd5d5, 4.5);
 light2.position.set(0, 0, -1).normalize();
 sceneRTT.add(light2);
 const target = new WebGLRenderTarget(innerWidth, innerHeight, {
-  minFilter: LinearFilter,
-  magFilter: NearestFilter,
-  format: RGBAFormat,
-  type: FloatType,
+  minFilter: TextureFilter.Linear,
+  magFilter: TextureFilter.Nearest,
+  format: PixelFormat.RGBA,
+  type: TextureType.Float,
 });
 const material = new ShaderMaterial({ uniforms: { time: { value: 0 } }, vertexShader, fragmentShader });
 const screenMaterial = new ShaderMaterial({

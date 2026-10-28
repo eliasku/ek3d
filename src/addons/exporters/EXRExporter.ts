@@ -1,4 +1,4 @@
-import { FloatType, HalfFloatType, RGBAFormat } from "../../constants";
+import { TextureType, PixelFormat } from "../../constants";
 import { toHalfFloat } from "../../extras/DataUtils";
 import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
 import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
@@ -129,21 +129,21 @@ function supportedRTT(renderTarget: WebGLRenderTarget, options: EXRExporterOptio
     throw Error("EXRExporter.parse: Unsupported render target type, expected instance of WebGLRenderTarget.");
   }
 
-  if (texture.type !== FloatType && texture.type !== HalfFloatType) {
+  if (texture.type !== TextureType.Float && texture.type !== TextureType.HalfFloat) {
     throw Error("EXRExporter.parse: Unsupported WebGLRenderTarget texture type.");
   }
 
-  if (texture.format !== RGBAFormat) {
+  if (texture.format !== PixelFormat.RGBA) {
     throw Error("EXRExporter.parse: Unsupported WebGLRenderTarget texture format, expected RGBAFormat.");
   }
 }
 
 function supportedDT(texture: DataTexture) {
-  if (texture.type !== FloatType && texture.type !== HalfFloatType) {
+  if (texture.type !== TextureType.Float && texture.type !== TextureType.HalfFloat) {
     throw Error("EXRExporter.parse: Unsupported DataTexture texture type.");
   }
 
-  if (texture.format !== RGBAFormat) {
+  if (texture.format !== PixelFormat.RGBA) {
     throw Error("EXRExporter.parse: Unsupported DataTexture texture format, expected RGBAFormat.");
   }
 
@@ -151,11 +151,11 @@ function supportedDT(texture: DataTexture) {
     throw Error("EXRExporter.parse: Invalid DataTexture image data.");
   }
 
-  if (texture.type === FloatType && texture.image.data.constructor.name !== "Float32Array") {
+  if (texture.type === TextureType.Float && texture.image.data.constructor.name !== "Float32Array") {
     throw Error("EXRExporter.parse: DataTexture image data doesn't match type, expected 'Float32Array'.");
   }
 
-  if (texture.type === HalfFloatType && texture.image.data.constructor.name !== "Uint16Array") {
+  if (texture.type === TextureType.HalfFloat && texture.image.data.constructor.name !== "Uint16Array") {
     throw Error("EXRExporter.parse: DataTexture image data doesn't match type, expected 'Uint16Array'.");
   }
 }
@@ -170,8 +170,8 @@ function buildInfoRTT(renderTarget: WebGLRenderTarget, options: EXRExporterOptio
     TYPE = TEXTURE.type,
     FORMAT = TEXTURE.format,
     COMPRESSION = options.compression !== undefined ? options.compression : ZIP_COMPRESSION,
-    EXPORTER_TYPE = options.type !== undefined ? options.type : HalfFloatType,
-    OUT_TYPE = EXPORTER_TYPE === FloatType ? 2 : 1,
+    EXPORTER_TYPE = options.type !== undefined ? options.type : TextureType.HalfFloat,
+    OUT_TYPE = EXPORTER_TYPE === TextureType.Float ? 2 : 1,
     COMPRESSION_SIZE = compressionSizes[COMPRESSION],
     NUM_CHANNELS = 4;
 
@@ -201,8 +201,8 @@ function buildInfoDT(texture: DataTexture, options: EXRExporterOptions = {}): In
     TYPE = texture.type,
     FORMAT = texture.format,
     COMPRESSION = options.compression !== undefined ? options.compression : ZIP_COMPRESSION,
-    EXPORTER_TYPE = options.type !== undefined ? options.type : HalfFloatType,
-    OUT_TYPE = EXPORTER_TYPE === FloatType ? 2 : 1,
+    EXPORTER_TYPE = options.type !== undefined ? options.type : TextureType.HalfFloat,
+    OUT_TYPE = EXPORTER_TYPE === TextureType.Float ? 2 : 1,
     COMPRESSION_SIZE = compressionSizes[COMPRESSION],
     NUM_CHANNELS = 4;
 
@@ -229,7 +229,7 @@ async function getPixelData(
   info: Info,
 ): Promise<Float32Array | Uint16Array> {
   const dataBuffer =
-    info.type === FloatType
+    info.type === TextureType.Float
       ? new Float32Array(info.width * info.height * info.numInputChannels)
       : new Uint16Array(info.width * info.height * info.numInputChannels);
   await renderer.readRenderTargetPixelsAsync(
@@ -251,7 +251,7 @@ function reorganizeDataBuffer(inBuffer: Float32Array | Uint16Array, info: Info) 
     dec = { r: 0, g: 0, b: 0, a: 0 },
     offset = { value: 0 },
     cOffset = info.numOutputChannels == 4 ? 1 : 0,
-    getValue = info.type == FloatType ? getFloat32 : getFloat16,
+    getValue = info.type == TextureType.Float ? getFloat32 : getFloat16,
     setValue = info.dataType == 1 ? setFloat16 : setFloat32,
     outBuffer = new Uint8Array(info.width * info.height * info.numOutputChannels * info.dataSize),
     dv = new DataView(outBuffer.buffer);

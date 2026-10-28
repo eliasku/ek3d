@@ -20,7 +20,7 @@ export async function checkLoaders() {
   if (typeof createImageBitmap !== "function")
     throw new Error("Loader browser fixture requires createImageBitmap support");
   const checks: string[] = [];
-  const url = new URL("../feature-testbed/assets/tile.png", import.meta.url).href;
+  const url = new URL("../testbed/assets/tile.png", import.meta.url).href;
   const manager = new LoadingManager();
   manager.cache.enabled = true;
   const other = new LoadingManager();

@@ -3,7 +3,7 @@ import { EffectComposer } from "ek3d/addons/postprocessing/EffectComposer";
 import { OutputPass } from "ek3d/addons/postprocessing/OutputPass";
 import { RenderPass } from "ek3d/addons/postprocessing/RenderPass";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Wrapping, ColorSpace } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { TorusGeometry } from "ek3d/geometries/TorusGeometry";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
@@ -47,9 +47,9 @@ function loadTexture(path: string) {
 }
 const cloudTexture = loadTexture("/examples/textures/lava/cloud.png");
 const lavaTexture = loadTexture("/examples/textures/lava/lavatile.jpg");
-cloudTexture.wrapS = cloudTexture.wrapT = RepeatWrapping;
-lavaTexture.wrapS = lavaTexture.wrapT = RepeatWrapping;
-lavaTexture.colorSpace = SRGBColorSpace;
+cloudTexture.wrapS = cloudTexture.wrapT = Wrapping.Repeat;
+lavaTexture.wrapS = lavaTexture.wrapT = Wrapping.Repeat;
+lavaTexture.colorSpace = ColorSpace.SRGB;
 const uniforms = {
   fogDensity: { value: 0.45 },
   fogColor: { value: new Vector3(0, 0, 0) },

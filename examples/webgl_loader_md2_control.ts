@@ -4,7 +4,7 @@ import { SunLight } from "ek3d/addons/lights/SunLight";
 import { Gyroscope } from "ek3d/addons/misc/Gyroscope";
 import { MD2CharacterComplex } from "ek3d/addons/misc/MD2CharacterComplex";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { PCFShadowMap, RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { ShadowMap, Wrapping, ColorSpace } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
@@ -46,7 +46,7 @@ renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
 if (!renderer.shadowMap) throw new Error("Missing shadow map system");
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = PCFShadowMap;
+renderer.shadowMap.type = ShadowMap.PCF;
 const cameraControls = new OrbitControls<PerspectiveCamera>(camera, canvas);
 cameraControls.target.set(0, 50, 0);
 cameraControls.update();
@@ -105,8 +105,8 @@ const groundTexture = new TextureLoader().load(
   fail,
 );
 groundTexture.repeat.set(64, 64);
-groundTexture.wrapS = groundTexture.wrapT = RepeatWrapping;
-groundTexture.colorSpace = SRGBColorSpace;
+groundTexture.wrapS = groundTexture.wrapT = Wrapping.Repeat;
+groundTexture.colorSpace = ColorSpace.SRGB;
 const groundGeometry = new PlaneGeometry(16000, 16000);
 const groundMaterial = new MeshPhongMaterial({ color: 0xffffff, map: groundTexture });
 const ground = new Mesh(groundGeometry, groundMaterial);

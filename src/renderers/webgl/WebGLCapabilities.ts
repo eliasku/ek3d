@@ -1,4 +1,5 @@
-import { FloatType, HalfFloatType, RGBAFormat, UnsignedByteType } from "../../constants";
+import { GL } from "../../GL";
+import { TextureType, PixelFormat } from "../../constants";
 import { warn } from "../../utils";
 export interface WebGLCapabilitiesState {
   isWebGL2: boolean;
@@ -49,8 +50,8 @@ export function WebGLCapabilities(gl?: any, extensions?: any, parameters?: any, 
   }
   function textureFormatReadable(textureFormat?: any) {
     if (
-      textureFormat !== RGBAFormat &&
-      utils.convert(textureFormat) !== gl.getParameter(gl.IMPLEMENTATION_COLOR_READ_FORMAT)
+      textureFormat !== PixelFormat.RGBA &&
+      utils.convert(textureFormat) !== gl.getParameter(GL.IMPLEMENTATION_COLOR_READ_FORMAT)
     ) {
       return false;
     }
@@ -58,13 +59,13 @@ export function WebGLCapabilities(gl?: any, extensions?: any, parameters?: any, 
   }
   function textureTypeReadable(textureType?: any) {
     const halfFloatSupportedByExt =
-      textureType === HalfFloatType &&
+      textureType === TextureType.HalfFloat &&
       (extensions.has("EXT_color_buffer_half_float") || extensions.has("EXT_color_buffer_float"));
     if (
-      textureType !== UnsignedByteType &&
-      textureType !== FloatType &&
+      textureType !== TextureType.UnsignedByte &&
+      textureType !== TextureType.Float &&
       !halfFloatSupportedByExt &&
-      utils.convert(textureType) !== gl.getParameter(gl.IMPLEMENTATION_COLOR_READ_TYPE)
+      utils.convert(textureType) !== gl.getParameter(GL.IMPLEMENTATION_COLOR_READ_TYPE)
     ) {
       // Edge and Chrome Mac < 52 (#9513)
       return false;
@@ -74,8 +75,8 @@ export function WebGLCapabilities(gl?: any, extensions?: any, parameters?: any, 
   function getMaxPrecision(precision?: any) {
     if (precision === "highp") {
       if (
-        gl.getShaderPrecisionFormat(gl.VERTEX_SHADER, gl.HIGH_FLOAT).precision > 0 &&
-        gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT).precision > 0
+        gl.getShaderPrecisionFormat(GL.VERTEX_SHADER, GL.HIGH_FLOAT).precision > 0 &&
+        gl.getShaderPrecisionFormat(GL.FRAGMENT_SHADER, GL.HIGH_FLOAT).precision > 0
       ) {
         return "highp";
       }
@@ -83,8 +84,8 @@ export function WebGLCapabilities(gl?: any, extensions?: any, parameters?: any, 
     }
     if (precision === "mediump") {
       if (
-        gl.getShaderPrecisionFormat(gl.VERTEX_SHADER, gl.MEDIUM_FLOAT).precision > 0 &&
-        gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.MEDIUM_FLOAT).precision > 0
+        gl.getShaderPrecisionFormat(GL.VERTEX_SHADER, GL.MEDIUM_FLOAT).precision > 0 &&
+        gl.getShaderPrecisionFormat(GL.FRAGMENT_SHADER, GL.MEDIUM_FLOAT).precision > 0
       ) {
         return "mediump";
       }
@@ -104,16 +105,16 @@ export function WebGLCapabilities(gl?: any, extensions?: any, parameters?: any, 
       "WebGLRenderer: Unable to use reversed depth buffer due to missing EXT_clip_control extension. Fallback to default depth buffer.",
     );
   }
-  const maxTextures = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
-  const maxVertexTextures = gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
-  const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-  const maxCubemapSize = gl.getParameter(gl.MAX_CUBE_MAP_TEXTURE_SIZE);
-  const maxAttributes = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
-  const maxVertexUniforms = gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS);
-  const maxVaryings = gl.getParameter(gl.MAX_VARYING_VECTORS);
-  const maxFragmentUniforms = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
-  const maxSamples = gl.getParameter(gl.MAX_SAMPLES);
-  const samples = gl.getParameter(gl.SAMPLES);
+  const maxTextures = gl.getParameter(GL.MAX_TEXTURE_IMAGE_UNITS);
+  const maxVertexTextures = gl.getParameter(GL.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
+  const maxTextureSize = gl.getParameter(GL.MAX_TEXTURE_SIZE);
+  const maxCubemapSize = gl.getParameter(GL.MAX_CUBE_MAP_TEXTURE_SIZE);
+  const maxAttributes = gl.getParameter(GL.MAX_VERTEX_ATTRIBS);
+  const maxVertexUniforms = gl.getParameter(GL.MAX_VERTEX_UNIFORM_VECTORS);
+  const maxVaryings = gl.getParameter(GL.MAX_VARYING_VECTORS);
+  const maxFragmentUniforms = gl.getParameter(GL.MAX_FRAGMENT_UNIFORM_VECTORS);
+  const maxSamples = gl.getParameter(GL.MAX_SAMPLES);
+  const samples = gl.getParameter(GL.SAMPLES);
   return {
     isWebGL2: true, // keeping this for backwards compatibility
     getMaxAnisotropy: getMaxAnisotropy,

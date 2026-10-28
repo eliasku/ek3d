@@ -1,6 +1,6 @@
 import type { CompressedTextureMipmap } from "./CompressedTexture";
 
-import { ClampToEdgeWrapping } from "../constants";
+import { Wrapping } from "../constants";
 import { CompressedTexture } from "./CompressedTexture";
 /**
  * Creates a texture 2D array based on data in compressed form.
@@ -10,7 +10,7 @@ import { CompressedTexture } from "./CompressedTexture";
  */
 export class CompressedArrayTexture extends CompressedTexture {
   isCompressedArrayTexture: boolean;
-  wrapR: number;
+  wrapR: Wrapping;
   layerUpdates: Set<number>;
 
   /**
@@ -21,8 +21,8 @@ export class CompressedArrayTexture extends CompressedTexture {
    * @param width - The width of the texture.
    * @param height - The height of the texture.
    * @param depth - The depth of the texture.
-   * @param [format=RGBAFormat] - The min filter value.
-   * @param [type=UnsignedByteType] - The min filter value.
+   * @param [format=PixelFormat.RGBA] - The min filter value.
+   * @param [type=TextureType.UnsignedByte] - The min filter value.
    */
   constructor(
     mipmaps: CompressedTextureMipmap[],
@@ -50,9 +50,9 @@ export class CompressedArrayTexture extends CompressedTexture {
      * This defines how the texture is wrapped in the depth and corresponds to
      * *W* in UVW mapping.
      *
-     * @default ClampToEdgeWrapping
+     * @default Wrapping.ClampToEdge
      */
-    this.wrapR = ClampToEdgeWrapping;
+    this.wrapR = Wrapping.ClampToEdge;
     /**
      * A set of all layers which need to be updated in the texture.
      *

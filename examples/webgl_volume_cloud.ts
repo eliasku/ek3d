@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { ImprovedNoise } from "ek3d/addons/math/ImprovedNoise";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { BackSide, GLSL3, LinearFilter, RedFormat, SRGBColorSpace } from "ek3d/constants";
+import { Side, GLSL, TextureFilter, PixelFormat, ColorSpace } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
@@ -170,8 +170,8 @@ gradient.addColorStop(1, "#437ab6");
 context.fillStyle = gradient;
 context.fillRect(0, 0, 1, 32);
 const skyMap = new CanvasTexture(skyCanvas);
-skyMap.colorSpace = SRGBColorSpace;
-scene.add(new Mesh(new SphereGeometry(10), new MeshBasicMaterial({ map: skyMap, side: BackSide })));
+skyMap.colorSpace = ColorSpace.SRGB;
+scene.add(new Mesh(new SphereGeometry(10), new MeshBasicMaterial({ map: skyMap, side: Side.Back })));
 
 const size = 128,
   data = new Uint8Array(size * size * size),
@@ -191,9 +191,9 @@ for (let z = 0; z < size; z++)
       data[i++] = (128 + 128 * noise.noise((x * 0.05) / 1.5, y * 0.05, (z * 0.05) / 1.5)) * d * d;
     }
 const texture = new Data3DTexture(data, size, size, size);
-texture.format = RedFormat;
-texture.minFilter = LinearFilter;
-texture.magFilter = LinearFilter;
+texture.format = PixelFormat.Red;
+texture.minFilter = TextureFilter.Linear;
+texture.magFilter = TextureFilter.Linear;
 texture.unpackAlignment = 1;
 texture.needsUpdate = true;
 const uniforms = {
@@ -207,11 +207,11 @@ const uniforms = {
   frame: { value: 0 },
 };
 const material = new RawShaderMaterial({
-  glslVersion: GLSL3,
+  glslVersion: GLSL.GLSL3,
   uniforms,
   vertexShader,
   fragmentShader,
-  side: BackSide,
+  side: Side.Back,
   transparent: true,
 });
 const mesh = new Mesh(new BoxGeometry(1, 1, 1), material);

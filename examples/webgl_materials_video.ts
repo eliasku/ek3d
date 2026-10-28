@@ -3,7 +3,7 @@ import { EffectComposer } from "ek3d/addons/postprocessing/EffectComposer";
 import { OutputPass } from "ek3d/addons/postprocessing/OutputPass";
 import { RenderPass } from "ek3d/addons/postprocessing/RenderPass";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
@@ -32,7 +32,7 @@ for (const [src, type] of [
   video.appendChild(source);
 }
 const texture = new VideoTexture(video);
-texture.colorSpace = SRGBColorSpace;
+texture.colorSpace = ColorSpace.SRGB;
 const camera = new PerspectiveCamera(40, innerWidth / innerHeight, 1, 10000);
 camera.position.z = 500;
 const scene = new Scene();

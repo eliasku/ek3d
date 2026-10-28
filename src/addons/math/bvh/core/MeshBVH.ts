@@ -4,7 +4,7 @@ import type { BufferGeometry } from "../../../../core/BufferGeometry";
 import type { Object3D } from "../../../../core/Object3D";
 import type { Raycaster, Intersection } from "../../../../core/Raycaster";
 import type { Material } from "../../../../materials/Material";
-import { FrontSide } from "../../../../constants";
+import { Side } from "../../../../constants";
 import { Ray } from "../../../../math/Ray";
 import { Vector3 } from "../../../../math/Vector3";
 import { Matrix4 } from "../../../../math/Matrix4";
@@ -448,7 +448,7 @@ export class MeshBVH extends GeometryBVH {
    * world space to be consistent with three's results.
    *
    */
-  raycast(ray: Ray, materialOrSide: number | Material | Material[] = FrontSide, near = 0, far = Infinity) {
+  raycast(ray: Ray, materialOrSide: number | Material | Material[] = Side.Front, near = 0, far = Infinity) {
     const roots = this._roots;
     const intersects: RayIntersection[] = [];
     const raycastFunc = this.indirect ? raycast_indirect : raycast;
@@ -465,7 +465,7 @@ export class MeshBVH extends GeometryBVH {
    * frame of the returned intersections.
    *
    */
-  raycastFirst(ray: Ray, materialOrSide: number | Material | Material[] = FrontSide, near = 0, far = Infinity) {
+  raycastFirst(ray: Ray, materialOrSide: number | Material | Material[] = Side.Front, near = 0, far = Infinity) {
     const roots = this._roots;
     let closestResult: RayIntersection | null = null;
 

@@ -1,7 +1,7 @@
 import type { DepthTexture } from "../textures/DepthTexture";
 import { EventDispatcher } from "./EventDispatcher";
 import { Texture } from "../textures/Texture";
-import { LinearFilter } from "../constants";
+import { TextureFilter, Wrapping, Mapping } from "../constants";
 import { Vector4 } from "../math/Vector4";
 import { TextureSource } from "../textures/TextureSource";
 
@@ -9,15 +9,15 @@ import { TextureSource } from "../textures/TextureSource";
  * Render target options.
  * - `generateMipmaps=false`: Whether to generate mipmaps or not.
  * - `mipmapsAutoUpdate=true`: Whether to regenerate mipmaps automatically after rendering or not.
- * - `magFilter=LinearFilter`: The mag filter.
- * - `minFilter=LinearFilter`: The min filter.
- * - `format=RGBAFormat`: The texture format.
- * - `type=UnsignedByteType`: The texture type.
+ * - `magFilter=TextureFilter.Linear`: The mag filter.
+ * - `minFilter=TextureFilter.Linear`: The min filter.
+ * - `format=PixelFormat.RGBA`: The texture format.
+ * - `type=TextureType.UnsignedByte`: The texture type.
  * - `internalFormat=null`: The texture's internal format.
- * - `wrapS=ClampToEdgeWrapping`: The texture's uv wrapping mode.
- * - `wrapT=ClampToEdgeWrapping`: The texture's uv wrapping mode.
+ * - `wrapS=Wrapping.ClampToEdge`: The texture's uv wrapping mode.
+ * - `wrapT=Wrapping.ClampToEdge`: The texture's uv wrapping mode.
  * - `anisotropy=1`: The texture's anisotropy value.
- * - `colorSpace=NoColorSpace`: The texture's color space.
+ * - `colorSpace=ColorSpace.No`: The texture's color space.
  * - `depthBuffer=true`: Whether to allocate a depth buffer or not.
  * - `stencilBuffer=false`: Whether to allocate a stencil buffer or not.
  * - `resolveColorBuffer=true`: Whether to resolve the color buffer or not. Only relevant for multisampled render targets.
@@ -33,7 +33,7 @@ import { TextureSource } from "../textures/TextureSource";
  * - `multiview=false`: Whether this target is used for multiview rendering (WebGL OVR_multiview2 extension).
  * - `useArrayDepthTexture=false`: Whether to create the depth texture as an array texture for per-layer depth testing. This is separate from multiview so layered render targets can use array depth without the multiview extension.
  */
-export type RenderTargetOptions = { wrapR?: number; mapping?: number; flipY?: boolean } & Pick<
+export type RenderTargetOptions = { wrapR?: Wrapping; mapping?: Mapping; flipY?: boolean } & Pick<
   Partial<Texture>,
   | "generateMipmaps"
   | "mipmapsAutoUpdate"
@@ -104,7 +104,7 @@ export class RenderTarget extends EventDispatcher {
       {
         generateMipmaps: false,
         internalFormat: null,
-        minFilter: LinearFilter,
+        minFilter: TextureFilter.Linear,
         depthBuffer: true,
         stencilBuffer: false,
         resolveColorBuffer: true,
@@ -278,7 +278,7 @@ export class RenderTarget extends EventDispatcher {
   }
   _setTextureOptions(options: any = {}) {
     const values: any = {
-      minFilter: LinearFilter,
+      minFilter: TextureFilter.Linear,
       generateMipmaps: false,
       flipY: false,
       internalFormat: null,

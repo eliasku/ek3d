@@ -11,7 +11,7 @@ import { RapierHelper } from "ek3d/addons/helpers/RapierHelper";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { RapierPhysics } from "ek3d/addons/physics/RapierPhysics";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { RepeatWrapping } from "ek3d/constants";
+import { Wrapping } from "ek3d/constants";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
 import { Color } from "ek3d/math/Color";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
@@ -110,7 +110,7 @@ async function init(): Promise<void> {
       texture.dispose();
       return;
     }
-    texture.wrapS = texture.wrapT = RepeatWrapping;
+    texture.wrapS = texture.wrapT = Wrapping.Repeat;
     texture.repeat.set(80, 80);
     groundMaterial.map = texture;
     groundMaterial.needsUpdate = true;

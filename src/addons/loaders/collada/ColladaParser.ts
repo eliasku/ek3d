@@ -1,4 +1,4 @@
-import { SRGBColorSpace } from "../../../constants";
+import { ColorSpace } from "../../../constants";
 import { Color } from "../../../math/Color";
 import { ColorManagement } from "../../../math/ColorManagement";
 import * as MathUtils from "../../../math/MathUtils";
@@ -1181,7 +1181,7 @@ export class ColladaParser {
         case "color":
           const array = parseFloats(child.textContent!);
           data.color = new Color().fromArray(array);
-          ColorManagement.colorSpaceToWorking(data.color, SRGBColorSpace);
+          ColorManagement.colorSpaceToWorking(data.color, ColorSpace.SRGB);
           break;
 
         case "falloff_angle":

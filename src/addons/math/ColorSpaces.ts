@@ -1,5 +1,5 @@
 import { ColorManagement } from "../../math/ColorManagement";
-import { LinearSRGBColorSpace, SRGBColorSpace, LinearTransfer, SRGBTransfer } from "../../constants";
+import { ColorSpace, Transfer } from "../../constants";
 import { Matrix3 } from "../../math/Matrix3";
 
 // Reference: http://www.russellcottrell.com/photo/matrixCalculator.htm
@@ -65,7 +65,7 @@ export const LinearDisplayP3ColorSpace = "display-p3-linear";
 export const DisplayP3ColorSpaceImpl: ColorSpaceImpl = {
   primaries: P3_PRIMARIES,
   whitePoint: D65,
-  transfer: SRGBTransfer,
+  transfer: Transfer.SRGB,
   toXYZ: LINEAR_DISPLAY_P3_TO_XYZ,
   fromXYZ: XYZ_TO_LINEAR_DISPLAY_P3,
   luminanceCoefficients: P3_LUMINANCE_COEFFICIENTS,
@@ -78,7 +78,7 @@ export const DisplayP3ColorSpaceImpl: ColorSpaceImpl = {
 export const LinearDisplayP3ColorSpaceImpl: ColorSpaceImpl = {
   primaries: P3_PRIMARIES,
   whitePoint: D65,
-  transfer: LinearTransfer,
+  transfer: Transfer.Linear,
   toXYZ: LINEAR_DISPLAY_P3_TO_XYZ,
   fromXYZ: XYZ_TO_LINEAR_DISPLAY_P3,
   luminanceCoefficients: P3_LUMINANCE_COEFFICIENTS,
@@ -125,7 +125,7 @@ export const LinearRec2020ColorSpace = "rec2020-linear";
 export const LinearRec2020ColorSpaceImpl: ColorSpaceImpl = {
   primaries: REC2020_PRIMARIES,
   whitePoint: D65,
-  transfer: LinearTransfer,
+  transfer: Transfer.Linear,
   toXYZ: LINEAR_REC2020_TO_XYZ,
   fromXYZ: XYZ_TO_LINEAR_REC2020,
   luminanceCoefficients: REC2020_LUMINANCE_COEFFICIENTS,
@@ -140,8 +140,8 @@ export const ExtendedSRGBColorSpace = "extended-srgb";
  * Implementation object for the Extended-sRGB color space.
  */
 export const ExtendedSRGBColorSpaceImpl: ColorSpaceImpl = {
-  ...(ColorManagement.spaces as Record<string, ColorSpaceImpl>)[SRGBColorSpace],
-  outputColorSpaceConfig: { drawingBufferColorSpace: SRGBColorSpace, toneMappingMode: "extended" },
+  ...(ColorManagement.spaces as Record<string, ColorSpaceImpl>)[ColorSpace.SRGB],
+  outputColorSpaceConfig: { drawingBufferColorSpace: ColorSpace.SRGB, toneMappingMode: "extended" },
 };
 
 ColorManagement.define({
@@ -150,5 +150,5 @@ ColorManagement.define({
   [LinearRec2020ColorSpace]: LinearRec2020ColorSpaceImpl,
 }) as void;
 
-void LinearSRGBColorSpace;
-void LinearTransfer;
+void ColorSpace.LinearSRGB;
+void Transfer.Linear;

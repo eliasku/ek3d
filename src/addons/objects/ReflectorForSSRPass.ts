@@ -1,4 +1,4 @@
-import { HalfFloatType, NearestFilter, UnsignedShortType } from "../../constants";
+import { TextureType, TextureFilter } from "../../constants";
 import { Color } from "../../math/Color";
 import { Matrix4 } from "../../math/Matrix4";
 import { Plane } from "../../math/Plane";
@@ -216,18 +216,18 @@ ${chunk_packing}
       depthTexture = new DepthTexture(
         1,
         1,
-        UnsignedShortType,
+        TextureType.UnsignedShort,
         undefined,
         undefined,
         undefined,
-        NearestFilter,
-        NearestFilter,
+        TextureFilter.Nearest,
+        TextureFilter.Nearest,
       );
     }
 
     const parameters = {
       depthTexture: useDepthTexture ? depthTexture : null,
-      type: HalfFloatType,
+      type: TextureType.HalfFloat,
     };
 
     const renderTarget = new WebGLRenderTarget(textureWidth, textureHeight, parameters);

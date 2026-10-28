@@ -3,7 +3,7 @@ import { BufferGeometry } from "../../core/BufferGeometry";
 import { Color } from "../../math/Color";
 import { Quaternion } from "../../math/Quaternion";
 import { Raycaster } from "../../core/Raycaster";
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import { Vector3 } from "../../math/Vector3";
 import type { Curve } from "../../extras/core/Curve";
 import type { Mesh } from "../../objects/Mesh";
@@ -519,7 +519,7 @@ export class TreesGeometry extends BufferGeometry {
       const random = Math.random() * 0.1;
 
       for (let j = 0; j < 6; j++) {
-        _color.setRGB(0.2 + random, 0.4 + random, 0, SRGBColorSpace);
+        _color.setRGB(0.2 + random, 0.4 + random, 0, ColorSpace.SRGB);
 
         colors.push(_color.r, _color.g, _color.b);
       }

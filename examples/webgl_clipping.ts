@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { TorusKnotGeometry } from "ek3d/geometries/TorusKnotGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
@@ -52,7 +52,7 @@ const globalPlane = new Plane(new Vector3(-1, 0, 0), 0.1);
 const material = new MeshPhongMaterial({
   color: 0x80ee10,
   shininess: 100,
-  side: DoubleSide,
+  side: Side.Double,
   clippingPlanes: [localPlane],
   clipShadows: true,
   alphaToCoverage: true,

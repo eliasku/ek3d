@@ -4,7 +4,7 @@ import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { clone } from "ek3d/addons/utils/SkeletonUtils";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DetachedBindMode } from "ek3d/constants";
+import { BindMode } from "ek3d/constants";
 import type { Object3D } from "ek3d/core/Object3D";
 import { Timer } from "ek3d/core/Timer";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
@@ -111,7 +111,7 @@ function setup(): void {
     const identity = new Matrix4();
     for (let i = 0; i < 3; i++) {
       const object = mesh.clone();
-      object.bindMode = DetachedBindMode;
+      object.bindMode = BindMode.Detached;
       object.bind(mesh.skeleton, identity);
       object.position.x = (i - 1) * 2;
       object.scale.setScalar(0.01);

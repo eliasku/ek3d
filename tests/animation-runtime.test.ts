@@ -11,7 +11,7 @@ import { QuaternionKeyframeTrack } from "../src/animation/tracks/QuaternionKeyfr
 import { BooleanKeyframeTrack } from "../src/animation/tracks/BooleanKeyframeTrack";
 import { StringKeyframeTrack } from "../src/animation/tracks/StringKeyframeTrack";
 import { Object3D } from "../src/core/Object3D";
-import { LoopOnce, LoopRepeat, LoopPingPong, AdditiveAnimationBlendMode } from "../src/constants";
+import { Loop, AnimationBlendMode } from "../src/constants";
 import { AnimationMixer as UpstreamMixer } from "../upstream/three.js/src/animation/AnimationMixer.js";
 import { AnimationObjectGroup as UpstreamGroup } from "../upstream/three.js/src/animation/AnimationObjectGroup.js";
 import { PropertyBinding as UpstreamBinding } from "../upstream/three.js/src/animation/PropertyBinding.js";
@@ -43,7 +43,7 @@ test("binding dispatch tables stay shared while callbacks bind and unbind per in
 });
 
 test("mixer once/repeat/pingpong, reverse playback and finish/loop events match upstream", () => {
-  for (const mode of [LoopOnce, LoopRepeat, LoopPingPong]) {
+  for (const mode of [Loop.Once, Loop.Repeat, Loop.PingPong]) {
     for (const reverse of [false, true]) {
       const results = mixers.map((Mixer) => {
         const root = new Object3D();
@@ -169,7 +169,7 @@ test("normal/additive blending, crossfade and warp match upstream and restore or
       "additive",
       1,
       [new NumberKeyframeTrack(".position[x]", [0, 1], [4, 4])],
-      AdditiveAnimationBlendMode,
+      AnimationBlendMode.Additive,
     );
     const additive = mixer.clipAction(additiveClip).setEffectiveWeight(0.5).play();
     mixer.update(0.25);
@@ -194,7 +194,7 @@ test("cached actions reuse per root and blend mode, and every uncache path relea
     assert.equal(mixer.clipAction(clip), a);
     assert.equal(mixer.existingAction(clip), a);
     assert.notEqual(a, b);
-    const additive = mixer.clipAction(clip, root, AdditiveAnimationBlendMode);
+    const additive = mixer.clipAction(clip, root, AnimationBlendMode.Additive);
     assert.notEqual(additive, a);
     a.play();
     b.play();
@@ -369,7 +369,7 @@ test("unclamped finish disables once actions and restores the original property"
     const root = new Object3D();
     root.position.x = 6;
     const mixer = new Mixer(root);
-    const action = mixer.clipAction(scalar()).setLoop(LoopOnce, 1).play();
+    const action = mixer.clipAction(scalar()).setLoop(Loop.Once, 1).play();
     let finished = 0;
     mixer.addEventListener("finished", () => {
       finished++;
@@ -397,7 +397,7 @@ test("quaternion additive blending and discrete weight thresholds match upstream
       "add",
       1,
       [new QuaternionKeyframeTrack(".quaternion", [0, 1], [0, 1, 0, 0, 0, 1, 0, 0])],
-      AdditiveAnimationBlendMode,
+      AnimationBlendMode.Additive,
     );
     const additive = mixer.clipAction(clip).setEffectiveWeight(0.5).play();
     const discrete = mixer

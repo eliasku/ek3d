@@ -2,13 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { UltraHDRLoader } from "ek3d/addons/loaders/UltraHDRLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import {
-  ACESFilmicToneMapping,
-  DoubleSide,
-  EquirectangularReflectionMapping,
-  NearestFilter,
-  RepeatWrapping,
-} from "ek3d/constants";
+import { ToneMapping, Side, Mapping, TextureFilter, Wrapping } from "ek3d/constants";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { LoadingManager } from "ek3d/loaders/LoadingManager";
 import { MeshPhysicalMaterial } from "ek3d/materials/MeshPhysicalMaterial";
@@ -53,7 +47,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 const image = document.createElement("canvas");
 image.width = image.height = 2;
 const context = image.getContext("2d");
@@ -61,8 +55,8 @@ if (!context) throw new Error("Unable to create alpha texture");
 context.fillStyle = "white";
 context.fillRect(0, 1, 2, 1);
 const alphaMap = new CanvasTexture(image);
-alphaMap.magFilter = NearestFilter;
-alphaMap.wrapS = alphaMap.wrapT = RepeatWrapping;
+alphaMap.magFilter = TextureFilter.Nearest;
+alphaMap.wrapS = alphaMap.wrapT = Wrapping.Repeat;
 alphaMap.repeat.set(1, 3.5);
 const material = new MeshPhysicalMaterial({
   color: params.color,
@@ -75,7 +69,7 @@ const material = new MeshPhysicalMaterial({
   specularIntensity: params.specularIntensity,
   specularColor: params.specularColor,
   opacity: params.opacity,
-  side: DoubleSide,
+  side: Side.Double,
   transparent: true,
 });
 scene.add(new Mesh(new SphereGeometry(20, 64, 32), material));
@@ -109,7 +103,7 @@ new UltraHDRLoader(manager).load(
       return;
     }
     environment = texture;
-    texture.mapping = EquirectangularReflectionMapping;
+    texture.mapping = Mapping.EquirectangularReflection;
     scene.background = texture;
     material.envMap = texture;
     canvas.dataset.state = "rendered";

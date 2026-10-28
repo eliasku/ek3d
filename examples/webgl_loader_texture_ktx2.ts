@@ -1,21 +1,6 @@
 import { KTX2Loader } from "ek3d/addons/loaders/KTX2Loader";
 import type { Texture } from "ek3d/textures/Texture";
-import {
-  RED_GREEN_RGTC2_Format,
-  RED_RGTC1_Format,
-  RGBA_ASTC_4x4_Format,
-  RGBA_BPTC_Format,
-  RGBA_ETC2_EAC_Format,
-  RGBA_PVRTC_4BPPV1_Format,
-  RGBA_S3TC_DXT1_Format,
-  RGBA_S3TC_DXT5_Format,
-  RGB_BPTC_UNSIGNED_Format,
-  RGB_ETC1_Format,
-  RGB_ETC2_Format,
-  RGB_PVRTC_4BPPV1_Format,
-  RGB_S3TC_DXT1_Format,
-  SRGBTransfer,
-} from "ek3d/constants";
+import { PixelFormat, Transfer } from "ek3d/constants";
 import { ColorManagement } from "ek3d/math/ColorManagement";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import type { BufferGeometry } from "ek3d/core/BufferGeometry";
@@ -247,28 +232,28 @@ function requiredExtension(texture: Texture): string | null {
   if (!(texture instanceof CompressedTexture)) return null;
 
   // Mirrors WebGLUtils' extension choice: sRGB S3TC data needs the separate sRGB extension.
-  const srgb = ColorManagement.getTransfer(texture.colorSpace) === SRGBTransfer;
+  const srgb = ColorManagement.getTransfer(texture.colorSpace) === Transfer.SRGB;
 
   switch (texture.format) {
-    case RGB_S3TC_DXT1_Format:
-    case RGBA_S3TC_DXT1_Format:
-    case RGBA_S3TC_DXT5_Format:
+    case PixelFormat.RGB_S3TC_DXT1:
+    case PixelFormat.RGBA_S3TC_DXT1:
+    case PixelFormat.RGBA_S3TC_DXT5:
       return srgb ? "WEBGL_compressed_texture_s3tc_srgb" : "WEBGL_compressed_texture_s3tc";
-    case RGB_ETC1_Format:
+    case PixelFormat.RGB_ETC1:
       return "WEBGL_compressed_texture_etc1";
-    case RGB_ETC2_Format:
-    case RGBA_ETC2_EAC_Format:
+    case PixelFormat.RGB_ETC2:
+    case PixelFormat.RGBA_ETC2_EAC:
       return "WEBGL_compressed_texture_etc";
-    case RGBA_ASTC_4x4_Format:
+    case PixelFormat.RGBA_ASTC_4x4:
       return "WEBGL_compressed_texture_astc";
-    case RGBA_BPTC_Format:
-    case RGB_BPTC_UNSIGNED_Format: // UASTC HDR transcoded to BC6H
+    case PixelFormat.RGBA_BPTC:
+    case PixelFormat.RGB_BPTC_UNSIGNED: // UASTC HDR transcoded to BC6H
       return "EXT_texture_compression_bptc";
-    case RED_RGTC1_Format:
-    case RED_GREEN_RGTC2_Format:
+    case PixelFormat.RED_RGTC1:
+    case PixelFormat.RED_GREEN_RGTC2:
       return "EXT_texture_compression_rgtc";
-    case RGB_PVRTC_4BPPV1_Format:
-    case RGBA_PVRTC_4BPPV1_Format:
+    case PixelFormat.RGB_PVRTC_4BPPV1:
+    case PixelFormat.RGBA_PVRTC_4BPPV1:
       return "WEBGL_compressed_texture_pvrtc";
     default:
       return null;

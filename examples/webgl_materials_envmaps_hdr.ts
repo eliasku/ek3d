@@ -4,7 +4,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { HDRCubeTextureLoader } from "ek3d/addons/loaders/HDRCubeTextureLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping, LinearFilter } from "ek3d/constants";
+import { ToneMapping, TextureFilter } from "ek3d/constants";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { TorusKnotGeometry } from "ek3d/geometries/TorusKnotGeometry";
@@ -50,7 +50,7 @@ const renderer = new WebGLRenderer({
   getDFGLUT: () => dfg,
   shaders: { MeshBasicMaterial: basicShader, MeshLambertMaterial: lambertShader, MeshStandardMaterial: standardShader },
 });
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 const pmrem = new PMREMGenerator(renderer);
@@ -81,7 +81,7 @@ const hdr = new HDRCubeTextureLoader(manager).setPath("/examples/textures/cube/p
       return;
     }
     hdrTarget = pmrem.fromCubemap(texture);
-    texture.magFilter = LinearFilter;
+    texture.magFilter = TextureFilter.Linear;
     texture.needsUpdate = true;
   },
   undefined,

@@ -4,7 +4,7 @@ import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { LoopOnce } from "ek3d/constants";
+import { Loop } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { GridHelper } from "ek3d/helpers/GridHelper";
@@ -89,7 +89,7 @@ new GLTFLoader().load(
       actions[clip.name] = action;
       if (emotes.includes(clip.name) || states.indexOf(clip.name) >= 4) {
         action.clampWhenFinished = true;
-        action.loop = LoopOnce;
+        action.loop = Loop.Once;
       }
     }
     const api = { state: "Walking" };

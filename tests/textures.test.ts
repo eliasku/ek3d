@@ -15,16 +15,7 @@ import { FramebufferTexture as UpstreamFramebuffer } from "../upstream/three.js/
 import { CompressedTexture as UpstreamCompressed } from "../upstream/three.js/src/textures/CompressedTexture.js";
 import { CompressedArrayTexture as UpstreamArray } from "../upstream/three.js/src/textures/CompressedArrayTexture.js";
 import { CompressedCubeTexture as UpstreamCube } from "../upstream/three.js/src/textures/CompressedCubeTexture.js";
-import {
-  ClampToEdgeWrapping,
-  CubeReflectionMapping,
-  LinearFilter,
-  NearestFilter,
-  RepeatWrapping,
-  RGBA_S3TC_DXT1_Format,
-  SRGBColorSpace,
-  UnsignedByteType,
-} from "../src/constants";
+import { Wrapping, Mapping, TextureFilter, PixelFormat, ColorSpace, TextureType } from "../src/constants";
 
 const mipmaps = () => [{ data: new Uint8Array(8), width: 4, height: 4 }];
 const faces = () => Array.from({ length: 6 }, () => ({ width: 4, height: 4, mipmaps: mipmaps() }));
@@ -68,22 +59,22 @@ test("texture defaults preserve upstream upload, mip, sampling and color contrac
       assert.equal(actual[key], expected[key], `${actual.constructor.name}.${key}`);
     assert.equal(actual.source.version, expected.source.version);
   }
-  const texture = new CompressedTexture(mipmaps(), 4, 4, RGBA_S3TC_DXT1_Format, UnsignedByteType);
+  const texture = new CompressedTexture(mipmaps(), 4, 4, PixelFormat.RGBA_S3TC_DXT1, TextureType.UnsignedByte);
   assert.equal(texture.version, 0);
   assert.equal(texture.generateMipmaps, false);
   assert.equal(texture.flipY, false);
   texture.needsUpdate = true;
   assert.equal(texture.version, 1);
   assert.equal(texture.source.version, 1);
-  texture.colorSpace = SRGBColorSpace;
-  texture.wrapS = RepeatWrapping;
+  texture.colorSpace = ColorSpace.SRGB;
+  texture.wrapS = Wrapping.Repeat;
   const clone = texture.clone();
-  assert.equal(clone.colorSpace, SRGBColorSpace);
-  assert.equal(clone.wrapS, RepeatWrapping);
+  assert.equal(clone.colorSpace, ColorSpace.SRGB);
+  assert.equal(clone.wrapS, Wrapping.Repeat);
   assert.equal(clone.source, texture.source);
   assert.notEqual(clone.mipmaps, texture.mipmaps);
   assert.equal(clone.mipmaps[0].data, texture.mipmaps[0].data);
-  assert.equal(new CompressedCubeTexture(faces()).mapping, CubeReflectionMapping);
+  assert.equal(new CompressedCubeTexture(faces()).mapping, Mapping.CubeReflection);
 });
 
 test("canvas CPU backing is caller-owned while framebuffer copies have independent dimensions", () => {
@@ -105,20 +96,20 @@ test("canvas CPU backing is caller-owned while framebuffer copies have independe
   assert.notEqual(framebufferCopy.image, framebuffer.image);
   framebufferCopy.image.width = 16;
   assert.equal(framebuffer.image.width, 8);
-  assert.equal(framebuffer.minFilter, NearestFilter);
-  assert.equal(framebuffer.magFilter, NearestFilter);
+  assert.equal(framebuffer.minFilter, TextureFilter.Nearest);
+  assert.equal(framebuffer.magFilter, TextureFilter.Nearest);
 });
 
 test("compressed array update sets are per texture and copy preserves wrapR", () => {
   const first = new CompressedArrayTexture(mipmaps(), 4, 4, 2);
-  assert.equal(first.wrapR, ClampToEdgeWrapping);
-  first.wrapR = RepeatWrapping;
+  assert.equal(first.wrapR, Wrapping.ClampToEdge);
+  first.wrapR = Wrapping.Repeat;
   first.addLayerUpdate(1);
   first.addLayerUpdate(1);
   assert.deepEqual([...first.layerUpdates], [1]);
   assert.equal(first.version, 0, "marking a layer does not request an upload");
   const second = first.clone();
-  assert.equal(second.wrapR, RepeatWrapping);
+  assert.equal(second.wrapR, Wrapping.Repeat);
   assert.notEqual(second.layerUpdates, first.layerUpdates);
   assert.equal(second.layerUpdates.size, 0);
   first.clearLayerUpdates();
@@ -143,8 +134,8 @@ test("video callbacks reschedule and disposal cancels only the owned callback", 
   } as unknown as HTMLVideoElement;
   const texture = new VideoTexture(video);
   assert.equal(texture.generateMipmaps, false);
-  assert.equal(texture.minFilter, LinearFilter);
-  assert.equal(texture.magFilter, LinearFilter);
+  assert.equal(texture.minFilter, TextureFilter.Linear);
+  assert.equal(texture.magFilter, TextureFilter.Linear);
   callbacks.get(1)!();
   assert.equal(texture.version, 1);
   assert.ok(callbacks.has(2));

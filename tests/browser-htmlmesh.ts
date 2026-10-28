@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { HTMLMesh } from "ek3d/addons/interactive/HTMLMesh";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { Raycaster } from "ek3d/core/Raycaster";
@@ -278,7 +279,7 @@ export async function verifyHtmlMesh() {
 
     const gl = renderer.getContext();
     const framebuffer = new Uint8Array(256 * 256 * 4);
-    gl.readPixels(0, 0, 256, 256, gl.RGBA, gl.UNSIGNED_BYTE, framebuffer);
+    gl.readPixels(0, 0, 256, 256, GL.RGBA, GL.UNSIGNED_BYTE, framebuffer);
     let varied = false;
     for (let i = 4; i < framebuffer.length; i += 4) {
       if (
@@ -334,7 +335,7 @@ export async function verifyHtmlMesh() {
     checks.push("dispose");
 
     const glError = gl.getError();
-    check(glError === gl.NO_ERROR, "HTMLMesh rendering produced a WebGL error");
+    check(glError === GL.NO_ERROR, "HTMLMesh rendering produced a WebGL error");
 
     return { checks, glError };
   } finally {

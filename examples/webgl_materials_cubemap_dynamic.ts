@@ -4,7 +4,7 @@ import { Stats } from "ek3d/addons/libs/Stats";
 import { HDRLoader } from "ek3d/addons/loaders/HDRLoader";
 import { CubeCamera } from "ek3d/cameras/CubeCamera";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping, HalfFloatType } from "ek3d/constants";
+import { ToneMapping, Mapping, TextureType } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { IcosahedronGeometry } from "ek3d/geometries/IcosahedronGeometry";
 import { TorusKnotGeometry } from "ek3d/geometries/TorusKnotGeometry";
@@ -39,9 +39,9 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 const target = new WebGLCubeRenderTarget(256);
-target.texture.type = HalfFloatType;
+target.texture.type = TextureType.HalfFloat;
 const cubeCamera = new CubeCamera(1, 1000, target);
 const material = new MeshStandardMaterial({ envMap: target.texture, roughness: 0.05, metalness: 1 });
 const sphere = new Mesh(new IcosahedronGeometry(15, 8), material);
@@ -70,7 +70,7 @@ const hdr = new HDRLoader(manager).load(
       texture.dispose();
       return;
     }
-    texture.mapping = EquirectangularReflectionMapping;
+    texture.mapping = Mapping.EquirectangularReflection;
     scene.background = texture;
     scene.environment = texture;
     loaded = true;

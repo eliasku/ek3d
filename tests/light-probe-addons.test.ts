@@ -2,7 +2,7 @@ import { test } from "vite-plus/test";
 import assert from "node:assert/strict";
 import { LightProbeHelper } from "../src/addons/helpers/LightProbeHelper";
 import { LightProbeGenerator } from "../src/addons/lights/LightProbeGenerator";
-import { FloatType, HalfFloatType } from "../src/constants";
+import { TextureType } from "../src/constants";
 import { toHalfFloat } from "../src/extras/DataUtils";
 import { LightProbe } from "../src/lights/LightProbe";
 import { WebGLCubeRenderTarget } from "../src/renderers/WebGLCubeRenderTarget";
@@ -10,7 +10,7 @@ import type { WebGLRenderer } from "../src/renderers/WebGLRenderer";
 import { CubeTexture } from "../src/textures/CubeTexture";
 
 test("cube readback projects constant radiance and respects pixel types", async () => {
-  for (const type of [undefined, FloatType, HalfFloatType]) {
+  for (const type of [undefined, TextureType.Float, TextureType.HalfFloat]) {
     const target = new WebGLCubeRenderTarget(1);
     if (type !== undefined) target.texture.type = type;
     const seen: number[] = [];
@@ -26,9 +26,9 @@ test("cube readback projects constant radiance and respects pixel types", async 
       ) {
         seen.push(face);
         data.set(
-          type === FloatType
+          type === TextureType.Float
             ? [1, 0.5, 0, 1]
-            : type === HalfFloatType
+            : type === TextureType.HalfFloat
               ? [toHalfFloat(1), toHalfFloat(0.5), 0, toHalfFloat(1)]
               : [255, 128, 0, 255],
         );

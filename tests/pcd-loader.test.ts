@@ -4,7 +4,7 @@ import { PCDLoader } from "../src/addons/loaders/PCDLoader";
 import { BufferAttribute } from "../src/core/BufferAttribute";
 import { PointsMaterial } from "../src/materials/PointsMaterial";
 import type { BufferGeometry } from "../src/core/BufferGeometry";
-import { SRGBColorSpace } from "../src/constants";
+import { ColorSpace } from "../src/constants";
 import { Color } from "../src/math/Color";
 
 function attribute(geometry: BufferGeometry, name: string): BufferAttribute {
@@ -51,8 +51,8 @@ test("ASCII xyz plus integer-valued float rgb produces position and color attrib
   assert.deepEqual(Array.from(attribute(geometry, "label").array), [7, 9]);
   assert.equal(attribute(geometry, "label").array instanceof Int32Array, true);
 
-  const red = new Color().setRGB(1, 0, 0, SRGBColorSpace);
-  const green = new Color().setRGB(0, 1, 0, SRGBColorSpace);
+  const red = new Color().setRGB(1, 0, 0, ColorSpace.SRGB);
+  const green = new Color().setRGB(0, 1, 0, ColorSpace.SRGB);
   const color = attribute(geometry, "color");
   assert.deepEqual(Array.from(color.array), [red.r, red.g, red.b, green.r, green.g, green.b]);
   assert.ok(points.material instanceof PointsMaterial);

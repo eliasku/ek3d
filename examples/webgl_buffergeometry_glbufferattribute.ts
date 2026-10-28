@@ -1,10 +1,11 @@
+import { GL } from "ek3d/GL";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { Scene } from "ek3d/scenes/Scene";
 import { Fog } from "ek3d/scenes/Fog";
 import { Color } from "ek3d/math/Color";
 import { Sphere } from "ek3d/math/Sphere";
 import { Vector3 } from "ek3d/math/Vector3";
-import { SRGBColorSpace, LinearSRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { GLBufferAttribute } from "ek3d/core/GLBufferAttribute";
 import { PointsMaterial } from "ek3d/materials/PointsMaterial";
@@ -44,8 +45,8 @@ for (let i = 0; i < particles; i++) {
   positions2[j] = z * 0.3;
   positions2[j + 1] = x * 0.3;
   positions2[j + 2] = y * 0.3;
-  color.setRGB(x / 1000 + 0.5, y / 1000 + 0.5, z / 1000 + 0.5, SRGBColorSpace);
-  const hex = color.getHex(LinearSRGBColorSpace);
+  color.setRGB(x / 1000 + 0.5, y / 1000 + 0.5, z / 1000 + 0.5, ColorSpace.SRGB);
+  const hex = color.getHex(ColorSpace.LinearSRGB);
   colors[j] = (hex >> 16) & 255;
   colors[j + 1] = (hex >> 8) & 255;
   colors[j + 2] = hex & 255;
@@ -54,18 +55,18 @@ const gl = renderer.getContext();
 function upload(data: Float32Array | Uint8Array): WebGLBuffer {
   const buffer = gl.createBuffer();
   if (!buffer) throw new Error("Could not create GPU buffer");
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+  gl.bindBuffer(GL.ARRAY_BUFFER, buffer);
+  gl.bufferData(GL.ARRAY_BUFFER, data, GL.STATIC_DRAW);
   return buffer;
 }
 const pos = upload(positions);
 const pos2 = upload(positions2);
 const rgb = upload(colors);
 const geometry = new BufferGeometry();
-const attr1 = new GLBufferAttribute(pos, gl.FLOAT, 3, 4, particles);
-const attr2 = new GLBufferAttribute(pos2, gl.FLOAT, 3, 4, particles);
+const attr1 = new GLBufferAttribute(pos, GL.FLOAT, 3, 4, particles);
+const attr2 = new GLBufferAttribute(pos2, GL.FLOAT, 3, 4, particles);
 geometry.setAttribute("position", attr1);
-geometry.setAttribute("color", new GLBufferAttribute(rgb, gl.UNSIGNED_BYTE, 3, 1, particles, true));
+geometry.setAttribute("color", new GLBufferAttribute(rgb, GL.UNSIGNED_BYTE, 3, 1, particles, true));
 geometry.boundingSphere = new Sphere().set(new Vector3(), 500);
 const points = new Points(geometry, new PointsMaterial({ size: 15, vertexColors: true }));
 scene.add(points);

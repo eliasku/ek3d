@@ -1,5 +1,5 @@
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide, RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Side, Wrapping, ColorSpace } from "ek3d/constants";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { Mesh } from "ek3d/objects/Mesh";
@@ -58,10 +58,10 @@ const map = new TextureLoader().load(
     console.error(error);
   },
 );
-map.wrapS = map.wrapT = RepeatWrapping;
+map.wrapS = map.wrapT = Wrapping.Repeat;
 map.anisotropy = 16;
-map.colorSpace = SRGBColorSpace;
-const material = new MeshPhongMaterial({ map, side: DoubleSide });
+map.colorSpace = ColorSpace.SRGB;
+const material = new MeshPhongMaterial({ map, side: Side.Double });
 const points: Vector2[] = [];
 for (let i = 0; i < 50; i++) points.push(new Vector2(Math.sin(i * 0.2) * Math.sin(i * 0.1) * 15 + 50, (i - 5) * 2));
 const plane = new ParametricGeometry(planeFunction, 10, 10);

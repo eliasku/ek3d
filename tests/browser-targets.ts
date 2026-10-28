@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { WebGLRenderTarget } from "ek3d/renderers/WebGLRenderTarget";
 import { WebGLArrayRenderTarget } from "ek3d/renderers/WebGLArrayRenderTarget";
@@ -8,7 +9,7 @@ import { Scene } from "ek3d/scenes/Scene";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { Mesh } from "ek3d/objects/Mesh";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
-import { GLSL3, NearestFilter } from "ek3d/constants";
+import { GLSL, TextureFilter } from "ek3d/constants";
 
 function check(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -35,7 +36,7 @@ export async function verifyLayeredTargets(canvas?: HTMLCanvasElement) {
   camera.position.z = 1;
   const scene = new Scene();
   const paint = new RawShaderMaterial({
-    glslVersion: GLSL3,
+    glslVersion: GLSL.GLSL3,
     uniforms: { tint: { value: [1, 0, 0, 1] }, z: { value: -0.5 } },
     vertexShader:
       "precision highp float; in vec3 position; uniform float z; void main() { gl_Position = vec4(position.xy, z, 1.0); }",
@@ -43,7 +44,7 @@ export async function verifyLayeredTargets(canvas?: HTMLCanvasElement) {
   });
   const sampler = (kind: string, coordinate: string) =>
     new RawShaderMaterial({
-      glslVersion: GLSL3,
+      glslVersion: GLSL.GLSL3,
       depthTest: false,
       depthWrite: false,
       uniforms: { map: { value: null }, layer: { value: 0 } },
@@ -55,8 +56,8 @@ export async function verifyLayeredTargets(canvas?: HTMLCanvasElement) {
   const mesh = new Mesh(geometry, paint);
   scene.add(mesh);
   const targets = [
-    new WebGLArrayRenderTarget(8, 8, 2, { minFilter: NearestFilter, magFilter: NearestFilter }),
-    new WebGL3DRenderTarget(8, 8, 2, { minFilter: NearestFilter, magFilter: NearestFilter }),
+    new WebGLArrayRenderTarget(8, 8, 2, { minFilter: TextureFilter.Nearest, magFilter: TextureFilter.Nearest }),
+    new WebGL3DRenderTarget(8, 8, 2, { minFilter: TextureFilter.Nearest, magFilter: TextureFilter.Nearest }),
   ];
   const output = new WebGLRenderTarget(8, 8, { depthBuffer: false });
   const pixel = new Uint8Array(4);
@@ -76,7 +77,7 @@ export async function verifyLayeredTargets(canvas?: HTMLCanvasElement) {
   const fill = (target: LayeredTarget) => {
     for (let layer = 0; layer < target.depth; layer++) {
       renderer.setRenderTarget(target, layer);
-      check(gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE, "Layer framebuffer is incomplete");
+      check(gl.checkFramebufferStatus(GL.FRAMEBUFFER) === GL.FRAMEBUFFER_COMPLETE, "Layer framebuffer is incomplete");
       renderer.clear();
       draw(layer % 2 === 0 ? [1, 0, 0, 1] : [0, 0, 1, 1], -0.5);
       draw([0, 1, 0, 1], 0.5);
@@ -123,27 +124,27 @@ export async function verifyLayeredTargets(canvas?: HTMLCanvasElement) {
       sample(target, 1, [0, 0, 0, 255], "shared depth persists until explicitly cleared for another slice");
       fill(target);
       renderer.setRenderTarget(target, 1);
-      const framebuffer = gl.getParameter(gl.FRAMEBUFFER_BINDING);
+      const framebuffer = gl.getParameter(GL.FRAMEBUFFER_BINDING);
       renderer.readRenderTargetPixels(target, 4, 4, 1, 1, pixel, 0);
       expect(pixel, red, "explicit readback selects layer zero, not last rendered layer");
       check(
-        renderer.getActiveCubeFace() === 1 && gl.getParameter(gl.FRAMEBUFFER_BINDING) === framebuffer,
+        renderer.getActiveCubeFace() === 1 && gl.getParameter(GL.FRAMEBUFFER_BINDING) === framebuffer,
         "Synchronous readback changed the active target/layer",
       );
       check(
         gl.getFramebufferAttachmentParameter(
-          gl.FRAMEBUFFER,
-          gl.COLOR_ATTACHMENT0,
-          gl.FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER,
+          GL.FRAMEBUFFER,
+          GL.COLOR_ATTACHMENT0,
+          GL.FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER,
         ) === 1,
         "Synchronous readback did not restore the active layer attachment",
       );
       const pending = renderer.readRenderTargetPixelsAsync(target, 4, 4, 1, 1, new Uint8Array(4), 0);
       check(
         gl.getFramebufferAttachmentParameter(
-          gl.FRAMEBUFFER,
-          gl.COLOR_ATTACHMENT0,
-          gl.FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER,
+          GL.FRAMEBUFFER,
+          GL.COLOR_ATTACHMENT0,
+          GL.FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER,
         ) === 1,
         "Asynchronous readback did not restore attachment before waiting",
       );
@@ -170,7 +171,7 @@ export async function verifyLayeredTargets(canvas?: HTMLCanvasElement) {
       }
       check(invalidAsyncLayer && renderer.getRenderTarget() === output, "Invalid async layer changed active target");
       check(
-        gl.getParameter(gl.FRAMEBUFFER_BINDING) === renderer.properties.get(output).__webglFramebuffer,
+        gl.getParameter(GL.FRAMEBUFFER_BINDING) === renderer.properties.get(output).__webglFramebuffer,
         "Invalid layer readback changed framebuffer binding",
       );
       renderer.setRenderTarget(null);
@@ -247,7 +248,7 @@ export async function verifyLayeredTargets(canvas?: HTMLCanvasElement) {
     const live = targets.map(handles);
     renderer.dispose();
     live.forEach((allocation) => deleted(allocation, "renderer disposal with live targets"));
-    check(gl.getError() === gl.NO_ERROR, "Layered target lifecycle produced a WebGL error");
+    check(gl.getError() === GL.NO_ERROR, "Layered target lifecycle produced a WebGL error");
     return {
       arrayLayers: true,
       volumeSlices: true,

@@ -1,4 +1,4 @@
-import { SRGBColorSpace, LinearSRGBColorSpace, SRGBTransfer, LinearTransfer, NoColorSpace } from "../constants";
+import { ColorSpace, Transfer } from "../constants";
 import { Matrix3 } from "./Matrix3";
 const LINEAR_REC709_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
   0.4123908,
@@ -25,7 +25,7 @@ const XYZ_TO_LINEAR_REC709 = /*@__PURE__*/ new Matrix3().set(
 function createColorManagement() {
   const ColorManagement: any = {
     enabled: true,
-    workingColorSpace: LinearSRGBColorSpace,
+    workingColorSpace: ColorSpace.LinearSRGB,
     /**
      * Implementations of supported color spaces.
      *
@@ -49,7 +49,7 @@ function createColorManagement() {
       if (this.enabled === false || sourceColorSpace === targetColorSpace || !sourceColorSpace || !targetColorSpace) {
         return color;
       }
-      if ((this.spaces as any)[sourceColorSpace].transfer === SRGBTransfer) {
+      if ((this.spaces as any)[sourceColorSpace].transfer === Transfer.SRGB) {
         color.r = SRGBToLinear(color.r);
         color.g = SRGBToLinear(color.g);
         color.b = SRGBToLinear(color.b);
@@ -58,7 +58,7 @@ function createColorManagement() {
         color.applyMatrix3((this.spaces as any)[sourceColorSpace].toXYZ);
         color.applyMatrix3((this.spaces as any)[targetColorSpace].fromXYZ);
       }
-      if ((this.spaces as any)[targetColorSpace].transfer === SRGBTransfer) {
+      if ((this.spaces as any)[targetColorSpace].transfer === Transfer.SRGB) {
         color.r = LinearToSRGB(color.r);
         color.g = LinearToSRGB(color.g);
         color.b = LinearToSRGB(color.b);
@@ -75,7 +75,7 @@ function createColorManagement() {
       return (this.spaces as any)[colorSpace].primaries;
     },
     getTransfer: function (this: any, colorSpace?: any) {
-      if (colorSpace === NoColorSpace) return LinearTransfer;
+      if (colorSpace === ColorSpace.No) return Transfer.Linear;
       return (this.spaces as any)[colorSpace].transfer;
     },
     getToneMappingMode: function (this: any, colorSpace?: any) {
@@ -107,24 +107,24 @@ function createColorManagement() {
   const REC709_LUMINANCE_COEFFICIENTS = [0.2126, 0.7152, 0.0722];
   const D65 = [0.3127, 0.329];
   ColorManagement.define({
-    [LinearSRGBColorSpace]: {
+    [ColorSpace.LinearSRGB]: {
       primaries: REC709_PRIMARIES,
       whitePoint: D65,
-      transfer: LinearTransfer,
+      transfer: Transfer.Linear,
       toXYZ: LINEAR_REC709_TO_XYZ,
       fromXYZ: XYZ_TO_LINEAR_REC709,
       luminanceCoefficients: REC709_LUMINANCE_COEFFICIENTS,
-      workingColorSpaceConfig: { unpackColorSpace: SRGBColorSpace },
-      outputColorSpaceConfig: { drawingBufferColorSpace: SRGBColorSpace },
+      workingColorSpaceConfig: { unpackColorSpace: ColorSpace.SRGB },
+      outputColorSpaceConfig: { drawingBufferColorSpace: ColorSpace.SRGB },
     },
-    [SRGBColorSpace]: {
+    [ColorSpace.SRGB]: {
       primaries: REC709_PRIMARIES,
       whitePoint: D65,
-      transfer: SRGBTransfer,
+      transfer: Transfer.SRGB,
       toXYZ: LINEAR_REC709_TO_XYZ,
       fromXYZ: XYZ_TO_LINEAR_REC709,
       luminanceCoefficients: REC709_LUMINANCE_COEFFICIENTS,
-      outputColorSpaceConfig: { drawingBufferColorSpace: SRGBColorSpace },
+      outputColorSpaceConfig: { drawingBufferColorSpace: ColorSpace.SRGB },
     },
   });
   return ColorManagement;

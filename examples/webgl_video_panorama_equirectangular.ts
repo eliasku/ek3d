@@ -1,5 +1,5 @@
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 import { Mesh } from "ek3d/objects/Mesh";
@@ -26,7 +26,7 @@ for (const [src, type] of [
   video.appendChild(source);
 }
 const texture = new VideoTexture(video);
-texture.colorSpace = SRGBColorSpace;
+texture.colorSpace = ColorSpace.SRGB;
 const camera = new PerspectiveCamera(75, innerWidth / innerHeight, 0.25, 10);
 const scene = new Scene();
 const geometry = new SphereGeometry(5, 60, 40);

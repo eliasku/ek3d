@@ -3,7 +3,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Sky } from "ek3d/addons/objects/Sky";
 import { CubeCamera } from "ek3d/cameras/CubeCamera";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping, HalfFloatType } from "ek3d/constants";
+import { ToneMapping, TextureType } from "ek3d/constants";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 import { degToRad } from "ek3d/math/MathUtils";
@@ -23,7 +23,7 @@ const canvas: HTMLCanvasElement = selected;
 const camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 100, 2000000);
 camera.position.set(0, 100, 2000);
 const scene = new Scene();
-const cubeRenderTarget = new WebGLCubeRenderTarget(256, { type: HalfFloatType });
+const cubeRenderTarget = new WebGLCubeRenderTarget(256, { type: TextureType.HalfFloat });
 const cubeCamera = new CubeCamera(1, 1000, cubeRenderTarget);
 const sphereMaterial = new MeshBasicMaterial({ envMap: cubeRenderTarget.texture });
 const sphere = new Mesh(new SphereGeometry(400, 64, 32), sphereMaterial);
@@ -34,7 +34,7 @@ const renderer = new WebGLRenderer({
   shaderChunks: { tonemapping_fragment: chunk_tonemapping_fragment, colorspace_fragment: chunk_colorspace_fragment },
 });
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 0.5;
 const controls = new OrbitControls(camera, canvas);
 controls.enableZoom = false;

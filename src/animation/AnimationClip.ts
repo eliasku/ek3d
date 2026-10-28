@@ -8,7 +8,7 @@ import { QuaternionKeyframeTrack } from "./tracks/QuaternionKeyframeTrack";
 import { StringKeyframeTrack } from "./tracks/StringKeyframeTrack";
 import { VectorKeyframeTrack } from "./tracks/VectorKeyframeTrack";
 import { generateUUID } from "../math/MathUtils";
-import { NormalAnimationBlendMode } from "../constants";
+import { AnimationBlendMode } from "../constants";
 /**
  * A reusable set of keyframe tracks which represent an animation.
  */
@@ -16,7 +16,7 @@ export class AnimationClip {
   name: string;
   tracks: KeyframeTrack[];
   duration: number;
-  blendMode: number;
+  blendMode: AnimationBlendMode;
   uuid: string;
   userData: any;
 
@@ -31,14 +31,14 @@ export class AnimationClip {
    * @param [duration=-1] - The clip's duration in seconds. If a negative value is passed,
    * the duration will be calculated from the passed keyframes.
    * @param tracks - An array of keyframe tracks.
-   * @param [blendMode=NormalAnimationBlendMode] - Defines how the animation
+   * @param [blendMode=AnimationBlendMode.Normal] - Defines how the animation
    * is blended/combined when two or more animations are simultaneously played.
    */
   constructor(
     name: string = "",
     duration: number = -1,
     tracks: KeyframeTrack[] = [],
-    blendMode: number = NormalAnimationBlendMode,
+    blendMode: AnimationBlendMode = AnimationBlendMode.Normal,
   ) {
     /**
      * The clip's name.

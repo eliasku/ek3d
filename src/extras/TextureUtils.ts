@@ -1,62 +1,5 @@
 import type { Texture } from "../textures/Texture";
-import {
-  AlphaFormat,
-  RedFormat,
-  RedIntegerFormat,
-  RGFormat,
-  RGIntegerFormat,
-  RGBFormat,
-  RGBAFormat,
-  RGBAIntegerFormat,
-  RGB_S3TC_DXT1_Format,
-  RGBA_S3TC_DXT1_Format,
-  RGBA_S3TC_DXT3_Format,
-  RGBA_S3TC_DXT5_Format,
-  RGB_PVRTC_2BPPV1_Format,
-  RGBA_PVRTC_2BPPV1_Format,
-  RGB_PVRTC_4BPPV1_Format,
-  RGBA_PVRTC_4BPPV1_Format,
-  RGB_ETC1_Format,
-  RGB_ETC2_Format,
-  RGBA_ETC2_EAC_Format,
-  R11_EAC_Format,
-  SIGNED_R11_EAC_Format,
-  RG11_EAC_Format,
-  SIGNED_RG11_EAC_Format,
-  RGBA_ASTC_4x4_Format,
-  RGBA_ASTC_5x4_Format,
-  RGBA_ASTC_5x5_Format,
-  RGBA_ASTC_6x5_Format,
-  RGBA_ASTC_6x6_Format,
-  RGBA_ASTC_8x5_Format,
-  RGBA_ASTC_8x6_Format,
-  RGBA_ASTC_8x8_Format,
-  RGBA_ASTC_10x5_Format,
-  RGBA_ASTC_10x6_Format,
-  RGBA_ASTC_10x8_Format,
-  RGBA_ASTC_10x10_Format,
-  RGBA_ASTC_12x10_Format,
-  RGBA_ASTC_12x12_Format,
-  RGBA_BPTC_Format,
-  RGB_BPTC_SIGNED_Format,
-  RGB_BPTC_UNSIGNED_Format,
-  RED_RGTC1_Format,
-  SIGNED_RED_RGTC1_Format,
-  RED_GREEN_RGTC2_Format,
-  SIGNED_RED_GREEN_RGTC2_Format,
-  UnsignedByteType,
-  ByteType,
-  UnsignedShortType,
-  ShortType,
-  HalfFloatType,
-  UnsignedShort4444Type,
-  UnsignedShort5551Type,
-  UnsignedIntType,
-  IntType,
-  FloatType,
-  UnsignedInt5999Type,
-  UnsignedInt101111Type,
-} from "../constants";
+import { PixelFormat, TextureType } from "../constants";
 /**
  * Scales the texture as large as possible within its surface without cropping
  * or stretching the texture. The method preserves the original aspect ratio of
@@ -131,108 +74,108 @@ export function getByteLength(width: number, height: number, format: number, typ
   const typeByteLength = getTextureTypeByteLength(type);
   switch (format) {
     // https://registry.khronos.org/OpenGL-Refpages/es3.0/html/glTexImage2D.xhtml
-    case AlphaFormat:
+    case PixelFormat.Alpha:
       return width * height;
-    case RedFormat:
+    case PixelFormat.Red:
       return ((width * height) / typeByteLength.components) * typeByteLength.byteLength;
-    case RedIntegerFormat:
+    case PixelFormat.RedInteger:
       return ((width * height) / typeByteLength.components) * typeByteLength.byteLength;
-    case RGFormat:
+    case PixelFormat.RG:
       return ((width * height * 2) / typeByteLength.components) * typeByteLength.byteLength;
-    case RGIntegerFormat:
+    case PixelFormat.RGInteger:
       return ((width * height * 2) / typeByteLength.components) * typeByteLength.byteLength;
-    case RGBFormat:
+    case PixelFormat.RGB:
       return ((width * height * 3) / typeByteLength.components) * typeByteLength.byteLength;
-    case RGBAFormat:
+    case PixelFormat.RGBA:
       return ((width * height * 4) / typeByteLength.components) * typeByteLength.byteLength;
-    case RGBAIntegerFormat:
+    case PixelFormat.RGBAInteger:
       return ((width * height * 4) / typeByteLength.components) * typeByteLength.byteLength;
     // https://registry.khronos.org/webgl/extensions/WEBGL_compressed_texture_s3tc_srgb/
-    case RGB_S3TC_DXT1_Format:
-    case RGBA_S3TC_DXT1_Format:
+    case PixelFormat.RGB_S3TC_DXT1:
+    case PixelFormat.RGBA_S3TC_DXT1:
       return Math.floor((width + 3) / 4) * Math.floor((height + 3) / 4) * 8;
-    case RGBA_S3TC_DXT3_Format:
-    case RGBA_S3TC_DXT5_Format:
+    case PixelFormat.RGBA_S3TC_DXT3:
+    case PixelFormat.RGBA_S3TC_DXT5:
       return Math.floor((width + 3) / 4) * Math.floor((height + 3) / 4) * 16;
     // https://registry.khronos.org/webgl/extensions/WEBGL_compressed_texture_pvrtc/
-    case RGB_PVRTC_2BPPV1_Format:
-    case RGBA_PVRTC_2BPPV1_Format:
+    case PixelFormat.RGB_PVRTC_2BPPV1:
+    case PixelFormat.RGBA_PVRTC_2BPPV1:
       return (Math.max(width, 16) * Math.max(height, 8)) / 4;
-    case RGB_PVRTC_4BPPV1_Format:
-    case RGBA_PVRTC_4BPPV1_Format:
+    case PixelFormat.RGB_PVRTC_4BPPV1:
+    case PixelFormat.RGBA_PVRTC_4BPPV1:
       return (Math.max(width, 8) * Math.max(height, 8)) / 2;
     // https://registry.khronos.org/webgl/extensions/WEBGL_compressed_texture_etc/
-    case RGB_ETC1_Format:
-    case RGB_ETC2_Format:
-    case R11_EAC_Format:
-    case SIGNED_R11_EAC_Format:
+    case PixelFormat.RGB_ETC1:
+    case PixelFormat.RGB_ETC2:
+    case PixelFormat.R11_EAC:
+    case PixelFormat.SIGNED_R11_EAC:
       return Math.floor((width + 3) / 4) * Math.floor((height + 3) / 4) * 8;
-    case RGBA_ETC2_EAC_Format:
-    case RG11_EAC_Format:
-    case SIGNED_RG11_EAC_Format:
+    case PixelFormat.RGBA_ETC2_EAC:
+    case PixelFormat.RG11_EAC:
+    case PixelFormat.SIGNED_RG11_EAC:
       return Math.floor((width + 3) / 4) * Math.floor((height + 3) / 4) * 16;
     // https://registry.khronos.org/webgl/extensions/WEBGL_compressed_texture_astc/
-    case RGBA_ASTC_4x4_Format:
+    case PixelFormat.RGBA_ASTC_4x4:
       return Math.floor((width + 3) / 4) * Math.floor((height + 3) / 4) * 16;
-    case RGBA_ASTC_5x4_Format:
+    case PixelFormat.RGBA_ASTC_5x4:
       return Math.floor((width + 4) / 5) * Math.floor((height + 3) / 4) * 16;
-    case RGBA_ASTC_5x5_Format:
+    case PixelFormat.RGBA_ASTC_5x5:
       return Math.floor((width + 4) / 5) * Math.floor((height + 4) / 5) * 16;
-    case RGBA_ASTC_6x5_Format:
+    case PixelFormat.RGBA_ASTC_6x5:
       return Math.floor((width + 5) / 6) * Math.floor((height + 4) / 5) * 16;
-    case RGBA_ASTC_6x6_Format:
+    case PixelFormat.RGBA_ASTC_6x6:
       return Math.floor((width + 5) / 6) * Math.floor((height + 5) / 6) * 16;
-    case RGBA_ASTC_8x5_Format:
+    case PixelFormat.RGBA_ASTC_8x5:
       return Math.floor((width + 7) / 8) * Math.floor((height + 4) / 5) * 16;
-    case RGBA_ASTC_8x6_Format:
+    case PixelFormat.RGBA_ASTC_8x6:
       return Math.floor((width + 7) / 8) * Math.floor((height + 5) / 6) * 16;
-    case RGBA_ASTC_8x8_Format:
+    case PixelFormat.RGBA_ASTC_8x8:
       return Math.floor((width + 7) / 8) * Math.floor((height + 7) / 8) * 16;
-    case RGBA_ASTC_10x5_Format:
+    case PixelFormat.RGBA_ASTC_10x5:
       return Math.floor((width + 9) / 10) * Math.floor((height + 4) / 5) * 16;
-    case RGBA_ASTC_10x6_Format:
+    case PixelFormat.RGBA_ASTC_10x6:
       return Math.floor((width + 9) / 10) * Math.floor((height + 5) / 6) * 16;
-    case RGBA_ASTC_10x8_Format:
+    case PixelFormat.RGBA_ASTC_10x8:
       return Math.floor((width + 9) / 10) * Math.floor((height + 7) / 8) * 16;
-    case RGBA_ASTC_10x10_Format:
+    case PixelFormat.RGBA_ASTC_10x10:
       return Math.floor((width + 9) / 10) * Math.floor((height + 9) / 10) * 16;
-    case RGBA_ASTC_12x10_Format:
+    case PixelFormat.RGBA_ASTC_12x10:
       return Math.floor((width + 11) / 12) * Math.floor((height + 9) / 10) * 16;
-    case RGBA_ASTC_12x12_Format:
+    case PixelFormat.RGBA_ASTC_12x12:
       return Math.floor((width + 11) / 12) * Math.floor((height + 11) / 12) * 16;
     // https://registry.khronos.org/webgl/extensions/EXT_texture_compression_bptc/
-    case RGBA_BPTC_Format:
-    case RGB_BPTC_SIGNED_Format:
-    case RGB_BPTC_UNSIGNED_Format:
+    case PixelFormat.RGBA_BPTC:
+    case PixelFormat.RGB_BPTC_SIGNED:
+    case PixelFormat.RGB_BPTC_UNSIGNED:
       return Math.ceil(width / 4) * Math.ceil(height / 4) * 16;
     // https://registry.khronos.org/webgl/extensions/EXT_texture_compression_rgtc/
-    case RED_RGTC1_Format:
-    case SIGNED_RED_RGTC1_Format:
+    case PixelFormat.RED_RGTC1:
+    case PixelFormat.SIGNED_RED_RGTC1:
       return Math.ceil(width / 4) * Math.ceil(height / 4) * 8;
-    case RED_GREEN_RGTC2_Format:
-    case SIGNED_RED_GREEN_RGTC2_Format:
+    case PixelFormat.RED_GREEN_RGTC2:
+    case PixelFormat.SIGNED_RED_GREEN_RGTC2:
       return Math.ceil(width / 4) * Math.ceil(height / 4) * 16;
   }
   throw new Error(`Unable to determine texture byte length for ${format} format.`);
 }
 function getTextureTypeByteLength(type?: any) {
   switch (type) {
-    case UnsignedByteType:
-    case ByteType:
+    case TextureType.UnsignedByte:
+    case TextureType.Byte:
       return { byteLength: 1, components: 1 };
-    case UnsignedShortType:
-    case ShortType:
-    case HalfFloatType:
+    case TextureType.UnsignedShort:
+    case TextureType.Short:
+    case TextureType.HalfFloat:
       return { byteLength: 2, components: 1 };
-    case UnsignedShort4444Type:
-    case UnsignedShort5551Type:
+    case TextureType.UnsignedShort4444:
+    case TextureType.UnsignedShort5551:
       return { byteLength: 2, components: 4 };
-    case UnsignedIntType:
-    case IntType:
-    case FloatType:
+    case TextureType.UnsignedInt:
+    case TextureType.Int:
+    case TextureType.Float:
       return { byteLength: 4, components: 1 };
-    case UnsignedInt5999Type:
-    case UnsignedInt101111Type:
+    case TextureType.UnsignedInt5999:
+    case TextureType.UnsignedInt101111:
       return { byteLength: 4, components: 3 };
   }
   throw new Error(`THREE.TextureUtils: Unknown texture type ${type}.`);

@@ -1,4 +1,4 @@
-import { BackSide } from "../../constants";
+import { Side } from "../../constants";
 import { Float32BufferAttribute } from "../../core/BufferAttribute";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import type { RectAreaLight } from "../../lights/RectAreaLight";
@@ -28,7 +28,7 @@ export class RectAreaLightHelper extends Line<LineBasicMaterial> {
       new Float32BufferAttribute([1, 1, 0, -1, 1, 0, -1, -1, 0, 1, 1, 0, -1, -1, 0, 1, -1, 0], 3),
     );
     face.computeBoundingSphere();
-    this.add(new Mesh(face, new MeshBasicMaterial({ side: BackSide, fog: false })));
+    this.add(new Mesh(face, new MeshBasicMaterial({ side: Side.Back, fog: false })));
   }
 
   updateMatrixWorld(): void {

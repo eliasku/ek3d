@@ -4,13 +4,7 @@ import { DDSLoader } from "../src/addons/loaders/DDSLoader";
 import { KTXLoader } from "../src/addons/loaders/KTXLoader";
 import { PVRLoader } from "../src/addons/loaders/PVRLoader";
 import { TGALoader } from "../src/addons/loaders/TGALoader";
-import {
-  RGB_BPTC_UNSIGNED_Format,
-  RGB_PVRTC_2BPPV1_Format,
-  RGBA_PVRTC_4BPPV1_Format,
-  RGBA_S3TC_DXT3_Format,
-  RGB_S3TC_DXT1_Format,
-} from "../src/constants";
+import { PixelFormat } from "../src/constants";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -63,7 +57,7 @@ test("DDS reads each S3TC level and reports an unsupported FourCC instead of an 
   new Uint8Array(buffer, 128, 40).fill(0x5a);
 
   const parsed = new DDSLoader().parse(buffer);
-  assert.equal(parsed.format, RGB_S3TC_DXT1_Format);
+  assert.equal(parsed.format, PixelFormat.RGB_S3TC_DXT1);
   assert.equal(parsed.width, 8);
   assert.equal(parsed.mipmapCount, 2);
   assert.equal(parsed.isCubemap, false);
@@ -80,7 +74,7 @@ test("DDS reads each S3TC level and reports an unsupported FourCC instead of an 
   assert.equal(single.mipmaps.length, 1);
 
   const dxt3 = new DDSLoader().parse(words(ddsHeader("DXT3", 4, 4, 1), 20));
-  assert.equal(dxt3.format, RGBA_S3TC_DXT3_Format);
+  assert.equal(dxt3.format, PixelFormat.RGBA_S3TC_DXT3);
 
   assert.throws(() => new DDSLoader().parse(words(ddsHeader("ATI2", 4, 4, 1), 20)), /Unsupported FourCC code ATI2/);
   const wrongMagic = ddsHeader("DXT1", 4, 4, 1);
@@ -95,7 +89,7 @@ test("DDS DX10 BC6H reads the extended header and rejects other DXGI formats", (
   const extended = new Uint32Array(buffer, 128, 5);
   extended[0] = 95;
   const parsed = new DDSLoader().parse(buffer);
-  assert.equal(parsed.format, RGB_BPTC_UNSIGNED_Format);
+  assert.equal(parsed.format, PixelFormat.RGB_BPTC_UNSIGNED);
   assert.equal(parsed.mipmaps[0].data.byteOffset, 148);
   assert.equal(parsed.mipmaps[0].data.byteLength, 16);
 
@@ -159,7 +153,7 @@ test("PVR v2 and v3 map PVRTC variants and clamp small levels to two blocks per 
   header[12] = 1;
   const v2 = words(header, 32 + 32);
   const parsedV2 = new PVRLoader().parse(v2);
-  assert.equal(parsedV2.format, RGB_PVRTC_2BPPV1_Format);
+  assert.equal(parsedV2.format, PixelFormat.RGB_PVRTC_2BPPV1);
   assert.equal(parsedV2.mipmapCount, 2);
   assert.deepEqual(
     parsedV2.mipmaps.map(({ width, height, data }) => [width, height, data.byteLength]),
@@ -178,7 +172,7 @@ test("PVR v2 and v3 map PVRTC variants and clamp small levels to two blocks per 
   v3[10] = 1;
   v3[11] = 1;
   const parsedV3 = new PVRLoader().parse(words(v3, 32));
-  assert.equal(parsedV3.format, RGBA_PVRTC_4BPPV1_Format);
+  assert.equal(parsedV3.format, PixelFormat.RGBA_PVRTC_4BPPV1);
   assert.equal(parsedV3.mipmaps[0].data.byteOffset, 52);
   // PVRTC4 still needs the minimum 2x2 block grid, so a 4x4 level is 32 bytes.
   assert.equal(parsedV3.mipmaps[0].data.byteLength, 32);

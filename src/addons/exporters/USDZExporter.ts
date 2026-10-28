@@ -4,7 +4,7 @@ import { PropertyBinding } from "../../animation/PropertyBinding";
 import { Camera } from "../../cameras/Camera";
 import { OrthographicCamera } from "../../cameras/OrthographicCamera";
 import { PerspectiveCamera } from "../../cameras/PerspectiveCamera";
-import { DoubleSide, NoColorSpace } from "../../constants";
+import { Side, ColorSpace } from "../../constants";
 import type { BufferGeometry } from "../../core/BufferGeometry";
 import type { Object3D } from "../../core/Object3D";
 import { MeshPhysicalMaterial } from "../../materials/MeshPhysicalMaterial";
@@ -879,7 +879,7 @@ function buildMaterial(material: MeshPhysicalMaterial, textures: Textures, quick
     }
 
     textureNode.addProperty(
-      `token inputs:sourceColorSpace = "${texture.colorSpace === NoColorSpace ? "raw" : "sRGB"}"`,
+      `token inputs:sourceColorSpace = "${texture.colorSpace === ColorSpace.No ? "raw" : "sRGB"}"`,
     );
     textureNode.addProperty(`token inputs:wrapS = "${WRAPPINGS[texture.wrapS]}"`);
     textureNode.addProperty(`token inputs:wrapT = "${WRAPPINGS[texture.wrapT]}"`);
@@ -895,7 +895,7 @@ function buildMaterial(material: MeshPhysicalMaterial, textures: Textures, quick
     return [primvarReaderNode, transform2dNode, textureNode];
   }
 
-  if (material.side === DoubleSide) {
+  if (material.side === Side.Double) {
     console.warn("THREE.USDZExporter: USDZ does not support double sided materials", material);
   }
 

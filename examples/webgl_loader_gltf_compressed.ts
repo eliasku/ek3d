@@ -4,7 +4,7 @@ import { GLTFLoader, type GLTF } from "ek3d/addons/loaders/GLTFLoader";
 import type { MeshoptDecoderLike } from "ek3d/addons/loaders/GLTFLoader";
 import { KTX2Loader } from "ek3d/addons/loaders/KTX2Loader";
 import { FileLoader } from "ek3d/loaders/FileLoader";
-import { ACESFilmicToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
 import { Color } from "ek3d/math/Color";
@@ -71,7 +71,7 @@ function init(): void {
   });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.toneMapping = ACESFilmicToneMapping;
+  renderer.toneMapping = ToneMapping.ACESFilmic;
   renderer.toneMappingExposure = 1;
 
   camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);

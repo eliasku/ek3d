@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { frameCorners } from "ek3d/addons/utils/CameraUtils";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { IcosahedronGeometry } from "ek3d/geometries/IcosahedronGeometry";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { PointLight } from "ek3d/lights/PointLight";
@@ -30,7 +30,7 @@ const renderer = new WebGLRenderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.localClippingEnabled = true;
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 const scene = new Scene();
 const camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 5000);
 camera.position.set(0, 75, 160);

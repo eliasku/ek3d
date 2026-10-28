@@ -5,7 +5,7 @@ import { NumberKeyframeTrack } from "../../animation/tracks/NumberKeyframeTrack"
 import { PropertyBinding } from "../../animation/PropertyBinding";
 import { QuaternionKeyframeTrack } from "../../animation/tracks/QuaternionKeyframeTrack";
 import { VectorKeyframeTrack } from "../../animation/tracks/VectorKeyframeTrack";
-import { InterpolateDiscrete, InterpolateLinear } from "../../constants";
+import { Interpolation } from "../../constants";
 import type { KeyframeTrack } from "../../animation/KeyframeTrack";
 import type { Group } from "../../objects/Group";
 import type { Mesh } from "../../objects/Mesh";
@@ -28,8 +28,8 @@ const KHR_ANIMATION_POINTER = "KHR_animation_pointer";
 // interpolant factory; LINEAR and STEP map to the shared interpolant classes.
 const INTERPOLATION = {
   CUBICSPLINE: undefined,
-  LINEAR: InterpolateLinear,
-  STEP: InterpolateDiscrete,
+  LINEAR: Interpolation.Linear,
+  STEP: Interpolation.Discrete,
 } as const;
 
 const _animationPointerDebug = false;
@@ -448,7 +448,7 @@ export class GLTFAnimationPointerExtension {
         name: string,
         times: NumericAnimationBuffer,
         values: NumericAnimationBuffer,
-        interpolation?: number,
+        interpolation?: Interpolation,
       ) => KeyframeTrack;
 
       let TypedKeyframeTrack: TrackCtor | undefined;
@@ -486,7 +486,7 @@ export class GLTFAnimationPointerExtension {
       const interpolation =
         sampler.interpolation !== undefined
           ? INTERPOLATION[sampler.interpolation as keyof typeof INTERPOLATION]
-          : InterpolateLinear;
+          : Interpolation.Linear;
 
       let outputArray = parser._getArrayFromAccessor(outputAccessor as never) as Float32Array;
 

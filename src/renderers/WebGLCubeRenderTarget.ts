@@ -4,7 +4,7 @@ import type { WebGLRenderer } from "./WebGLRenderer";
 import chunk_begin_vertex from "./shaders/ShaderChunk/begin_vertex.glsl";
 import chunk_project_vertex from "./shaders/ShaderChunk/project_vertex.glsl";
 import chunk_common from "./shaders/ShaderChunk/common.glsl";
-import { BackSide, LinearFilter, LinearMipmapLinearFilter, NoBlending } from "../constants";
+import { Side, TextureFilter, Blending } from "../constants";
 import { Mesh } from "../objects/Mesh";
 import { BoxGeometry } from "../geometries/BoxGeometry";
 import { ShaderMaterial } from "../materials/ShaderMaterial";
@@ -93,14 +93,14 @@ export class WebGLCubeRenderTarget extends WebGLRenderTarget {
       uniforms: cloneUniforms(shader.uniforms),
       vertexShader: shader.vertexShader,
       fragmentShader: shader.fragmentShader,
-      side: BackSide,
-      blending: NoBlending,
+      side: Side.Back,
+      blending: Blending.No,
     });
     material.uniforms.tEquirect.value = texture;
     const mesh = new Mesh(geometry, material) as Mesh & { material: ShaderMaterial };
     const currentMinFilter = texture.minFilter;
     try {
-      if (texture.minFilter === LinearMipmapLinearFilter) texture.minFilter = LinearFilter;
+      if (texture.minFilter === TextureFilter.LinearMipmapLinear) texture.minFilter = TextureFilter.Linear;
       const camera = new CubeCamera(1, 10, this);
       camera.update(renderer, mesh);
     } finally {

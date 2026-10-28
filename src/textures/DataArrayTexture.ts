@@ -1,12 +1,12 @@
 import { Texture } from "./Texture";
-import { ClampToEdgeWrapping, NearestFilter } from "../constants";
+import { Wrapping, TextureFilter } from "../constants";
 /**
  * Creates an array of textures directly from raw buffer data.
  *
  */
 export class DataArrayTexture extends Texture {
   isDataArrayTexture: boolean;
-  wrapR: number;
+  wrapR: Wrapping;
   layerUpdates: Set<number>;
 
   /**
@@ -51,26 +51,26 @@ export class DataArrayTexture extends Texture {
     /**
      * How the texture is sampled when a texel covers more than one pixel.
      *
-     * Overwritten and set to `NearestFilter` by default.
+     * Overwritten and set to `TextureFilter.Nearest` by default.
      *
-     * @default NearestFilter
+     * @default TextureFilter.Nearest
      */
-    this.magFilter = NearestFilter;
+    this.magFilter = TextureFilter.Nearest;
     /**
      * How the texture is sampled when a texel covers less than one pixel.
      *
-     * Overwritten and set to `NearestFilter` by default.
+     * Overwritten and set to `TextureFilter.Nearest` by default.
      *
-     * @default NearestFilter
+     * @default TextureFilter.Nearest
      */
-    this.minFilter = NearestFilter;
+    this.minFilter = TextureFilter.Nearest;
     /**
      * This defines how the texture is wrapped in the depth and corresponds to
      * *W* in UVW mapping.
      *
-     * @default ClampToEdgeWrapping
+     * @default Wrapping.ClampToEdge
      */
-    this.wrapR = ClampToEdgeWrapping;
+    this.wrapR = Wrapping.ClampToEdge;
     /**
      * Whether to generate mipmaps (if possible) for a texture.
      *

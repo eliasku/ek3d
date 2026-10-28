@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { WebGLShadowMap } from "ek3d/renderers/webgl/WebGLShadowMap";
 import { Scene } from "ek3d/scenes/Scene";
@@ -21,7 +22,7 @@ import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
 import { depthShader } from "ek3d/renderers/shaders/DepthShader";
 import { distanceShader } from "ek3d/renderers/shaders/DistanceShader";
-import { DynamicDrawUsage, LinearSRGBColorSpace } from "ek3d/constants";
+import { BufferUsage, ColorSpace } from "ek3d/constants";
 import { configureShadowScene } from "./browser-fixtures";
 
 function check(condition: boolean, message: string) {
@@ -58,8 +59,8 @@ export async function verifyInstancingRendering() {
   place(instances, 1, 1, 0);
   instances.setColorAt(0, tint.setRGB(1, 0, 0));
   instances.setColorAt(1, tint.setRGB(0, 1, 0));
-  instances.instanceMatrix.setUsage(DynamicDrawUsage);
-  instances.instanceColor!.setUsage(DynamicDrawUsage);
+  instances.instanceMatrix.setUsage(BufferUsage.DynamicDraw);
+  instances.instanceColor!.setUsage(BufferUsage.DynamicDraw);
   place(sibling, 0, 0, 1);
   sibling.setColorAt(0, tint.setRGB(1, 1, 0));
 
@@ -107,8 +108,8 @@ void main() { gl_FragColor = vec4(instanceTint, 1.0); }`,
   const materials = [material, custom, receiverMaterial, casterMaterial];
   const readPixels = (width = 64, height = 64) => {
     const pixels = new Uint8Array(width * height * 4);
-    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-    check(gl.getError() === gl.NO_ERROR, "Instancing produced a GL error");
+    gl.readPixels(0, 0, width, height, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+    check(gl.getError() === GL.NO_ERROR, "Instancing produced a GL error");
     return pixels;
   };
   const draw = (...objects: Mesh[]) => {
@@ -130,22 +131,22 @@ void main() { gl_FragColor = vec4(instanceTint, 1.0); }`,
       label,
     );
   const attribute = (name: string) => {
-    const program = gl.getParameter(gl.CURRENT_PROGRAM) as WebGLProgram;
+    const program = gl.getParameter(GL.CURRENT_PROGRAM) as WebGLProgram;
     const location = gl.getAttribLocation(program, name);
     check(location >= 0, `Missing active ${name} attribute`);
-    const buffer = gl.getVertexAttrib(location, gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING) as WebGLBuffer;
+    const buffer = gl.getVertexAttrib(location, GL.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING) as WebGLBuffer;
     check(gl.isBuffer(buffer), `Missing GPU ${name} buffer`);
     return { location, buffer };
   };
   const vao = () => {
-    const handle = gl.getParameter(gl.VERTEX_ARRAY_BINDING) as WebGLVertexArrayObject;
+    const handle = gl.getParameter(GL.VERTEX_ARRAY_BINDING) as WebGLVertexArrayObject;
     check(gl.isVertexArray(handle), "Missing instancing VAO");
     return handle;
   };
   const allocation = (object: Mesh, names: string[]) => {
     draw(object);
     const buffers = names.map((name) => attribute(name).buffer);
-    const index = gl.getParameter(gl.ELEMENT_ARRAY_BUFFER_BINDING) as WebGLBuffer | null;
+    const index = gl.getParameter(GL.ELEMENT_ARRAY_BUFFER_BINDING) as WebGLBuffer | null;
     if (index !== null) {
       check(gl.isBuffer(index), "Missing index buffer");
       buffers.push(index);
@@ -180,7 +181,7 @@ void main() { gl_FragColor = vec4(instanceTint, 1.0); }`,
   try {
     renderer.setPixelRatio(1);
     renderer.setSize(64, 64, false);
-    renderer.outputColorSpace = LinearSRGBColorSpace;
+    renderer.outputColorSpace = ColorSpace.LinearSRGB;
     renderer.setClearColor(0x000000, 1);
     const initial = draw(instances);
     color(initial, 16, 32, [255, 0, 0], "Initial left instance");
@@ -188,9 +189,9 @@ void main() { gl_FragColor = vec4(instanceTint, 1.0); }`,
     check(renderer.info.render.calls === 1 && renderer.info.render.triangles === 4, "Indexed instanced draw count");
     const matrixLocation = attribute("instanceMatrix").location;
     for (let column = 0; column < 4; column++)
-      check(gl.getVertexAttrib(matrixLocation + column, gl.VERTEX_ATTRIB_ARRAY_DIVISOR) === 1, "Matrix column divisor");
+      check(gl.getVertexAttrib(matrixLocation + column, GL.VERTEX_ATTRIB_ARRAY_DIVISOR) === 1, "Matrix column divisor");
     check(
-      gl.getVertexAttrib(attribute("instanceColor").location, gl.VERTEX_ATTRIB_ARRAY_DIVISOR) === 1,
+      gl.getVertexAttrib(attribute("instanceColor").location, GL.VERTEX_ATTRIB_ARRAY_DIVISOR) === 1,
       "Color divisor",
     );
 
@@ -261,7 +262,7 @@ void main() { gl_FragColor = vec4(instanceTint, 1.0); }`,
       ["tint", 1],
     ] as const)
       check(
-        gl.getVertexAttrib(attribute(name).location, gl.VERTEX_ATTRIB_ARRAY_DIVISOR) === divisor,
+        gl.getVertexAttrib(attribute(name).location, GL.VERTEX_ATTRIB_ARRAY_DIVISOR) === divisor,
         `${name} divisor`,
       );
     colors.setXYZ(0, 1, 0, 1);
@@ -435,12 +436,12 @@ void main() { gl_FragColor = vec4(instanceTint, 1.0); }`,
     );
     disposeObjects();
     deleted(restored, "Restored instance/geometry disposal");
-    check(gl.getError() === gl.NO_ERROR, "Context restore followed by instance disposal produced a GL error");
+    check(gl.getError() === GL.NO_ERROR, "Context restore followed by instance disposal produced a GL error");
     const liveAtRendererDisposal = allocations();
     renderer.dispose();
     deleted(liveAtRendererDisposal, "Renderer disposal with live instances and shared geometry");
     const glError = gl.getError();
-    check(glError === gl.NO_ERROR, "Instancing lifecycle produced a GL error");
+    check(glError === GL.NO_ERROR, "Instancing lifecycle produced a GL error");
     return {
       matrixColorUploads: true,
       updateRanges: true,

@@ -1,4 +1,4 @@
-import { HalfFloatType, NearestFilter, NoBlending, RGBADepthPacking } from "../../constants";
+import { TextureType, TextureFilter, Blending, DepthPacking } from "../../constants";
 import { Color } from "../../math/Color";
 import { MeshDepthMaterial } from "../../materials/MeshDepthMaterial";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
@@ -72,9 +72,9 @@ export class BokehPass extends Pass {
 
     this._renderTargetDepth = new WebGLRenderTarget(1, 1, {
       // will be resized later
-      minFilter: NearestFilter,
-      magFilter: NearestFilter,
-      type: HalfFloatType,
+      minFilter: TextureFilter.Nearest,
+      magFilter: TextureFilter.Nearest,
+      type: TextureType.HalfFloat,
     });
 
     this._renderTargetDepth.texture.name = "BokehPass.depth";
@@ -82,8 +82,8 @@ export class BokehPass extends Pass {
     // depth material
 
     this._materialDepth = new MeshDepthMaterial();
-    this._materialDepth.depthPacking = RGBADepthPacking;
-    this._materialDepth.blending = NoBlending;
+    this._materialDepth.depthPacking = DepthPacking.RGBA;
+    this._materialDepth.blending = Blending.No;
 
     // bokeh material
 

@@ -3,14 +3,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import {
-  DepthFormat,
-  DepthStencilFormat,
-  FloatType,
-  NearestFilter,
-  UnsignedIntType,
-  UnsignedShortType,
-} from "ek3d/constants";
+import { PixelFormat, TextureType, TextureFilter } from "ek3d/constants";
 import { Object3D } from "ek3d/core/Object3D";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { TorusKnotGeometry } from "ek3d/geometries/TorusKnotGeometry";
@@ -36,7 +29,7 @@ const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 const stats = new Stats();
 document.body.appendChild(stats.dom);
-const params = { format: DepthFormat, type: UnsignedShortType, samples: 0 };
+const params = { format: PixelFormat.Depth, type: TextureType.UnsignedShort, samples: 0 };
 let target: WebGLRenderTarget;
 function setupRenderTarget(): void {
   if (target) {
@@ -45,10 +38,10 @@ function setupRenderTarget(): void {
   }
   const dpr = renderer.getPixelRatio();
   target = new WebGLRenderTarget(window.innerWidth * dpr, window.innerHeight * dpr);
-  target.texture.minFilter = NearestFilter;
-  target.texture.magFilter = NearestFilter;
+  target.texture.minFilter = TextureFilter.Nearest;
+  target.texture.magFilter = TextureFilter.Nearest;
   target.texture.generateMipmaps = false;
-  target.stencilBuffer = Number(params.format) === DepthStencilFormat;
+  target.stencilBuffer = Number(params.format) === PixelFormat.DepthStencil;
   target.samples = Number(params.samples);
   target.depthTexture = new DepthTexture(1, 1);
   target.depthTexture.format = Number(params.format);
@@ -93,8 +86,16 @@ void main() { float depth = readDepth(tDepth, vUv); gl_FragColor = vec4(1.0 - ve
 const postScene = new Scene();
 postScene.add(new Mesh(new PlaneGeometry(2, 2), postMaterial));
 const gui = new GUI({ width: 300 });
-gui.add(params, "format", { DepthFormat, DepthStencilFormat }).onChange(setupRenderTarget);
-gui.add(params, "type", { UnsignedShortType, UnsignedIntType, FloatType }).onChange(setupRenderTarget);
+gui
+  .add(params, "format", { DepthFormat: PixelFormat.Depth, DepthStencilFormat: PixelFormat.DepthStencil })
+  .onChange(setupRenderTarget);
+gui
+  .add(params, "type", {
+    UnsignedShortType: TextureType.UnsignedShort,
+    UnsignedIntType: TextureType.UnsignedInt,
+    FloatType: TextureType.Float,
+  })
+  .onChange(setupRenderTarget);
 gui.add(params, "samples", 0, 16, 1).onChange(setupRenderTarget);
 gui.open();
 function resize(): void {

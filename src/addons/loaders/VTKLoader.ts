@@ -1,4 +1,4 @@
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import { BufferAttribute, Float32BufferAttribute } from "../../core/BufferAttribute";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { FileLoader } from "../../loaders/FileLoader";
@@ -92,7 +92,7 @@ export class VTKLoader extends Loader<BufferGeometry> {
       else if (section === "NORMALS") normals.push(...values.slice(0, values.length - (values.length % 3)));
       else if (section === "COLOR_SCALARS") {
         for (let i = 0; i + 2 < values.length; i += 3) {
-          color.setRGB(values[i], values[i + 1], values[i + 2], SRGBColorSpace);
+          color.setRGB(values[i], values[i + 1], values[i + 2], ColorSpace.SRGB);
           colors.push(color.r, color.g, color.b);
         }
       } else if (section === "POLYGONS" || section === "TRIANGLE_STRIPS") {
@@ -116,7 +116,7 @@ export class VTKLoader extends Loader<BufferGeometry> {
       if (colors.length === geometry.attributes.position.count) {
         const expanded: number[] = [];
         for (let i = 0; i < colors.length; i += 3) {
-          color.setRGB(colors[i], colors[i + 1], colors[i + 2], SRGBColorSpace);
+          color.setRGB(colors[i], colors[i + 1], colors[i + 2], ColorSpace.SRGB);
           for (let j = 0; j < 3; j++) expanded.push(color.r, color.g, color.b);
         }
         geometry.setAttribute("color", new Float32BufferAttribute(expanded, 3));

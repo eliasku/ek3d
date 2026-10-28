@@ -14,7 +14,7 @@
     "trademarks": "Several other model notices identify trademarks in addition to permissive copyright licenses. Their treatment requires individual review."
   },
   "environment": {
-    "localPath": "examples/public/examples/textures/equirectangular/royal_esplanade_2k.hdr.jpg",
+    "localPath": "public/examples/textures/equirectangular/royal_esplanade_2k.hdr.jpg",
     "upstreamPath": "upstream/three.js/examples/textures/equirectangular/royal_esplanade_2k.hdr.jpg at e06d724a29df5b44c6ad878207974eb09ed7e0d9",
     "source": "https://polyhaven.com/a/royal_esplanade",
     "author": "Greg Zaal",

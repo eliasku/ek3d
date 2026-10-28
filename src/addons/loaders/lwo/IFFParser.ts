@@ -678,7 +678,7 @@ export class IFFParser {
 
   // VEC12 * ( F4 + F4 + F4 ) array of x,y,z vectors
   // Converting from left to right handed coordinate system:
-  // x -> -x and switch material FrontSide -> BackSide
+  // x -> -x and switch material Side.Front -> Side.Back
   parsePoints(length: number) {
     this.currentPoints = [];
     for (let i = 0; i < length / 4; i += 3) {

@@ -1,5 +1,5 @@
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { GLSL3, RedFormat } from "ek3d/constants";
+import { GLSL, PixelFormat } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { ShaderMaterial } from "ek3d/materials/ShaderMaterial";
 import { Vector2 } from "ek3d/math/Vector2";
@@ -64,7 +64,7 @@ const uniforms = {
   depth: { value: 55 },
   size: { value: new Vector2(50, 50) },
 };
-const material = new ShaderMaterial({ uniforms, vertexShader, fragmentShader, glslVersion: GLSL3 });
+const material = new ShaderMaterial({ uniforms, vertexShader, fragmentShader, glslVersion: GLSL.GLSL3 });
 const geometry = new PlaneGeometry(50, 50),
   mesh = new Mesh(geometry, material);
 async function load(): Promise<void> {
@@ -79,7 +79,7 @@ async function load(): Promise<void> {
     if (!data) throw new Error("Missing volume in archive");
     if (disposed) return;
     texture = new DataArrayTexture(data, 256, 256, 109);
-    texture.format = RedFormat;
+    texture.format = PixelFormat.Red;
     texture.needsUpdate = true;
     uniforms.diffuse.value = texture;
     scene.add(mesh);

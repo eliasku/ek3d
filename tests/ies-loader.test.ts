@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "vite-plus/test";
 import { IESLoader } from "../src/addons/loaders/IESLoader";
-import { FloatType, HalfFloatType, UnsignedByteType } from "../src/constants";
+import { TextureType } from "../src/constants";
 import { fromHalfFloat } from "../src/extras/DataUtils";
 
 function profile(horizontal: number[], rows: number[][]): string {
@@ -18,24 +18,31 @@ function profile(horizontal: number[], rows: number[][]): string {
 
 test("IES samples rotationally symmetric profiles and encodes each supported texture type", () => {
   const loader = new IESLoader();
-  for (const type of [FloatType, HalfFloatType, UnsignedByteType]) {
+  for (const type of [TextureType.Float, TextureType.HalfFloat, TextureType.UnsignedByte]) {
     loader.type = type;
     const texture = loader.parse(profile([0], [[10, 0]]));
     assert.equal(texture.image.width, 180);
     assert.equal(texture.image.height, 1);
     const data = texture.image.data!;
-    assert.equal(type === HalfFloatType ? fromHalfFloat(data[0]) : data[0], type === UnsignedByteType ? 255 : 1);
+    assert.equal(
+      type === TextureType.HalfFloat ? fromHalfFloat(data[0]) : data[0],
+      type === TextureType.UnsignedByte ? 255 : 1,
+    );
     assert.equal(data[179], 0);
     const sample =
-      type === HalfFloatType ? fromHalfFloat(data[90]) : type === UnsignedByteType ? data[90] / 255 : data[90];
-    assert.ok(Math.abs(sample - 89 / 179) < (type === UnsignedByteType ? 1 / 255 : 0.001));
+      type === TextureType.HalfFloat
+        ? fromHalfFloat(data[90])
+        : type === TextureType.UnsignedByte
+          ? data[90] / 255
+          : data[90];
+    assert.ok(Math.abs(sample - 89 / 179) < (type === TextureType.UnsignedByte ? 1 / 255 : 0.001));
     texture.dispose();
   }
 });
 
 test("IES mirrors partial horizontal ranges and shifts nonzero starting angles", () => {
   const loader = new IESLoader();
-  loader.type = FloatType;
+  loader.type = TextureType.Float;
   const texture = loader.parse(
     profile(
       [90, 180],
@@ -61,7 +68,7 @@ test("IES mirrors partial horizontal ranges and shifts nonzero starting angles",
 
 test("IES closes asymmetric profiles that omit the final repeated horizontal angle", () => {
   const loader = new IESLoader();
-  loader.type = FloatType;
+  loader.type = TextureType.Float;
   const texture = loader.parse(
     profile(
       [0, 180, 270],
@@ -83,6 +90,7 @@ test("IES rejects missing, truncated and unsupported records instead of hanging"
   assert.throws(() => loader.parse("no photometric data"), /Missing TILT/);
   assert.throws(() => loader.parse("TILT=NONE\n1 2"), /truncated/);
   assert.throws(() => loader.parse("TILT=external.tlt"), /External tilt/);
+  // @ts-expect-error Exercise rejection of an unsupported texture type.
   loader.type = 0;
   assert.throws(() => loader.parse(profile([0], [[1, 0]])), /Unsupported type/);
 });

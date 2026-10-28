@@ -1,3 +1,4 @@
+import { GL } from "../../GL";
 import { Uint16BufferAttribute, Uint32BufferAttribute } from "../../core/BufferAttribute";
 export function WebGLGeometries(gl?: any, attributes?: any, info?: any, bindingStates?: any) {
   const geometries: any = {};
@@ -40,7 +41,7 @@ export function WebGLGeometries(gl?: any, attributes?: any, info?: any, bindingS
     const geometryAttributes = geometry.attributes;
     // Updating index buffer in VAO now. See WebGLBindingStates.
     for (const name in geometryAttributes) {
-      attributes.update(geometryAttributes[name], gl.ARRAY_BUFFER);
+      attributes.update(geometryAttributes[name], GL.ARRAY_BUFFER);
     }
   }
   function updateWireframeAttribute(geometry?: any) {

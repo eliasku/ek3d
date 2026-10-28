@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
@@ -82,7 +82,7 @@ const clippingPlanes = planes.map(() => new Plane());
 const material = new MeshPhongMaterial({
   color: 0xee0a10,
   shininess: 100,
-  side: DoubleSide,
+  side: Side.Double,
   clippingPlanes,
   clipShadows: true,
 });
@@ -106,7 +106,7 @@ planes.forEach((_, i) => {
     planeGeometry,
     new MeshBasicMaterial({
       color: color.setHSL(i / planes.length, 0.5, 0.5).getHex(),
-      side: DoubleSide,
+      side: Side.Double,
       opacity: 0.2,
       transparent: true,
       clippingPlanes: clippingPlanes.filter((_, j) => j !== i),

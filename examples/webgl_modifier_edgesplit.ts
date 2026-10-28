@@ -4,7 +4,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { EdgeSplitModifier } from "ek3d/addons/modifiers/EdgeSplitModifier";
 import { mergeVertices } from "ek3d/addons/utils/BufferGeometryUtils";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import type { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { HemisphereLight } from "ek3d/lights/HemisphereLight";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
@@ -103,7 +103,7 @@ new TextureLoader().load(
       return;
     }
     map = texture;
-    map.colorSpace = SRGBColorSpace;
+    map.colorSpace = ColorSpace.SRGB;
     update();
   },
   undefined,

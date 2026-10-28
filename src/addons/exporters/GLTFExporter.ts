@@ -16,24 +16,7 @@ import type { OrthographicCamera } from "../../cameras/OrthographicCamera";
 import type { PerspectiveCamera } from "../../cameras/PerspectiveCamera";
 import { BufferAttribute } from "../../core/BufferAttribute";
 import type { InterleavedBufferAttribute } from "../../core/InterleavedBufferAttribute";
-import {
-  ClampToEdgeWrapping,
-  DoubleSide,
-  InterpolateDiscrete,
-  InterpolateLinear,
-  NoColorSpace,
-  LinearFilter,
-  LinearMipmapLinearFilter,
-  LinearMipmapNearestFilter,
-  MirroredRepeatWrapping,
-  NearestFilter,
-  NearestMipmapLinearFilter,
-  NearestMipmapNearestFilter,
-  RGBAFormat,
-  RepeatWrapping,
-  SRGBColorSpace,
-  REVISION,
-} from "../../constants";
+import { Wrapping, Side, Interpolation, ColorSpace, TextureFilter, PixelFormat, REVISION } from "../../constants";
 import { Color } from "../../math/Color";
 import * as MathUtils from "../../math/MathUtils";
 import { Matrix4 } from "../../math/Matrix4";
@@ -48,6 +31,7 @@ import { TextureSource } from "../../textures/TextureSource";
 import { CompressedTexture } from "../../textures/CompressedTexture";
 import { Scene } from "../../scenes/Scene";
 import { ImageUtils } from "../../extras/ImageUtils";
+import { GL } from "../../GL";
 
 export interface GLTFWriterOptions {
   binary?: boolean;
@@ -90,52 +74,21 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
   TANGENT: ["byte normalized", "short normalized"],
   TEXCOORD: ["byte", "byte normalized", "unsigned byte", "short", "short normalized", "unsigned short"],
 };
-const WEBGL_CONSTANTS = {
-  POINTS: 0x0000,
-  LINES: 0x0001,
-  LINE_LOOP: 0x0002,
-  LINE_STRIP: 0x0003,
-  TRIANGLES: 0x0004,
-  TRIANGLE_STRIP: 0x0005,
-  TRIANGLE_FAN: 0x0006,
-
-  BYTE: 0x1400,
-  UNSIGNED_BYTE: 0x1401,
-  SHORT: 0x1402,
-  UNSIGNED_SHORT: 0x1403,
-  INT: 0x1404,
-  UNSIGNED_INT: 0x1405,
-  FLOAT: 0x1406,
-
-  ARRAY_BUFFER: 0x8892,
-  ELEMENT_ARRAY_BUFFER: 0x8893,
-
-  NEAREST: 0x2600,
-  LINEAR: 0x2601,
-  NEAREST_MIPMAP_NEAREST: 0x2700,
-  LINEAR_MIPMAP_NEAREST: 0x2701,
-  NEAREST_MIPMAP_LINEAR: 0x2702,
-  LINEAR_MIPMAP_LINEAR: 0x2703,
-
-  CLAMP_TO_EDGE: 33071,
-  MIRRORED_REPEAT: 33648,
-  REPEAT: 10497,
-};
 
 const KHR_MESH_QUANTIZATION = "KHR_mesh_quantization";
 
 const THREE_TO_WEBGL: Record<number, number> = {};
 
-THREE_TO_WEBGL[NearestFilter] = WEBGL_CONSTANTS.NEAREST;
-THREE_TO_WEBGL[NearestMipmapNearestFilter] = WEBGL_CONSTANTS.NEAREST_MIPMAP_NEAREST;
-THREE_TO_WEBGL[NearestMipmapLinearFilter] = WEBGL_CONSTANTS.NEAREST_MIPMAP_LINEAR;
-THREE_TO_WEBGL[LinearFilter] = WEBGL_CONSTANTS.LINEAR;
-THREE_TO_WEBGL[LinearMipmapNearestFilter] = WEBGL_CONSTANTS.LINEAR_MIPMAP_NEAREST;
-THREE_TO_WEBGL[LinearMipmapLinearFilter] = WEBGL_CONSTANTS.LINEAR_MIPMAP_LINEAR;
+THREE_TO_WEBGL[TextureFilter.Nearest] = GL.NEAREST;
+THREE_TO_WEBGL[TextureFilter.NearestMipmapNearest] = GL.NEAREST_MIPMAP_NEAREST;
+THREE_TO_WEBGL[TextureFilter.NearestMipmapLinear] = GL.NEAREST_MIPMAP_LINEAR;
+THREE_TO_WEBGL[TextureFilter.Linear] = GL.LINEAR;
+THREE_TO_WEBGL[TextureFilter.LinearMipmapNearest] = GL.LINEAR_MIPMAP_NEAREST;
+THREE_TO_WEBGL[TextureFilter.LinearMipmapLinear] = GL.LINEAR_MIPMAP_LINEAR;
 
-THREE_TO_WEBGL[ClampToEdgeWrapping] = WEBGL_CONSTANTS.CLAMP_TO_EDGE;
-THREE_TO_WEBGL[RepeatWrapping] = WEBGL_CONSTANTS.REPEAT;
-THREE_TO_WEBGL[MirroredRepeatWrapping] = WEBGL_CONSTANTS.MIRRORED_REPEAT;
+THREE_TO_WEBGL[Wrapping.ClampToEdge] = GL.CLAMP_TO_EDGE;
+THREE_TO_WEBGL[Wrapping.Repeat] = GL.REPEAT;
+THREE_TO_WEBGL[Wrapping.MirroredRepeat] = GL.MIRRORED_REPEAT;
 
 const PATH_PROPERTIES: Record<string, string> = {
   scale: "scale",
@@ -266,7 +219,7 @@ export interface GLTFDocument {
   bufferViews?: GLTFBufferViewDef[];
   accessors?: GLTFAccessorDef[];
   images?: GLTFImageDef[];
-  samplers?: { magFilter: number; minFilter: number; wrapS: number; wrapT: number }[];
+  samplers?: { magFilter: TextureFilter; minFilter: TextureFilter; wrapS: Wrapping; wrapT: Wrapping }[];
   textures?: GLTFTextureDef[];
   materials?: GLTFMaterialDef[];
   meshes?: GLTFMeshDef[];
@@ -544,7 +497,7 @@ export class GLTFWriter {
   async buildMetalRoughTextureAsync(metalnessMap: Texture | null, roughnessMap: Texture | null): Promise<Texture> {
     if (metalnessMap && metalnessMap === roughnessMap) return metalnessMap;
     const conversion = (map: Texture) =>
-      map.colorSpace === SRGBColorSpace
+      map.colorSpace === ColorSpace.SRGB
         ? (c: number) => (c < 0.04045 ? c * 0.0773993808 : Math.pow(c * 0.9478672986 + 0.0521327014, 2.4))
         : (c: number) => c;
     if (metalnessMap instanceof CompressedTexture) metalnessMap = await this.decompressTextureAsync(metalnessMap);
@@ -581,7 +534,7 @@ export class GLTFWriter {
     context.putImageData(composite, 0, 0);
     const texture = reference.clone();
     texture.source = new TextureSource(canvas);
-    texture.colorSpace = NoColorSpace;
+    texture.colorSpace = ColorSpace.No;
     texture.channel = reference.channel;
     if (metalnessMap && roughnessMap && metalnessMap.channel !== roughnessMap.channel) {
       console.warn("THREE.GLTFExporter: UV channels for metalnessMap and roughnessMap textures must match.");
@@ -654,14 +607,14 @@ export class GLTFWriter {
     let componentSize;
 
     switch (componentType) {
-      case WEBGL_CONSTANTS.BYTE:
-      case WEBGL_CONSTANTS.UNSIGNED_BYTE:
+      case GL.BYTE:
+      case GL.UNSIGNED_BYTE:
         componentSize = 1;
 
         break;
 
-      case WEBGL_CONSTANTS.SHORT:
-      case WEBGL_CONSTANTS.UNSIGNED_SHORT:
+      case GL.SHORT:
+      case GL.UNSIGNED_SHORT:
         componentSize = 2;
 
         break;
@@ -672,7 +625,7 @@ export class GLTFWriter {
 
     let byteStride = attribute.itemSize * componentSize;
 
-    if (target === WEBGL_CONSTANTS.ARRAY_BUFFER) {
+    if (target === GL.ARRAY_BUFFER) {
       // Each element of a vertex attribute MUST be aligned to 4-byte boundaries
       // inside a bufferView
       byteStride = Math.ceil(byteStride / 4) * 4;
@@ -701,19 +654,19 @@ export class GLTFWriter {
           }
         }
 
-        if (componentType === WEBGL_CONSTANTS.FLOAT) {
+        if (componentType === GL.FLOAT) {
           dataView.setFloat32(offset, value, true);
-        } else if (componentType === WEBGL_CONSTANTS.INT) {
+        } else if (componentType === GL.INT) {
           dataView.setInt32(offset, value, true);
-        } else if (componentType === WEBGL_CONSTANTS.UNSIGNED_INT) {
+        } else if (componentType === GL.UNSIGNED_INT) {
           dataView.setUint32(offset, value, true);
-        } else if (componentType === WEBGL_CONSTANTS.SHORT) {
+        } else if (componentType === GL.SHORT) {
           dataView.setInt16(offset, value, true);
-        } else if (componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT) {
+        } else if (componentType === GL.UNSIGNED_SHORT) {
           dataView.setUint16(offset, value, true);
-        } else if (componentType === WEBGL_CONSTANTS.BYTE) {
+        } else if (componentType === GL.BYTE) {
           dataView.setInt8(offset, value);
-        } else if (componentType === WEBGL_CONSTANTS.UNSIGNED_BYTE) {
+        } else if (componentType === GL.UNSIGNED_BYTE) {
           dataView.setUint8(offset, value);
         }
 
@@ -733,7 +686,7 @@ export class GLTFWriter {
 
     if (target !== undefined) bufferViewDef.target = target;
 
-    if (target === WEBGL_CONSTANTS.ARRAY_BUFFER) {
+    if (target === GL.ARRAY_BUFFER) {
       // Only define byteStride for vertex attributes.
       bufferViewDef.byteStride = byteStride;
     }
@@ -794,19 +747,19 @@ export class GLTFWriter {
 
     // Detect the component type of the attribute array
     if (attribute.array.constructor === Float32Array) {
-      componentType = WEBGL_CONSTANTS.FLOAT;
+      componentType = GL.FLOAT;
     } else if (attribute.array.constructor === Int32Array) {
-      componentType = WEBGL_CONSTANTS.INT;
+      componentType = GL.INT;
     } else if (attribute.array.constructor === Uint32Array) {
-      componentType = WEBGL_CONSTANTS.UNSIGNED_INT;
+      componentType = GL.UNSIGNED_INT;
     } else if (attribute.array.constructor === Int16Array) {
-      componentType = WEBGL_CONSTANTS.SHORT;
+      componentType = GL.SHORT;
     } else if (attribute.array.constructor === Uint16Array) {
-      componentType = WEBGL_CONSTANTS.UNSIGNED_SHORT;
+      componentType = GL.UNSIGNED_SHORT;
     } else if (attribute.array.constructor === Int8Array) {
-      componentType = WEBGL_CONSTANTS.BYTE;
+      componentType = GL.BYTE;
     } else if (attribute.array.constructor === Uint8Array) {
-      componentType = WEBGL_CONSTANTS.UNSIGNED_BYTE;
+      componentType = GL.UNSIGNED_BYTE;
     } else {
       throw new Error(
         "THREE.GLTFExporter: Unsupported bufferAttribute component type: " + attribute.array.constructor.name,
@@ -825,8 +778,7 @@ export class GLTFWriter {
     // If geometry isn't provided, don't infer the target usage of the bufferView. For
     // animation samplers, target must not be set.
     if (geometry !== undefined) {
-      bufferViewTarget =
-        attribute === geometry.index ? WEBGL_CONSTANTS.ELEMENT_ARRAY_BUFFER : WEBGL_CONSTANTS.ARRAY_BUFFER;
+      bufferViewTarget = attribute === geometry.index ? GL.ELEMENT_ARRAY_BUFFER : GL.ARRAY_BUFFER;
     }
 
     const bufferView = this.processBufferView(attribute, componentType, start, count, bufferViewTarget);
@@ -850,7 +802,7 @@ export class GLTFWriter {
   /**
    * Process image
    * @param image Image to process.
-   * @param format Identifier of the format (RGBAFormat).
+   * @param format Identifier of the format (PixelFormat.RGBA).
    * @param flipY Whether to flip the image before writing.
    * @param mimeType Export format.
    * @returns Index of the processed image.
@@ -891,7 +843,7 @@ export class GLTFWriter {
       if ("data" in image && image.data !== undefined) {
         // THREE.DataTexture
 
-        if (format !== RGBAFormat) {
+        if (format !== PixelFormat.RGBA) {
           console.error("GLTFExporter: Only RGBAFormat is supported.", format);
         }
 
@@ -1171,7 +1123,7 @@ export class GLTFWriter {
     }
 
     // doubleSided
-    if (material.side === DoubleSide) materialDef.doubleSided = true;
+    if (material.side === Side.Double) materialDef.doubleSided = true;
     if (material.name !== "") materialDef.name = material.name;
 
     this.serializeUserData(material, materialDef);
@@ -1212,17 +1164,15 @@ export class GLTFWriter {
 
     // Use the correct mode
     if (mesh.isLineSegments) {
-      mode = WEBGL_CONSTANTS.LINES;
+      mode = GL.LINES;
     } else if (mesh.isLineLoop) {
-      mode = WEBGL_CONSTANTS.LINE_LOOP;
+      mode = GL.LINE_LOOP;
     } else if (mesh.isLine) {
-      mode = WEBGL_CONSTANTS.LINE_STRIP;
+      mode = GL.LINE_STRIP;
     } else if (mesh.isPoints) {
-      mode = WEBGL_CONSTANTS.POINTS;
+      mode = GL.POINTS;
     } else {
-      mode = (mesh.material as Material & { wireframe?: boolean }).wireframe
-        ? WEBGL_CONSTANTS.LINES
-        : WEBGL_CONSTANTS.TRIANGLES;
+      mode = (mesh.material as Material & { wireframe?: boolean }).wireframe ? GL.LINES : GL.TRIANGLES;
     }
 
     const meshDef: GLTFMeshDef = {};
@@ -1584,7 +1534,7 @@ export class GLTFWriter {
       if (track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline === true) {
         interpolation = "CUBICSPLINE";
         outputItemSize /= 3;
-      } else if (track.getInterpolation() === InterpolateDiscrete) {
+      } else if (track.getInterpolation() === Interpolation.Discrete) {
         interpolation = "STEP";
       } else {
         interpolation = "LINEAR";
@@ -2702,7 +2652,7 @@ export const GLTFExporterUtils = {
         console.warn("THREE.GLTFExporter: Morph target interpolation mode not yet supported. Using LINEAR instead.");
 
         sourceTrack = sourceTrack.clone();
-        sourceTrack.setInterpolation(InterpolateLinear);
+        sourceTrack.setInterpolation(Interpolation.Linear);
       }
 
       const targetCount = sourceTrackNode.morphTargetInfluences!.length;

@@ -4,7 +4,7 @@ import type { Object3D } from "../core/Object3D";
 import type { Sphere } from "./Sphere";
 import type { Sprite } from "../objects/Sprite";
 import type { Vector3 } from "./Vector3";
-import { WebGLCoordinateSystem } from "../constants";
+import { CoordinateSystem } from "../constants";
 import { Frustum } from "./Frustum";
 import { Matrix4 } from "./Matrix4";
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
@@ -13,7 +13,7 @@ const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
  * from an array of cameras. This is particularly useful for multi-view renderers.
  */
 export class FrustumArray {
-  coordinateSystem: number;
+  coordinateSystem: CoordinateSystem;
   _frustums: Frustum[];
   _count: number;
 
@@ -25,9 +25,9 @@ export class FrustumArray {
     /**
      * The coordinate system to use.
      *
-     * @default WebGLCoordinateSystem
+     * @default CoordinateSystem.WebGL
      */
-    this.coordinateSystem = WebGLCoordinateSystem;
+    this.coordinateSystem = CoordinateSystem.WebGL;
     /**
      * A pool of frustum instances. It may hold more entries than are
      * currently in use; surplus instances are kept for reuse to avoid

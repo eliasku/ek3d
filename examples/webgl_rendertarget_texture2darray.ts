@@ -2,7 +2,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { WebGLArrayRenderTarget } from "ek3d/renderers/WebGLArrayRenderTarget";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { RedFormat } from "ek3d/constants";
+import { PixelFormat } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { ShaderMaterial } from "ek3d/materials/ShaderMaterial";
 import { Vector2 } from "ek3d/math/Vector2";
@@ -85,7 +85,7 @@ renderer.setSize(innerWidth, innerHeight);
 const stats = new Stats();
 document.body.appendChild(stats.dom);
 const renderTarget = new WebGLArrayRenderTarget(256, 256, 109);
-renderTarget.texture.format = RedFormat;
+renderTarget.texture.format = PixelFormat.Red;
 const postScene = new Scene(),
   postCamera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
 const postUniforms = {
@@ -130,7 +130,7 @@ async function load(): Promise<void> {
     if (!data) throw new Error("Missing volume in archive");
     if (disposed) return;
     texture = new DataArrayTexture(data, 256, 256, 109);
-    texture.format = RedFormat;
+    texture.format = PixelFormat.Red;
     texture.needsUpdate = true;
     postUniforms.uTexture.value = texture;
     uniforms.diffuse.value = renderTarget.texture;

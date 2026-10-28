@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide, RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Side, Wrapping, ColorSpace } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
@@ -301,9 +301,9 @@ export function startSoftBodyDemo(kind: "cloth" | "rope"): void {
             texture.dispose();
             return;
           }
-          texture.colorSpace = SRGBColorSpace;
-          texture.wrapS = RepeatWrapping;
-          texture.wrapT = RepeatWrapping;
+          texture.colorSpace = ColorSpace.SRGB;
+          texture.wrapS = Wrapping.Repeat;
+          texture.wrapT = Wrapping.Repeat;
           texture.repeat.set(x, y);
           material.map = texture;
           material.needsUpdate = true;
@@ -352,7 +352,7 @@ export function startSoftBodyDemo(kind: "cloth" | "rope"): void {
       plane.rotateY(Math.PI / 2);
       plane.translate(-3, 4.5, 0);
       geometry = plane;
-      const material = new MeshLambertMaterial({ color: 0xffffff, side: DoubleSide });
+      const material = new MeshLambertMaterial({ color: 0xffffff, side: Side.Double });
       const cloth = new Mesh(plane, material);
       cloth.castShadow = true;
       cloth.receiveShadow = true;

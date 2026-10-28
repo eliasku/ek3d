@@ -1,5 +1,5 @@
 import { PVRLoader } from "ek3d/addons/loaders/PVRLoader";
-import { CubeReflectionMapping, DoubleSide, LinearFilter, SRGBColorSpace } from "ek3d/constants";
+import { Mapping, Side, TextureFilter, ColorSpace } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { TorusGeometry } from "ek3d/geometries/TorusGeometry";
@@ -78,10 +78,10 @@ function loadTexture(url: string, configure?: (texture: CompressedTexture) => vo
 function loadCube(url: string, assign: (texture: CompressedTexture) => void): void {
   if (!pvrtc) return;
   loadTexture(url, (texture) => {
-    texture.magFilter = LinearFilter;
-    texture.minFilter = LinearFilter;
-    texture.mapping = CubeReflectionMapping;
-    texture.colorSpace = SRGBColorSpace;
+    texture.magFilter = TextureFilter.Linear;
+    texture.minFilter = TextureFilter.Linear;
+    texture.mapping = Mapping.CubeReflection;
+    texture.colorSpace = ColorSpace.SRGB;
     assign(texture);
   });
 }
@@ -97,8 +97,8 @@ if (pvrtc) {
   // Levels without mipmaps cannot use a mipmap filter.
   for (const texture of [disturb_2bpp_rgb, disturb_4bpp_rgb, disturb_4bpp_rgb_v3, flare_4bpp_rgba, flare_2bpp_rgba]) {
     if (!texture) continue;
-    texture.minFilter = texture.magFilter = LinearFilter;
-    texture.colorSpace = SRGBColorSpace;
+    texture.minFilter = texture.magFilter = TextureFilter.Linear;
+    texture.colorSpace = ColorSpace.SRGB;
   }
 
   const material1 = new MeshBasicMaterial({ map: disturb_4bpp_rgb });
@@ -106,13 +106,13 @@ if (pvrtc) {
   const material3 = new MeshBasicMaterial({ map: disturb_2bpp_rgb });
   const material4 = new MeshBasicMaterial({
     map: flare_4bpp_rgba,
-    side: DoubleSide,
+    side: Side.Double,
     depthTest: false,
     transparent: true,
   });
   const material5 = new MeshBasicMaterial({
     map: flare_2bpp_rgba,
-    side: DoubleSide,
+    side: Side.Double,
     depthTest: false,
     transparent: true,
   });

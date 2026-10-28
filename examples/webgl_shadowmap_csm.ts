@@ -4,7 +4,7 @@ import { CSMHelper } from "ek3d/addons/csm/CSMHelper";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { PCFShadowMap } from "ek3d/constants";
+import { ShadowMap } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
@@ -44,7 +44,7 @@ const renderer = new WebGLRenderer({
 });
 const shadowMap = renderer.shadowMap!;
 shadowMap.enabled = true;
-shadowMap.type = PCFShadowMap;
+shadowMap.type = ShadowMap.PCF;
 renderer.setPixelRatio(devicePixelRatio);
 const controls = new OrbitControls(camera, canvas);
 controls.maxPolarAngle = Math.PI / 2;

@@ -1,4 +1,4 @@
-import { AdditiveBlending, DoubleSide, HalfFloatType, NoBlending, RGBADepthPacking } from "../../constants";
+import { Blending, Side, TextureType, DepthPacking } from "../../constants";
 import { Color } from "../../math/Color";
 import { Matrix4 } from "../../math/Matrix4";
 import { Vector2 } from "../../math/Vector2";
@@ -197,44 +197,52 @@ export class OutlinePass extends Pass {
     this.renderTargetMaskBuffer.texture.generateMipmaps = false;
 
     this.depthMaterial = new MeshDepthMaterial();
-    this.depthMaterial.side = DoubleSide;
-    this.depthMaterial.depthPacking = RGBADepthPacking;
-    this.depthMaterial.blending = NoBlending;
+    this.depthMaterial.side = Side.Double;
+    this.depthMaterial.depthPacking = DepthPacking.RGBA;
+    this.depthMaterial.blending = Blending.No;
 
     this.prepareMaskMaterial = this._getPrepareMaskMaterial();
-    this.prepareMaskMaterial.side = DoubleSide;
+    this.prepareMaskMaterial.side = Side.Double;
     this.prepareMaskMaterial.fragmentShader = replaceDepthToViewZ(
       this.prepareMaskMaterial.fragmentShader,
       this.renderCamera,
     );
 
-    this.renderTargetDepthBuffer = new WebGLRenderTarget(this.resolution.x, this.resolution.y, { type: HalfFloatType });
+    this.renderTargetDepthBuffer = new WebGLRenderTarget(this.resolution.x, this.resolution.y, {
+      type: TextureType.HalfFloat,
+    });
     this.renderTargetDepthBuffer.texture.name = "OutlinePass.depth";
     this.renderTargetDepthBuffer.texture.generateMipmaps = false;
 
     this.renderTargetMaskDownSampleBuffer = new WebGLRenderTarget(resx, resy, {
-      type: HalfFloatType,
+      type: TextureType.HalfFloat,
       depthBuffer: false,
     });
     this.renderTargetMaskDownSampleBuffer.texture.name = "OutlinePass.depthDownSample";
     this.renderTargetMaskDownSampleBuffer.texture.generateMipmaps = false;
 
-    this.renderTargetBlurBuffer1 = new WebGLRenderTarget(resx, resy, { type: HalfFloatType, depthBuffer: false });
+    this.renderTargetBlurBuffer1 = new WebGLRenderTarget(resx, resy, {
+      type: TextureType.HalfFloat,
+      depthBuffer: false,
+    });
     this.renderTargetBlurBuffer1.texture.name = "OutlinePass.blur1";
     this.renderTargetBlurBuffer1.texture.generateMipmaps = false;
     this.renderTargetBlurBuffer2 = new WebGLRenderTarget(Math.round(resx / 2), Math.round(resy / 2), {
-      type: HalfFloatType,
+      type: TextureType.HalfFloat,
       depthBuffer: false,
     });
     this.renderTargetBlurBuffer2.texture.name = "OutlinePass.blur2";
     this.renderTargetBlurBuffer2.texture.generateMipmaps = false;
 
     this.edgeDetectionMaterial = this._getEdgeDetectionMaterial();
-    this.renderTargetEdgeBuffer1 = new WebGLRenderTarget(resx, resy, { type: HalfFloatType, depthBuffer: false });
+    this.renderTargetEdgeBuffer1 = new WebGLRenderTarget(resx, resy, {
+      type: TextureType.HalfFloat,
+      depthBuffer: false,
+    });
     this.renderTargetEdgeBuffer1.texture.name = "OutlinePass.edge1";
     this.renderTargetEdgeBuffer1.texture.generateMipmaps = false;
     this.renderTargetEdgeBuffer2 = new WebGLRenderTarget(Math.round(resx / 2), Math.round(resy / 2), {
-      type: HalfFloatType,
+      type: TextureType.HalfFloat,
       depthBuffer: false,
     });
     this.renderTargetEdgeBuffer2.texture.name = "OutlinePass.edge2";
@@ -263,7 +271,7 @@ export class OutlinePass extends Pass {
       uniforms: this.copyUniforms,
       vertexShader: copyShader.vertexShader,
       fragmentShader: copyShader.fragmentShader,
-      blending: NoBlending,
+      blending: Blending.No,
       depthTest: false,
       depthWrite: false,
     } as never);
@@ -747,7 +755,7 @@ export class OutlinePass extends Pass {
 						finalColor += + visibilityFactor * (1.0 - maskColor.r) * (1.0 - patternColor.r);
 					gl_FragColor = finalColor;
 				}`,
-      blending: AdditiveBlending,
+      blending: Blending.Additive,
       depthTest: false,
       depthWrite: false,
       transparent: true,

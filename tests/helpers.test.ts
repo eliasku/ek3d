@@ -228,6 +228,7 @@ test("camera helper follows perspective/orthographic projection, reversed depth 
       parity(actual, expected);
     }
     camera._reversedDepth = false;
+    // @ts-expect-error Exercise rejection of an invalid coordinate system.
     camera.coordinateSystem = -1;
     assert.throws(() => actual.update(), /Invalid coordinate system/);
     assert.throws(() => expected.update(), /Invalid coordinate system/);

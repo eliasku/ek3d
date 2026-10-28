@@ -1,13 +1,13 @@
-import { ClampToEdgeWrapping, FloatType, LinearFilter, RGBAFormat, UnsignedByteType } from "../../constants";
+import { Wrapping, TextureType, TextureFilter, PixelFormat } from "../../constants";
 import { FileLoader } from "../../loaders/FileLoader";
 import { Loader } from "../../loaders/Loader";
 import { Data3DTexture } from "../../textures/Data3DTexture";
 
 /** Loads Autodesk 3DL color lookup tables. */
 export class LUT3dlLoader extends Loader<{ size: number; texture3D: Data3DTexture }> {
-  type: typeof UnsignedByteType | typeof FloatType = UnsignedByteType;
+  type: TextureType.UnsignedByte | TextureType.Float = TextureType.UnsignedByte;
 
-  setType(type: typeof UnsignedByteType | typeof FloatType): this {
+  setType(type: TextureType.UnsignedByte | TextureType.Float): this {
     this.type = type;
     return this;
   }
@@ -73,8 +73,8 @@ export class LUT3dlLoader extends Loader<{ size: number; texture3D: Data3DTextur
       index++;
     }
     const maxBitValue = 2 ** Math.max(0, Math.ceil(Math.log2(max)));
-    const data = this.type === UnsignedByteType ? new Uint8Array(floats.length) : floats;
-    const scale = this.type === UnsignedByteType ? 255 : 1;
+    const data = this.type === TextureType.UnsignedByte ? new Uint8Array(floats.length) : floats;
+    const scale = this.type === TextureType.UnsignedByte ? 255 : 1;
     for (let i = 0; i < data.length; i += 4) {
       data[i] = (floats[i] / maxBitValue) * scale;
       data[i + 1] = (floats[i + 1] / maxBitValue) * scale;
@@ -82,10 +82,10 @@ export class LUT3dlLoader extends Loader<{ size: number; texture3D: Data3DTextur
       data[i + 3] = scale;
     }
     const texture3D = new Data3DTexture(data, size, size, size);
-    texture3D.format = RGBAFormat;
+    texture3D.format = PixelFormat.RGBA;
     texture3D.type = this.type;
-    texture3D.magFilter = texture3D.minFilter = LinearFilter;
-    texture3D.wrapS = texture3D.wrapT = texture3D.wrapR = ClampToEdgeWrapping;
+    texture3D.magFilter = texture3D.minFilter = TextureFilter.Linear;
+    texture3D.wrapS = texture3D.wrapT = texture3D.wrapR = Wrapping.ClampToEdge;
     texture3D.generateMipmaps = false;
     texture3D.needsUpdate = true;
     return { size, texture3D };

@@ -1,5 +1,5 @@
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import type { Object3D } from "ek3d/core/Object3D";
 import { Raycaster } from "ek3d/core/Raycaster";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
@@ -54,7 +54,7 @@ const map = new TextureLoader().load(
     console.error(error);
   },
 );
-map.colorSpace = SRGBColorSpace;
+map.colorSpace = ColorSpace.SRGB;
 const cubeGeo = new BoxGeometry(50, 50, 50);
 const cubeMaterial = new MeshLambertMaterial({ color: 0xfeb74c, map });
 scene.add(new GridHelper(1000, 20));

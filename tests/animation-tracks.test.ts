@@ -18,13 +18,7 @@ import {
   makeClipAdditive,
 } from "../src/animation/AnimationUtils";
 import { Interpolant } from "../src/math/Interpolant";
-import {
-  InterpolateDiscrete,
-  InterpolateLinear,
-  InterpolateSmooth,
-  InterpolateBezier,
-  AdditiveAnimationBlendMode,
-} from "../src/constants";
+import { Interpolation, AnimationBlendMode } from "../src/constants";
 import { AnimationClip as UpstreamClip } from "../upstream/three.js/src/animation/AnimationClip.js";
 import { NumberKeyframeTrack as UpstreamNumber } from "../upstream/three.js/src/animation/tracks/NumberKeyframeTrack.js";
 import { VectorKeyframeTrack as UpstreamVector } from "../upstream/three.js/src/animation/tracks/VectorKeyframeTrack.js";
@@ -74,7 +68,7 @@ test("every track family preserves interpolation and non-monotonic boundary samp
       new UpstreamString(".name", [0, 1, 2], ["first", "second", "last"]) as unknown as KeyframeTrack,
     ],
   ];
-  for (const interpolation of [InterpolateDiscrete, InterpolateLinear, InterpolateSmooth]) {
+  for (const interpolation of [Interpolation.Discrete, Interpolation.Linear, Interpolation.Smooth]) {
     tracks.push([
       new NumberKeyframeTrack(".position[x]", [0, 1, 2], [1, 4, 2], interpolation),
       new UpstreamNumber(".position[x]", [0, 1, 2], [1, 4, 2], interpolation) as unknown as KeyframeTrack,
@@ -97,12 +91,12 @@ test("every track family preserves interpolation and non-monotonic boundary samp
 test("track defaults remain inherited and writable without hiding prototype factories", () => {
   class CustomTrack extends NumberKeyframeTrack {}
   CustomTrack.prototype.ValueBufferType = Float64Array;
-  CustomTrack.prototype.DefaultInterpolation = InterpolateDiscrete;
+  CustomTrack.prototype.DefaultInterpolation = Interpolation.Discrete;
   const settings = { inTangents: [0, 2, 1, 4], outTangents: [0, 2, 1, 4] };
   CustomTrack.prototype.settings = settings;
   const track = new CustomTrack(".position[x]", [0, 1], [2, 4]);
   assert.ok(track.values instanceof Float64Array);
-  assert.equal(track.getInterpolation(), InterpolateDiscrete);
+  assert.equal(track.getInterpolation(), Interpolation.Discrete);
   assert.equal(Object.hasOwn(track, "ValueBufferType"), false);
   assert.equal(track.settings, settings);
   assert.equal(Object.hasOwn(track, "settings"), false);
@@ -164,7 +158,7 @@ test("Bezier tangent interpolation, time transforms, cloning and serialization m
         type: "number",
         times: [0, 1, 2],
         values: [0, 2, 1],
-        interpolation: InterpolateBezier,
+        interpolation: Interpolation.Bezier,
         settings: { inTangents: [0, 0, 0.7, 2, 1.6, 1], outTangents: [0.3, 0, 1.4, 2, 2, 1] },
       },
     ],
@@ -205,7 +199,8 @@ test("track validation, trimming, optimization and one-key tracks retain upstrea
     try {
       assert.equal(new Track(".x", [1, 0], [1, 2]).validate(), false);
       assert.equal(new Track(".x", [0, 1], [1, NaN]).validate(), false);
-      assert.equal(new Track(".x", [0, 1], [1, 2]).setInterpolation(-1).getInterpolation(), InterpolateLinear);
+      // @ts-expect-error Exercise rejection of an invalid interpolation value.
+      assert.equal(new Track(".x", [0, 1], [1, 2]).setInterpolation(-1).getInterpolation(), Interpolation.Linear);
     } finally {
       warn.mockRestore();
       error.mockRestore();
@@ -300,7 +295,7 @@ test("subclip, additive conversion and morph sequence creation match upstream wi
   for (const frame of [-1, 15, 120]) {
     const actual = makeClipAdditive(clip.clone(), frame, clip);
     const expected = upstreamMakeAdditive(clip.clone(), frame, clip);
-    assert.equal(actual.blendMode, AdditiveAnimationBlendMode);
+    assert.equal(actual.blendMode, AnimationBlendMode.Additive);
     assert.deepEqual(data(actual), data(expected));
     assert.deepEqual(Array.from(actual.tracks[2].values), [true, false]);
   }

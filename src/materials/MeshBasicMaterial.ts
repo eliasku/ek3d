@@ -1,6 +1,6 @@
 import type { Texture } from "../textures/Texture";
 import { Material } from "./Material";
-import { MultiplyOperation } from "../constants";
+import { Combine } from "../constants";
 import { Color } from "../math/Color";
 import { Euler } from "../math/Euler";
 
@@ -27,7 +27,7 @@ export class MeshBasicMaterial extends Material {
   specularMap: Texture | null;
   alphaMap: Texture | null;
   envMap: Texture | null;
-  combine: number;
+  combine: Combine;
   reflectivity: number;
   refractionRatio: number;
   wireframe: boolean;
@@ -68,7 +68,7 @@ export class MeshBasicMaterial extends Material {
      *
      * `map` represents color data, and the texture must be assigned a
      * {@link Texture#colorSpace}. Most `map` textures set
-     * `texture.colorSpace = SRGBColorSpace`.
+     * `texture.colorSpace = ColorSpace.SRGB`.
      *
      * @default null
      */
@@ -78,7 +78,7 @@ export class MeshBasicMaterial extends Material {
      *
      * `lightMap` represents pre-baked illuminance data, and the texture must be assigned
      * a {@link Texture#colorSpace}. Most `lightMap` textures set
-     * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+     * `texture.colorSpace = ColorSpace.LinearSRGB` and use float-type formats
      * such as `.exr` or `.hdr`.
      *
      * @default null
@@ -95,7 +95,7 @@ export class MeshBasicMaterial extends Material {
      * Requires a second set of UVs.
      *
      * `aoMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -113,7 +113,7 @@ export class MeshBasicMaterial extends Material {
      *
      * `specularMap` represents color data, and the texture must be assigned a
      * {@link Texture#colorSpace}. Most `specularMap` textures set
-     * `texture.colorSpace = SRGBColorSpace`.
+     * `texture.colorSpace = ColorSpace.SRGB`.
      *
      * @default null
      */
@@ -129,7 +129,7 @@ export class MeshBasicMaterial extends Material {
      * luminance/alpha textures will also still work as expected.
      *
      * `alphaMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -139,7 +139,7 @@ export class MeshBasicMaterial extends Material {
      *
      * `envMap` represents luminance data, and the texture must be assigned
      * a {@link Texture#colorSpace}. Most `envMap` textures set
-     * `texture.colorSpace = LinearSRGBColorSpace` and use float-type formats
+     * `texture.colorSpace = ColorSpace.LinearSRGB` and use float-type formats
      * such as `.exr` or `.hdr`.
      *
      * @default null
@@ -154,12 +154,12 @@ export class MeshBasicMaterial extends Material {
     /**
      * How to combine the result of the surface's color with the environment map, if any.
      *
-     * When set to `MixOperation`, the {@link MeshBasicMaterial#reflectivity} is used to
+     * When set to `Combine.Mix`, the {@link MeshBasicMaterial#reflectivity} is used to
      * blend between the two colors.
      *
-     * @default MultiplyOperation
+     * @default Combine.Multiply
      */
-    this.combine = MultiplyOperation;
+    this.combine = Combine.Multiply;
     /**
      * How much the environment map affects the surface.
      * The valid range is between `0` (no reflections) and `1` (full reflections).
@@ -170,7 +170,7 @@ export class MeshBasicMaterial extends Material {
     /**
      * The index of refraction (IOR) of air (approximately 1) divided by the
      * index of refraction of the material. It is used with environment mapping
-     * modes {@link CubeRefractionMapping} and {@link EquirectangularRefractionMapping}.
+     * modes {@link Mapping.CubeRefraction} and {@link Mapping.EquirectangularRefraction}.
      * The refraction ratio should not exceed `1`.
      *
      * @default 0.98

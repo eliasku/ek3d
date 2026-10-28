@@ -4,7 +4,7 @@ import type { Matrix3 } from "./Matrix3";
 import type { Vector3 } from "./Vector3";
 import { clamp, euclideanModulo, lerp } from "./MathUtils";
 import { ColorManagement, SRGBToLinear, LinearToSRGB } from "./ColorManagement";
-import { SRGBColorSpace } from "../constants";
+import { ColorSpace } from "../constants";
 import { warn } from "../utils";
 const _colorKeywords = {
   aliceblue: 0xf0f8ff,
@@ -168,27 +168,27 @@ function hue2rgb(p?: any, q?: any, t?: any) {
 }
 /**
  * A Color instance is represented by RGB components in the linear <i>working
- * color space</i>, which defaults to `LinearSRGBColorSpace`. Inputs
- * conventionally using `SRGBColorSpace` (such as hexadecimals and CSS
+ * color space</i>, which defaults to `ColorSpace.LinearSRGB`. Inputs
+ * conventionally using `ColorSpace.SRGB` (such as hexadecimals and CSS
  * strings) are converted to the working color space automatically.
  *
  * ```typescript
  * import { Color } from 'ek3d/math/Color';
- * import { SRGBColorSpace } from 'ek3d/constants';
+ * import { ColorSpace } from 'ek3d/constants';
  *
- * // converted automatically from SRGBColorSpace to LinearSRGBColorSpace
+ * // converted automatically from ColorSpace.SRGB to ColorSpace.LinearSRGB
  * const color = new Color().setHex( 0x112233 );
  * ```
  * Source color spaces may be specified explicitly, to ensure correct conversions.
  * ```typescript
  * import { Color } from 'ek3d/math/Color';
- * import { SRGBColorSpace } from 'ek3d/constants';
+ * import { ColorSpace } from 'ek3d/constants';
  *
- * // assumed already LinearSRGBColorSpace; no conversion
+ * // assumed already ColorSpace.LinearSRGB; no conversion
  * const color = new Color().setRGB( 0.5, 0.5, 0.5 );
  *
- * // converted explicitly from SRGBColorSpace to LinearSRGBColorSpace
- * const srgbColor = new Color().setRGB( 0.5, 0.5, 0.5, SRGBColorSpace );
+ * // converted explicitly from ColorSpace.SRGB to ColorSpace.LinearSRGB
+ * const srgbColor = new Color().setRGB( 0.5, 0.5, 0.5, ColorSpace.SRGB );
  * ```
  * If THREE.ColorManagement is disabled, no conversions occur. For details,
  * see <i>Color management</i>. Iterating through a Color instance will yield
@@ -305,10 +305,10 @@ export class Color {
    * Sets this color from a hexadecimal value.
    *
    * @param hex - The hexadecimal value.
-   * @param [colorSpace=SRGBColorSpace] - The color space.
+   * @param [colorSpace=ColorSpace.SRGB] - The color space.
    * @return A reference to this color.
    */
-  setHex(hex: number, colorSpace: string = SRGBColorSpace): Color {
+  setHex(hex: number, colorSpace: string = ColorSpace.SRGB): Color {
     hex = Math.floor(hex);
     this.r = ((hex >> 16) & 255) / 255;
     this.g = ((hex >> 8) & 255) / 255;
@@ -365,10 +365,10 @@ export class Color {
    * all 140 color names are supported).
    *
    * @param style - Color as a CSS-style string.
-   * @param [colorSpace=SRGBColorSpace] - The color space.
+   * @param [colorSpace=ColorSpace.SRGB] - The color space.
    * @return A reference to this color.
    */
-  setStyle(style: string, colorSpace: string = SRGBColorSpace): Color {
+  setStyle(style: string, colorSpace: string = ColorSpace.SRGB): Color {
     function handleAlpha(string?: any) {
       if (string === undefined) return;
       if (parseFloat(string) < 1) {
@@ -466,10 +466,10 @@ export class Color {
    * ```
    *
    * @param style - The color name.
-   * @param [colorSpace=SRGBColorSpace] - The color space.
+   * @param [colorSpace=ColorSpace.SRGB] - The color space.
    * @return A reference to this color.
    */
-  setColorName(style: string, colorSpace: string = SRGBColorSpace): Color {
+  setColorName(style: string, colorSpace: string = ColorSpace.SRGB): Color {
     // color keywords
     const hex = (_colorKeywords as any)[style.toLowerCase()];
     if (hex !== undefined) {
@@ -503,7 +503,7 @@ export class Color {
   }
   /**
    * Copies the given color into this color, and then converts this color from
-   * `SRGBColorSpace` to `LinearSRGBColorSpace`.
+   * `ColorSpace.SRGB` to `ColorSpace.LinearSRGB`.
    *
    * @param color - The color to copy/convert.
    * @return A reference to this color.
@@ -516,7 +516,7 @@ export class Color {
   }
   /**
    * Copies the given color into this color, and then converts this color from
-   * `LinearSRGBColorSpace` to `SRGBColorSpace`.
+   * `ColorSpace.LinearSRGB` to `ColorSpace.SRGB`.
    *
    * @param color - The color to copy/convert.
    * @return A reference to this color.
@@ -528,7 +528,7 @@ export class Color {
     return this;
   }
   /**
-   * Converts this color from `SRGBColorSpace` to `LinearSRGBColorSpace`.
+   * Converts this color from `ColorSpace.SRGB` to `ColorSpace.LinearSRGB`.
    *
    * @return A reference to this color.
    */
@@ -537,7 +537,7 @@ export class Color {
     return this;
   }
   /**
-   * Converts this color from `LinearSRGBColorSpace` to `SRGBColorSpace`.
+   * Converts this color from `ColorSpace.LinearSRGB` to `ColorSpace.SRGB`.
    *
    * @return A reference to this color.
    */
@@ -548,10 +548,10 @@ export class Color {
   /**
    * Returns the hexadecimal value of this color.
    *
-   * @param [colorSpace=SRGBColorSpace] - The color space.
+   * @param [colorSpace=ColorSpace.SRGB] - The color space.
    * @return The hexadecimal value.
    */
-  getHex(colorSpace: string = SRGBColorSpace): number {
+  getHex(colorSpace: string = ColorSpace.SRGB): number {
     ColorManagement.workingToColorSpace(_color.copy(this), colorSpace);
     return (
       Math.round(clamp(_color.r * 255, 0, 255)) * 65536 +
@@ -562,10 +562,10 @@ export class Color {
   /**
    * Returns the hexadecimal value of this color as a string (for example, 'FFFFFF').
    *
-   * @param [colorSpace=SRGBColorSpace] - The color space.
+   * @param [colorSpace=ColorSpace.SRGB] - The color space.
    * @return The hexadecimal value as a string.
    */
-  getHexString(colorSpace: string = SRGBColorSpace): string {
+  getHexString(colorSpace: string = ColorSpace.SRGB): string {
     return ("000000" + this.getHex(colorSpace).toString(16)).slice(-6);
   }
   /**
@@ -627,15 +627,15 @@ export class Color {
   /**
    * Returns the value of this color as a CSS style string. Example: `rgb(255,0,0)`.
    *
-   * @param [colorSpace=SRGBColorSpace] - The color space.
+   * @param [colorSpace=ColorSpace.SRGB] - The color space.
    * @return The CSS representation of this color.
    */
-  getStyle(colorSpace: string = SRGBColorSpace): string {
+  getStyle(colorSpace: string = ColorSpace.SRGB): string {
     ColorManagement.workingToColorSpace(_color.copy(this), colorSpace);
     const r = _color.r,
       g = _color.g,
       b = _color.b;
-    if (colorSpace !== SRGBColorSpace) {
+    if (colorSpace !== ColorSpace.SRGB) {
       // Requires CSS Color Module Level 4 (https://www.w3.org/TR/css-color-4/).
       return `color(${colorSpace} ${r.toFixed(3)} ${g.toFixed(3)} ${b.toFixed(3)})`;
     }

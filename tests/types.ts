@@ -17,7 +17,7 @@ import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { DataTexture } from "ek3d/textures/DataTexture";
 import { Vector2 } from "ek3d/math/Vector2";
-import { RGBAFormat, UnsignedByteType, SRGBColorSpace, RepeatWrapping } from "ek3d/constants";
+import { PixelFormat, TextureType, ColorSpace, Wrapping } from "ek3d/constants";
 import { MeshLambertMaterial } from "ek3d/materials/MeshLambertMaterial";
 import { HemisphereLight } from "ek3d/lights/HemisphereLight";
 import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
@@ -43,7 +43,7 @@ import type { RenderTargetOptions } from "ek3d/core/RenderTarget";
 import { CubeCamera } from "ek3d/cameras/CubeCamera";
 import { CubeTexture } from "ek3d/textures/CubeTexture";
 import { Texture } from "ek3d/textures/Texture";
-import { EquirectangularReflectionMapping, LinearMipmapLinearFilter, HalfFloatType } from "ek3d/constants";
+import { Mapping, TextureFilter } from "ek3d/constants";
 import { Object3D } from "ek3d/core/Object3D";
 import { Camera } from "ek3d/cameras/Camera";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
@@ -70,7 +70,7 @@ import type {
 } from "ek3d/renderers/webgl/WebGLShadowMap";
 import { depthShader } from "ek3d/renderers/shaders/DepthShader";
 import { distanceShader } from "ek3d/renderers/shaders/DistanceShader";
-import { PCFShadowMap, RGBADepthPacking, LessEqualCompare, DynamicDrawUsage } from "ek3d/constants";
+import { ShadowMap, DepthPacking, Compare, BufferUsage } from "ek3d/constants";
 import { WebGLOutput } from "ek3d/renderers/webgl/WebGLOutput";
 import type { WebGLOutputSystem, WebGLOutputEffect } from "ek3d/renderers/webgl/WebGLOutput";
 import { RawShaderMaterial } from "ek3d/materials/RawShaderMaterial";
@@ -217,7 +217,7 @@ import type { NumericAnimationBuffer } from "ek3d/math/Interpolant";
 import { Bone } from "ek3d/objects/Bone";
 import { Skeleton } from "ek3d/objects/Skeleton";
 import { SkinnedMesh } from "ek3d/objects/SkinnedMesh";
-import { InterpolateLinear, LoopRepeat } from "ek3d/constants";
+import { Interpolation, Loop } from "ek3d/constants";
 
 void [WebGPUCoordinateSystem, TimestampQuery];
 
@@ -304,7 +304,7 @@ renderer.setAnimationLoop((time: string) => {});
 // @ts-expect-error Window RAF callbacks receive no XR frame argument.
 renderer.setAnimationLoop((time: number, frame: object) => {});
 
-const output: WebGLOutputSystem = WebGLOutput(HalfFloatType, 64, 48, false, true, false);
+const output: WebGLOutputSystem = WebGLOutput(TextureType.HalfFloat, 64, 48, false, true, false);
 const effect: WebGLOutputEffect = {
   needsSwap: true,
   enabled: true,
@@ -324,7 +324,7 @@ const effect: WebGLOutputEffect = {
     void [target, elapsed];
   },
 };
-const outputRenderer = new WebGLRenderer({ createOutput: WebGLOutput, outputBufferType: HalfFloatType });
+const outputRenderer = new WebGLRenderer({ createOutput: WebGLOutput, outputBufferType: TextureType.HalfFloat });
 outputRenderer.setEffects([effect]);
 outputRenderer.setEffects(null);
 output.setEffects([effect]);
@@ -347,9 +347,9 @@ void [outputBegun, outputCompositing, outputRenderPass, rawClone];
 // @ts-expect-error Output factories return the complete lifecycle, not an inert object.
 new WebGLRenderer({ createOutput: () => ({ dispose() {} }) });
 // @ts-expect-error Output factory dimensions are numeric.
-WebGLOutput(HalfFloatType, "64", 48, false, true, false);
+WebGLOutput(TextureType.HalfFloat, "64", 48, false, true, false);
 // @ts-expect-error Output factory antialiasing is boolean.
-WebGLOutput(HalfFloatType, 64, 48, 4, true, false);
+WebGLOutput(TextureType.HalfFloat, 64, 48, 4, true, false);
 // @ts-expect-error An effect needs a render operation.
 outputRenderer.setEffects([{ enabled: true }]);
 // @ts-expect-error Render targets are not arbitrary texture values.
@@ -371,9 +371,9 @@ new RawShaderMaterial({ vertexShader: 1 });
 new RawShaderMaterial({ uniforms: { gain: 2 } });
 
 const pixels = new Uint8Array(16);
-const texture = new DataTexture(pixels, 2, 2, RGBAFormat, UnsignedByteType);
-texture.colorSpace = SRGBColorSpace;
-texture.wrapS = RepeatWrapping;
+const texture = new DataTexture(pixels, 2, 2, PixelFormat.RGBA, TextureType.UnsignedByte);
+texture.colorSpace = ColorSpace.SRGB;
+texture.wrapS = Wrapping.Repeat;
 texture.offset.set(0.5, 0);
 texture.repeat.set(2, 1);
 texture.updateMatrix();
@@ -503,7 +503,7 @@ const rgbColor: Color = new Color().getRGB(new Color());
 new Color().getRGB({ r: 0, g: 0, b: "blue" });
 void [rgbLabel, rgbColor];
 
-texture.mapping = EquirectangularReflectionMapping;
+texture.mapping = Mapping.EquirectangularReflection;
 texture.needsPMREMUpdate = true;
 const pmremVersion: number = texture.pmremVersion;
 const isPMREM: boolean = texture.isPMREMTexture;
@@ -529,14 +529,14 @@ environments.get(undefined, false);
 environmentProvider.get(null);
 environments.dispose();
 const targetOptions: RenderTargetOptions = {
-  type: HalfFloatType,
+  type: TextureType.HalfFloat,
   generateMipmaps: true,
   mipmapsAutoUpdate: false,
-  minFilter: LinearMipmapLinearFilter,
+  minFilter: TextureFilter.LinearMipmapLinear,
   depthBuffer: false,
   samples: 0,
   internalFormat: null,
-  colorSpace: SRGBColorSpace,
+  colorSpace: ColorSpace.SRGB,
 };
 const cubeTarget = new WebGLCubeRenderTarget(256, targetOptions);
 const cubeTexture: CubeTexture = cubeTarget.texture;
@@ -599,7 +599,7 @@ const directionalClone: DirectionalLight = directional.clone();
 const pointClone: PointLight = point.clone();
 const directionalShadowClone: DirectionalLightShadow = directionalShadow.clone();
 const pointShadowClone: PointLightShadow = pointShadow.clone();
-const depthParameters: MeshDepthMaterialParameters = { depthPacking: RGBADepthPacking, map: texture, alphaTest: 0.5 };
+const depthParameters: MeshDepthMaterialParameters = { depthPacking: DepthPacking.RGBA, map: texture, alphaTest: 0.5 };
 const distanceParameters: MeshDistanceMaterialParameters = { displacementMap: texture, displacementScale: 2 };
 const depthMaterial = new MeshDepthMaterial(depthParameters);
 const distanceMaterial = new MeshDistanceMaterial(distanceParameters);
@@ -625,7 +625,7 @@ mesh.onBeforeShadow = (renderer, object, camera, shadowCamera, geometry, materia
 };
 mesh.onAfterShadow = mesh.onBeforeShadow;
 const depthTexture = new DepthTexture(256, 256);
-depthTexture.compareFunction = LessEqualCompare;
+depthTexture.compareFunction = Compare.LessEqual;
 depthTexture.compareFunction = null;
 const depthTextureClone: DepthTexture = depthTexture.clone();
 const cubeDepth = new CubeDepthTexture(128);
@@ -643,7 +643,7 @@ const shadowRenderer = new WebGLRenderer({
     shadows.enabled = true;
     shadows.autoUpdate = false;
     shadows.needsUpdate = true;
-    shadows.type = PCFShadowMap;
+    shadows.type = ShadowMap.PCF;
     shadows.render([directional, point], scene, camera);
     shadows.dispose();
     // @ts-expect-error Uploads require scene objects.
@@ -669,7 +669,7 @@ optionalShadows?.render([directional, point], scene, camera);
 const requiredShadows: WebGLShadowMapSystem = shadowRenderer.shadowMap;
 new WebGLRenderer({
   // @ts-expect-error Factory results must implement render and dispose.
-  createShadowMap: () => ({ enabled: false, autoUpdate: true, needsUpdate: false, type: PCFShadowMap }),
+  createShadowMap: () => ({ enabled: false, autoUpdate: true, needsUpdate: false, type: ShadowMap.PCF }),
 });
 // @ts-expect-error Factories cannot require a string renderer.
 new WebGLRenderer({ createShadowMap: (renderer: string) => optionalShadows! });
@@ -1330,7 +1330,7 @@ const colorUniform = new Uniform(new Vector3());
 const uniformCopy: Uniform<Vector3> = colorUniform.clone();
 const typedScalar = new Uniform(2);
 typedScalar.type = "int";
-const uniformGroup = new UniformsGroup().setName("Frame").setUsage(DynamicDrawUsage);
+const uniformGroup = new UniformsGroup().setName("Frame").setUsage(BufferUsage.DynamicDraw);
 uniformGroup
   .add(colorUniform)
   .add([new Uniform(1), typedScalar])
@@ -1473,7 +1473,7 @@ const instancedFlag: boolean = instances.isInstancedMesh;
 const instanceTransform: Matrix4 = instances.getMatrixAt(0, new Matrix4());
 const instanceTint: Color = instances.getColorAt(0, new Color());
 const updatedInstances: InstancedMesh = instances.setMatrixAt(0, instanceTransform).setColorAt(0, instanceTint);
-instances.instanceMatrix.setUsage(DynamicDrawUsage).addUpdateRange(0, 16);
+instances.instanceMatrix.setUsage(BufferUsage.DynamicDraw).addUpdateRange(0, 16);
 instances.instanceMatrix.needsUpdate = true;
 if (instances.instanceColor !== null) instances.instanceColor.needsUpdate = true;
 instances.count = 0;
@@ -1928,14 +1928,14 @@ new QuaternionLinearInterpolant([0, 1], quaternionTrack.values, 4).evaluate(0.5)
 const discreteBooleans: boolean[] = new DiscreteInterpolant([0, 1], [true, false], 1).evaluate(0.5);
 const discreteStrings: string[] = new DiscreteInterpolant(animationTimes, ["a", "b"], 1, []).evaluate(0.5);
 numericTrack.createInterpolant(null);
-numericTrack.setInterpolation(InterpolateLinear);
+numericTrack.setInterpolation(Interpolation.Linear);
 const groupedAnimation = new AnimationObjectGroup(new Object3D(), new Object3D());
 groupedAnimation.add(new Object3D());
 groupedAnimation.remove(new Object3D());
 groupedAnimation.uncache(new Object3D());
 const stage4Mixer = new AnimationMixer(groupedAnimation);
 const stage4Action: AnimationAction | null = stage4Mixer.clipAction(heterogeneousClip);
-stage4Action?.setLoop(LoopRepeat, 2).play().fadeIn(0.2).warp(1, 2, 0.5);
+stage4Action?.setLoop(Loop.Repeat, 2).play().fadeIn(0.2).warp(1, 2, 0.5);
 stage4Mixer.update(1 / 60);
 stage4Mixer.existingAction(heterogeneousClip, groupedAnimation);
 const parsedAnimationPath = PropertyBinding.parseTrackName(".position[x]");

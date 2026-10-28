@@ -1,4 +1,4 @@
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import { BufferAttribute, Float32BufferAttribute } from "../../core/BufferAttribute";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { FileLoader } from "../../loaders/FileLoader";
@@ -157,7 +157,7 @@ function parseBinary(data: ArrayBufferLike): STLGeometry {
       normals[componentIdx + 2] = normalZ;
 
       if (colors !== null) {
-        color.setRGB(r, g, b, SRGBColorSpace);
+        color.setRGB(r, g, b, ColorSpace.SRGB);
 
         colors[componentIdx] = color.r;
         colors[componentIdx + 1] = color.g;

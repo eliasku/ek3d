@@ -1,4 +1,4 @@
-import { FloatType, RedFormat } from "../../constants";
+import { TextureType, PixelFormat } from "../../constants";
 import { DataTexture } from "../../textures/DataTexture";
 import { randFloat, randInt } from "../../math/MathUtils";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
@@ -150,7 +150,7 @@ export class GlitchPass extends Pass {
       dataArr[i] = val;
     }
 
-    const texture = new DataTexture(dataArr, dtSize, dtSize, RedFormat, FloatType);
+    const texture = new DataTexture(dataArr, dtSize, dtSize, PixelFormat.Red, TextureType.Float);
     texture.needsUpdate = true;
     return texture;
   }

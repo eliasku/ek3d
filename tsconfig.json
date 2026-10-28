@@ -15,7 +15,7 @@
   },
   "include": [
     "src/**/*.ts",
-    "feature-testbed/**/*.ts",
+    "testbed/**/*.ts",
     "examples/**/*.ts",
     "tests/**/*.ts",
     "scripts/**/*.ts",

@@ -2,7 +2,7 @@ import { Color } from "../../math/Color";
 import { Matrix4 } from "../../math/Matrix4";
 import { Vector2 } from "../../math/Vector2";
 import { Vector4 } from "../../math/Vector4";
-import { RepeatWrapping } from "../../constants";
+import { Wrapping } from "../../constants";
 import { Mesh } from "../../objects/Mesh";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { TextureLoader } from "../../loaders/TextureLoader";
@@ -302,8 +302,8 @@ ${chunk_fog_fragment}
 
     // maps
 
-    normalMap0.wrapS = normalMap0.wrapT = RepeatWrapping;
-    normalMap1.wrapS = normalMap1.wrapT = RepeatWrapping;
+    normalMap0.wrapS = normalMap0.wrapT = Wrapping.Repeat;
+    normalMap1.wrapS = normalMap1.wrapT = Wrapping.Repeat;
 
     material.uniforms["tReflectionMap"].value = reflector.getRenderTarget().texture;
     material.uniforms["tRefractionMap"].value = refractor.getRenderTarget().texture;

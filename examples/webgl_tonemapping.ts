@@ -1,14 +1,4 @@
-import {
-  ACESFilmicToneMapping,
-  AgXToneMapping,
-  CineonToneMapping,
-  CustomToneMapping,
-  EquirectangularReflectionMapping,
-  LinearToneMapping,
-  NeutralToneMapping,
-  NoToneMapping,
-  ReinhardToneMapping,
-} from "ek3d/constants";
+import { ToneMapping, Mapping } from "ek3d/constants";
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { DRACOLoader } from "ek3d/addons/loaders/DRACOLoader";
@@ -49,14 +39,14 @@ const params = {
 };
 
 const toneMappingOptions = {
-  None: NoToneMapping,
-  Linear: LinearToneMapping,
-  Reinhard: ReinhardToneMapping,
-  Cineon: CineonToneMapping,
-  ACESFilmic: ACESFilmicToneMapping,
-  AgX: AgXToneMapping,
-  Neutral: NeutralToneMapping,
-  Custom: CustomToneMapping,
+  None: ToneMapping.No,
+  Linear: ToneMapping.Linear,
+  Reinhard: ToneMapping.Reinhard,
+  Cineon: ToneMapping.Cineon,
+  ACESFilmic: ToneMapping.ACESFilmic,
+  AgX: ToneMapping.AgX,
+  Neutral: ToneMapping.Neutral,
+  Custom: ToneMapping.Custom,
 };
 
 init().catch(function (err: unknown) {
@@ -91,7 +81,7 @@ async function init(): Promise<void> {
   renderer.toneMapping = toneMappingOptions[params.toneMapping as keyof typeof toneMappingOptions];
   renderer.toneMappingExposure = params.exposure;
 
-  // Set CustomToneMapping to Uncharted2
+  // Set ToneMapping.Custom to Uncharted2
   // source: http://filmicworlds.com/blog/filmic-tonemapping-operators/
 
   tonemapping_pars_fragment.set(
@@ -141,7 +131,7 @@ async function init(): Promise<void> {
 
   // environment
 
-  texture.mapping = EquirectangularReflectionMapping;
+  texture.mapping = Mapping.EquirectangularReflection;
 
   scene.background = texture;
   scene.environment = texture;

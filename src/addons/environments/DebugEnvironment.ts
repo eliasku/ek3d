@@ -1,4 +1,4 @@
-import { BackSide } from "../../constants";
+import { Side } from "../../constants";
 import { BoxGeometry } from "../../geometries/BoxGeometry";
 import { PointLight } from "../../lights/PointLight";
 import { MeshLambertMaterial } from "../../materials/MeshLambertMaterial";
@@ -12,7 +12,7 @@ export class DebugEnvironment extends Scene {
     super();
     const geometry = new BoxGeometry();
     geometry.deleteAttribute("uv");
-    const room = new Mesh(geometry, new MeshStandardMaterial({ metalness: 0, side: BackSide }));
+    const room = new Mesh(geometry, new MeshStandardMaterial({ metalness: 0, side: Side.Back }));
     room.scale.setScalar(10);
     this.add(room, new PointLight(0xffffff, 50, 0, 2));
     const light1 = new Mesh(

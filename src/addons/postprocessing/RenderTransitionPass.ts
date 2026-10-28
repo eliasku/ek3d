@@ -1,4 +1,4 @@
-import { HalfFloatType } from "../../constants";
+import { TextureType } from "../../constants";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
 import { Pass, FullScreenQuad } from "./Pass";
@@ -67,9 +67,9 @@ export class RenderTransitionPass extends Pass {
     // internals
 
     this._renderTargetA = new WebGLRenderTarget();
-    this._renderTargetA.texture.type = HalfFloatType;
+    this._renderTargetA.texture.type = TextureType.HalfFloat;
     this._renderTargetB = new WebGLRenderTarget();
-    this._renderTargetB.texture.type = HalfFloatType;
+    this._renderTargetB.texture.type = TextureType.HalfFloat;
 
     this._fsQuad = new FullScreenQuad(this.material);
   }

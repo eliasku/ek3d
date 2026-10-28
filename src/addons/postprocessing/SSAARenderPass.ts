@@ -1,4 +1,4 @@
-import { AdditiveBlending, HalfFloatType } from "../../constants";
+import { Blending, TextureType } from "../../constants";
 import { Color } from "../../math/Color";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { cloneUniforms } from "../../renderers/shaders/UniformsUtils";
@@ -127,7 +127,7 @@ export class SSAARenderPass extends Pass {
       depthTest: false,
       depthWrite: false,
       premultipliedAlpha: true,
-      blending: AdditiveBlending,
+      blending: Blending.Additive,
     });
 
     this._fsQuad = new FullScreenQuad(this._copyMaterial);
@@ -172,7 +172,7 @@ export class SSAARenderPass extends Pass {
   render(renderer: WebGLRenderer, writeBuffer: RT, readBuffer: RT, _deltaTime: number, _maskActive: boolean): void {
     if (!this._sampleRenderTarget) {
       this._sampleRenderTarget = new WebGLRenderTarget(readBuffer.width, readBuffer.height, {
-        type: HalfFloatType,
+        type: TextureType.HalfFloat,
         stencilBuffer: this.stencilBuffer,
       });
       this._sampleRenderTarget.texture.name = "SSAARenderPass.sample";

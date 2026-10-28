@@ -8,7 +8,7 @@ import { DirectionalLight } from "ek3d/lights/DirectionalLight";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { MeshPhongMaterial } from "ek3d/materials/MeshPhongMaterial";
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { Mesh } from "ek3d/objects/Mesh";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { phongShader } from "ek3d/renderers/shaders/PhongShader";
@@ -77,7 +77,7 @@ const material = new MeshPhongMaterial({
   color: 0xd5d5d5,
   specular: 0xffffff,
   shininess: 250,
-  side: DoubleSide,
+  side: Side.Double,
   vertexColors: true,
 });
 const mesh = new Mesh(geometry, material);

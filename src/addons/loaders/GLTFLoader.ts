@@ -7,25 +7,7 @@ import { VectorKeyframeTrack } from "../../animation/tracks/VectorKeyframeTrack"
 import type { Camera } from "../../cameras/Camera";
 import { OrthographicCamera } from "../../cameras/OrthographicCamera";
 import { PerspectiveCamera } from "../../cameras/PerspectiveCamera";
-import {
-  ClampToEdgeWrapping,
-  DoubleSide,
-  FrontSide,
-  InterpolateDiscrete,
-  InterpolateLinear,
-  LinearFilter,
-  LinearMipmapLinearFilter,
-  LinearMipmapNearestFilter,
-  LinearSRGBColorSpace,
-  MirroredRepeatWrapping,
-  NearestFilter,
-  NearestMipmapLinearFilter,
-  NearestMipmapNearestFilter,
-  RepeatWrapping,
-  SRGBColorSpace,
-  TriangleFanDrawMode,
-  TriangleStripDrawMode,
-} from "../../constants";
+import { Wrapping, Side, Interpolation, TextureFilter, ColorSpace, DrawMode } from "../../constants";
 import { BufferAttribute } from "../../core/BufferAttribute";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { InstancedBufferAttribute } from "../../core/InstancedBufferAttribute";
@@ -71,6 +53,7 @@ import { SkinnedMesh } from "../../objects/SkinnedMesh";
 import { Texture } from "../../textures/Texture";
 import { toTrianglesDrawMode } from "../utils/BufferGeometryUtils";
 import { clone } from "../utils/SkeletonUtils";
+import { GL } from "../../GL";
 
 type TypedArray =
   | Int8Array
@@ -746,7 +729,7 @@ class GLTFLightsExtension implements GLTFLoaderPlugin {
     const color = new Color(0xffffff);
 
     if (lightDef.color !== undefined)
-      color.setRGB(lightDef.color[0], lightDef.color[1], lightDef.color[2], LinearSRGBColorSpace);
+      color.setRGB(lightDef.color[0], lightDef.color[1], lightDef.color[2], ColorSpace.LinearSRGB);
 
     const range = lightDef.range !== undefined ? lightDef.range : 0;
 
@@ -848,12 +831,12 @@ class GLTFMaterialsUnlitExtension {
       if (Array.isArray(metallicRoughness.baseColorFactor)) {
         const array = metallicRoughness.baseColorFactor;
 
-        materialParams.color.setRGB(array[0], array[1], array[2], LinearSRGBColorSpace);
+        materialParams.color.setRGB(array[0], array[1], array[2], ColorSpace.LinearSRGB);
         materialParams.opacity = array[3];
       }
 
       if (metallicRoughness.baseColorTexture !== undefined) {
-        pending.push(parser.assignTexture(materialParams, "map", metallicRoughness.baseColorTexture, SRGBColorSpace));
+        pending.push(parser.assignTexture(materialParams, "map", metallicRoughness.baseColorTexture, ColorSpace.SRGB));
       }
     }
 
@@ -1106,7 +1089,7 @@ class GLTFMaterialsSheenExtension implements GLTFLoaderPlugin {
 
     if (extension.sheenColorFactor !== undefined) {
       const colorFactor = extension.sheenColorFactor;
-      materialParams.sheenColor.setRGB(colorFactor[0], colorFactor[1], colorFactor[2], LinearSRGBColorSpace);
+      materialParams.sheenColor.setRGB(colorFactor[0], colorFactor[1], colorFactor[2], ColorSpace.LinearSRGB);
     }
 
     if (extension.sheenRoughnessFactor !== undefined) {
@@ -1115,7 +1098,7 @@ class GLTFMaterialsSheenExtension implements GLTFLoaderPlugin {
 
     if (extension.sheenColorTexture !== undefined) {
       pending.push(
-        this.parser.assignTexture(materialParams, "sheenColorMap", extension.sheenColorTexture, SRGBColorSpace),
+        this.parser.assignTexture(materialParams, "sheenColorMap", extension.sheenColorTexture, ColorSpace.SRGB),
       );
     }
 
@@ -1207,7 +1190,7 @@ class GLTFMaterialsVolumeExtension implements GLTFLoaderPlugin {
       colorArray[0],
       colorArray[1],
       colorArray[2],
-      LinearSRGBColorSpace,
+      ColorSpace.LinearSRGB,
     );
 
     return Promise.all(pending);
@@ -1285,12 +1268,12 @@ class GLTFMaterialsSpecularExtension implements GLTFLoaderPlugin {
       colorArray[0],
       colorArray[1],
       colorArray[2],
-      LinearSRGBColorSpace,
+      ColorSpace.LinearSRGB,
     );
 
     if (extension.specularColorTexture !== undefined) {
       pending.push(
-        this.parser.assignTexture(materialParams, "specularColorMap", extension.specularColorTexture, SRGBColorSpace),
+        this.parser.assignTexture(materialParams, "specularColorMap", extension.specularColorTexture, ColorSpace.SRGB),
       );
     }
 
@@ -1592,9 +1575,9 @@ class GLTFMeshGpuInstancing implements GLTFLoaderPlugin {
 
     for (const primitive of meshDef.primitives) {
       if (
-        primitive.mode !== WEBGL_CONSTANTS.TRIANGLES &&
-        primitive.mode !== WEBGL_CONSTANTS.TRIANGLE_STRIP &&
-        primitive.mode !== WEBGL_CONSTANTS.TRIANGLE_FAN &&
+        primitive.mode !== GL.TRIANGLES &&
+        primitive.mode !== GL.TRIANGLE_STRIP &&
+        primitive.mode !== GL.TRIANGLE_FAN &&
         primitive.mode !== undefined
       ) {
         return null;
@@ -1847,7 +1830,7 @@ class GLTFDracoMeshCompressionExtension {
           },
           threeAttributeMap,
           attributeTypeMap,
-          LinearSRGBColorSpace,
+          ColorSpace.LinearSRGB,
           reject,
         );
       });
@@ -2031,28 +2014,6 @@ class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
 
 /* CONSTANTS */
 
-const WEBGL_CONSTANTS = {
-  FLOAT: 5126,
-  //FLOAT_MAT2: 35674,
-  FLOAT_MAT3: 35675,
-  FLOAT_MAT4: 35676,
-  FLOAT_VEC2: 35664,
-  FLOAT_VEC3: 35665,
-  FLOAT_VEC4: 35666,
-  LINEAR: 9729,
-  REPEAT: 10497,
-  SAMPLER_2D: 35678,
-  POINTS: 0,
-  LINES: 1,
-  LINE_LOOP: 2,
-  LINE_STRIP: 3,
-  TRIANGLES: 4,
-  TRIANGLE_STRIP: 5,
-  TRIANGLE_FAN: 6,
-  UNSIGNED_BYTE: 5121,
-  UNSIGNED_SHORT: 5123,
-};
-
 const WEBGL_COMPONENT_TYPES: Record<number, TypedArrayConstructor> = {
   5120: Int8Array,
   5121: Uint8Array,
@@ -2063,18 +2024,18 @@ const WEBGL_COMPONENT_TYPES: Record<number, TypedArrayConstructor> = {
 };
 
 const WEBGL_FILTERS: Record<number, number> = {
-  9728: NearestFilter,
-  9729: LinearFilter,
-  9984: NearestMipmapNearestFilter,
-  9985: LinearMipmapNearestFilter,
-  9986: NearestMipmapLinearFilter,
-  9987: LinearMipmapLinearFilter,
+  9728: TextureFilter.Nearest,
+  9729: TextureFilter.Linear,
+  9984: TextureFilter.NearestMipmapNearest,
+  9985: TextureFilter.LinearMipmapNearest,
+  9986: TextureFilter.NearestMipmapLinear,
+  9987: TextureFilter.LinearMipmapLinear,
 };
 
 const WEBGL_WRAPPINGS: Record<number, number> = {
-  33071: ClampToEdgeWrapping,
-  33648: MirroredRepeatWrapping,
-  10497: RepeatWrapping,
+  33071: Wrapping.ClampToEdge,
+  33648: Wrapping.MirroredRepeat,
+  10497: Wrapping.Repeat,
 };
 
 const WEBGL_TYPE_SIZES: Record<string, number> = {
@@ -2110,8 +2071,8 @@ const PATH_PROPERTIES: Record<string, string> = {
 const INTERPOLATION: Record<string, number | undefined> = {
   CUBICSPLINE: undefined, // We use a custom interpolant (GLTFCubicSplineInterpolation) for CUBICSPLINE tracks. Each
   // keyframe track will be initialized with a default interpolation type, then modified.
-  LINEAR: InterpolateLinear,
-  STEP: InterpolateDiscrete,
+  LINEAR: Interpolation.Linear,
+  STEP: Interpolation.Discrete,
 };
 
 const ALPHA_MODES = {
@@ -2133,7 +2094,7 @@ function createDefaultMaterial(cache: GLTFRegistryInstance & Record<string, Mate
       roughness: 1,
       transparent: false,
       depthTest: true,
-      side: FrontSide,
+      side: Side.Front,
     });
   }
 
@@ -2964,14 +2925,16 @@ export class GLTFParser {
         const samplers = json.samplers || {};
         const sampler = samplers[textureDef.sampler] || {};
 
-        texture.magFilter = WEBGL_FILTERS[sampler.magFilter] || LinearFilter;
-        texture.minFilter = WEBGL_FILTERS[sampler.minFilter] || LinearMipmapLinearFilter;
-        texture.wrapS = WEBGL_WRAPPINGS[sampler.wrapS] || RepeatWrapping;
-        texture.wrapT = WEBGL_WRAPPINGS[sampler.wrapT] || RepeatWrapping;
+        texture.magFilter = WEBGL_FILTERS[sampler.magFilter] || TextureFilter.Linear;
+        texture.minFilter = WEBGL_FILTERS[sampler.minFilter] || TextureFilter.LinearMipmapLinear;
+        texture.wrapS = WEBGL_WRAPPINGS[sampler.wrapS] || Wrapping.Repeat;
+        texture.wrapT = WEBGL_WRAPPINGS[sampler.wrapT] || Wrapping.Repeat;
         // Compressed textures supply their own mip levels.
         const compressed = texture as Texture & { isCompressedTexture?: boolean };
         texture.generateMipmaps =
-          !compressed.isCompressedTexture && texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter;
+          !compressed.isCompressedTexture &&
+          texture.minFilter !== TextureFilter.Nearest &&
+          texture.minFilter !== TextureFilter.Linear;
 
         parser.associations.set(texture, { textures: textureIndex });
 
@@ -3233,12 +3196,12 @@ export class GLTFParser {
       if (Array.isArray(metallicRoughness.baseColorFactor)) {
         const array = metallicRoughness.baseColorFactor;
 
-        materialParams.color.setRGB(array[0], array[1], array[2], LinearSRGBColorSpace);
+        materialParams.color.setRGB(array[0], array[1], array[2], ColorSpace.LinearSRGB);
         materialParams.opacity = array[3];
       }
 
       if (metallicRoughness.baseColorTexture !== undefined) {
-        pending.push(parser.assignTexture(materialParams, "map", metallicRoughness.baseColorTexture, SRGBColorSpace));
+        pending.push(parser.assignTexture(materialParams, "map", metallicRoughness.baseColorTexture, ColorSpace.SRGB));
       }
 
       materialParams.metalness =
@@ -3265,7 +3228,7 @@ export class GLTFParser {
     }
 
     if (materialDef.doubleSided === true) {
-      materialParams.side = DoubleSide;
+      materialParams.side = Side.Double;
     }
 
     const alphaMode = materialDef.alphaMode || ALPHA_MODES.OPAQUE;
@@ -3309,12 +3272,12 @@ export class GLTFParser {
         emissiveFactor[0],
         emissiveFactor[1],
         emissiveFactor[2],
-        LinearSRGBColorSpace,
+        ColorSpace.LinearSRGB,
       );
     }
 
     if (materialDef.emissiveTexture !== undefined && materialType !== MeshBasicMaterial) {
-      pending.push(parser.assignTexture(materialParams, "emissiveMap", materialDef.emissiveTexture, SRGBColorSpace));
+      pending.push(parser.assignTexture(materialParams, "emissiveMap", materialDef.emissiveTexture, ColorSpace.SRGB));
     }
 
     return Promise.all(pending).then(function () {
@@ -3391,10 +3354,10 @@ export class GLTFParser {
 
         // Convert strip/fan primitives to triangles
 
-        if (primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP) {
-          geometryPromise = geometryPromise.then((geometry) => toTrianglesDrawMode(geometry, TriangleStripDrawMode));
-        } else if (primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN) {
-          geometryPromise = geometryPromise.then((geometry) => toTrianglesDrawMode(geometry, TriangleFanDrawMode));
+        if (primitive.mode === GL.TRIANGLE_STRIP) {
+          geometryPromise = geometryPromise.then((geometry) => toTrianglesDrawMode(geometry, DrawMode.TriangleStrip));
+        } else if (primitive.mode === GL.TRIANGLE_FAN) {
+          geometryPromise = geometryPromise.then((geometry) => toTrianglesDrawMode(geometry, DrawMode.TriangleFan));
         }
 
         // Cache this geometry
@@ -3449,9 +3412,9 @@ export class GLTFParser {
         const material = materials[i] as Material;
 
         if (
-          primitive.mode === WEBGL_CONSTANTS.TRIANGLES ||
-          primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ||
-          primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ||
+          primitive.mode === GL.TRIANGLES ||
+          primitive.mode === GL.TRIANGLE_STRIP ||
+          primitive.mode === GL.TRIANGLE_FAN ||
           primitive.mode === undefined
         ) {
           const needsSkinning = meshDef.isSkinnedMesh === true;
@@ -3469,13 +3432,13 @@ export class GLTFParser {
             // normalize skin weights to fix malformed assets (see #15319)
             (mesh as SkinnedMesh).normalizeSkinWeights();
           }
-        } else if (primitive.mode === WEBGL_CONSTANTS.LINES) {
+        } else if (primitive.mode === GL.LINES) {
           mesh = new LineSegments(geometry, material);
-        } else if (primitive.mode === WEBGL_CONSTANTS.LINE_STRIP) {
+        } else if (primitive.mode === GL.LINE_STRIP) {
           mesh = new Line(geometry, material);
-        } else if (primitive.mode === WEBGL_CONSTANTS.LINE_LOOP) {
+        } else if (primitive.mode === GL.LINE_LOOP) {
           mesh = new LineLoop(geometry, material);
-        } else if (primitive.mode === WEBGL_CONSTANTS.POINTS) {
+        } else if (primitive.mode === GL.POINTS) {
           mesh = new Points(geometry, material);
         } else {
           throw new Error("THREE.GLTFLoader: Primitive mode unsupported: " + primitive.mode);
@@ -3985,7 +3948,7 @@ export class GLTFParser {
       name: string,
       times: NumericAnimationBuffer,
       values: NumericAnimationBuffer,
-      interpolation?: number,
+      interpolation?: Interpolation,
     ) => KeyframeTrack;
 
     switch (PATH_PROPERTIES[target.path]) {
@@ -4018,7 +3981,7 @@ export class GLTFParser {
     }
 
     const interpolation =
-      sampler.interpolation !== undefined ? INTERPOLATION[sampler.interpolation] : InterpolateLinear;
+      sampler.interpolation !== undefined ? INTERPOLATION[sampler.interpolation] : Interpolation.Linear;
 
     const outputArray = this._getArrayFromAccessor(outputAccessor);
 
@@ -4204,7 +4167,7 @@ function addPrimitiveAttributes(
     pending.push(accessor);
   }
 
-  if (ColorManagement.workingColorSpace !== LinearSRGBColorSpace && "COLOR_0" in attributes) {
+  if (ColorManagement.workingColorSpace !== ColorSpace.LinearSRGB && "COLOR_0" in attributes) {
     console.warn(
       `THREE.GLTFLoader: Converting vertex colors from "srgb-linear" to "${ColorManagement.workingColorSpace}" not supported.`,
     );

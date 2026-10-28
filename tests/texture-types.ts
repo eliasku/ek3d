@@ -8,7 +8,7 @@ import { CompressedArrayTexture } from "ek3d/textures/CompressedArrayTexture";
 import { CompressedCubeTexture } from "ek3d/textures/CompressedCubeTexture";
 import { DataTexture } from "ek3d/textures/DataTexture";
 import { DepthTexture } from "ek3d/textures/DepthTexture";
-import { RGBA_S3TC_DXT1_Format } from "ek3d/constants";
+import { PixelFormat } from "ek3d/constants";
 
 declare const canvas: HTMLCanvasElement;
 declare const offscreen: OffscreenCanvas;
@@ -23,13 +23,13 @@ videoFrames.setFrame(frame);
 const framebuffer: FramebufferTexture = new FramebufferTexture(4, 4).clone();
 const width: number = framebuffer.image.width;
 const mipmaps: CompressedTextureMipmap[] = [{ width: 4, height: 4, data: new Uint8Array(8) }];
-const compressed: CompressedTexture = new CompressedTexture(mipmaps, 4, 4, RGBA_S3TC_DXT1_Format).clone();
-const array: CompressedArrayTexture = new CompressedArrayTexture(mipmaps, 4, 4, 2, RGBA_S3TC_DXT1_Format).clone();
+const compressed: CompressedTexture = new CompressedTexture(mipmaps, 4, 4, PixelFormat.RGBA_S3TC_DXT1).clone();
+const array: CompressedArrayTexture = new CompressedArrayTexture(mipmaps, 4, 4, 2, PixelFormat.RGBA_S3TC_DXT1).clone();
 array.addLayerUpdate(1);
 array.clearLayerUpdates();
 const depth: number = array.image.depth;
 const faces: CompressedTextureFace[] = Array.from({ length: 6 }, () => ({ width: 4, height: 4, mipmaps }));
-const cube: CompressedCubeTexture = new CompressedCubeTexture(faces, RGBA_S3TC_DXT1_Format);
+const cube: CompressedCubeTexture = new CompressedCubeTexture(faces, PixelFormat.RGBA_S3TC_DXT1);
 const face: CompressedTextureFace = cube.image[0];
 // @ts-expect-error Canvas textures require a canvas, not video media.
 new CanvasTexture(video);

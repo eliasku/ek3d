@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { UltraHDRLoader } from "ek3d/addons/loaders/UltraHDRLoader";
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping, FloatType, HalfFloatType } from "ek3d/constants";
+import { ToneMapping, Mapping, TextureType } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { TorusKnotGeometry } from "ek3d/geometries/TorusKnotGeometry";
 import { MeshStandardMaterial } from "ek3d/materials/MeshStandardMaterial";
@@ -42,7 +42,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = params.exposure;
 
 const scene = new Scene();
@@ -69,7 +69,7 @@ function loadEnvironment(resolution = "2k", type = "HalfFloatType"): void {
   canvas.dataset.state = "loading";
   delete canvas.dataset.error;
 
-  loader.setDataType(type === "FloatType" ? FloatType : HalfFloatType);
+  loader.setDataType(type === "FloatType" ? TextureType.Float : TextureType.HalfFloat);
 
   loader.load(
     `/examples/textures/equirectangular/spruit_sunrise_${resolution}.hdr.jpg`,
@@ -80,7 +80,7 @@ function loadEnvironment(resolution = "2k", type = "HalfFloatType"): void {
         return;
       }
 
-      texture.mapping = EquirectangularReflectionMapping;
+      texture.mapping = Mapping.EquirectangularReflection;
       texture.needsUpdate = true;
 
       const previous = environment;

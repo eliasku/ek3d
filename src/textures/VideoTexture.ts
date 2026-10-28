@@ -1,4 +1,4 @@
-import { LinearFilter } from "../constants";
+import { TextureFilter, Mapping, Wrapping } from "../constants";
 import { Texture } from "./Texture";
 /**
  * A texture for use with a video.
@@ -26,21 +26,21 @@ export class VideoTexture extends Texture {
    *
    * @param video - The video element to use as a data source for the texture.
    * @param [mapping=Texture.DEFAULT_MAPPING] - The texture mapping.
-   * @param [wrapS=ClampToEdgeWrapping] - The wrapS value.
-   * @param [wrapT=ClampToEdgeWrapping] - The wrapT value.
-   * @param [magFilter=LinearFilter] - The mag filter value.
-   * @param [minFilter=LinearFilter] - The min filter value.
-   * @param [format=RGBAFormat] - The texture format.
-   * @param [type=UnsignedByteType] - The texture type.
+   * @param [wrapS=Wrapping.ClampToEdge] - The wrapS value.
+   * @param [wrapT=Wrapping.ClampToEdge] - The wrapT value.
+   * @param [magFilter=TextureFilter.Linear] - The mag filter value.
+   * @param [minFilter=TextureFilter.Linear] - The min filter value.
+   * @param [format=PixelFormat.RGBA] - The texture format.
+   * @param [type=TextureType.UnsignedByte] - The texture type.
    * @param [anisotropy=Texture.DEFAULT_ANISOTROPY] - The anisotropy value.
    */
   constructor(
     video: HTMLVideoElement,
-    mapping?: number,
-    wrapS?: number,
-    wrapT?: number,
-    magFilter: number = LinearFilter,
-    minFilter: number = LinearFilter,
+    mapping?: Mapping,
+    wrapS?: Wrapping,
+    wrapT?: Wrapping,
+    magFilter: TextureFilter = TextureFilter.Linear,
+    minFilter: TextureFilter = TextureFilter.Linear,
     format?: number,
     type?: number,
     anisotropy?: number,

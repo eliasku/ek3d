@@ -1,5 +1,5 @@
 import { Texture } from "./Texture";
-import { NearestFilter } from "../constants";
+import { TextureFilter, Mapping, Wrapping } from "../constants";
 
 export type DataTextureImageData =
   | Int8Array
@@ -23,8 +23,8 @@ export interface DataTextureImage {
  * Creates a texture directly from raw buffer data.
  *
  * The interpretation of the data depends on type and format: If the type is
- * `UnsignedByteType`, a `Uint8Array` will be useful for addressing the
- * texel data. If the format is `RGBAFormat`, data needs four values for
+ * `TextureType.UnsignedByte`, a `Uint8Array` will be useful for addressing the
+ * texel data. If the format is `PixelFormat.RGBA`, data needs four values for
  * one texel; Red, Green, Blue and Alpha (typically the opacity).
  *
  */
@@ -37,15 +37,15 @@ export class DataTexture extends Texture {
    * @param [data=null] - The buffer data.
    * @param [width=1] - The width of the texture.
    * @param [height=1] - The height of the texture.
-   * @param [format=RGBAFormat] - The texture format.
-   * @param [type=UnsignedByteType] - The texture type.
+   * @param [format=PixelFormat.RGBA] - The texture format.
+   * @param [type=TextureType.UnsignedByte] - The texture type.
    * @param [mapping=Texture.DEFAULT_MAPPING] - The texture mapping.
-   * @param [wrapS=ClampToEdgeWrapping] - The wrapS value.
-   * @param [wrapT=ClampToEdgeWrapping] - The wrapT value.
-   * @param [magFilter=NearestFilter] - The mag filter value.
-   * @param [minFilter=NearestFilter] - The min filter value.
+   * @param [wrapS=Wrapping.ClampToEdge] - The wrapS value.
+   * @param [wrapT=Wrapping.ClampToEdge] - The wrapT value.
+   * @param [magFilter=TextureFilter.Nearest] - The mag filter value.
+   * @param [minFilter=TextureFilter.Nearest] - The min filter value.
    * @param [anisotropy=Texture.DEFAULT_ANISOTROPY] - The anisotropy value.
-   * @param [colorSpace=NoColorSpace] - The color space.
+   * @param [colorSpace=ColorSpace.No] - The color space.
    */
   constructor(
     data: DataTextureImageData = null,
@@ -53,11 +53,11 @@ export class DataTexture extends Texture {
     height: number = 1,
     format?: number,
     type?: number,
-    mapping?: number,
-    wrapS?: number,
-    wrapT?: number,
-    magFilter: number = NearestFilter,
-    minFilter: number = NearestFilter,
+    mapping?: Mapping,
+    wrapS?: Wrapping,
+    wrapT?: Wrapping,
+    magFilter: TextureFilter = TextureFilter.Nearest,
+    minFilter: TextureFilter = TextureFilter.Nearest,
     anisotropy?: number,
     colorSpace?: string,
   ) {

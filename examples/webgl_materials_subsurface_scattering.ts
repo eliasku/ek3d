@@ -4,7 +4,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { SubsurfaceScatteringShader } from "ek3d/addons/shaders/SubsurfaceScatteringShader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Wrapping, ColorSpace } from "ek3d/constants";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
@@ -69,8 +69,8 @@ function failed(error: unknown): void {
 }
 const textureLoader = new TextureLoader();
 const diffuse = textureLoader.load("/examples/models/fbx/white.jpg", loaded, undefined, failed);
-diffuse.colorSpace = SRGBColorSpace;
-diffuse.wrapS = diffuse.wrapT = RepeatWrapping;
+diffuse.colorSpace = ColorSpace.SRGB;
+diffuse.wrapS = diffuse.wrapT = Wrapping.Repeat;
 const thickness = textureLoader.load("/examples/models/fbx/bunny_thickness.jpg", loaded, undefined, failed);
 const shader = SubsurfaceScatteringShader;
 const uniforms = cloneUniforms(shader.uniforms) as Record<string, { value: unknown }>;

@@ -1,4 +1,4 @@
-import { FloatType, HalfFloatType, LinearFilter, RedFormat, RepeatWrapping, UnsignedByteType } from "../../constants";
+import { TextureType, TextureFilter, PixelFormat, Wrapping } from "../../constants";
 import { toHalfFloat } from "../../extras/DataUtils";
 import { FileLoader } from "../../loaders/FileLoader";
 import { Loader } from "../../loaders/Loader";
@@ -13,7 +13,7 @@ interface IESProfile {
 
 /** Loads normalized IES photometric profiles as red-channel textures. */
 export class IESLoader extends Loader<DataTexture> {
-  type: number = HalfFloatType;
+  type: TextureType = TextureType.HalfFloat;
 
   override load(
     url: string,
@@ -53,13 +53,13 @@ export class IESLoader extends Loader<DataTexture> {
     const height = 180;
     let data: Uint8Array | Uint16Array | Float32Array;
     switch (this.type) {
-      case UnsignedByteType:
+      case TextureType.UnsignedByte:
         data = new Uint8Array(width * height);
         break;
-      case HalfFloatType:
+      case TextureType.HalfFloat:
         data = new Uint16Array(width * height);
         break;
-      case FloatType:
+      case TextureType.Float:
         data = new Float32Array(width * height);
         break;
       default:
@@ -75,17 +75,17 @@ export class IESLoader extends Loader<DataTexture> {
       for (let phi = 0; phi < height; phi++) {
         const value = interpolate(profile, (phi * 180) / (height - 1), sampleTheta);
         data[phi + theta * height] =
-          this.type === HalfFloatType
+          this.type === TextureType.HalfFloat
             ? toHalfFloat(value)
-            : this.type === UnsignedByteType
+            : this.type === TextureType.UnsignedByte
               ? Math.min(value * 255, 255)
               : value;
       }
     }
-    const texture = new DataTexture(data, height, width, RedFormat, this.type);
-    texture.minFilter = LinearFilter;
-    texture.magFilter = LinearFilter;
-    texture.wrapT = RepeatWrapping;
+    const texture = new DataTexture(data, height, width, PixelFormat.Red, this.type);
+    texture.minFilter = TextureFilter.Linear;
+    texture.magFilter = TextureFilter.Linear;
+    texture.wrapT = Wrapping.Repeat;
     texture.needsUpdate = true;
     return texture;
   }

@@ -6,7 +6,7 @@ import { LineMaterial } from "ek3d/addons/lines/LineMaterial";
 import { LineSegments2 } from "ek3d/addons/lines/LineSegments2";
 import { LineSegmentsGeometry } from "ek3d/addons/lines/LineSegmentsGeometry";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import type { InterleavedBufferAttribute } from "ek3d/core/InterleavedBufferAttribute";
 import type { Intersection } from "ek3d/core/Raycaster";
 import { Raycaster } from "ek3d/core/Raycaster";
@@ -91,7 +91,7 @@ for (let i = 0; i < divisions; i++) {
   const t = i / divisions;
   spline.getPoint(t, point);
   positions.push(point.x, point.y, point.z);
-  color.setHSL(t, 1, 0.5, SRGBColorSpace);
+  color.setHSL(t, 1, 0.5, ColorSpace.SRGB);
   colors.push(color.r, color.g, color.b);
 }
 const lineGeometry = new LineGeometry().setPositions(positions).setColors(colors);

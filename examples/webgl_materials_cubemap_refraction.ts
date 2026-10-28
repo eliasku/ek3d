@@ -1,7 +1,7 @@
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PLYLoader } from "ek3d/addons/loaders/PLYLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { CubeRefractionMapping } from "ek3d/constants";
+import { Mapping } from "ek3d/constants";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { CubeTextureLoader } from "ek3d/loaders/CubeTextureLoader";
 import { LoadingManager } from "ek3d/loaders/LoadingManager";
@@ -46,7 +46,7 @@ const cube = new CubeTextureLoader(manager).load(
   undefined,
   reportFailure,
 );
-cube.mapping = CubeRefractionMapping;
+cube.mapping = Mapping.CubeRefraction;
 scene.background = cube;
 const materials = [
   new MeshPhongMaterial({ color: 0xffffff, envMap: cube, refractionRatio: 0.98 }),

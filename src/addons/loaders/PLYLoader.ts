@@ -1,4 +1,4 @@
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import {
   BufferAttribute,
   Float32BufferAttribute,
@@ -681,7 +681,7 @@ export class PLYLoader extends Loader<BufferGeometry, string> {
             (element[color.names[0]] as number) * scale,
             (element[color.names[1]] as number) * scale,
             (element[color.names[2]] as number) * scale,
-            SRGBColorSpace,
+            ColorSpace.SRGB,
           );
 
           // convert back to original type
@@ -742,7 +742,7 @@ export class PLYLoader extends Loader<BufferGeometry, string> {
             (element[color.names[0]] as number) * scale,
             (element[color.names[1]] as number) * scale,
             (element[color.names[2]] as number) * scale,
-            SRGBColorSpace,
+            ColorSpace.SRGB,
           );
 
           // convert back to original type

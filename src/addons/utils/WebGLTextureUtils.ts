@@ -1,5 +1,5 @@
 import { PerspectiveCamera } from "../../cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import { PlaneGeometry } from "../../geometries/PlaneGeometry";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { Mesh } from "../../objects/Mesh";
@@ -29,7 +29,7 @@ export function decompress(
   const geometry = new PlaneGeometry(2, 2, 1, 1);
   const material = new ShaderMaterial({
     uniforms: { blitTexture: { value: texture } },
-    defines: { IS_SRGB: texture.colorSpace === SRGBColorSpace },
+    defines: { IS_SRGB: texture.colorSpace === ColorSpace.SRGB },
     vertexShader: `varying vec2 vUv;
       void main() { vUv = uv; gl_Position = vec4(position.xy, 0., .999999); }`,
     fragmentShader: `uniform sampler2D blitTexture;

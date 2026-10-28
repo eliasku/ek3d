@@ -1,10 +1,4 @@
-import {
-  ClampToEdgeWrapping,
-  DoubleSide,
-  MirroredRepeatWrapping,
-  RepeatWrapping,
-  SRGBColorSpace,
-} from "../../constants";
+import { Wrapping, Side, ColorSpace } from "../../constants";
 import { ShapePath } from "../../extras/core/ShapePath";
 import { MeshBasicMaterial } from "../../materials/MeshBasicMaterial";
 import { Box2 } from "../../math/Box2";
@@ -171,7 +165,7 @@ export function createSVGFillMaterial(path: SVGLoadedPath): MeshBasicMaterial | 
   const material = new MeshBasicMaterial({
     opacity: style.fillOpacity * (style.opacity || 1),
     transparent: true,
-    side: DoubleSide,
+    side: Side.Double,
     depthWrite: false,
   });
   if (texture !== null) material.map = texture;
@@ -184,10 +178,10 @@ export function createSVGStrokeMaterial(path: SVGLoadedPath): MeshBasicMaterial 
   if (style.stroke === undefined || style.stroke === "none") return null;
   if (gradientURL.test(style.stroke)) console.warn("THREE.SVGLoader: Gradient strokes are not supported.");
   return new MeshBasicMaterial({
-    color: new Color().setStyle(style.stroke, SRGBColorSpace),
+    color: new Color().setStyle(style.stroke, ColorSpace.SRGB),
     opacity: style.strokeOpacity * (style.opacity || 1),
     transparent: true,
-    side: DoubleSide,
+    side: Side.Double,
     depthWrite: false,
   });
 }
@@ -260,16 +254,16 @@ function buildGradientTexture(gradient: SVGGradient | undefined, path: SVGLoaded
     matrix = new Matrix3().set(1 / span, 0, -minX / span, 0, 1 / span, -minY / span, 0, 0, 1).multiply(inv);
   }
   const texture = new CanvasTexture(canvas);
-  texture.colorSpace = SRGBColorSpace;
+  texture.colorSpace = ColorSpace.SRGB;
   texture.flipY = false;
   texture.matrixAutoUpdate = false;
   texture.matrix = matrix;
   const wrap =
     gradient.spreadMethod === "reflect"
-      ? MirroredRepeatWrapping
+      ? Wrapping.MirroredRepeat
       : gradient.spreadMethod === "repeat"
-        ? RepeatWrapping
-        : ClampToEdgeWrapping;
+        ? Wrapping.Repeat
+        : Wrapping.ClampToEdge;
   texture.wrapS = wrap;
   texture.wrapT = wrap;
   return texture;
@@ -297,8 +291,8 @@ function addStops(gradient: CanvasGradient, stops: SVGGradientStop[]): void {
   for (const stop of stops) {
     let css = stop.color;
     if (stop.opacity < 1) {
-      color.setStyle(stop.color, SRGBColorSpace);
-      const match = /rgb\(([^)]+)\)/.exec(color.getStyle(SRGBColorSpace));
+      color.setStyle(stop.color, ColorSpace.SRGB);
+      const match = /rgb\(([^)]+)\)/.exec(color.getStyle(ColorSpace.SRGB));
       if (match) css = `rgba(${match[1]},${stop.opacity})`;
     }
     gradient.addColorStop(Math.max(0, Math.min(1, stop.offset)), css);

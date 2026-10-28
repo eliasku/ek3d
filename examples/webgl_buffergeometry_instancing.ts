@@ -4,7 +4,7 @@ import { Float32BufferAttribute } from "ek3d/core/BufferAttribute";
 import { InstancedBufferAttribute } from "ek3d/core/InstancedBufferAttribute";
 import { InstancedBufferGeometry } from "ek3d/core/InstancedBufferGeometry";
 import { Vector4 } from "ek3d/math/Vector4";
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { RawShaderMaterial } from "ek3d/materials/RawShaderMaterial";
 import { Mesh } from "ek3d/objects/Mesh";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
@@ -71,7 +71,7 @@ const material = new RawShaderMaterial({
       gl_FragColor = color;
     }
   `,
-  side: DoubleSide,
+  side: Side.Double,
   forceSinglePass: true,
   transparent: true,
 });

@@ -1,13 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import {
-  CubeReflectionMapping,
-  CubeRefractionMapping,
-  EquirectangularReflectionMapping,
-  EquirectangularRefractionMapping,
-  SRGBColorSpace,
-} from "ek3d/constants";
+import { Mapping, ColorSpace } from "ek3d/constants";
 import { IcosahedronGeometry } from "ek3d/geometries/IcosahedronGeometry";
 import { CubeTextureLoader } from "ek3d/loaders/CubeTextureLoader";
 import { LoadingManager } from "ek3d/loaders/LoadingManager";
@@ -61,8 +55,8 @@ const equirect = new TextureLoader(manager).load(
   undefined,
   onError,
 );
-equirect.mapping = EquirectangularReflectionMapping;
-equirect.colorSpace = SRGBColorSpace;
+equirect.mapping = Mapping.EquirectangularReflection;
+equirect.colorSpace = ColorSpace.SRGB;
 scene.background = cube;
 const material = new MeshBasicMaterial({ envMap: cube });
 const sphere = new Mesh(new IcosahedronGeometry(1, 15), material);
@@ -99,8 +93,8 @@ const gui = new GUI({ width: 300 });
 gui.add(params, "Cube");
 gui.add(params, "Equirectangular");
 gui.add(params, "Refraction").onChange(() => {
-  equirect.mapping = params.Refraction ? EquirectangularRefractionMapping : EquirectangularReflectionMapping;
-  cube.mapping = params.Refraction ? CubeRefractionMapping : CubeReflectionMapping;
+  equirect.mapping = params.Refraction ? Mapping.EquirectangularRefraction : Mapping.EquirectangularReflection;
+  cube.mapping = params.Refraction ? Mapping.CubeRefraction : Mapping.CubeReflection;
   material.needsUpdate = true;
 });
 gui.add(params, "backgroundRotationX");

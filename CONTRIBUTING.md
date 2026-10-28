@@ -47,7 +47,7 @@ The loader supports XYZ and XYZRGB rows, converting byte sRGB colors to working-
 Comments and unsupported row widths are ignored, matching upstream. Use a consistent row layout
 within each file; mixed colored/uncolored rows retain upstream's unequal attribute counts.
 The page handles resize, load errors and late responses after disposal. Data attribution and
-the LGPL license are retained in `examples/public/examples/`.
+the LGPL license are retained in `public/examples/`.
 
 `/examples/webgl_loader_gcode.html` loads three local toolpaths with
 `ek3d/addons/loaders/GCodeLoader`, explicit `LineBasicMaterial` shader composition,
@@ -206,7 +206,7 @@ live in `ek3d/addons/math/bvh/utils/ExtensionUtilities`.
 
 Open the URL printed by Vite. `/` is the English project landing page: a fullscreen, animated metallic torus knot with a short introduction, a link to `/examples/examples.html`, and a "Star on GitHub" CTA linking to [eliasku/ek3d](https://github.com/eliasku/ek3d) in a new tab. Its entrypoint is `examples/landing.ts`. A `MeshStandardMaterial` reflects a `RoomEnvironment`, baked once through `PMREMGenerator`; neutral tone mapping preserves highlight detail. The model and room are generated locally, with no external assets or runtime dependencies. The layout adapts to narrow screens. Capture resources are released after baking; navigation releases the model, environment target and DFG lookup texture while preserving back/forward-cache restores.
 
-`/feature-testbed/` is the internal feature self-testing stand. It runs `feature-testbed/main.ts`: a combined scene with camera/hierarchy, a reflective sphere, textured cylinder, normalized interleaved Lambert capsule, and an alternate set with a curved tube, beveled extrusion and flat shape with real holes. **O** replaces those meshes with a line strip, dashed loop, box edges, textured points and a translucent camera-facing sprite. **M** shows three colored instanced boxes. **H** shows a batched sphere/cylinder and a distance-selected sphere/box LOD. These paths include independent transforms, picking and directional/point/spot shadows. Ambient fill and a projected spot cookie can be toggled independently. All sets support fog, environment/background, HDR output and animation. Use the controls shown on the canvas; resizing updates both camera projections and the renderer. Rendering failures remain visible and are rethrown, not replaced with a mock or software scene.
+`/testbed/` is the internal feature self-testing stand. It runs `testbed/main.ts`: a combined scene with camera/hierarchy, a reflective sphere, textured cylinder, normalized interleaved Lambert capsule, and an alternate set with a curved tube, beveled extrusion and flat shape with real holes. **O** replaces those meshes with a line strip, dashed loop, box edges, textured points and a translucent camera-facing sprite. **M** shows three colored instanced boxes. **H** shows a batched sphere/cylinder and a distance-selected sphere/box LOD. These paths include independent transforms, picking and directional/point/spot shadows. Ambient fill and a projected spot cookie can be toggled independently. All sets support fog, environment/background, HDR output and animation. Use the controls shown on the canvas; resizing updates both camera projections and the renderer. Rendering failures remain visible and are rethrown, not replaced with a mock or software scene.
 
 Controls: drag to orbit, wheel to zoom (and switch LOD), **click** an object to select it (wireframe for ordinary meshes/LOD, white tint for lines/points/sprites or the selected instance; click empty space to clear), **G** to switch primitives/curve geometries, **O** to toggle lines/points/sprites, **M** to toggle instanced boxes, **H** to toggle batching/LOD and return to the previous set, **J** to hide/show the first batched instance, **X** to delete/recreate the second, **R** to advance instance/batch transforms even while paused, **C** to switch perspective/orthographic cameras, **F** to cycle off/linear/exponential fog, **N** to change the beacon's uniform-block tint, **I** to update the normalized interleaved capsule position buffer, **Space** to pause/resume, **L** to cycle directional/point/spot light, **A** to toggle ambient fill, **K** to toggle the spot cookie (visible in spot mode), **S** to toggle received shadows, **B** to toggle background blur, **E** to toggle background/basic reflection, **U** to update texture pixels, **T** to cycle tone mapping, and **+ / −** to change exposure.
 
@@ -214,11 +214,11 @@ Controls: drag to orbit, wheel to zoom (and switch LOD), **click** an object to 
 
 **W** shows a skinned cylinder and a morph sphere driven by an `AnimationMixer`, and returns to the previous object set. **[ / ]** seek backward/forward by 0.25 seconds, **Z** restarts the clip, and **Space** pauses playback. Deformation updates picking bounds and directional/point/spot shadows; both camera projections remain available.
 
-**1** loads a bundled local PNG onto the cylinder, then toggles it against the original texture. **2** loads deliberately corrupt JSON; **3** requests a missing resource. The canvas reports errors without destroying the working scene; manager completion and byte/item progress remain observable. No external CDN is used. `feature-testbed/assets.ts` owns its manager and loaded texture, aborts pending file requests and releases resources during scene disposal.
+**1** loads a bundled local PNG onto the cylinder, then toggles it against the original texture. **2** loads deliberately corrupt JSON; **3** requests a missing resource. The canvas reports errors without destroying the working scene; manager completion and byte/item progress remain observable. No external CDN is used. `testbed/assets.ts` owns its manager and loaded texture, aborts pending file requests and releases resources during scene disposal.
 
 **4** cycles off/array layers/3D slices, displaying two independently rendered texture slices. **5** toggles axes, grid, bounds, camera, light and skeleton helpers; use **W** to observe animated bones and **C** to inspect the perspective camera from the orthographic view. **6** toggles animated custom GLSL rings. **7 / 8** deliberately trigger compile/link failures, capture driver logs, repair the shader and restore the scene. The HUD reports recovery; `data-shader-log` retains the actual logs.
 
-The canvas help panel starts with compact controls, scene state and asset status. Click its title or press **?** to switch between compact and full help; this also works while paused without selecting objects underneath. The testbed is split into `feature-testbed/main.ts` (lifecycle, controls and animation), `feature-testbed/renderer.ts` (renderer/shader setup), `feature-testbed/scene.ts` (objects, materials, textures and lights), `feature-testbed/assets.ts` (local loading and resource ownership), and `feature-testbed/hud.ts` (help drawing and title hit testing).
+The canvas help panel starts with compact controls, scene state and asset status. Click its title or press **?** to switch between compact and full help; this also works while paused without selecting objects underneath. The testbed is split into `testbed/main.ts` (lifecycle, controls and animation), `testbed/renderer.ts` (renderer/shader setup), `testbed/scene.ts` (objects, materials, textures and lights), `testbed/assets.ts` (local loading and resource ownership), and `testbed/hud.ts` (help drawing and title hit testing).
 
 The feature testbed checks currently implemented functionality, not full upstream coverage. `FontLoader` is available as an addon; `GLTFLoader`, other format-specific addon loaders, codecs, decoders and transcoding workers remain pending. Third-party runtime will be supplied explicitly by consumers rather than bundled into the source-first package.
 
@@ -226,9 +226,9 @@ The feature testbed checks currently implemented functionality, not full upstrea
 
 Maintained addon code lives in `src/addons/`, under the same TypeScript and dependency rules as core. Import defining modules such as `ek3d/addons/shaders/CopyShader`; no `Addons` aggregator or `three/addons/*` compatibility path exists. The first migration iteration contains 48 shader modules (58 exported shader definitions). `DepthLimitedBlurShader`, `GTAOShader`, `PoissonDenoiseShader` and `SubsurfaceScatteringShader` remain deferred with their executable helpers.
 
-HTML examples live in `examples/` with adjacent TypeScript entrypoints. Open `/examples/webgl_shaders.html` for a four-panel comparison: copy and grayscale above, green tint and half exposure below. It uses generated local texture data, no CDN or vendor runtime. Both this page and `/feature-testbed/` are production build entries and are copied into the isolated package consumer.
+HTML examples live in `examples/` with adjacent TypeScript entrypoints. Open `/examples/webgl_shaders.html` for a four-panel comparison: copy and grayscale above, green tint and half exposure below. It uses generated local texture data, no CDN or vendor runtime. Both this page and `/testbed/` are production build entries and are copied into the isolated package consumer.
 
-Shader chunks are imported directly and composed once when the module loads; no implicit renderer chunk registry is required. Use `RawShaderMaterial` for `OutputShader`, and supply integer `RINGS` and `SAMPLES` defines for `BokehShader2`. Frei-Chen moves uniform-dependent initialization into `main` and avoids the GLSL3 reserved word `sample`. Triangle blur preserves its public `texture` uniform while resolving texture sampling before that name shadows the GLSL3 builtin.
+Shader chunks are imported directly and composed once when the module loads; no implicit renderer chunk registry is required. Use `RawShaderMaterial` for `OutputShader`, and supply integer `RINGS` and `SAMPLES` defines for `BokehShader2`. Frei-Chen moves uniform-dependent initialization into `main` and avoids the GLSL.GLSL3 reserved word `sample`. Triangle blur preserves its public `texture` uniform while resolving texture sampling before that name shadows the GLSL.GLSL3 builtin.
 
 `tests/browser-addon-shaders.ts` checks actual pixels, opacity/alpha, luminance, tint, exposure, cloned-uniform isolation, flat-field Frei-Chen response and zero-radius triangle blur. These are standard-browser checks during porting; the remaining release browser/device matrix is a separate gate.
 
@@ -240,7 +240,7 @@ Import `OrbitControls` from `ek3d/addons/controls/OrbitControls`. Its generic ca
 
 `/examples/webgl_geometry_text.html` preserves the upstream text scene, mirrored text, floor, lighting, fog, drag-to-spin and editable text. Type to replace the initial text; Backspace deletes. **F1** changes color, **F2** cycles the five font families, **F3** switches regular/bold, and **F4** toggles bevel. These replace the vendor GUI, not its features. Non-editing keys do not clear the initial text; stale asynchronous font responses do not override the current selection.
 
-The ten fonts in `examples/fonts/` are byte-identical upstream assets and are excluded from formatting. Their licenses and attribution live in `examples/public/font-licenses/`, which Vite copies to `dist/font-licenses/`. The isolated installed-package consumer uses the same public directory and all ten explicit asset URLs.
+The ten fonts in `examples/fonts/` are byte-identical upstream assets and are excluded from formatting. Their licenses and attribution live in `public/font-licenses/`, which Vite copies to `dist/font-licenses/`. The isolated installed-package consumer uses the same public directory and all ten explicit asset URLs.
 
 `FontLoader` and `Font` are defined in `ek3d/addons/loaders/FontLoader`. `loadAsync()` returns a typed font; malformed JSON rejects through the error callback and loading manager. Shapes preserve glyph holes, advance widths, newlines, Unicode character splitting, `ltr`/`rtl`/`tb` directions and the `?` fallback. A missing glyph with no fallback throws rather than fabricating geometry.
 
@@ -254,7 +254,7 @@ Iteration eight ports the remaining small controls and their pages. Import them 
 
 `TransformControls` is not generic: it transforms an arbitrary `Object3D` and owns a separate `camera` property assignable at runtime (the upstream camera-swap keyboard hook). Mirrored state (mode, space, axis, snaps, size, visibility toggles) propagates to the internal gizmo and plane through syncing accessors installed in the constructor, firing `<prop>-changed` and `change` events. The gizmo caches highlight state lazily on each material (`_color`/`_opacity`), exactly like upstream.
 
-Pages: `/examples/misc_controls_map.html` (keys **1**/**2** toggle `zoomToCursor` and `screenSpacePanning`), `/examples/misc_controls_drag.html` (Shift+click groups, **Digit1** switches touch pan/rotate), `/examples/misc_controls_pointerlock.html` (click to lock; WASD/arrows/Space), `/examples/misc_controls_transform.html` (q/w/e/r, Shift snaps, x/y/z visibility, space disables, Escape resets, **C** swaps perspective/orthographic, ±size). The vendor GUI is replaced with keyboard hooks, not dropped features; the transform page loads `examples/public/examples/textures/crate.gif`.
+Pages: `/examples/misc_controls_map.html` (keys **1**/**2** toggle `zoomToCursor` and `screenSpacePanning`), `/examples/misc_controls_drag.html` (Shift+click groups, **Digit1** switches touch pan/rotate), `/examples/misc_controls_pointerlock.html` (click to lock; WASD/arrows/Space), `/examples/misc_controls_transform.html` (q/w/e/r, Shift snaps, x/y/z visibility, space disables, Escape resets, **C** swaps perspective/orthographic, ±size). The vendor GUI is replaced with keyboard hooks, not dropped features; the transform page loads `public/examples/textures/crate.gif`.
 
 `tests/controls.test.ts` covers MapControls presets and no-element no-op panning, PointerLockControls movement and disabled behavior, DragControls state wiring without fake dispatches, and TransformControls attach/detach/mirror/reset boundaries. Real pointer capture, hover cursors, axis picking and dragging are verified through the standard browser tool on the pages during porting.
 
@@ -276,7 +276,7 @@ Pages wire the real GUI instead of keyboard replacements: `/examples/misc_contro
 
 ### Draco and UltraHDR loaders, Sky family and the demo browser
 
-`ek3d/addons/loaders/DRACOLoader` decodes standalone `.drc` files and glTF `KHR_draco_mesh_compression` payloads with a worker pool over the vendored WASM runtime under `/libs/draco/`. Use `dracoLoader.setDecoderPath(DRACO_GLTF_CONFIG)` when wiring a glTF loader. Decoded `bunny.drc` output matches the upstream loader byte-for-byte. `ek3d/addons/loaders/UltraHDRLoader` reads Ultra HDR JPEGs (XMP + ISO 21496-1 metadata, MPF container, gain-map recovery) into half/float data textures; pair it with `EquirectangularReflectionMapping` for environment use. `ek3d/addons/objects/Sky` is the Preetham skydome with cloud and sun-disc uniforms; `ek3d/addons/objects/GroundedSkybox` projects an envmap onto the ground plane.
+`ek3d/addons/loaders/DRACOLoader` decodes standalone `.drc` files and glTF `KHR_draco_mesh_compression` payloads with a worker pool over the vendored WASM runtime under `/libs/draco/`. Use `dracoLoader.setDecoderPath(DRACO_GLTF_CONFIG)` when wiring a glTF loader. Decoded `bunny.drc` output matches the upstream loader byte-for-byte. `ek3d/addons/loaders/UltraHDRLoader` reads Ultra HDR JPEGs (XMP + ISO 21496-1 metadata, MPF container, gain-map recovery) into half/float data textures; pair it with `Mapping.EquirectangularReflection` for environment use. `ek3d/addons/objects/Sky` is the Preetham skydome with cloud and sun-disc uniforms; `ek3d/addons/objects/GroundedSkybox` projects an envmap onto the ground plane.
 
 `tonemapping_pars_fragment.glsl` exports a `{ get(), set(replacement) }` accessor so pages can swap tonemapping functions at runtime (the tonemapping example injects the Uncharted2 curve for the `Custom` mode this way). `PMREMGenerator.fromScene` accepts any `Object3D`, so a `Sky` mesh can be PMREMed directly.
 
@@ -292,7 +292,7 @@ Import `STLLoader` from `ek3d/addons/loaders/STLLoader` or `PLYLoader` from `ek3
 
 STL preserves non-indexed facets, normals, groups for multiple ASCII solids and Magics binary vertex colors/alpha. PLY preserves ASCII, little- and big-endian binary input, vertex and face colors/UVs, triangle/quad faces, property-name remapping and custom attributes.
 
-The corresponding `/examples/webgl_loader_stl.html` and `/examples/webgl_loader_ply.html` pages use local upstream models, animated cameras, fog, directional shadows and Stats. Model provenance is recorded in `examples/public/examples/README.md`. Parser regression tests use synthetic data and require no network.
+The corresponding `/examples/webgl_loader_stl.html` and `/examples/webgl_loader_ply.html` pages use local upstream models, animated cameras, fog, directional shadows and Stats. Model provenance is recorded in `public/examples/README.md`. Parser regression tests use synthetic data and require no network.
 
 ### Collada, SVG, VRML, lighting, workers and audio
 
@@ -323,7 +323,7 @@ and close an owned context explicitly. `PositionalAudioHelper` lives at its cano
 AudioLoader copies encoded data before decoding so cached buffers are not detached, and keeps
 the loading manager active until decoding finishes.
 
-Asset notices are in `examples/public/examples/README.md` and adjacent files. Code/package
+Asset notices are in `public/examples/README.md` and adjacent files. Code/package
 checks and a minimal changed-path browser check do not establish the deferred combined
 interaction, lifecycle or device matrix recorded in `.local/PLAN.md`.
 
@@ -556,12 +556,12 @@ Browser regressions cover ordinary uniforms together with shared UBOs across Sha
 
 ```ts
 import { DataTexture } from "ek3d/textures/DataTexture";
-import { RGBAFormat, UnsignedByteType, SRGBColorSpace } from "ek3d/constants";
+import { PixelFormat, TextureType, ColorSpace } from "ek3d/constants";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 
 const pixels = new Uint8Array([255, 64, 32, 255, 32, 192, 64, 255, 64, 96, 255, 255, 224, 176, 32, 255]);
-const map = new DataTexture(pixels, 2, 2, RGBAFormat, UnsignedByteType);
-map.colorSpace = SRGBColorSpace;
+const map = new DataTexture(pixels, 2, 2, PixelFormat.RGBA, TextureType.UnsignedByte);
+map.colorSpace = ColorSpace.SRGB;
 map.needsUpdate = true;
 const material = new MeshBasicMaterial({ map });
 ```
@@ -582,7 +582,7 @@ Import `CanvasTexture`, `VideoTexture`, `VideoFrameTexture`, `FramebufferTexture
 
 Use `renderer.copyFramebufferToTexture(texture)` with a `FramebufferTexture(width, height)` to capture rendered pixels. Compressed textures take caller-supplied mip levels; compressed array updates can select layers with `addLayerUpdate(layer)`. Compressed cube inputs contain six faces with dimensions and mip levels. Compression formats require the corresponding GPU extension; there is no built-in decoder or transcoder. S3TC/DXT1 2D, array-layer and cube uploads were exercised, not every compressed format.
 
-Tag color data explicitly with `SRGBColorSpace`; data maps remain untagged. Canvas sRGB decoding, nearest/linear filtering, repeated UVs, generated mipmaps and explicit compressed mip levels have browser checks. Video/frame textures retain their upstream no-generated-mipmap defaults.
+Tag color data explicitly with `ColorSpace.SRGB`; data maps remain untagged. Canvas sRGB decoding, nearest/linear filtering, repeated UVs, generated mipmaps and explicit compressed mip levels have browser checks. Video/frame textures retain their upstream no-generated-mipmap defaults.
 
 `dispose()` releases GPU resources, not the canvas, video stream, compressed byte arrays or `VideoFrame`. The application stops media tracks and closes frames/bitmaps only after their consumers finish. Video disposal cancels its frame callback; create a new VideoTexture to resume automatic updates. Preserve upstream sharing rules when cloning. In particular, upstream `CompressedCubeTexture.clone()` throws because its constructor requires faces; copy into an explicitly constructed cube instead.
 
@@ -749,7 +749,7 @@ Select the environment implementation separately from textured backgrounds and m
 import { WebGLEnvironments } from "ek3d/renderers/webgl/WebGLEnvironments";
 import { WebGLBackground } from "ek3d/renderers/webgl/WebGLBackground";
 import { DataTexture } from "ek3d/textures/DataTexture";
-import { EquirectangularReflectionMapping, SRGBColorSpace } from "ek3d/constants";
+import { Mapping, ColorSpace } from "ek3d/constants";
 
 const renderer = new WebGLRenderer({
   createEnvironments: WebGLEnvironments,
@@ -757,8 +757,8 @@ const renderer = new WebGLRenderer({
   shaders: { MeshBasicMaterial: basicShader },
 });
 const environment = new DataTexture(new Uint8Array([255, 64, 32, 255, 32, 80, 240, 255]), 2, 1);
-environment.mapping = EquirectangularReflectionMapping;
-environment.colorSpace = SRGBColorSpace;
+environment.mapping = Mapping.EquirectangularReflection;
+environment.colorSpace = ColorSpace.SRGB;
 environment.needsUpdate = true;
 material.envMap = environment; // MeshBasicMaterial from the scene setup
 scene.background = environment;
@@ -809,7 +809,7 @@ Set `castShadow = true` on the caster and `receiveShadow = true` on the Lambert 
 
 `createShadowMap` has concrete renderer, object-update and maximum-texture-size arguments and returns `WebGLShadowMapSystem`. Without the factory, `renderer.shadowMap` is `null`; shadow-casting lights are rejected in both `render` and `compile`. With the factory, shadows default to disabled, matching upstream. Ordinary `compile` prepares visible materials; shadow materials are compiled when the shadow pass actually draws them. Missing built-in descriptors throw on use, without importing defaults.
 
-`BasicShadowMap` and `PCFShadowMap` support directional, point and spot lights; VSM retains its upstream directional/spot blur passes and does not support point lights. `PCFSoftShadowMap` retains upstream's warning and PCF fallback. `shadow.intensity`, bias, normal bias, radius, map size, camera and update flags retain their upstream meaning. With `renderer.shadowMap.autoUpdate = false`, set its `needsUpdate = true` for a new pass; if the light's own `shadow.autoUpdate` is also false, set that shadow's `needsUpdate` too.
+`ShadowMap.Basic` and `ShadowMap.PCF` support directional, point and spot lights; VSM retains its upstream directional/spot blur passes and does not support point lights. `ShadowMap.PCFSoft` retains upstream's warning and PCF fallback. `shadow.intensity`, bias, normal bias, radius, map size, camera and update flags retain their upstream meaning. With `renderer.shadowMap.autoUpdate = false`, set its `needsUpdate = true` for a new pass; if the light's own `shadow.autoUpdate` is also false, set that shadow's `needsUpdate` too.
 
 Light-owned shadow targets are released by `light.dispose()` or `light.shadow.dispose()`. Remove the light from the scene before final disposal; materials and geometries remain caller-owned. The shadow system releases its internal depth/distance/VSM materials, fullscreen geometry, cached material variants and listeners on renderer disposal. The renderer releases all remaining GPU programs even when a caller's material outlives it. Failed callbacks restore render-target/face/mip and clipping phase. Context loss clears old GPU caches and marks frozen shadows dirty for one refill while preserving both `autoUpdate` flags and clear color/alpha. Per-shadow map-type tracking prevents incompatible samplers when a light returns after being absent during a mode change. These changes fix reproduced upstream lifecycle failures without changing shadow rendering algorithms.
 
@@ -821,14 +821,14 @@ Select output independently of the material shaders, using the earlier material,
 
 ```ts
 import { WebGLOutput } from "ek3d/renderers/webgl/WebGLOutput";
-import { HalfFloatType, ACESFilmicToneMapping } from "ek3d/constants";
+import { TextureType, ToneMapping } from "ek3d/constants";
 
 const renderer = new WebGLRenderer({
   createOutput: WebGLOutput,
-  outputBufferType: HalfFloatType,
+  outputBufferType: TextureType.HalfFloat,
   shaders: { MeshBasicMaterial: basicShader },
 });
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 1;
 material.color.setRGB(4, 1, 0.25);
 renderer.render(scene, camera);
@@ -836,7 +836,7 @@ renderer.render(scene, camera);
 
 `WebGLOutput` preserves the upstream scene target, fullscreen triangle, tone-mapping/color-space shader and lazy effect buffers. Its dependency closure adds only `WebGLOutput` and `RawShaderMaterial` to the packaged implementation graph; other dependencies were already ported. Embedded GLSL imports its defining chunks directly. The renderer has only type imports of the factory, whose six arguments and `WebGLOutputSystem` result are concrete.
 
-Use `HalfFloatType` or `FloatType` for HDR. Without `createOutput`, requesting HDR throws before context creation or listener registration. Merely supplying the factory with the default `UnsignedByteType` does not activate it. With no effects and `NoToneMapping`, rendering bypasses the HDR pass and ignores exposure, matching upstream. Tone mapping occurs after the HDR scene render; `renderer.outputColorSpace` selects the final transfer. Ordinary offscreen render targets bypass output.
+Use `TextureType.HalfFloat` or `TextureType.Float` for HDR. Without `createOutput`, requesting HDR throws before context creation or listener registration. Merely supplying the factory with the default `TextureType.UnsignedByte` does not activate it. With no effects and `ToneMapping.No`, rendering bypasses the HDR pass and ignores exposure, matching upstream. Tone mapping occurs after the HDR scene render; `renderer.outputColorSpace` selects the final transfer. Ordinary offscreen render targets bypass output.
 
 No postprocessing addon or effect is imported or installed automatically. `renderer.setEffects(effects)` accepts explicit `WebGLOutputEffect[]`; `null` or `[]` removes them. Calling it without an HDR output buffer throws. The structural effect contract includes `render(renderer, writeBuffer, readBuffer, deltaTime?)`, optional `enabled`/`needsSwap`, `isRenderPass`/`isOutputPass`, `setSize`, `needsDepthTexture` and `setDepthTexture`. Effects ping-pong between single-sampled HalfFloat buffers; a leading RenderPass supplies the scene itself. Effect objects and their own resources remain caller-owned. This ports the protocol, not the addons implementing it.
 

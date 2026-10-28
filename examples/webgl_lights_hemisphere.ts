@@ -1,7 +1,7 @@
 import { AnimationMixer } from "ek3d/animation/AnimationMixer";
 import { HemisphereLightHelper } from "ek3d/helpers/HemisphereLightHelper";
 import { DirectionalLightHelper } from "ek3d/helpers/DirectionalLightHelper";
-import { BackSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
@@ -132,7 +132,7 @@ const skyMat = new ShaderMaterial({
   uniforms: uniforms,
   vertexShader: vertexShader,
   fragmentShader: fragmentShader,
-  side: BackSide,
+  side: Side.Back,
 });
 
 const sky = new Mesh(skyGeo, skyMat);

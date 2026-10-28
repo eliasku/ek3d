@@ -8,7 +8,7 @@ import { Mesh } from "ek3d/objects/Mesh";
 import { Vector3 } from "ek3d/math/Vector3";
 import { WebGLRenderTarget } from "ek3d/renderers/WebGLRenderTarget";
 import { DepthTexture } from "ek3d/textures/DepthTexture";
-import { FloatType } from "ek3d/constants";
+import { TextureType } from "ek3d/constants";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { EffectComposer } from "ek3d/addons/postprocessing/EffectComposer";
 import { RenderPass } from "ek3d/addons/postprocessing/RenderPass";
@@ -99,7 +99,7 @@ const views = ["normal z-buffer", "logarithmic z-buffer", "reverse z-buffer"].ma
   renderer.setPixelRatio(window.devicePixelRatio);
   const target = new WebGLRenderTarget();
   target.depthTexture = new DepthTexture(1, 1);
-  target.depthTexture.type = FloatType;
+  target.depthTexture.type = TextureType.Float;
   const composer = new EffectComposer(renderer, target);
   const renderPass = new RenderPass(scene, index === 2 ? reverseCamera : camera);
   const output = new OutputPass();

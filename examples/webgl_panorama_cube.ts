@@ -1,6 +1,6 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { ImageLoader } from "ek3d/loaders/ImageLoader";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
@@ -56,7 +56,7 @@ new ImageLoader().load(
         const context = tile.getContext("2d");
         if (!context) throw new Error("Canvas2D is unavailable for panorama atlas extraction");
         context.drawImage(image, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth);
-        textures[i].colorSpace = SRGBColorSpace;
+        textures[i].colorSpace = ColorSpace.SRGB;
         textures[i].image = tile;
         textures[i].needsUpdate = true;
       }

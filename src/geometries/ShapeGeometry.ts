@@ -17,7 +17,7 @@ export interface ShapeGeometryJSON {
  * import { ShapeGeometry } from 'ek3d/geometries/ShapeGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
  * import { Mesh } from 'ek3d/objects/Mesh';
- * import { DoubleSide } from 'ek3d/constants';
+ * import { Side } from 'ek3d/constants';
  *
  * const scene = new Scene();
  *
@@ -26,7 +26,7 @@ export interface ShapeGeometryJSON {
  * arcShape.absarc( 1, 1, 4, 0, Math.PI * 2, false );
  *
  * const geometry = new ShapeGeometry( arcShape );
- * const material = new MeshBasicMaterial( { color: 0x00ff00, side: DoubleSide } );
+ * const material = new MeshBasicMaterial( { color: 0x00ff00, side: Side.Double } );
  * const mesh = new Mesh( geometry, material ) ;
  * scene.add( mesh );
  * ```

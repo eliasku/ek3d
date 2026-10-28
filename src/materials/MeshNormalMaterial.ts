@@ -1,5 +1,5 @@
 import type { Texture } from "../textures/Texture";
-import { TangentSpaceNormalMap } from "../constants";
+import { NormalMap } from "../constants";
 import { Material } from "./Material";
 import { Vector2 } from "../math/Vector2";
 
@@ -80,7 +80,7 @@ export class MeshNormalMaterial extends Material {
   bumpMap: Texture | null;
   bumpScale: number;
   normalMap: Texture | null;
-  normalMapType: number;
+  normalMapType: NormalMap;
   normalScale: Vector2;
   displacementMap: Texture | null;
   displacementScale: number;
@@ -115,7 +115,7 @@ export class MeshNormalMaterial extends Material {
      * this will be ignored.
      *
      * `bumpMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -135,7 +135,7 @@ export class MeshNormalMaterial extends Material {
      * for the different handedness.
      *
      * `normalMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -143,9 +143,9 @@ export class MeshNormalMaterial extends Material {
     /**
      * The type of normal map.
      *
-     * @default TangentSpaceNormalMap
+     * @default NormalMap.TangentSpace
      */
-    this.normalMapType = TangentSpaceNormalMap;
+    this.normalMapType = NormalMap.TangentSpace;
     /**
      * How much the normal map affects the material. Typical value range is `[0,1]`.
      *

@@ -103,10 +103,7 @@ test("Draco exporter passes geometry and options to an injected encoder and copi
 });
 
 test("local Draco encoder produces a Draco stream", async () => {
-  const source = readFileSync(
-    new URL("../examples/public/examples/libs/draco/draco_encoder.js", import.meta.url),
-    "utf8",
-  );
+  const source = readFileSync(new URL("../public/examples/libs/draco/draco_encoder.js", import.meta.url), "utf8");
   const module: { exports: unknown } = { exports: {} };
   runInNewContext(source, {
     module,
@@ -125,10 +122,7 @@ test("local Draco encoder produces a Draco stream", async () => {
 });
 
 test("encoder resources are released when Draco rejects geometry", async () => {
-  const source = readFileSync(
-    new URL("../examples/public/examples/libs/draco/draco_encoder.js", import.meta.url),
-    "utf8",
-  );
+  const source = readFileSync(new URL("../public/examples/libs/draco/draco_encoder.js", import.meta.url), "utf8");
   const module: { exports: unknown } = { exports: {} };
   runInNewContext(source, {
     module,

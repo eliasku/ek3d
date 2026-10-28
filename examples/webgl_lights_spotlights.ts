@@ -1,6 +1,6 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { PCFShadowMap } from "ek3d/constants";
+import { ShadowMap } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { SpotLightHelper } from "ek3d/helpers/SpotLightHelper";
@@ -29,7 +29,7 @@ renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
 if (!renderer.shadowMap) throw new Error("Missing shadow map system");
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = PCFShadowMap;
+renderer.shadowMap.type = ShadowMap.PCF;
 const camera = new PerspectiveCamera(35, innerWidth / innerHeight, 0.1, 100);
 camera.position.set(4.6, 2.2, -2.1);
 const controls = new OrbitControls(camera, canvas);

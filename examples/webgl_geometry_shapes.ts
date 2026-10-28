@@ -1,4 +1,4 @@
-import { DoubleSide, RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Side, Wrapping, ColorSpace } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { ExtrudeGeometry } from "ek3d/geometries/ExtrudeGeometry";
 import { ShapeGeometry } from "ek3d/geometries/ShapeGeometry";
@@ -55,12 +55,12 @@ let windowHalfX = window.innerWidth / 2;
 
 const loader = new TextureLoader();
 const texture = loader.load("/examples/textures/uv_grid_opengl.jpg");
-texture.colorSpace = SRGBColorSpace;
+texture.colorSpace = ColorSpace.SRGB;
 
 // it's necessary to apply these settings in order to correctly display the texture on a shape geometry
 
-texture.wrapS = RepeatWrapping;
-texture.wrapT = RepeatWrapping;
+texture.wrapS = Wrapping.Repeat;
+texture.wrapT = Wrapping.Repeat;
 texture.repeat.set(0.008, 0.008);
 
 function addShape(
@@ -87,7 +87,7 @@ function addShape(
 
   let geometry: ShapeGeometry | ExtrudeGeometry = new ShapeGeometry(shape);
 
-  let mesh = new Mesh(geometry, new MeshPhongMaterial({ side: DoubleSide, map: texture }));
+  let mesh = new Mesh(geometry, new MeshPhongMaterial({ side: Side.Double, map: texture }));
   mesh.position.set(x, y, z - 175);
   mesh.rotation.set(rx, ry, rz);
   mesh.scale.setScalar(s);
@@ -97,7 +97,7 @@ function addShape(
 
   geometry = new ShapeGeometry(shape);
 
-  mesh = new Mesh(geometry, new MeshPhongMaterial({ color: color, side: DoubleSide }));
+  mesh = new Mesh(geometry, new MeshPhongMaterial({ color: color, side: Side.Double }));
   mesh.position.set(x, y, z - 125);
   mesh.rotation.set(rx, ry, rz);
   mesh.scale.setScalar(s);

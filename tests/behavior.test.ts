@@ -19,7 +19,7 @@ import { BoxGeometry as UpstreamBoxGeometry } from "../upstream/three.js/src/geo
 import { PerspectiveCamera as UpstreamCamera } from "../upstream/three.js/src/cameras/PerspectiveCamera.js";
 import { DataTexture } from "../src/textures/DataTexture";
 import { Vector2 } from "../src/math/Vector2";
-import { RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping, SRGBColorSpace } from "../src/constants";
+import { Wrapping, ColorSpace } from "../src/constants";
 import { DataTexture as UpstreamDataTexture } from "../upstream/three.js/src/textures/DataTexture.js";
 import { Vector2 as UpstreamVector2 } from "../upstream/three.js/src/math/Vector2.js";
 import { MeshLambertMaterial } from "../src/materials/MeshLambertMaterial";
@@ -31,12 +31,7 @@ import { ShaderMaterial } from "../src/materials/ShaderMaterial";
 import { getEnvironment } from "../src/renderers/webgl/WebGLEnvironmentAccess";
 import { backgroundShader } from "../src/renderers/shaders/BackgroundShader";
 import { backgroundCubeShader } from "../src/renderers/shaders/BackgroundCubeShader";
-import {
-  CubeReflectionMapping,
-  CubeRefractionMapping,
-  EquirectangularReflectionMapping,
-  EquirectangularRefractionMapping,
-} from "../src/constants";
+import { Mapping } from "../src/constants";
 import { WebGLEnvironments as UpstreamEnvironments } from "../upstream/three.js/src/renderers/webgl/WebGLEnvironments.js";
 import { DirectionalLight } from "../src/lights/DirectionalLight";
 import { PointLight } from "../src/lights/PointLight";
@@ -48,8 +43,8 @@ import { PointLight as UpstreamPointLight } from "../upstream/three.js/src/light
 import { MeshDepthMaterial as UpstreamDepthMaterial } from "../upstream/three.js/src/materials/MeshDepthMaterial.js";
 import { MeshDistanceMaterial as UpstreamDistanceMaterial } from "../upstream/three.js/src/materials/MeshDistanceMaterial.js";
 import { DepthTexture as UpstreamDepthTexture } from "../upstream/three.js/src/textures/DepthTexture.js";
-import { RGBADepthPacking, LessEqualCompare } from "../src/constants";
-import { WebGLCoordinateSystem } from "../src/constants";
+import { DepthPacking, Compare } from "../src/constants";
+import { CoordinateSystem } from "../src/constants";
 import { Frustum } from "../src/math/Frustum";
 import { Frustum as UpstreamFrustum } from "../upstream/three.js/src/math/Frustum.js";
 import { OrthographicCamera } from "../src/cameras/OrthographicCamera";
@@ -98,13 +93,13 @@ test("box geometry and camera projection preserve upstream buffers and clipping"
 test("WebGL projections and frustum boundaries agree with upstream at both depth conventions", () => {
   for (const reversedDepth of [false, true]) {
     for (const method of ["makePerspective", "makeOrthographic"] as const) {
-      const actual = new Matrix4()[method](-2, 4, 3, -1, 2, 18, WebGLCoordinateSystem, reversedDepth);
-      const expected = new UpstreamMatrix4()[method](-2, 4, 3, -1, 2, 18, WebGLCoordinateSystem, reversedDepth);
+      const actual = new Matrix4()[method](-2, 4, 3, -1, 2, 18, CoordinateSystem.WebGL, reversedDepth);
+      const expected = new UpstreamMatrix4()[method](-2, 4, 3, -1, 2, 18, CoordinateSystem.WebGL, reversedDepth);
       assert.deepEqual(actual.elements, expected.elements);
-      const frustum = new Frustum().setFromProjectionMatrix(actual, WebGLCoordinateSystem, reversedDepth);
+      const frustum = new Frustum().setFromProjectionMatrix(actual, CoordinateSystem.WebGL, reversedDepth);
       const upstreamFrustum = new UpstreamFrustum().setFromProjectionMatrix(
         expected,
-        WebGLCoordinateSystem,
+        CoordinateSystem.WebGL,
         reversedDepth,
       );
       assert.deepEqual(
@@ -251,7 +246,7 @@ test("scene reparenting preserves event ownership and matrix updates", () => {
 });
 
 test("data texture UV transforms preserve upstream wrapping, boundaries and flipY", () => {
-  for (const wrapping of [RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping]) {
+  for (const wrapping of [Wrapping.Repeat, Wrapping.ClampToEdge, Wrapping.MirroredRepeat]) {
     for (const flipY of [false, true]) {
       const actual = new DataTexture(),
         expected = new UpstreamDataTexture();
@@ -285,7 +280,7 @@ test("data texture clones share source updates but not UV state, matching upstre
   const actual = new DataTexture(data, 1, 1),
     expected = new UpstreamDataTexture(data, 1, 1);
   for (const texture of [actual, expected]) {
-    texture.colorSpace = SRGBColorSpace;
+    texture.colorSpace = ColorSpace.SRGB;
     texture.needsUpdate = false;
     assert.equal(texture.version, 0);
     texture.needsUpdate = true;
@@ -293,7 +288,7 @@ test("data texture clones share source updates but not UV state, matching upstre
     assert.equal(clone.source, texture.source);
     assert.ok(clone.image && "data" in clone.image);
     assert.equal(clone.image.data, data);
-    assert.equal(clone.colorSpace, SRGBColorSpace);
+    assert.equal(clone.colorSpace, ColorSpace.SRGB);
     assert.notEqual(clone.offset, texture.offset);
     clone.offset.set(0.5, 0.25);
     assert.deepEqual(texture.offset.toArray(), [0, 0]);
@@ -371,13 +366,13 @@ test("environment access preserves upstream passthrough and rejects only convers
       assert.equal(getEnvironment(null, texture, usePMREM), upstream.get(texture, usePMREM));
     }
   }
-  for (const mapping of [CubeReflectionMapping, CubeRefractionMapping]) {
+  for (const mapping of [Mapping.CubeReflection, Mapping.CubeRefraction]) {
     cube.mapping = mapping;
     assert.equal(getEnvironment(null, cube), cube);
     assert.equal(getEnvironment(null, cube), upstream.get(cube));
     assert.throws(() => getEnvironment(null, cube, true), /createEnvironments/);
   }
-  for (const mapping of [EquirectangularReflectionMapping, EquirectangularRefractionMapping]) {
+  for (const mapping of [Mapping.EquirectangularReflection, Mapping.EquirectangularRefraction]) {
     flat.mapping = mapping;
     for (const usePMREM of [false, true]) {
       assert.throws(() => getEnvironment(null, flat, usePMREM), /createEnvironments/);
@@ -530,12 +525,12 @@ test("depth and distance parameters and clones preserve upstream material and te
     assert.equal(actual.displacementScale, expected.displacementScale);
   }
   assert.equal(
-    new MeshDepthMaterial({ depthPacking: RGBADepthPacking }).clone().depthPacking,
-    new UpstreamDepthMaterial({ depthPacking: RGBADepthPacking }).clone().depthPacking,
+    new MeshDepthMaterial({ depthPacking: DepthPacking.RGBA }).clone().depthPacking,
+    new UpstreamDepthMaterial({ depthPacking: DepthPacking.RGBA }).clone().depthPacking,
   );
   const depth = new DepthTexture(32, 16);
   const upstreamDepth = new UpstreamDepthTexture(32, 16);
-  depth.compareFunction = upstreamDepth.compareFunction = LessEqualCompare;
+  depth.compareFunction = upstreamDepth.compareFunction = Compare.LessEqual;
   const clone = depth.clone();
   const upstreamClone = upstreamDepth.clone();
   assert.ok(upstreamClone instanceof UpstreamDepthTexture);

@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometryLoader } from "ek3d/loaders/BufferGeometryLoader";
 import { LoadingManager } from "ek3d/loaders/LoadingManager";
@@ -44,7 +44,7 @@ void main() {
   gl_FragColor.rgb = gl_FrontFacing ? vec3(0.9, 0.9, 1.0) : vec3(0.4, 0.4, 0.5);
   gl_FragColor.a = edge;
 }`,
-  side: DoubleSide,
+  side: Side.Double,
   alphaToCoverage: true,
 });
 const gui = new GUI();

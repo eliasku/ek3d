@@ -77,8 +77,11 @@ try {
   for (const file of ["README.md"])
     assert.deepEqual(await readFile(path.join(installed, file)), await readFile(path.join(root, file)), file);
 
-  await cp(path.join(root, "feature-testbed"), path.join(consumer, "feature-testbed"), { recursive: true });
-  const directories = ["feature-testbed"];
+  await cp(path.join(root, "testbed"), path.join(consumer, "testbed"), { recursive: true });
+  await cp(path.join(root, "public"), path.join(consumer, "public"), { recursive: true });
+  await mkdir(path.join(consumer, "scripts"));
+  await cp(path.join(root, "scripts/const-enums.ts"), path.join(consumer, "scripts/const-enums.ts"));
+  const directories = ["testbed"];
   if ((await readdir(root)).includes("examples")) {
     await cp(path.join(root, "examples"), path.join(consumer, "examples"), { recursive: true });
     directories.push("examples");
@@ -102,7 +105,7 @@ try {
     }),
   );
   run(process.execPath, ["node_modules/typescript/bin/tsc", "--noEmit"]);
-  const entries = ["index.html", "feature-testbed/index.html"];
+  const entries = ["index.html", "testbed/index.html"];
   if (directories.includes("examples")) {
     for (const name of await readdir(path.join(consumer, "examples"), { recursive: true })) {
       if (name.endsWith(".html")) entries.push(`examples/${name.split(path.sep).join("/")}`);
@@ -112,12 +115,14 @@ try {
     path.join(consumer, "vite.config.ts"),
     `import { defineConfig } from 'vite-plus';
 import { writeFileSync } from 'node:fs';
+import { constEnums } from './scripts/const-enums';
 export default defineConfig({
-  publicDir: 'examples/public',
-  build: { target: 'es2022', minify: 'oxc', rollupOptions: { input: ${JSON.stringify(entries)} } },
-  plugins: [{ name: 'record-packed-graph', generateBundle(_options, bundle) {
+  publicDir: 'public',
+  worker: { plugins: () => [constEnums()] },
+  plugins: [constEnums(), { name: 'record-packed-graph', generateBundle(_options, bundle) {
     writeFileSync('graph.json', JSON.stringify([...new Set(Object.values(bundle).flatMap(chunk => chunk.type === 'chunk' ? Object.keys(chunk.modules) : []))].sort()));
   } }],
+  build: { target: 'es2022', minify: 'oxc', rollupOptions: { input: ${JSON.stringify(entries)} } },
 });\n`,
   );
   run("npm", ["exec", "--", "vp", "build"]);
@@ -131,7 +136,7 @@ export default defineConfig({
   dev = await vite.createServer({
     root: consumer,
     configFile: false,
-    publicDir: "examples/public",
+    publicDir: "public",
     // Runtime-selected smoke imports must join the initial dependency scan, not trigger reloads mid-lifecycle.
     optimizeDeps: {
       entries: [...entries, "tests/browser*.ts"],

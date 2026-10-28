@@ -1,6 +1,6 @@
 import { BufferAttribute } from "../../core/BufferAttribute";
 import { BufferGeometry } from "../../core/BufferGeometry";
-import { DynamicDrawUsage } from "../../constants";
+import { BufferUsage } from "../../constants";
 import { Color } from "../../math/Color";
 import { Sphere } from "../../math/Sphere";
 import { Vector3 } from "../../math/Vector3";
@@ -133,25 +133,25 @@ export class MarchingCubes extends Mesh<Material> {
 
       this.positionArray = new Float32Array(maxVertexCount * 3);
       const positionAttribute = new BufferAttribute(this.positionArray, 3);
-      positionAttribute.setUsage(DynamicDrawUsage);
+      positionAttribute.setUsage(BufferUsage.DynamicDraw);
       geometry.setAttribute("position", positionAttribute);
 
       this.normalArray = new Float32Array(maxVertexCount * 3);
       const normalAttribute = new BufferAttribute(this.normalArray, 3);
-      normalAttribute.setUsage(DynamicDrawUsage);
+      normalAttribute.setUsage(BufferUsage.DynamicDraw);
       geometry.setAttribute("normal", normalAttribute);
 
       if (enableUvs || this.enableUvs || geometry.getAttribute("uv")) {
         this.uvArray = new Float32Array(maxVertexCount * 2);
         const uvAttribute = new BufferAttribute(this.uvArray, 2);
-        uvAttribute.setUsage(DynamicDrawUsage);
+        uvAttribute.setUsage(BufferUsage.DynamicDraw);
         geometry.setAttribute("uv", uvAttribute);
       }
 
       if (enableColors || this.enableColors || geometry.getAttribute("color")) {
         this.colorArray = new Float32Array(maxVertexCount * 3);
         const colorAttribute = new BufferAttribute(this.colorArray, 3);
-        colorAttribute.setUsage(DynamicDrawUsage);
+        colorAttribute.setUsage(BufferUsage.DynamicDraw);
         geometry.setAttribute("color", colorAttribute);
       }
 
@@ -819,11 +819,11 @@ export class MarchingCubes extends Mesh<Material> {
     this.update = () => {
       if (this.enableUvs && !geometry.getAttribute("uv")) {
         this.uvArray = new Float32Array(maxPolyCount * 6);
-        geometry.setAttribute("uv", new BufferAttribute(this.uvArray, 2).setUsage(DynamicDrawUsage));
+        geometry.setAttribute("uv", new BufferAttribute(this.uvArray, 2).setUsage(BufferUsage.DynamicDraw));
       }
       if (this.enableColors && !geometry.getAttribute("color")) {
         this.colorArray = new Float32Array(maxPolyCount * 9);
-        geometry.setAttribute("color", new BufferAttribute(this.colorArray, 3).setUsage(DynamicDrawUsage));
+        geometry.setAttribute("color", new BufferAttribute(this.colorArray, 3).setUsage(BufferUsage.DynamicDraw));
       }
 
       this.count = 0;

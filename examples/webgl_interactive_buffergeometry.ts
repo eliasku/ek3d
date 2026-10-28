@@ -1,5 +1,5 @@
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { Raycaster } from "ek3d/core/Raycaster";
@@ -72,7 +72,7 @@ const mesh = new Mesh(
     color: 0xaaaaaa,
     specular: 0xffffff,
     shininess: 250,
-    side: DoubleSide,
+    side: Side.Double,
     vertexColors: true,
   }),
 );

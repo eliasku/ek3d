@@ -2,12 +2,7 @@ import { CompressedTextureLoader } from "../../loaders/CompressedTextureLoader";
 import type { CompressedTextureData } from "../../loaders/CompressedTextureLoader";
 import type { CompressedTextureMipmap } from "../../textures/CompressedTexture";
 import type { LoadingManager } from "../../loaders/LoadingManager";
-import {
-  RGBA_PVRTC_2BPPV1_Format,
-  RGBA_PVRTC_4BPPV1_Format,
-  RGB_PVRTC_2BPPV1_Format,
-  RGB_PVRTC_4BPPV1_Format,
-} from "../../constants";
+import { PixelFormat } from "../../constants";
 
 const HEADER_LENGTH_INT = 13;
 
@@ -32,10 +27,10 @@ interface PvrDatas {
  *
  * ```typescript
  * import { PVRLoader } from "ek3d/addons/loaders/PVRLoader";
- * import { SRGBColorSpace } from "ek3d/constants";
+ * import { ColorSpace } from "ek3d/constants";
  *
  * const map = await new PVRLoader().loadAsync("textures/compressed/disturb_4bpp_rgb.pvr");
- * map.colorSpace = SRGBColorSpace; // only for color textures
+ * map.colorSpace = ColorSpace.SRGB; // only for color textures
  * ```
  */
 export class PVRLoader extends CompressedTextureLoader {
@@ -86,19 +81,19 @@ function parseV3(pvrDatas: PvrDatas): CompressedTextureData {
   switch (pixelFormat) {
     case 0: // PVRTC 2bpp RGB
       bpp = 2;
-      format = RGB_PVRTC_2BPPV1_Format;
+      format = PixelFormat.RGB_PVRTC_2BPPV1;
       break;
     case 1: // PVRTC 2bpp RGBA
       bpp = 2;
-      format = RGBA_PVRTC_2BPPV1_Format;
+      format = PixelFormat.RGBA_PVRTC_2BPPV1;
       break;
     case 2: // PVRTC 4bpp RGB
       bpp = 4;
-      format = RGB_PVRTC_4BPPV1_Format;
+      format = PixelFormat.RGB_PVRTC_4BPPV1;
       break;
     case 3: // PVRTC 4bpp RGBA
       bpp = 4;
-      format = RGBA_PVRTC_4BPPV1_Format;
+      format = PixelFormat.RGBA_PVRTC_4BPPV1;
       break;
     default:
       throw new Error("THREE.PVRLoader: Unsupported PVR format: " + pixelFormat);
@@ -135,10 +130,10 @@ function parseV2(pvrDatas: PvrDatas): CompressedTextureData {
   let format: number;
 
   if (formatFlags === PVRTC_4) {
-    format = hasAlpha ? RGBA_PVRTC_4BPPV1_Format : RGB_PVRTC_4BPPV1_Format;
+    format = hasAlpha ? PixelFormat.RGBA_PVRTC_4BPPV1 : PixelFormat.RGB_PVRTC_4BPPV1;
     bpp = 4;
   } else if (formatFlags === PVRTC_2) {
-    format = hasAlpha ? RGBA_PVRTC_2BPPV1_Format : RGB_PVRTC_2BPPV1_Format;
+    format = hasAlpha ? PixelFormat.RGBA_PVRTC_2BPPV1 : PixelFormat.RGB_PVRTC_2BPPV1;
     bpp = 2;
   } else {
     throw new Error("THREE.PVRLoader: Unknown PVR format: " + formatFlags);

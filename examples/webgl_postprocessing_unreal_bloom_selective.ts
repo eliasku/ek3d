@@ -25,7 +25,7 @@ import { createLTCTextures } from "ek3d/renderers/shaders/LTCTextures";
 import { standardShader } from "ek3d/renderers/shaders/StandardShader";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
-import { HalfFloatType, NeutralToneMapping } from "ek3d/constants";
+import { TextureType, ToneMapping } from "ek3d/constants";
 import type { Material } from "ek3d/materials/Material";
 import type { Object3D } from "ek3d/core/Object3D";
 import { Scene } from "ek3d/scenes/Scene";
@@ -116,7 +116,7 @@ function init(): void {
   });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.toneMapping = NeutralToneMapping;
+  renderer.toneMapping = ToneMapping.Neutral;
 
   const pmremGenerator = new PMREMGenerator(renderer);
   scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
@@ -134,7 +134,9 @@ function init(): void {
   bloomPass.strength = params.strength;
   bloomPass.radius = params.radius;
 
-  const bloomRenderTarget = new WebGLRenderTarget(window.innerWidth, window.innerHeight, { type: HalfFloatType });
+  const bloomRenderTarget = new WebGLRenderTarget(window.innerWidth, window.innerHeight, {
+    type: TextureType.HalfFloat,
+  });
   bloomComposer = new EffectComposer(renderer, bloomRenderTarget);
   bloomComposer.renderToScreen = false;
   bloomComposer.addPass(renderPass);
@@ -158,7 +160,7 @@ function init(): void {
   const outputPass = new OutputPass();
 
   const finalRenderTarget = new WebGLRenderTarget(window.innerWidth, window.innerHeight, {
-    type: HalfFloatType,
+    type: TextureType.HalfFloat,
     samples: 4,
   });
   finalComposer = new EffectComposer(renderer, finalRenderTarget);

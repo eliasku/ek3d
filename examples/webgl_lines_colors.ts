@@ -1,6 +1,6 @@
 import { hilbert3D } from "ek3d/addons/utils/GeometryUtils";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { Float32BufferAttribute } from "ek3d/core/BufferAttribute";
 import { CatmullRomCurve3 } from "ek3d/extras/curves/CatmullRomCurve3";
@@ -32,16 +32,16 @@ for (let row = 0; row < 2; row++) {
     const point = row === 0 ? spline.getPoint(i / count) : hilbert[i];
     vertices.push(point.x, point.y, point.z);
     if (row === 0) {
-      color.setHSL(0.6, 1, Math.max(0, -point.x / 200) + 0.5, SRGBColorSpace);
+      color.setHSL(0.6, 1, Math.max(0, -point.x / 200) + 0.5, ColorSpace.SRGB);
       colors[0].push(color.r, color.g, color.b);
-      color.setHSL(0.9, 1, Math.max(0, -point.y / 200) + 0.5, SRGBColorSpace);
+      color.setHSL(0.9, 1, Math.max(0, -point.y / 200) + 0.5, ColorSpace.SRGB);
     } else {
-      color.setHSL(0.6, 1, Math.max(0, (200 - point.x) / 400) * 0.5 + 0.5, SRGBColorSpace);
+      color.setHSL(0.6, 1, Math.max(0, (200 - point.x) / 400) * 0.5 + 0.5, ColorSpace.SRGB);
       colors[0].push(color.r, color.g, color.b);
-      color.setHSL(0.3, 1, Math.max(0, (200 + point.x) / 400) * 0.5, SRGBColorSpace);
+      color.setHSL(0.3, 1, Math.max(0, (200 + point.x) / 400) * 0.5, ColorSpace.SRGB);
     }
     colors[1].push(color.r, color.g, color.b);
-    color.setHSL(i / count, 1, 0.5, SRGBColorSpace);
+    color.setHSL(i / count, 1, 0.5, ColorSpace.SRGB);
     colors[2].push(color.r, color.g, color.b);
   }
   for (let column = 0; column < 3; column++) {

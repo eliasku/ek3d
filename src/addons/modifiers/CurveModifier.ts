@@ -1,4 +1,4 @@
-import { DynamicDrawUsage, HalfFloatType, LinearFilter, RepeatWrapping, RGBAFormat } from "../../constants";
+import { BufferUsage, TextureType, TextureFilter, Wrapping, PixelFormat } from "../../constants";
 import type { BufferGeometry } from "../../core/BufferGeometry";
 import type { Curve } from "../../extras/core/Curve";
 import { toHalfFloat } from "../../extras/DataUtils";
@@ -93,11 +93,11 @@ export class Flow<T extends Mesh = Mesh> {
       new Uint16Array(WIDTH * HEIGHT * numberOfCurves * 4),
       WIDTH,
       HEIGHT * numberOfCurves,
-      RGBAFormat,
-      HalfFloatType,
+      PixelFormat.RGBA,
+      TextureType.HalfFloat,
     );
-    texture.wrapS = RepeatWrapping;
-    texture.magFilter = texture.minFilter = LinearFilter;
+    texture.wrapS = Wrapping.Repeat;
+    texture.magFilter = texture.minFilter = TextureFilter.Linear;
     texture.needsUpdate = true;
     this.splineTexture = texture;
     this.uniforms = {
@@ -163,7 +163,7 @@ export class InstancedFlow extends Flow<InstancedMesh> {
   whichCurve: number[];
   constructor(count: number, curveCount: number, geometry: BufferGeometry, material: Material | Material[]) {
     const mesh = new InstancedMesh(geometry, material, count);
-    mesh.instanceMatrix.setUsage(DynamicDrawUsage);
+    mesh.instanceMatrix.setUsage(BufferUsage.DynamicDraw);
     mesh.frustumCulled = false;
     super(mesh, curveCount);
     this.offsets = [];

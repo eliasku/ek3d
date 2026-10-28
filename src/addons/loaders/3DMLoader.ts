@@ -1,13 +1,7 @@
 import { BufferAttribute } from "../../core/BufferAttribute";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { Object3D } from "../../core/Object3D";
-import {
-  ClampToEdgeWrapping,
-  DoubleSide,
-  EquirectangularReflectionMapping,
-  LinearFilter,
-  RepeatWrapping,
-} from "../../constants";
+import { Wrapping, Side, Mapping, TextureFilter } from "../../constants";
 import { DirectionalLight } from "../../lights/DirectionalLight";
 import { PointLight } from "../../lights/PointLight";
 import { RectAreaLight } from "../../lights/RectAreaLight";
@@ -397,7 +391,7 @@ export class Rhino3dmLoader extends Loader<Object3D> {
         color: new Color(1, 1, 1),
         metalness: 0.8,
         name: Loader.DEFAULT_MATERIAL_NAME,
-        side: DoubleSide,
+        side: Side.Double,
       });
     const mat = new MeshPhysicalMaterial({
       color: rgb(material.diffuseColor),
@@ -407,7 +401,7 @@ export class Rhino3dmLoader extends Loader<Object3D> {
       name: material.name,
       reflectivity: material.reflectivity,
       opacity: 1 - material.transparency,
-      side: DoubleSide,
+      side: Side.Double,
       specularColor: rgb(material.specularColor),
       transparent: material.transparency > 0,
     });
@@ -495,15 +489,15 @@ export class Rhino3dmLoader extends Loader<Object3D> {
           if (warnings !== this.warnings) this.warnings.push(warning);
         }
       }
-      map.wrapS = texture.wrapU === 0 ? RepeatWrapping : ClampToEdgeWrapping;
-      map.wrapT = texture.wrapV === 0 ? RepeatWrapping : ClampToEdgeWrapping;
+      map.wrapS = texture.wrapU === 0 ? Wrapping.Repeat : Wrapping.ClampToEdge;
+      map.wrapT = texture.wrapV === 0 ? Wrapping.Repeat : Wrapping.ClampToEdge;
       if (texture.repeat) map.repeat.set(texture.repeat[0], texture.repeat[1]);
     }
     if (environment) {
       const loader = new EXRLoader(this.manager).setPriority(this.priority).setCache(this.cache);
       if (this.zlibDecoder) loader.setZlibDecoder(this.zlibDecoder);
       loader.load(environment.image, (texture) => {
-        texture.mapping = EquirectangularReflectionMapping;
+        texture.mapping = Mapping.EquirectangularReflection;
         mat.envMap = texture;
       });
     }
@@ -633,10 +627,10 @@ export class Rhino3dmLoader extends Loader<Object3D> {
         ctx.fillStyle = "white";
         ctx.fillText(g.text, width / 2, height / 2);
         const texture = new CanvasTexture(ctx.canvas);
-        texture.minFilter = LinearFilter;
+        texture.minFilter = TextureFilter.Linear;
         texture.generateMipmaps = false;
-        texture.wrapS = ClampToEdgeWrapping;
-        texture.wrapT = ClampToEdgeWrapping;
+        texture.wrapS = Wrapping.ClampToEdge;
+        texture.wrapT = Wrapping.ClampToEdge;
         const sprite = new Sprite(new SpriteMaterial({ map: texture, depthTest: false }));
         sprite.position.set(g.point[0], g.point[1], g.point[2]);
         sprite.scale.set(width / 10, height / 10, 1);

@@ -1,5 +1,5 @@
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import type { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { Float32BufferAttribute } from "ek3d/core/BufferAttribute";
 import { IcosahedronGeometry } from "ek3d/geometries/IcosahedronGeometry";
@@ -52,11 +52,11 @@ const geometries = [first, first.clone(), first.clone()];
 const color = new Color();
 for (let i = 0; i < count; i++) {
   const y = ((first.attributes.position as BufferAttribute).getY(i) / radius + 1) / 2;
-  color.setHSL(y, 1, 0.5, SRGBColorSpace);
+  color.setHSL(y, 1, 0.5, ColorSpace.SRGB);
   (geometries[0].attributes.color as BufferAttribute).setXYZ(i, color.r, color.g, color.b);
-  color.setHSL(0, y, 0.5, SRGBColorSpace);
+  color.setHSL(0, y, 0.5, ColorSpace.SRGB);
   (geometries[1].attributes.color as BufferAttribute).setXYZ(i, color.r, color.g, color.b);
-  color.setRGB(1, 0.8 - y, 0, SRGBColorSpace);
+  color.setRGB(1, 0.8 - y, 0, ColorSpace.SRGB);
   (geometries[2].attributes.color as BufferAttribute).setXYZ(i, color.r, color.g, color.b);
 }
 const material = new MeshPhongMaterial({ color: 0xffffff, flatShading: true, vertexColors: true, shininess: 0 });

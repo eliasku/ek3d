@@ -1,7 +1,7 @@
 import { BufferAttribute } from "../../core/BufferAttribute";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { Color } from "../../math/Color";
-import { DynamicDrawUsage } from "../../constants";
+import { BufferUsage } from "../../constants";
 import { Matrix4 } from "../../math/Matrix4";
 import { Matrix3 } from "../../math/Matrix3";
 import { Mesh } from "../../objects/Mesh";
@@ -21,13 +21,13 @@ export const TubePainter = function (): TubePainterInstance {
   const BUFFER_SIZE = 1000000 * 3;
 
   const positions = new BufferAttribute(new Float32Array(BUFFER_SIZE), 3);
-  positions.usage = DynamicDrawUsage;
+  positions.usage = BufferUsage.DynamicDraw;
 
   const normals = new BufferAttribute(new Float32Array(BUFFER_SIZE), 3);
-  normals.usage = DynamicDrawUsage;
+  normals.usage = BufferUsage.DynamicDraw;
 
   const colors = new BufferAttribute(new Float32Array(BUFFER_SIZE), 3);
-  colors.usage = DynamicDrawUsage;
+  colors.usage = BufferUsage.DynamicDraw;
 
   const geometry = new BufferGeometry();
   geometry.setAttribute("position", positions);

@@ -1,5 +1,5 @@
 import { KTXLoader } from "ek3d/addons/loaders/KTXLoader";
-import { DoubleSide, SRGBColorSpace } from "ek3d/constants";
+import { Side, ColorSpace } from "ek3d/constants";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { PointLight } from "ek3d/lights/PointLight";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
@@ -53,7 +53,7 @@ let failed = false;
 let pending = 0;
 
 // Each container carries one GPU format. These are the extensions the renderer actually consults:
-// WebGL 2 maps RGB_ETC1_Format through WEBGL_compressed_texture_etc, not the WebGL 1 etc1 extension.
+// WebGL 2 maps PixelFormat.RGB_ETC1 through WEBGL_compressed_texture_etc, not the WebGL 1 etc1 extension.
 const extensions: { has(name: string): boolean } = renderer.extensions;
 const formats = {
   astc: extensions.has("WEBGL_compressed_texture_astc"),
@@ -82,7 +82,7 @@ function loadTexture(url: string, colorTexture: boolean): CompressedTexture {
     url,
     (loaded) => {
       pending = Math.max(0, pending - 1);
-      if (colorTexture) loaded.colorSpace = SRGBColorSpace;
+      if (colorTexture) loaded.colorSpace = ColorSpace.SRGB;
       if (!disposed) renderer.render(scene, camera);
     },
     undefined,
@@ -114,7 +114,7 @@ if (formats.pvrtc) {
     map: loadTexture("/examples/textures/compressed/lensflare_PVR4bpp.ktx", true),
     depthTest: false,
     transparent: true,
-    side: DoubleSide,
+    side: Side.Double,
   });
   materials.push(material1, material2);
   meshes.push(new Mesh(geometry, material1), new Mesh(geometry, material2));
@@ -128,7 +128,7 @@ if (formats.s3tcSrgb) {
     map: loadTexture("/examples/textures/compressed/lensflare_BC3.ktx", true),
     depthTest: false,
     transparent: true,
-    side: DoubleSide,
+    side: Side.Double,
   });
   materials.push(material1, material2);
   meshes.push(new Mesh(geometry, material1), new Mesh(geometry, material2));
@@ -166,7 +166,7 @@ if (formats.astc) {
     map: loadTexture("/examples/textures/compressed/lensflare_ASTC8x8.ktx", true),
     depthTest: false,
     transparent: true,
-    side: DoubleSide,
+    side: Side.Double,
   });
   materials.push(material1, material2);
   meshes.push(new Mesh(geometry, material1), new Mesh(geometry, material2));

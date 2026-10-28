@@ -1,7 +1,7 @@
 import { KTX2Loader } from "ek3d/addons/loaders/KTX2Loader";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { GLSL3 } from "ek3d/constants";
+import { GLSL } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { ShaderMaterial } from "ek3d/materials/ShaderMaterial";
@@ -67,7 +67,7 @@ const uniforms = {
   depth: { value: 55 },
   size: { value: new Vector2(50, 25) },
 };
-const material = new ShaderMaterial({ uniforms, vertexShader, fragmentShader, glslVersion: GLSL3 });
+const material = new ShaderMaterial({ uniforms, vertexShader, fragmentShader, glslVersion: GLSL.GLSL3 });
 const geometry = new PlaneGeometry(50, 25),
   mesh = new Mesh(geometry, material);
 loader.load(

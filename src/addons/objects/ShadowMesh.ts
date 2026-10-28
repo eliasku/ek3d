@@ -1,4 +1,4 @@
-import { EqualStencilFunc, IncrementStencilOp } from "../../constants";
+import { StencilFunc, StencilOp } from "../../constants";
 import { MeshBasicMaterial } from "../../materials/MeshBasicMaterial";
 import { Matrix4 } from "../../math/Matrix4";
 import { Mesh } from "../../objects/Mesh";
@@ -21,9 +21,9 @@ export class ShadowMesh extends Mesh<MeshBasicMaterial> {
         opacity: 0.6,
         depthWrite: false,
         stencilWrite: true,
-        stencilFunc: EqualStencilFunc,
+        stencilFunc: StencilFunc.Equal,
         stencilRef: 0,
-        stencilZPass: IncrementStencilOp,
+        stencilZPass: StencilOp.Increment,
       }),
     );
     this.meshMatrix = mesh.matrixWorld;

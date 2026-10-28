@@ -1,4 +1,4 @@
-import { LinearSRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import { Color } from "../../math/Color";
 import { clamp } from "../../math/MathUtils";
 
@@ -65,20 +65,20 @@ export class Lut {
     const minColor = new Color();
     const maxColor = new Color();
     this.lut.length = 0;
-    this.lut.push(new Color().setHex(this.map[0][1], LinearSRGBColorSpace));
+    this.lut.push(new Color().setHex(this.map[0][1], ColorSpace.LinearSRGB));
     for (let i = 1; i < count; i++) {
       const alpha = i / count;
       for (let j = 0; j < this.map.length - 1; j++) {
         const [min, minHex] = this.map[j];
         const [max, maxHex] = this.map[j + 1];
         if (alpha > min && alpha <= max) {
-          minColor.setHex(minHex, LinearSRGBColorSpace);
-          maxColor.setHex(maxHex, LinearSRGBColorSpace);
+          minColor.setHex(minHex, ColorSpace.LinearSRGB);
+          maxColor.setHex(maxHex, ColorSpace.LinearSRGB);
           this.lut.push(new Color().lerpColors(minColor, maxColor, (alpha - min) / (max - min)));
         }
       }
     }
-    this.lut.push(new Color().setHex(this.map[this.map.length - 1][1], LinearSRGBColorSpace));
+    this.lut.push(new Color().setHex(this.map[this.map.length - 1][1], ColorSpace.LinearSRGB));
     return this;
   }
 
@@ -122,8 +122,8 @@ export class Lut {
         const [min, minHex] = this.map[j - 1];
         const [max, maxHex] = this.map[j];
         if (i < max && i >= min) {
-          minColor.setHex(minHex, LinearSRGBColorSpace);
-          maxColor.setHex(maxHex, LinearSRGBColorSpace);
+          minColor.setHex(minHex, ColorSpace.LinearSRGB);
+          maxColor.setHex(maxHex, ColorSpace.LinearSRGB);
           finalColor.lerpColors(minColor, maxColor, (i - min) / (max - min));
           data[k * 4] = Math.round(finalColor.r * 255);
           data[k * 4 + 1] = Math.round(finalColor.g * 255);

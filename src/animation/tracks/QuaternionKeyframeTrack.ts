@@ -1,3 +1,4 @@
+import { Interpolation } from "../../constants";
 import type { AnimationBuffer } from "../../math/Interpolant";
 import type { NumericAnimationBuffer } from "../../math/Interpolant";
 import { KeyframeTrack } from "../KeyframeTrack";
@@ -22,7 +23,12 @@ export class QuaternionKeyframeTrack extends KeyframeTrack {
    * @param values - A list of keyframe values.
    * @param [interpolation] - The interpolation type.
    */
-  constructor(name: string, times: NumericAnimationBuffer, values: NumericAnimationBuffer, interpolation?: number) {
+  constructor(
+    name: string,
+    times: NumericAnimationBuffer,
+    values: NumericAnimationBuffer,
+    interpolation?: Interpolation,
+  ) {
     super(name, times, values, interpolation);
   }
   /**

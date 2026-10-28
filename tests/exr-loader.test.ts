@@ -2,15 +2,7 @@ import { test } from "vite-plus/test";
 import assert from "node:assert/strict";
 import { EXRLoader } from "../src/addons/loaders/EXRLoader";
 import type { EXRTextureData, EXRZlibDecoder } from "../src/addons/loaders/EXRLoader";
-import {
-  FloatType,
-  HalfFloatType,
-  LinearFilter,
-  LinearSRGBColorSpace,
-  RedFormat,
-  RGBAFormat,
-  RGFormat,
-} from "../src/constants";
+import { TextureType, TextureFilter, ColorSpace, PixelFormat } from "../src/constants";
 import { fromHalfFloat, toHalfFloat } from "../src/extras/DataUtils";
 
 interface ChannelSpec {
@@ -303,11 +295,11 @@ test("EXRLoader decodes uncompressed half RGB scanlines into RGBA half floats", 
 
   assert.equal(data.width, 2);
   assert.equal(data.height, 1);
-  assert.equal(data.format, RGBAFormat);
-  assert.equal(data.type, HalfFloatType);
-  assert.equal(data.colorSpace, LinearSRGBColorSpace);
-  assert.equal(data.minFilter, LinearFilter);
-  assert.equal(data.magFilter, LinearFilter);
+  assert.equal(data.format, PixelFormat.RGBA);
+  assert.equal(data.type, TextureType.HalfFloat);
+  assert.equal(data.colorSpace, ColorSpace.LinearSRGB);
+  assert.equal(data.minFilter, TextureFilter.Linear);
+  assert.equal(data.magFilter, TextureFilter.Linear);
   assert.equal(data.generateMipmaps, false);
   assert.equal(data.flipY, false);
   assert.equal(data.header.compression, "NO_COMPRESSION");
@@ -328,7 +320,7 @@ test("EXRLoader decodes uncompressed half RGB scanlines into RGBA half floats", 
 });
 
 test("EXRLoader returns float pixels when the data type is FloatType", () => {
-  const loader = new EXRLoader().setDataType(FloatType);
+  const loader = new EXRLoader().setDataType(TextureType.Float);
   const buffer = buildSinglePart({
     width: 1,
     height: 1,
@@ -342,7 +334,7 @@ test("EXRLoader returns float pixels when the data type is FloatType", () => {
 
   const data = loader.parse(buffer);
 
-  assert.equal(data.type, FloatType);
+  assert.equal(data.type, TextureType.Float);
   assert.ok(data.data instanceof Float32Array);
   assert.equal(Math.abs((data.data as Float32Array)[0] - 0.25) < 0.001, true);
   assert.equal(Math.abs((data.data as Float32Array)[1] - 0.5) < 0.001, true);
@@ -366,7 +358,7 @@ test("EXRLoader keeps full float channel precision when reading FloatType", () =
     data: payload,
   });
 
-  const data = new EXRLoader().setDataType(FloatType).parse(buffer);
+  const data = new EXRLoader().setDataType(TextureType.Float).parse(buffer);
 
   assert.ok(data.data instanceof Float32Array);
   assert.equal((data.data as Float32Array)[0], Math.fround(0.1));
@@ -388,19 +380,19 @@ test("EXRLoader expands luminance files to RGB and honours RG/Red output formats
   });
 
   const rgba = new EXRLoader().parse(buffer);
-  assert.equal(rgba.format, RGBAFormat);
+  assert.equal(rgba.format, PixelFormat.RGBA);
   assert.equal(pixels(rgba).length, 4);
   assert.equal(readHalf(rgba, 0), readHalf(rgba, 1));
   assert.equal(readHalf(rgba, 1), readHalf(rgba, 2));
   assert.equal(readHalf(rgba, 3), 1);
 
-  const rg = new EXRLoader().setOutputFormat(RGFormat).parse(buffer);
-  assert.equal(rg.format, RGFormat);
+  const rg = new EXRLoader().setOutputFormat(PixelFormat.RG).parse(buffer);
+  assert.equal(rg.format, PixelFormat.RG);
   assert.equal(pixels(rg).length, 2);
   assert.equal(readHalf(rg, 0), readHalf(rg, 1));
 
-  const red = new EXRLoader().setOutputFormat(RedFormat).parse(buffer);
-  assert.equal(red.format, RedFormat);
+  const red = new EXRLoader().setOutputFormat(PixelFormat.Red).parse(buffer);
+  assert.equal(red.format, PixelFormat.Red);
   assert.equal(pixels(red).length, 1);
   assert.equal(Math.abs(readHalf(red, 0) - 0.5) < 0.001, true);
 });
@@ -417,14 +409,14 @@ test("EXRLoader crops RGB output to RG and Red when asked for fewer channels", (
     data: scanlineRow(1, [[0.1], [0.2], [0.3]]),
   });
 
-  const rg = new EXRLoader().setOutputFormat(RGFormat).parse(buffer);
-  assert.equal(rg.format, RGFormat);
+  const rg = new EXRLoader().setOutputFormat(PixelFormat.RG).parse(buffer);
+  assert.equal(rg.format, PixelFormat.RG);
   assert.equal(pixels(rg).length, 2);
   assert.equal(Math.abs(readHalf(rg, 0) - 0.1) < 0.001, true);
   assert.equal(Math.abs(readHalf(rg, 1) - 0.2) < 0.001, true);
 
-  const red = new EXRLoader().setOutputFormat(RedFormat).parse(buffer);
-  assert.equal(red.format, RedFormat);
+  const red = new EXRLoader().setOutputFormat(PixelFormat.Red).parse(buffer);
+  assert.equal(red.format, PixelFormat.Red);
   assert.equal(pixels(red).length, 1);
   assert.equal(Math.abs(readHalf(red, 0) - 0.1) < 0.001, true);
 });
@@ -451,7 +443,7 @@ test("EXRLoader converts luminance/chroma Y/RY/BY data to Rec.709 RGB", () => {
   const B = (1 + BY) * Y;
   const G = (Y - R * 0.2126 - B * 0.0722) / 0.7152;
 
-  assert.equal(data.format, RGBAFormat);
+  assert.equal(data.format, PixelFormat.RGBA);
   assert.equal(data.header.compression, "NO_COMPRESSION");
   assert.equal(Math.abs(readHalf(data, 0) - R) < 0.002, true);
   assert.equal(Math.abs(readHalf(data, 1) - G) < 0.002, true);

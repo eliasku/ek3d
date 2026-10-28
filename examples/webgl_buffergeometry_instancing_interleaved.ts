@@ -8,7 +8,7 @@ import { InterleavedBufferAttribute } from "ek3d/core/InterleavedBufferAttribute
 import { Matrix4 } from "ek3d/math/Matrix4";
 import { Quaternion } from "ek3d/math/Quaternion";
 import { Vector3 } from "ek3d/math/Vector3";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 import { InstancedMesh } from "ek3d/objects/InstancedMesh";
@@ -64,7 +64,7 @@ const texture = new TextureLoader().load(
     console.error(error);
   },
 );
-texture.colorSpace = SRGBColorSpace;
+texture.colorSpace = ColorSpace.SRGB;
 texture.flipY = false;
 const material = new MeshBasicMaterial({ map: texture });
 const instances = 5000;

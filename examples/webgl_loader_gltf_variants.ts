@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GLTFLoader, type GLTF, type GLTFParser } from "ek3d/addons/loaders/GLTFLoader";
 import { HDRLoader } from "ek3d/addons/loaders/HDRLoader";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping } from "ek3d/constants";
+import { ToneMapping, Mapping } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import type { Material } from "ek3d/materials/Material";
 import { Mesh } from "ek3d/objects/Mesh";
@@ -58,7 +58,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 1;
 
 let environment: DataTexture | null = null;
@@ -92,7 +92,7 @@ function init(): void {
       }
 
       environment = texture;
-      texture.mapping = EquirectangularReflectionMapping;
+      texture.mapping = Mapping.EquirectangularReflection;
 
       scene.background = texture;
       scene.environment = texture;

@@ -1,6 +1,6 @@
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ClampToEdgeWrapping, MirroredRepeatWrapping, RepeatWrapping, SRGBColorSpace, UVMapping } from "ek3d/constants";
+import { Wrapping, ColorSpace, Mapping } from "ek3d/constants";
 import { Raycaster } from "ek3d/core/Raycaster";
 import type { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
@@ -61,8 +61,8 @@ function draw(): void {
   for (const texture of textures) texture.needsUpdate = true;
 }
 function makeTexture(wrapping: number): Texture {
-  const texture = new Texture(drawing, UVMapping, wrapping, wrapping);
-  texture.colorSpace = SRGBColorSpace;
+  const texture = new Texture(drawing, Mapping.UV, wrapping, wrapping);
+  texture.colorSpace = ColorSpace.SRGB;
   textures.push(texture);
   return texture;
 }
@@ -71,9 +71,9 @@ function mapGeometry(geometry: BufferGeometry, shift: number): void {
   if (!(uv instanceof BufferAttribute)) throw new Error("Missing geometry UVs");
   for (let i = 0; i < uv.count; i++) uv.setXY(i, (uv.getX(i) - shift) * 2, (uv.getY(i) - shift) * 2);
 }
-const cubeTexture = makeTexture(RepeatWrapping);
-const planeTexture = makeTexture(MirroredRepeatWrapping);
-const circleTexture = makeTexture(RepeatWrapping);
+const cubeTexture = makeTexture(Wrapping.Repeat);
+const planeTexture = makeTexture(Wrapping.MirroredRepeat);
+const circleTexture = makeTexture(Wrapping.Repeat);
 const cubeGeometry = new BoxGeometry(20, 20, 20);
 const planeGeometry = new PlaneGeometry(25, 25, 1, 1);
 const circleGeometry = new CircleGeometry(25, 40, 0, Math.PI * 2);
@@ -105,15 +105,19 @@ background.onerror = () => {
 background.src = "/examples/textures/uv_grid_opengl.jpg";
 
 const params = {
-  wrapS: RepeatWrapping,
-  wrapT: RepeatWrapping,
+  wrapS: Wrapping.Repeat,
+  wrapT: Wrapping.Repeat,
   offsetX: 0,
   offsetY: 0,
   repeatX: 1,
   repeatY: 1,
   rotation: 0,
 };
-const wrapping = { RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping };
+const wrapping = {
+  RepeatWrapping: Wrapping.Repeat,
+  ClampToEdgeWrapping: Wrapping.ClampToEdge,
+  MirroredRepeatWrapping: Wrapping.MirroredRepeat,
+};
 const gui = new GUI();
 gui.title("Circle Texture Settings");
 gui.add(params, "wrapS", wrapping).onChange(() => {

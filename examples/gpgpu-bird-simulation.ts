@@ -1,7 +1,7 @@
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { GPUComputationRenderer } from "ek3d/addons/misc/GPUComputationRenderer";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { RepeatWrapping } from "ek3d/constants";
+import { Wrapping } from "ek3d/constants";
 import { Color } from "ek3d/math/Color";
 import { Vector3 } from "ek3d/math/Vector3";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
@@ -73,7 +73,7 @@ export function createBirdSimulation(canvas: HTMLCanvasElement, width: number, b
   Object.assign(position.material.uniforms, positionUniforms);
   Object.assign(velocity.material.uniforms, velocityUniforms);
   velocity.material.defines.BOUNDS = "800.00";
-  velocity.wrapS = velocity.wrapT = position.wrapS = position.wrapT = RepeatWrapping;
+  velocity.wrapS = velocity.wrapT = position.wrapS = position.wrapT = Wrapping.Repeat;
   const error = compute.init();
   if (error !== null) {
     compute.dispose();

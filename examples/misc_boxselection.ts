@@ -1,6 +1,6 @@
 import { SelectionBox } from "ek3d/addons/interactive/SelectionBox";
 import { SelectionHelper } from "ek3d/addons/interactive/SelectionHelper";
-import { PCFShadowMap } from "ek3d/constants";
+import { ShadowMap } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
@@ -81,7 +81,7 @@ renderer.setAnimationLoop(animate);
 const shadowMap = renderer.shadowMap;
 if (shadowMap === null) throw new Error("the shadow map system failed to install");
 shadowMap.enabled = true;
-shadowMap.type = PCFShadowMap;
+shadowMap.type = ShadowMap.PCF;
 
 const stats = new Stats();
 document.body.appendChild(stats.dom);

@@ -1,6 +1,6 @@
 import { RoomEnvironment } from "ek3d/addons/environments/RoomEnvironment";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { NeutralToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
 import { TorusGeometry } from "ek3d/geometries/TorusGeometry";
 import { TorusKnotGeometry } from "ek3d/geometries/TorusKnotGeometry";
@@ -62,7 +62,7 @@ const renderer = new WebGLRenderer({
   },
 });
 renderer.setClearColor(0x000000, 0);
-renderer.toneMapping = NeutralToneMapping;
+renderer.toneMapping = ToneMapping.Neutral;
 
 const room = new RoomEnvironment();
 const pmrem = new PMREMGenerator(renderer);

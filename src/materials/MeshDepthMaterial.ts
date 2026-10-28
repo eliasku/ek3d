@@ -1,6 +1,6 @@
 import type { Texture } from "../textures/Texture";
 import { Material } from "./Material";
-import { BasicDepthPacking } from "../constants";
+import { DepthPacking } from "../constants";
 
 export type MeshDepthMaterialParameters = Partial<MeshDepthMaterial>;
 /**
@@ -12,7 +12,7 @@ export type MeshDepthMaterialParameters = Partial<MeshDepthMaterial>;
 export class MeshDepthMaterial extends Material {
   isMeshDepthMaterial: boolean;
 
-  depthPacking: number;
+  depthPacking: DepthPacking;
   map: Texture | null;
   alphaMap: Texture | null;
   displacementMap: Texture | null;
@@ -43,16 +43,16 @@ export class MeshDepthMaterial extends Material {
     /**
      * Type for depth packing.
      *
-     * @default BasicDepthPacking
+     * @default DepthPacking.Basic
      */
-    this.depthPacking = BasicDepthPacking;
+    this.depthPacking = DepthPacking.Basic;
     /**
      * The color map. May optionally include an alpha channel, typically combined
      * with {@link Material#transparent} or {@link Material#alphaTest}.
      *
      * `map` represents color data, and the texture must be assigned a
      * {@link Texture#colorSpace}. Most `map` textures set
-     * `texture.colorSpace = SRGBColorSpace`.
+     * `texture.colorSpace = ColorSpace.SRGB`.
      *
      * @default null
      */
@@ -68,7 +68,7 @@ export class MeshDepthMaterial extends Material {
      * luminance/alpha textures will also still work as expected.
      *
      * `alphaMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -82,7 +82,7 @@ export class MeshDepthMaterial extends Material {
      * repositions, the vertices of the mesh.
      *
      * `displacementMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */

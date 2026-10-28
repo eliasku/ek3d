@@ -52,15 +52,15 @@ import { LightProbe } from "ek3d/lights/LightProbe";
 import { RectAreaLight } from "ek3d/lights/RectAreaLight";
 import { DataTexture } from "ek3d/textures/DataTexture";
 import {
-  RGBAFormat,
-  UnsignedByteType,
-  RepeatWrapping,
-  SRGBColorSpace,
-  NearestFilter,
-  EquirectangularReflectionMapping,
-  DynamicDrawUsage,
-  DoubleSide,
-  GLSL3,
+  PixelFormat,
+  TextureType,
+  Wrapping,
+  ColorSpace,
+  TextureFilter,
+  Mapping,
+  BufferUsage,
+  Side,
+  GLSL,
 } from "ek3d/constants";
 
 export function createScene(resources: Array<{ dispose(): void }>) {
@@ -84,9 +84,9 @@ export function createScene(resources: Array<{ dispose(): void }>) {
       pixels[offset + 3] = 255;
     }
   }
-  const environment = new DataTexture(pixels, 128, 64, RGBAFormat, UnsignedByteType);
-  environment.colorSpace = SRGBColorSpace;
-  environment.mapping = EquirectangularReflectionMapping;
+  const environment = new DataTexture(pixels, 128, 64, PixelFormat.RGBA, TextureType.UnsignedByte);
+  environment.colorSpace = ColorSpace.SRGB;
+  environment.mapping = Mapping.EquirectangularReflection;
   environment.needsUpdate = true;
   scene.background = environment;
   scene.backgroundIntensity = 0.4;
@@ -96,11 +96,11 @@ export function createScene(resources: Array<{ dispose(): void }>) {
     new Uint8Array([255, 190, 60, 255, 30, 80, 140, 255, 30, 80, 140, 255, 255, 190, 60, 255]),
     2,
     2,
-    RGBAFormat,
-    UnsignedByteType,
+    PixelFormat.RGBA,
+    TextureType.UnsignedByte,
   );
-  checker.colorSpace = SRGBColorSpace;
-  checker.wrapS = checker.wrapT = RepeatWrapping;
+  checker.colorSpace = ColorSpace.SRGB;
+  checker.wrapS = checker.wrapT = Wrapping.Repeat;
   checker.repeat.set(3, 3);
   checker.needsUpdate = true;
   resources.push(environment, checker);
@@ -113,7 +113,7 @@ export function createScene(resources: Array<{ dispose(): void }>) {
   const normals = litGeometry.getAttribute("normal");
   if (!positions || !normals || !("getX" in positions) || !("getX" in normals))
     throw new Error("Capsule geometry is missing CPU attributes");
-  const packed = new InterleavedBuffer(new Int16Array(positions.count * 6), 6).setUsage(DynamicDrawUsage);
+  const packed = new InterleavedBuffer(new Int16Array(positions.count * 6), 6).setUsage(BufferUsage.DynamicDraw);
   const packedPositions = new InterleavedBufferAttribute(packed, 3, 0, true);
   const packedNormals = new InterleavedBufferAttribute(packed, 3, 3, true);
   for (let i = 0; i < positions.count; i++) {
@@ -128,9 +128,9 @@ export function createScene(resources: Array<{ dispose(): void }>) {
   const reflectedMaterial = new MeshBasicMaterial({ envMap: environment, reflectivity: 1 });
   const tint = new Uniform(new Vector3(0.3, 2, 4));
   const pulse = new Uniform(1);
-  const beaconUniforms = new UniformsGroup().setName("Beacon").setUsage(DynamicDrawUsage).add(tint);
+  const beaconUniforms = new UniformsGroup().setName("Beacon").setUsage(BufferUsage.DynamicDraw).add(tint);
   const beaconMaterial = new ShaderMaterial({
-    glslVersion: GLSL3,
+    glslVersion: GLSL.GLSL3,
     uniforms: { pulse },
     uniformsGroups: [beaconUniforms],
     vertexShader: "void main() { gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
@@ -189,17 +189,17 @@ void main() { fragColor = vec4(tint * pulse, 1.0); }`,
     }
   }
   const matcap = new DataTexture(matcapPixels, 32, 32);
-  matcap.colorSpace = SRGBColorSpace;
+  matcap.colorSpace = ColorSpace.SRGB;
   matcap.needsUpdate = true;
   const normalMap = new DataTexture(normalPixels, 32, 32);
-  normalMap.wrapS = normalMap.wrapT = RepeatWrapping;
+  normalMap.wrapS = normalMap.wrapT = Wrapping.Repeat;
   normalMap.needsUpdate = true;
   const gradientMap = new DataTexture(
     new Uint8Array([35, 35, 35, 255, 100, 100, 100, 255, 180, 180, 180, 255, 255, 255, 255, 255]),
     4,
     1,
   );
-  gradientMap.minFilter = gradientMap.magFilter = NearestFilter;
+  gradientMap.minFilter = gradientMap.magFilter = TextureFilter.Nearest;
   gradientMap.needsUpdate = true;
   const phongMaterial = new MeshPhongMaterial({ color: 0xeea060, shininess: 80, map: checker });
   const normalMaterial = new MeshNormalMaterial({ normalMap });
@@ -251,14 +251,14 @@ void main() { fragColor = vec4(tint * pulse, 1.0); }`,
   instances.name = "Instances";
   instances.castShadow = true;
   instances.receiveShadow = true;
-  instances.instanceMatrix.setUsage(DynamicDrawUsage);
+  instances.instanceMatrix.setUsage(BufferUsage.DynamicDraw);
   const instanceColors = [new Color(0x44bbff), new Color(0xff8844), new Color(0x88dd55)];
   const instanceHighlight = new Color(0xffffff);
   const instanceTransform = new Object3D();
   const instanceScreen = new Vector3();
   const instancePositionKeys = ["instance0", "instance1", "instance2"];
   for (let i = 0; i < instances.count; i++) instances.setColorAt(i, instanceColors[i]);
-  instances.instanceColor!.setUsage(DynamicDrawUsage);
+  instances.instanceColor!.setUsage(BufferUsage.DynamicDraw);
   instances.instanceColor!.needsUpdate = true;
   // InstancedMesh owns its GPU attributes, not the shared box geometry or material.
   resources.push(instanceMaterial, instances);
@@ -321,7 +321,7 @@ void main() { fragColor = vec4(tint * pulse, 1.0); }`,
   const shapeGeometry = new ShapeGeometry(contour, 24);
   const tubeMaterial = new MeshLambertMaterial({ color: 0x55ccee });
   const extrudeMaterial = new MeshLambertMaterial({ color: 0xffbb55 });
-  const shapeMaterial = new MeshLambertMaterial({ color: 0xaa77ee, side: DoubleSide });
+  const shapeMaterial = new MeshLambertMaterial({ color: 0xaa77ee, side: Side.Double });
   resources.push(tubeGeometry, extrudeGeometry, shapeGeometry, tubeMaterial, extrudeMaterial, shapeMaterial);
   const tube = new Mesh(tubeGeometry, tubeMaterial);
   tube.name = "Tube";
@@ -421,10 +421,10 @@ void main() { fragColor = vec4(tint * pulse, 1.0); }`,
     new Uint8Array([255, 80, 40, 255, 0, 0, 0, 255, 0, 0, 0, 255, 40, 120, 255, 255]),
     2,
     2,
-    RGBAFormat,
-    UnsignedByteType,
+    PixelFormat.RGBA,
+    TextureType.UnsignedByte,
   );
-  cookie.colorSpace = SRGBColorSpace;
+  cookie.colorSpace = ColorSpace.SRGB;
   cookie.needsUpdate = true;
   directional.position.set(-3, 6, 3);
   point.position.copy(directional.position);

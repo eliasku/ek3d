@@ -1,7 +1,7 @@
 import { Stats } from "ek3d/addons/libs/Stats";
 import { mergeVertices } from "ek3d/addons/utils/BufferGeometryUtils";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { RepeatWrapping } from "ek3d/constants";
+import { Wrapping } from "ek3d/constants";
 import { BufferAttribute, Float32BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
@@ -93,7 +93,7 @@ const texture = new TextureLoader().load(
     console.error(error);
   },
 );
-texture.wrapS = texture.wrapT = RepeatWrapping;
+texture.wrapS = texture.wrapT = Wrapping.Repeat;
 const material = new ShaderMaterial({
   uniforms: { amplitude: { value: 1 }, color: { value: new Color(0xffffff) }, pointTexture: { value: texture } },
   vertexShader: `attribute float size; attribute vec4 ca; varying vec4 vColor; void main() { vColor = ca; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); gl_PointSize = size * (150.0 / -mvPosition.z); gl_Position = projectionMatrix * mvPosition; }`,

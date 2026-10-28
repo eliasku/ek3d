@@ -9,7 +9,7 @@ import { TAARenderPass } from "ek3d/addons/postprocessing/TAARenderPass";
 import { UnrealBloomPass } from "ek3d/addons/postprocessing/UnrealBloomPass";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import type { Object3D } from "ek3d/core/Object3D";
-import { AdditiveBlending, EquirectangularReflectionMapping, NeutralToneMapping } from "ek3d/constants";
+import { Blending, Mapping, ToneMapping } from "ek3d/constants";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
 import { PointLight } from "ek3d/lights/PointLight";
 import { Material } from "ek3d/materials/Material";
@@ -50,7 +50,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = NeutralToneMapping;
+renderer.toneMapping = ToneMapping.Neutral;
 renderer.toneMappingExposure = 0.7;
 renderer.shadowMap!.enabled = true;
 const controls = new OrbitControls(camera, canvas);
@@ -121,7 +121,7 @@ new HDRLoader().load(
       return;
     }
     environment = texture;
-    texture.mapping = EquirectangularReflectionMapping;
+    texture.mapping = Mapping.EquirectangularReflection;
     scene.background = scene.environment = texture;
     scene.backgroundBlurriness = 0.5;
     scene.backgroundIntensity = 1;
@@ -172,7 +172,7 @@ new HDRLoader().load(
           roughness: 0,
           iridescence: 0.3,
           clearcoat: 1,
-          blending: AdditiveBlending,
+          blending: Blending.Additive,
         });
         scene.add(model);
         gui = new GUI();

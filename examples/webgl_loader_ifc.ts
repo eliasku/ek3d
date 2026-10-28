@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { mergeGeometries } from "ek3d/addons/utils/BufferGeometryUtils";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import type { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
@@ -157,7 +157,7 @@ async function load(): Promise<void> {
       const merged = mergeGeometries(geometries);
       if (merged === null) throw new Error("Unable to merge IFC geometry");
       scene.add(
-        new Mesh(merged, new MeshPhongMaterial({ side: DoubleSide, vertexColors: true, transparent: isTransparent })),
+        new Mesh(merged, new MeshPhongMaterial({ side: Side.Double, vertexColors: true, transparent: isTransparent })),
       );
     }
     canvas.dataset.meshes = String(scene.children.filter((object) => object instanceof Mesh).length);

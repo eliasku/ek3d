@@ -4,7 +4,7 @@ import { RapierHelper } from "ek3d/addons/helpers/RapierHelper";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { RapierPhysics } from "ek3d/addons/physics/RapierPhysics";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { RepeatWrapping } from "ek3d/constants";
+import { Wrapping } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
@@ -89,7 +89,7 @@ async function init(): Promise<void> {
       dispose();
     },
   );
-  texture.wrapS = texture.wrapT = RepeatWrapping;
+  texture.wrapS = texture.wrapT = Wrapping.Repeat;
   texture.repeat.set(20, 20);
   floor.material.map = texture;
   physics.addScene(scene);

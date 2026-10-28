@@ -2,24 +2,7 @@ import type { Camera } from "../../cameras/Camera";
 import type { Light } from "../../lights/Light";
 import type { Object3D } from "../../core/Object3D";
 import type { WebGLRenderer } from "../WebGLRenderer";
-import {
-  FrontSide,
-  BackSide,
-  DoubleSide,
-  NearestFilter,
-  LinearFilter,
-  PCFShadowMap,
-  VSMShadowMap,
-  NoBlending,
-  LessEqualCompare,
-  GreaterEqualCompare,
-  DepthFormat,
-  UnsignedIntType,
-  RGFormat,
-  HalfFloatType,
-  FloatType,
-  PCFSoftShadowMap,
-} from "../../constants";
+import { Side, TextureFilter, ShadowMap, Blending, Compare, PixelFormat, TextureType } from "../../constants";
 import { WebGLRenderTarget } from "../WebGLRenderTarget";
 import { WebGLCubeRenderTarget } from "../WebGLCubeRenderTarget";
 import { MeshDepthMaterial } from "../../materials/MeshDepthMaterial";
@@ -51,8 +34,8 @@ export interface WebGLShadowMapSystem {
   autoUpdate: boolean;
   /** Requests a shadow update on the next render. Defaults to false. */
   needsUpdate: boolean;
-  /** Shadow filtering algorithm. Defaults to PCFShadowMap. */
-  type: number;
+  /** Shadow filtering algorithm. Defaults to ShadowMap.PCF. */
+  type: ShadowMap;
   render(lights: Light[], scene: Object3D, camera: Camera): void;
   dispose(): void;
 }
@@ -88,7 +71,7 @@ export function WebGLShadowMap(
     _distanceMaterial = new MeshDistanceMaterial(),
     _materialCache: any = {},
     _maxTextureSize = capabilities.maxTextureSize;
-  const shadowSide: any = { [FrontSide]: BackSide, [BackSide]: FrontSide, [DoubleSide]: DoubleSide };
+  const shadowSide: any = { [Side.Front]: Side.Back, [Side.Back]: Side.Front, [Side.Double]: Side.Double };
   const shadowMaterialVertical = new ShaderMaterial({
     defines: {
       VSM_SAMPLES: 8,
@@ -113,7 +96,7 @@ export function WebGLShadowMap(
     enabled: false,
     autoUpdate: true,
     needsUpdate: false,
-    type: PCFShadowMap,
+    type: ShadowMap.PCF,
     render,
     dispose,
   };
@@ -127,9 +110,9 @@ export function WebGLShadowMap(
     if (scope.enabled === false) return;
     if (scope.autoUpdate === false && scope.needsUpdate === false) return;
     if (lights.length === 0) return;
-    if (scope.type === PCFSoftShadowMap) {
+    if (scope.type === ShadowMap.PCFSoft) {
       warn("WebGLShadowMap: PCFSoftShadowMap has been removed. Using PCFShadowMap instead.");
-      scope.type = PCFShadowMap;
+      scope.type = ShadowMap.PCF;
     }
     const currentRenderTarget = renderer.getRenderTarget();
     const activeCubeFace = renderer.getActiveCubeFace();
@@ -137,7 +120,7 @@ export function WebGLShadowMap(
     try {
       const _state = (renderer as any).state;
       // Set GL state for depth map.
-      _state.setBlending(NoBlending);
+      _state.setBlending(Blending.No);
       if (_state.buffers.depth.getReversed() === true) {
         _state.buffers.color.setClear(0, 0, 0, 0);
       } else {
@@ -201,7 +184,7 @@ export function WebGLShadowMap(
             }
             shadow.map.dispose();
           }
-          if (scope.type === VSMShadowMap) {
+          if (scope.type === ShadowMap.VSM) {
             if (light.isPointLight) {
               warn(
                 "WebGLShadowMap: VSM shadow maps are not supported for PointLights. Use PCF or BasicShadowMap instead.",
@@ -209,38 +192,38 @@ export function WebGLShadowMap(
               continue;
             }
             shadow.map = new WebGLRenderTarget(_shadowMapSize.x, _shadowMapSize.y, {
-              format: RGFormat,
-              type: HalfFloatType,
-              minFilter: LinearFilter,
-              magFilter: LinearFilter,
+              format: PixelFormat.RG,
+              type: TextureType.HalfFloat,
+              minFilter: TextureFilter.Linear,
+              magFilter: TextureFilter.Linear,
               generateMipmaps: false,
             });
             shadow.map.texture.name = light.name + ".shadowMap";
             // Native depth texture for VSM - depth is captured here, then blurred into the color texture
-            shadow.map.depthTexture = new DepthTexture(_shadowMapSize.x, _shadowMapSize.y, FloatType);
+            shadow.map.depthTexture = new DepthTexture(_shadowMapSize.x, _shadowMapSize.y, TextureType.Float);
             shadow.map.depthTexture.name = light.name + ".shadowMapDepth";
-            shadow.map.depthTexture.format = DepthFormat;
+            shadow.map.depthTexture.format = PixelFormat.Depth;
             shadow.map.depthTexture.compareFunction = null; // For regular sampling (not shadow comparison)
-            shadow.map.depthTexture.minFilter = NearestFilter;
-            shadow.map.depthTexture.magFilter = NearestFilter;
+            shadow.map.depthTexture.minFilter = TextureFilter.Nearest;
+            shadow.map.depthTexture.magFilter = TextureFilter.Nearest;
           } else {
             if (light.isPointLight) {
               shadow.map = new WebGLCubeRenderTarget(_shadowMapSize.x);
-              shadow.map.depthTexture = new CubeDepthTexture(_shadowMapSize.x, UnsignedIntType);
+              shadow.map.depthTexture = new CubeDepthTexture(_shadowMapSize.x, TextureType.UnsignedInt);
             } else {
               shadow.map = new WebGLRenderTarget(_shadowMapSize.x, _shadowMapSize.y);
-              shadow.map.depthTexture = new DepthTexture(_shadowMapSize.x, _shadowMapSize.y, UnsignedIntType);
+              shadow.map.depthTexture = new DepthTexture(_shadowMapSize.x, _shadowMapSize.y, TextureType.UnsignedInt);
             }
             shadow.map.depthTexture.name = light.name + ".shadowMap";
-            shadow.map.depthTexture.format = DepthFormat;
-            if (scope.type === PCFShadowMap) {
-              shadow.map.depthTexture.compareFunction = reversedDepthBuffer ? GreaterEqualCompare : LessEqualCompare;
-              shadow.map.depthTexture.minFilter = LinearFilter;
-              shadow.map.depthTexture.magFilter = LinearFilter;
+            shadow.map.depthTexture.format = PixelFormat.Depth;
+            if (scope.type === ShadowMap.PCF) {
+              shadow.map.depthTexture.compareFunction = reversedDepthBuffer ? Compare.GreaterEqual : Compare.LessEqual;
+              shadow.map.depthTexture.minFilter = TextureFilter.Linear;
+              shadow.map.depthTexture.magFilter = TextureFilter.Linear;
             } else {
               shadow.map.depthTexture.compareFunction = null;
-              shadow.map.depthTexture.minFilter = NearestFilter;
-              shadow.map.depthTexture.magFilter = NearestFilter;
+              shadow.map.depthTexture.minFilter = TextureFilter.Nearest;
+              shadow.map.depthTexture.magFilter = TextureFilter.Nearest;
             }
           }
           shadow.camera.updateProjectionMatrix();
@@ -301,7 +284,7 @@ export function WebGLShadowMap(
           renderObject(scene, camera, shadowCamera, light, layers, scope.type);
         }
         // do blur pass for VSM
-        if (shadow.isPointLightShadow !== true && scope.type === VSMShadowMap) {
+        if (shadow.isPointLightShadow !== true && scope.type === ShadowMap.VSM) {
           VSMPass(shadow, camera);
         }
         shadow.needsUpdate = false;
@@ -322,8 +305,8 @@ export function WebGLShadowMap(
     }
     if (shadow.mapPass === null) {
       shadow.mapPass = new WebGLRenderTarget(_shadowMapSize.x, _shadowMapSize.y, {
-        format: RGFormat,
-        type: HalfFloatType,
+        format: PixelFormat.RG,
+        type: TextureType.HalfFloat,
       });
     } else if (shadow.mapPass.width !== shadow.map.width || shadow.mapPass.height !== shadow.map.height) {
       shadow.mapPass.setSize(shadow.map.width, shadow.map.height);
@@ -381,7 +364,7 @@ export function WebGLShadowMap(
     }
     result.visible = material.visible;
     result.wireframe = material.wireframe;
-    if (type === VSMShadowMap) {
+    if (type === ShadowMap.VSM) {
       result.side = material.shadowSide !== null ? material.shadowSide : material.side;
     } else {
       result.side = material.shadowSide !== null ? material.shadowSide : (shadowSide as any)[material.side];
@@ -408,7 +391,7 @@ export function WebGLShadowMap(
     const visible = object.layers.test(layers);
     if (visible && (object.isMesh || object.isLine || object.isPoints)) {
       if (
-        (object.castShadow || (object.receiveShadow && type === VSMShadowMap)) &&
+        (object.castShadow || (object.receiveShadow && type === ShadowMap.VSM)) &&
         (!object.frustumCulled || object.intersectsFrustum(_frustum))
       ) {
         object.modelViewMatrix.multiplyMatrices(shadowCamera.matrixWorldInverse, object.matrixWorld);

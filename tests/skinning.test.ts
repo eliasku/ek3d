@@ -15,7 +15,7 @@ import { Vector3 } from "../src/math/Vector3";
 import { Vector4 } from "../src/math/Vector4";
 import { Frustum } from "../src/math/Frustum";
 import { OrthographicCamera } from "../src/cameras/OrthographicCamera";
-import { AttachedBindMode, DetachedBindMode, FloatType, RGBAFormat, NearestFilter } from "../src/constants";
+import { BindMode, TextureType, PixelFormat, TextureFilter } from "../src/constants";
 import { Bone as ReferenceBone } from "../upstream/three.js/src/objects/Bone.js";
 import { Skeleton as ReferenceSkeleton } from "../upstream/three.js/src/objects/Skeleton.js";
 import { SkinnedMesh as ReferenceSkinnedMesh } from "../upstream/three.js/src/objects/SkinnedMesh.js";
@@ -222,10 +222,10 @@ test("skeleton updates pack column-major float matrices and textures retain thei
     assert.deepEqual(skeleton.boneMatrices.slice(0, count * 16), original);
     assert.ok(skeleton.boneMatrices.slice(count * 16).every((value) => value === 0));
     assert.deepEqual(texture.image.data, reference.boneTexture!.image.data);
-    assert.equal(texture.format, RGBAFormat);
-    assert.equal(texture.type, FloatType);
-    assert.equal(texture.magFilter, NearestFilter);
-    assert.equal(texture.minFilter, NearestFilter);
+    assert.equal(texture.format, PixelFormat.RGBA);
+    assert.equal(texture.type, TextureType.Float);
+    assert.equal(texture.magFilter, TextureFilter.Nearest);
+    assert.equal(texture.minFilter, TextureFilter.Nearest);
     assert.equal(texture.generateMipmaps, false);
     const version = texture.version;
     const storage = skeleton.boneMatrices;
@@ -422,7 +422,7 @@ test("skinned mesh clones share resources and skeletons but isolate bind matrice
   assert.deepEqual(actual.morphTargetInfluences, [0.5]);
   const json = actual.toJSON();
   const referenceJSON = expected.toJSON("") as {
-    object: { bindMatrix: number[]; bindMode: string };
+    object: { bindMatrix: number[]; bindMode: BindMode };
     skeletons: unknown[];
   };
   assert.equal(json.object.type, "SkinnedMesh");
@@ -494,7 +494,7 @@ test("animated bounds, culling and picking require refresh and include morph and
 });
 
 test("attached and detached modes use their respective inverse bind spaces under transformed picking", () => {
-  for (const mode of [AttachedBindMode, DetachedBindMode] as const) {
+  for (const mode of [BindMode.Attached, BindMode.Detached] as const) {
     const { actual, expected, root, referenceRoot } = pair();
     actual.bindMode = expected.bindMode = mode;
     actual.position.set(4, -2, 1);
@@ -508,7 +508,7 @@ test("attached and detached modes use their respective inverse bind spaces under
     close(actual.bindMatrixInverse.elements, expected.bindMatrixInverse.elements);
     close(
       actual.bindMatrixInverse.elements,
-      mode === AttachedBindMode ? new Matrix4().copy(actual.matrixWorld).invert().elements : new Matrix4().elements,
+      mode === BindMode.Attached ? new Matrix4().copy(actual.matrixWorld).invert().elements : new Matrix4().elements,
     );
     actual.computeBoundingBox();
     expected.computeBoundingBox();

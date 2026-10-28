@@ -1,7 +1,7 @@
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { KTX2Loader } from "ek3d/addons/loaders/KTX2Loader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { GLSL3, IntType } from "ek3d/constants";
+import { GLSL, TextureType } from "ek3d/constants";
 import { InstancedBufferAttribute } from "ek3d/core/InstancedBufferAttribute";
 import { InstancedBufferGeometry } from "ek3d/core/InstancedBufferGeometry";
 import { getByteLength } from "ek3d/extras/TextureUtils";
@@ -110,7 +110,7 @@ async function init(): Promise<void> {
       uniforms: { diffuse: { value: target }, size: { value: new Vector2(20, 10) } },
       vertexShader,
       fragmentShader,
-      glslVersion: GLSL3,
+      glslVersion: GLSL.GLSL3,
     });
     geometry = new InstancedBufferGeometry();
     const plane = new PlaneGeometry(20, 10);
@@ -119,7 +119,7 @@ async function init(): Promise<void> {
     plane.dispose();
     geometry.instanceCount = 3;
     const indices = new InstancedBufferAttribute(new Uint16Array([0, 1, 2]), 1, false, 1);
-    indices.gpuType = IntType;
+    indices.gpuType = TextureType.Int;
     geometry.setAttribute("instancedIndex", indices);
     scene.add(new InstancedMesh(geometry, material, 3));
     render();

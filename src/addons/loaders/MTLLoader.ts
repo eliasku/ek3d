@@ -1,4 +1,4 @@
-import { FrontSide, RepeatWrapping, SRGBColorSpace } from "../../constants";
+import { Side, Wrapping, ColorSpace, Mapping } from "../../constants";
 import { FileLoader } from "../../loaders/FileLoader";
 import { Loader } from "../../loaders/Loader";
 import { LoaderUtils } from "../../loaders/LoaderUtils";
@@ -12,7 +12,7 @@ import { Vector2 } from "../../math/Vector2";
 import { Texture } from "../../textures/Texture";
 
 export interface MaterialOptions {
-  side?: number;
+  side?: Side;
   wrap?: number;
   normalizeRGB?: boolean;
   ignoreZeroRGBs?: boolean;
@@ -103,15 +103,15 @@ export class MaterialCreator {
   crossOrigin: string = "anonymous";
   priority: "high" | "low" | "auto" = "auto";
   cache: RequestCache = "default";
-  side: number;
+  side: Side;
   wrap: number;
   manager: LoadingManager | undefined;
 
   constructor(baseUrl: string = "", options: MaterialOptions = {}) {
     this.baseUrl = baseUrl;
     this.options = options;
-    this.side = options.side !== undefined ? options.side : FrontSide;
-    this.wrap = options.wrap !== undefined ? options.wrap : RepeatWrapping;
+    this.side = options.side !== undefined ? options.side : Side.Front;
+    this.wrap = options.wrap !== undefined ? options.wrap : Wrapping.Repeat;
   }
 
   setCrossOrigin(value: string): this {
@@ -182,7 +182,7 @@ export class MaterialCreator {
       map.offset.copy(textureParams.offset);
       map.wrapS = this.wrap;
       map.wrapT = this.wrap;
-      if (mapType === "map" || mapType === "emissiveMap") map.colorSpace = SRGBColorSpace;
+      if (mapType === "map" || mapType === "emissiveMap") map.colorSpace = ColorSpace.SRGB;
       params[mapType] = map;
     };
     const material = this.materialsInfo[materialName];
@@ -192,7 +192,7 @@ export class MaterialCreator {
       const key = property.toLowerCase();
       if (Array.isArray(value)) {
         if (key !== "kd" && key !== "ks" && key !== "ke") continue;
-        const color = ColorManagement.colorSpaceToWorking(new Color().fromArray(value), SRGBColorSpace);
+        const color = ColorManagement.colorSpaceToWorking(new Color().fromArray(value), ColorSpace.SRGB);
         if (key === "kd") params.color = color;
         else if (key === "ks") params.specular = color;
         else if (key === "ke") params.emissive = color;
@@ -282,7 +282,7 @@ export class MaterialCreator {
 
   loadTexture(
     url: string,
-    mapping?: number,
+    mapping?: Mapping,
     onLoad?: (texture: Texture) => void,
     onProgress?: (event: ProgressEvent) => void,
     onError?: (error: unknown) => void,

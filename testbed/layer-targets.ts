@@ -7,7 +7,7 @@ import { Mesh } from "ek3d/objects/Mesh";
 import { Scene } from "ek3d/scenes/Scene";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
-import { GLSL3, NearestFilter, DoubleSide } from "ek3d/constants";
+import { GLSL, TextureFilter, Side } from "ek3d/constants";
 
 /** Two panels sample independent slices; key 4 cycles off / array / volume. */
 export function createLayerTargets(renderer: WebGLRenderer) {
@@ -17,11 +17,17 @@ export function createLayerTargets(renderer: WebGLRenderer) {
   object.position.set(0, 3.4, -1);
   const geometry = new PlaneGeometry(2, 1.25);
   const quad = new PlaneGeometry(2, 2);
-  const array = new WebGLArrayRenderTarget(64, 64, 2, { minFilter: NearestFilter, magFilter: NearestFilter });
-  const volume = new WebGL3DRenderTarget(64, 64, 2, { minFilter: NearestFilter, magFilter: NearestFilter });
+  const array = new WebGLArrayRenderTarget(64, 64, 2, {
+    minFilter: TextureFilter.Nearest,
+    magFilter: TextureFilter.Nearest,
+  });
+  const volume = new WebGL3DRenderTarget(64, 64, 2, {
+    minFilter: TextureFilter.Nearest,
+    magFilter: TextureFilter.Nearest,
+  });
   const targets = [array, volume];
   const paint = new RawShaderMaterial({
-    glslVersion: GLSL3,
+    glslVersion: GLSL.GLSL3,
     uniforms: { tint: { value: [1, 0.15, 0.03] }, phase: { value: 0 } },
     vertexShader:
       "precision highp float; in vec3 position; in vec2 uv; out vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position, 1.0); }",
@@ -35,8 +41,8 @@ export function createLayerTargets(renderer: WebGLRenderer) {
   const materials: RawShaderMaterial[] = [];
   for (let layer = 0; layer < 2; layer++) {
     const material = new RawShaderMaterial({
-      glslVersion: GLSL3,
-      side: DoubleSide,
+      glslVersion: GLSL.GLSL3,
+      side: Side.Double,
       uniforms: {
         arrayMap: { value: array.texture },
         volumeMap: { value: volume.texture },

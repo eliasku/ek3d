@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { Timer } from "ek3d/core/Timer";
@@ -20,13 +21,7 @@ import { NumberKeyframeTrack } from "ek3d/animation/tracks/NumberKeyframeTrack";
 import type { DirectionalLight } from "ek3d/lights/DirectionalLight";
 import type { PointLight } from "ek3d/lights/PointLight";
 import type { SpotLight } from "ek3d/lights/SpotLight";
-import {
-  ACESFilmicToneMapping,
-  ReinhardToneMapping,
-  AgXToneMapping,
-  NeutralToneMapping,
-  NoToneMapping,
-} from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { createRenderer } from "./renderer";
 import { createScene } from "./scene";
 import { createHud } from "./hud";
@@ -288,7 +283,7 @@ try {
   let distance = 11;
   let frames = 0;
   let tone = 0;
-  const tones = [ACESFilmicToneMapping, ReinhardToneMapping, AgXToneMapping, NeutralToneMapping, NoToneMapping];
+  const tones = [ToneMapping.ACESFilmic, ToneMapping.Reinhard, ToneMapping.AgX, ToneMapping.Neutral, ToneMapping.No];
   const toneNames = ["ACES", "Reinhard", "AgX", "Neutral", "None"];
 
   function updateMaterialLighting() {
@@ -387,7 +382,7 @@ try {
     layerTargets.update();
     renderer.render(scene, camera);
     const gl = renderer.getContext();
-    if (gl.isContextLost() || gl.getError() !== gl.NO_ERROR) throw new Error("WebGL rendering failed");
+    if (gl.isContextLost() || gl.getError() !== GL.NO_ERROR) throw new Error("WebGL rendering failed");
     canvas.dataset.state = "rendered";
     canvas.dataset.frame = String(++frames);
     canvas.dataset.paused = String(paused);

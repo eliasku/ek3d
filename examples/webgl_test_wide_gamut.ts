@@ -6,7 +6,7 @@ import {
   LinearDisplayP3ColorSpaceImpl,
 } from "ek3d/addons/math/ColorSpaces";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { contain } from "ek3d/extras/TextureUtils";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { ColorManagement } from "ek3d/math/ColorManagement";
@@ -46,7 +46,7 @@ let frames = 0;
 canvas.dataset.state = "loading";
 canvas.dataset.p3Context = String(isP3Context);
 function updateGamut(): void {
-  renderer.outputColorSpace = isP3Context && gamut.matches ? DisplayP3ColorSpace : SRGBColorSpace;
+  renderer.outputColorSpace = isP3Context && gamut.matches ? DisplayP3ColorSpace : ColorSpace.SRGB;
   if (textureL) textureL.needsUpdate = true;
   if (textureR) textureR.needsUpdate = true;
 }
@@ -59,7 +59,7 @@ async function loadTextures(): Promise<void> {
       return;
     }
     textureL = left;
-    left.colorSpace = SRGBColorSpace;
+    left.colorSpace = ColorSpace.SRGB;
     const right = await loader.loadAsync("/examples/textures/wide_gamut/logo_p3.png");
     if (disposed) {
       right.dispose();

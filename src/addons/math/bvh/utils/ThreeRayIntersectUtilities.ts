@@ -1,7 +1,7 @@
 import { Vector3 } from "../../../../math/Vector3";
 import { Vector2 } from "../../../../math/Vector2";
 import { Triangle } from "../../../../math/Triangle";
-import { DoubleSide, BackSide } from "../../../../constants";
+import { Side } from "../../../../constants";
 import type { BufferGeometry } from "../../../../core/BufferGeometry";
 import type { BufferAttribute } from "../../../../core/BufferAttribute";
 import type { InterleavedBufferAttribute } from "../../../../core/InterleavedBufferAttribute";
@@ -41,15 +41,15 @@ function checkIntersection(
   pB: Vector3,
   pC: Vector3,
   point: Vector3,
-  side: number,
+  side: Side,
   near: number,
   far: number,
 ): PartialHit | null {
   let intersect;
-  if (side === BackSide) {
+  if (side === Side.Back) {
     intersect = ray.intersectTriangle(pC, pB, pA, true, point);
   } else {
-    intersect = ray.intersectTriangle(pA, pB, pC, side !== DoubleSide, point);
+    intersect = ray.intersectTriangle(pA, pB, pC, side !== Side.Double, point);
   }
 
   if (intersect === null) return null;
@@ -73,7 +73,7 @@ function checkBufferGeometryIntersection(
   a: number,
   b: number,
   c: number,
-  side: number,
+  side: Side,
   near: number,
   far: number,
 ): RayIntersection | null {

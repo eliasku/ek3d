@@ -1,4 +1,4 @@
-import { BackSide } from "../../constants";
+import { Side } from "../../constants";
 import { Color } from "../../math/Color";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { fog, displacementmap } from "../../renderers/shaders/UniformsLib";
@@ -118,7 +118,7 @@ export class OutlineEffect {
       "	float thickness = outlineThickness;",
       "	const float ratio = 1.0;",
       "	vec4 pos2 = projectionMatrix * modelViewMatrix * vec4( skinned.xyz + normal, 1.0 );",
-      // NOTE: subtract pos2 from pos because BackSide objectNormal is negative
+      // NOTE: subtract pos2 from pos because Side.Back objectNormal is negative
       "	vec4 norm = normalize( pos - pos2 );",
       "	return pos + norm * thickness * pos.w * ratio;",
       "}",
@@ -138,7 +138,7 @@ export class OutlineEffect {
       chunk_displacementmap_vertex,
       chunk_project_vertex,
 
-      "	vec3 outlineNormal = - objectNormal;", // the outline material is always rendered with BackSide
+      "	vec3 outlineNormal = - objectNormal;", // the outline material is always rendered with Side.Back
 
       "	gl_Position = calculateOutline( gl_Position, outlineNormal, vec4( transformed, 1.0 ) );",
 
@@ -179,7 +179,7 @@ export class OutlineEffect {
         uniforms: mergeUniforms([fog, displacementmap, uniformsOutline]),
         vertexShader: vertexShader,
         fragmentShader: fragmentShader,
-        side: BackSide,
+        side: Side.Back,
       });
     }
 

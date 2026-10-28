@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide, ObjectSpaceNormalMap } from "ek3d/constants";
+import { Side, NormalMap } from "ek3d/constants";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { PointLight } from "ek3d/lights/PointLight";
 import { LoadingManager } from "ek3d/loaders/LoadingManager";
@@ -53,8 +53,8 @@ new GLTFLoader(manager).load(
     for (const child of meshes) {
       for (const material of Array.isArray(child.material) ? child.material : [child.material]) {
         if (material instanceof MeshStandardMaterial) {
-          material.normalMapType = ObjectSpaceNormalMap;
-          material.side = DoubleSide;
+          material.normalMapType = NormalMap.ObjectSpace;
+          material.side = Side.Double;
         }
       }
       child.geometry.deleteAttribute("normal");

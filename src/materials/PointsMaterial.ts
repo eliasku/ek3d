@@ -77,7 +77,7 @@ export class PointsMaterial extends Material {
      *
      * `map` represents color data, and the texture must be assigned a
      * {@link Texture#colorSpace}. Most `map` textures set
-     * `texture.colorSpace = SRGBColorSpace`.
+     * `texture.colorSpace = ColorSpace.SRGB`.
      *
      * @default null
      */
@@ -93,7 +93,7 @@ export class PointsMaterial extends Material {
      * luminance/alpha textures will also still work as expected.
      *
      * `alphaMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -101,7 +101,7 @@ export class PointsMaterial extends Material {
     /**
      * Defines the size of the points in pixels.
      *
-     * Might be capped if the value exceeds hardware dependent parameters like [gl.ALIASED_POINT_SIZE_RANGE](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParamete).
+     * Might be capped if the value exceeds hardware dependent parameters like [GL.ALIASED_POINT_SIZE_RANGE](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParamete).
      *
      * @default 1
      */

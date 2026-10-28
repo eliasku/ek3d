@@ -5,7 +5,7 @@ import { InstancedInterleavedBuffer } from "../../core/InstancedInterleavedBuffe
 import { InterleavedBuffer } from "../../core/InterleavedBuffer";
 import { InterleavedBufferAttribute } from "../../core/InterleavedBufferAttribute";
 import { normalize } from "../../math/MathUtils";
-import { TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode } from "../../constants";
+import { DrawMode } from "../../constants";
 import { Vector3 } from "../../math/Vector3";
 import type { Line } from "../../objects/Line";
 import type { Mesh } from "../../objects/Mesh";
@@ -698,12 +698,12 @@ export function mergeVertices(geometry: BufferGeometry, tolerance: number = 1e-4
  * @return The converted geometry using `TrianglesDrawMode`.
  */
 export function toTrianglesDrawMode(geometry: BufferGeometry, drawMode: number): BufferGeometry {
-  if (drawMode === TrianglesDrawMode) {
+  if (drawMode === DrawMode.Triangles) {
     console.warn("THREE.BufferGeometryUtils.toTrianglesDrawMode(): Geometry already defined as triangles.");
     return geometry;
   }
 
-  if (drawMode === TriangleFanDrawMode || drawMode === TriangleStripDrawMode) {
+  if (drawMode === DrawMode.TriangleFan || drawMode === DrawMode.TriangleStrip) {
     let index = geometry.getIndex();
 
     // generate index if not present
@@ -733,7 +733,7 @@ export function toTrianglesDrawMode(geometry: BufferGeometry, drawMode: number):
     const numberOfTriangles = index.count - 2;
     const newIndices = [];
 
-    if (drawMode === TriangleFanDrawMode) {
+    if (drawMode === DrawMode.TriangleFan) {
       // gl.TRIANGLE_FAN
 
       for (let i = 1; i <= numberOfTriangles; i++) {

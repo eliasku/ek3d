@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
@@ -174,7 +175,7 @@ export function verifyOrbitControls() {
 
     renderer.render(scene, camera);
     const glError = gl.getError();
-    check(glError === gl.NO_ERROR, "Orbit controls rendering produced a WebGL error");
+    check(glError === GL.NO_ERROR, "Orbit controls rendering produced a WebGL error");
 
     return { glError: 0, starts, ends, changes, damped };
   } finally {

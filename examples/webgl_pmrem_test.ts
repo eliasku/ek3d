@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { HDRLoader } from "ek3d/addons/loaders/HDRLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
@@ -31,7 +31,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 1;
 const scene = new Scene();
 const camera = new PerspectiveCamera(40, innerWidth / innerHeight, 1, 30);

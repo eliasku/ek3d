@@ -1,4 +1,4 @@
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { Float32BufferAttribute } from "../../core/BufferAttribute";
 import { FileLoader } from "../../loaders/FileLoader";
@@ -593,7 +593,7 @@ export class OBJLoader extends Loader<Group, string> {
           case "v":
             state.vertices.push(parseFloat(data[1]!), parseFloat(data[2]!), parseFloat(data[3]!));
             if (data.length >= 7) {
-              _color.setRGB(parseFloat(data[4]!), parseFloat(data[5]!), parseFloat(data[6]!), SRGBColorSpace);
+              _color.setRGB(parseFloat(data[4]!), parseFloat(data[5]!), parseFloat(data[6]!), ColorSpace.SRGB);
 
               state.colors.push(_color.r, _color.g, _color.b);
             } else {

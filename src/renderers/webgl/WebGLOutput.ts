@@ -1,20 +1,7 @@
 import type { WebGLRenderer } from "../WebGLRenderer";
 import chunk_tonemapping_pars_fragment_chunk from "../shaders/ShaderChunk/tonemapping_pars_fragment.glsl";
 import chunk_colorspace_pars_fragment from "../shaders/ShaderChunk/colorspace_pars_fragment.glsl";
-import {
-  NoToneMapping,
-  LinearToneMapping,
-  ReinhardToneMapping,
-  CineonToneMapping,
-  ACESFilmicToneMapping,
-  AgXToneMapping,
-  NeutralToneMapping,
-  CustomToneMapping,
-  SRGBTransfer,
-  HalfFloatType,
-  DepthStencilFormat,
-  UnsignedInt248Type,
-} from "../../constants";
+import { ToneMapping, Transfer, TextureType, PixelFormat } from "../../constants";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { Float32BufferAttribute } from "../../core/BufferAttribute";
 import { RawShaderMaterial } from "../../materials/RawShaderMaterial";
@@ -50,13 +37,13 @@ export interface WebGLOutputSystem {
   dispose(): void;
 }
 const toneMappingMap = {
-  [LinearToneMapping]: "LINEAR_TONE_MAPPING",
-  [ReinhardToneMapping]: "REINHARD_TONE_MAPPING",
-  [CineonToneMapping]: "CINEON_TONE_MAPPING",
-  [ACESFilmicToneMapping]: "ACES_FILMIC_TONE_MAPPING",
-  [AgXToneMapping]: "AGX_TONE_MAPPING",
-  [NeutralToneMapping]: "NEUTRAL_TONE_MAPPING",
-  [CustomToneMapping]: "CUSTOM_TONE_MAPPING",
+  [ToneMapping.Linear]: "LINEAR_TONE_MAPPING",
+  [ToneMapping.Reinhard]: "REINHARD_TONE_MAPPING",
+  [ToneMapping.Cineon]: "CINEON_TONE_MAPPING",
+  [ToneMapping.ACESFilmic]: "ACES_FILMIC_TONE_MAPPING",
+  [ToneMapping.AgX]: "AGX_TONE_MAPPING",
+  [ToneMapping.Neutral]: "NEUTRAL_TONE_MAPPING",
+  [ToneMapping.Custom]: "CUSTOM_TONE_MAPPING",
 };
 export function WebGLOutput(
   type: number,
@@ -142,8 +129,16 @@ export function WebGLOutput(
     const width = targetScene.width;
     const height = targetScene.height;
     if (_effects.length > 0 && targetA === null) {
-      targetA = new WebGLRenderTarget(width, height, { type: HalfFloatType, depthBuffer: false, stencilBuffer: false });
-      targetB = new WebGLRenderTarget(width, height, { type: HalfFloatType, depthBuffer: false, stencilBuffer: false });
+      targetA = new WebGLRenderTarget(width, height, {
+        type: TextureType.HalfFloat,
+        depthBuffer: false,
+        stencilBuffer: false,
+      });
+      targetB = new WebGLRenderTarget(width, height, {
+        type: TextureType.HalfFloat,
+        depthBuffer: false,
+        stencilBuffer: false,
+      });
     }
     // only store and resolve the scene depth if an effect reads it
     const needsDepthTexture =
@@ -152,8 +147,8 @@ export function WebGLOutput(
       if (needsDepthTexture === true && depthTexture === null) {
         depthTexture = new DepthTexture(width, height);
         if (stencil === true) {
-          depthTexture.format = DepthStencilFormat;
-          depthTexture.type = UnsignedInt248Type;
+          depthTexture.format = PixelFormat.DepthStencil;
+          depthTexture.type = TextureType.UnsignedInt248;
         }
       }
       // release GPU resources so the scene target is rebuilt with the new depth setup
@@ -172,7 +167,7 @@ export function WebGLOutput(
   function begin(renderer: WebGLRenderer, renderTarget: WebGLRenderTarget | null) {
     // Don't begin during compositing phase (post-processing effects call render())
     if (_isActive) return false;
-    if (renderer.toneMapping === NoToneMapping && _effects.length === 0) return false;
+    if (renderer.toneMapping === ToneMapping.No && _effects.length === 0) return false;
     try {
       _savedRenderTarget = renderTarget;
       _savedToneMapping = renderer.toneMapping;
@@ -192,7 +187,7 @@ export function WebGLOutput(
         renderer.setRenderTarget(targetScene);
       }
       // disable tone mapping during render - it will be applied in end()
-      renderer.toneMapping = NoToneMapping;
+      renderer.toneMapping = ToneMapping.No;
       return true;
     } catch (error: any) {
       restore(renderer);
@@ -226,7 +221,7 @@ export function WebGLOutput(
         _outputColorSpace = renderer.outputColorSpace;
         _outputToneMapping = renderer.toneMapping;
         material.defines = {};
-        if (ColorManagement.getTransfer(_outputColorSpace) === SRGBTransfer) material.defines.SRGB_TRANSFER = "";
+        if (ColorManagement.getTransfer(_outputColorSpace) === Transfer.SRGB) material.defines.SRGB_TRANSFER = "";
         const toneMapping = (toneMappingMap as any)[_outputToneMapping];
         if (toneMapping) material.defines[toneMapping] = "";
         material.needsUpdate = true;

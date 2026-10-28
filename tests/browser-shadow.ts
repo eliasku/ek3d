@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { WebGLShadowMap } from "ek3d/renderers/webgl/WebGLShadowMap";
 import { WebGLCubeRenderTarget } from "ek3d/renderers/WebGLCubeRenderTarget";
@@ -12,7 +13,7 @@ import type { Material } from "ek3d/materials/Material";
 import type { Texture } from "ek3d/textures/Texture";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
 import { PointLight } from "ek3d/lights/PointLight";
-import { PCFShadowMap, BasicShadowMap, VSMShadowMap } from "ek3d/constants";
+import { ShadowMap } from "ek3d/constants";
 import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
 import { depthShader } from "ek3d/renderers/shaders/DepthShader";
 import { distanceShader } from "ek3d/renderers/shaders/DistanceShader";
@@ -96,10 +97,7 @@ export async function verifyShadowLifecycle() {
         renderer.shaders = shaders;
         renderer.render(f.scene, f.camera);
       }
-      check(
-        renderer.getContext().getError() === renderer.getContext().NO_ERROR,
-        `Missing ${missing} recovery produced a GL error`,
-      );
+      check(renderer.getContext().getError() === GL.NO_ERROR, `Missing ${missing} recovery produced a GL error`);
     } finally {
       depth.dispose();
       distance.dispose();
@@ -146,10 +144,10 @@ export async function verifyShadowLifecycle() {
   };
   const pixels = () => {
     const result = new Uint8Array(96 * 72 * 4);
-    gl.readPixels(0, 0, 96, 72, gl.RGBA, gl.UNSIGNED_BYTE, result);
-    check(gl.getError() === gl.NO_ERROR, "Shadow rendering produced a WebGL error");
+    gl.readPixels(0, 0, 96, 72, GL.RGBA, GL.UNSIGNED_BYTE, result);
+    check(gl.getError() === GL.NO_ERROR, "Shadow rendering produced a WebGL error");
     for (const program of renderer.info.programs ?? [])
-      check(gl.getProgramParameter(program.program, gl.LINK_STATUS), `Shadow program did not link: ${program.name}`);
+      check(gl.getProgramParameter(program.program, GL.LINK_STATUS), `Shadow program did not link: ${program.name}`);
     return result;
   };
   const draw = () => {
@@ -215,7 +213,7 @@ export async function verifyShadowLifecycle() {
     receiver.receiveShadow = true;
     caster.position.x = 0;
 
-    for (const type of [BasicShadowMap, VSMShadowMap, PCFShadowMap]) {
+    for (const type of [ShadowMap.Basic, ShadowMap.VSM, ShadowMap.PCF]) {
       const oldHandles = [directional.shadow.map!.texture, directional.shadow.map!.depthTexture]
         .filter((texture): texture is Texture => texture !== null)
         .map((texture): WebGLTexture => renderer.properties.get(texture).__webglTexture)
@@ -230,7 +228,7 @@ export async function verifyShadowLifecycle() {
         oldHandles.every((handle) => !gl.isTexture(handle)),
         "Shadow mode change retained old GPU map storage",
       );
-      if (type === VSMShadowMap) check(directional.shadow.mapPass !== null, "VSM did not allocate its blur target");
+      if (type === ShadowMap.VSM) check(directional.shadow.mapPass !== null, "VSM did not allocate its blur target");
     }
 
     let shadowDraws = 0;
@@ -279,7 +277,7 @@ export async function verifyShadowLifecycle() {
     receiver.receiveShadow = false;
     const pointOcclusion = occluded(pointFrame, draw());
     receiver.receiveShadow = true;
-    renderer.shadowMap!.type = BasicShadowMap;
+    renderer.shadowMap!.type = ShadowMap.Basic;
     const pointBasic = draw();
     receiver.receiveShadow = false;
     occluded(pointBasic, draw());
@@ -297,7 +295,7 @@ export async function verifyShadowLifecycle() {
     );
     scene.remove(point);
     scene.add(directional);
-    renderer.shadowMap!.type = PCFShadowMap;
+    renderer.shadowMap!.type = ShadowMap.PCF;
 
     // alphaToCoverage selects real per-source depth/distance cache variants without an extra texture fixture.
     casterMaterial.alphaToCoverage = true;
@@ -409,7 +407,7 @@ export async function verifyShadowLifecycle() {
 
     // Keep VSM blur programs and source cache variants live until renderer disposal.
     renderer.shadowMap!.autoUpdate = directional.shadow.autoUpdate = true;
-    renderer.shadowMap!.type = VSMShadowMap;
+    renderer.shadowMap!.type = ShadowMap.VSM;
     caster.onBeforeShadow = captureMaterial;
     seen.clear();
     disposed.clear();
@@ -436,7 +434,7 @@ export async function verifyShadowLifecycle() {
       "Final disposal retained shadow textures",
     );
     check(
-      programs.every((program) => !gl.isProgram(program) || gl.getProgramParameter(program, gl.DELETE_STATUS) === true),
+      programs.every((program) => !gl.isProgram(program) || gl.getProgramParameter(program, GL.DELETE_STATUS) === true),
       "Renderer disposal retained GPU shader programs",
     );
     check(
@@ -445,7 +443,7 @@ export async function verifyShadowLifecycle() {
         renderer.info.programs?.length === 0,
       `Final shadow disposal leaked resources: textures=${renderer.info.memory.textures}, geometries=${renderer.info.memory.geometries}, programs=${renderer.info.programs?.length}`,
     );
-    check(gl.getError() === gl.NO_ERROR, "Shadow cleanup produced a WebGL error");
+    check(gl.getError() === GL.NO_ERROR, "Shadow cleanup produced a WebGL error");
     return {
       initialOcclusion,
       pointOcclusion,

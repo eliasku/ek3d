@@ -1,7 +1,7 @@
 import { FlyControls } from "ek3d/addons/controls/FlyControls";
 import { Lensflare, LensflareElement } from "ek3d/addons/objects/Lensflare";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
@@ -27,7 +27,7 @@ let disposed = false,
 const camera = new PerspectiveCamera(40, innerWidth / innerHeight, 1, 15000);
 camera.position.z = 250;
 const scene = new Scene();
-scene.background = new Color().setHSL(0.51, 0.4, 0.01, SRGBColorSpace);
+scene.background = new Color().setHSL(0.51, 0.4, 0.01, ColorSpace.SRGB);
 scene.fog = new Fog(scene.background, 3500, 15000);
 const geometry = new BoxGeometry(250, 250, 250);
 const material = new MeshPhongMaterial({ color: 0xffffff, specular: 0xffffff, shininess: 50 });

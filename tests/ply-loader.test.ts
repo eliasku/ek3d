@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { PLYLoader } from "../src/addons/loaders/PLYLoader";
 import { BufferAttribute } from "../src/core/BufferAttribute";
 import { Color } from "../src/math/Color";
-import { SRGBColorSpace } from "../src/constants";
+import { ColorSpace } from "../src/constants";
 
 function attribute(geometry: { getAttribute(name: string): unknown }, name: string): BufferAttribute {
   const value = geometry.getAttribute(name);
@@ -120,7 +120,7 @@ test("double properties keep 64-bit attributes and normalized color conversion a
   assert.deepEqual(Array.from(position.array), [1.5, 2.5, 3.5]);
 
   // sRGB 128 -> linear working color -> back to 8 bit is lossy, exactly as upstream.
-  const expected = Math.round(new Color().setRGB(128 / 255, 0, 0, SRGBColorSpace).r * 255);
+  const expected = Math.round(new Color().setRGB(128 / 255, 0, 0, ColorSpace.SRGB).r * 255);
   assert.notEqual(expected, 128);
   assert.deepEqual(Array.from(attribute(geometry, "color").array), [expected, 0, 0]);
 });

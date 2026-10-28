@@ -24,7 +24,7 @@ import premultiplied_alpha_fragment from "ek3d/renderers/shaders/ShaderChunk/pre
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { RoomEnvironment } from "ek3d/addons/environments/RoomEnvironment";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
-import { ACESFilmicToneMapping, HalfFloatType } from "ek3d/constants";
+import { ToneMapping, TextureType } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
 import { Box3 } from "ek3d/math/Box3";
@@ -131,7 +131,7 @@ function init(): void {
   renderer = new WebGLRenderer({
     canvas,
     antialias: true,
-    outputBufferType: HalfFloatType,
+    outputBufferType: TextureType.HalfFloat,
     createOutput: WebGLOutput,
     preserveDrawingBuffer: true,
     createEnvironments: WebGLEnvironments,
@@ -149,7 +149,7 @@ function init(): void {
   });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.toneMapping = ACESFilmicToneMapping;
+  renderer.toneMapping = ToneMapping.ACESFilmic;
   renderer.setAnimationLoop(animate);
 
   camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);

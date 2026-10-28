@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { HDRCubeTextureLoader } from "ek3d/addons/loaders/HDRCubeTextureLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping, RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { ToneMapping, Wrapping, ColorSpace } from "ek3d/constants";
 import { Group } from "ek3d/objects/Group";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { PointLight } from "ek3d/lights/PointLight";
@@ -44,7 +44,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 1.25;
 const controls = new OrbitControls(camera, canvas);
 controls.minDistance = 3;
@@ -92,11 +92,11 @@ function load(path: string) {
   );
 }
 const diffuse = load("/examples/textures/carbon/Carbon.png");
-diffuse.colorSpace = SRGBColorSpace;
-diffuse.wrapS = diffuse.wrapT = RepeatWrapping;
+diffuse.colorSpace = ColorSpace.SRGB;
+diffuse.wrapS = diffuse.wrapT = Wrapping.Repeat;
 diffuse.repeat.set(10, 10);
 const normal = load("/examples/textures/carbon/Carbon_Normal.png");
-normal.wrapS = normal.wrapT = RepeatWrapping;
+normal.wrapS = normal.wrapT = Wrapping.Repeat;
 normal.repeat.set(10, 10);
 const water = load("/examples/textures/water/Water_1_M_Normal.jpg");
 const golf = load("/examples/textures/golfball.jpg");
@@ -124,7 +124,7 @@ for (let i = 0; i < 4000; i++) {
   context.fill();
 }
 const flakes = new CanvasTexture(flakesCanvas);
-flakes.wrapS = flakes.wrapT = RepeatWrapping;
+flakes.wrapS = flakes.wrapT = Wrapping.Repeat;
 flakes.repeat.set(10, 6);
 flakes.anisotropy = 16;
 const geometry = new SphereGeometry(0.8, 64, 32);

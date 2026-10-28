@@ -3,7 +3,7 @@ import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { FileLoader } from "ek3d/loaders/FileLoader";
 import type { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 import type { Texture } from "ek3d/textures/Texture";
-import { RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Wrapping, ColorSpace } from "ek3d/constants";
 
 export function createAssets(canvas: HTMLCanvasElement, material: MeshBasicMaterial, redraw: () => void) {
   const original = material.map;
@@ -56,8 +56,8 @@ export function createAssets(canvas: HTMLCanvasElement, material: MeshBasicMater
           new URL("./assets/tile.png", import.meta.url).href,
           (loaded) => {
             if (disposed) return;
-            loaded.colorSpace = SRGBColorSpace;
-            loaded.wrapS = loaded.wrapT = RepeatWrapping;
+            loaded.colorSpace = ColorSpace.SRGB;
+            loaded.wrapS = loaded.wrapT = Wrapping.Repeat;
             loaded.repeat.set(3, 3);
             material.map = loaded;
             material.needsUpdate = true;

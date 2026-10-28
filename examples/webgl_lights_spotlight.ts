@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { PLYLoader } from "ek3d/addons/loaders/PLYLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { LinearFilter, NeutralToneMapping, PCFShadowMap, SRGBColorSpace } from "ek3d/constants";
+import { TextureFilter, ToneMapping, ShadowMap, ColorSpace } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { CameraHelper } from "ek3d/helpers/CameraHelper";
 import { SpotLightHelper } from "ek3d/helpers/SpotLightHelper";
@@ -30,10 +30,10 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = NeutralToneMapping;
+renderer.toneMapping = ToneMapping.Neutral;
 if (!renderer.shadowMap) throw new Error("Missing shadow map system");
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = PCFShadowMap;
+renderer.shadowMap.type = ShadowMap.PCF;
 const scene = new Scene();
 const camera = new PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 100);
 camera.position.set(7, 4, 1);
@@ -50,10 +50,10 @@ const maps = ["disturb.jpg", "colors.png", "uv_grid_opengl.jpg"].map((name) => {
   const texture = loader.load(name, (loaded) => {
     if (disposed) loaded.dispose();
   });
-  texture.minFilter = LinearFilter;
-  texture.magFilter = LinearFilter;
+  texture.minFilter = TextureFilter.Linear;
+  texture.magFilter = TextureFilter.Linear;
   texture.generateMipmaps = false;
-  texture.colorSpace = SRGBColorSpace;
+  texture.colorSpace = ColorSpace.SRGB;
   return texture;
 });
 scene.add(new HemisphereLight(0xffffff, 0x8d8d8d, 0.25));

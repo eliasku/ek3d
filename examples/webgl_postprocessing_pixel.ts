@@ -4,7 +4,7 @@ import { EffectComposer } from "ek3d/addons/postprocessing/EffectComposer";
 import { OutputPass } from "ek3d/addons/postprocessing/OutputPass";
 import { RenderPixelatedPass } from "ek3d/addons/postprocessing/RenderPixelatedPass";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
-import { NearestFilter, RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { TextureFilter, Wrapping, ColorSpace } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { IcosahedronGeometry } from "ek3d/geometries/IcosahedronGeometry";
@@ -90,12 +90,12 @@ const texture2 = loader.load("/examples/textures/checker.png", (map) => {
   if (disposed) map.dispose();
 });
 for (const map of [texture, texture2]) {
-  map.minFilter = NearestFilter;
-  map.magFilter = NearestFilter;
+  map.minFilter = TextureFilter.Nearest;
+  map.magFilter = TextureFilter.Nearest;
   map.generateMipmaps = false;
-  map.wrapS = RepeatWrapping;
-  map.wrapT = RepeatWrapping;
-  map.colorSpace = SRGBColorSpace;
+  map.wrapS = Wrapping.Repeat;
+  map.wrapT = Wrapping.Repeat;
+  map.colorSpace = ColorSpace.SRGB;
 }
 texture.repeat.set(3, 3);
 texture2.repeat.set(1.5, 1.5);

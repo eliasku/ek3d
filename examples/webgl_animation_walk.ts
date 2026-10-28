@@ -5,13 +5,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { HDRLoader } from "ek3d/addons/loaders/HDRLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import {
-  ACESFilmicToneMapping,
-  EquirectangularReflectionMapping,
-  PCFShadowMap,
-  RepeatWrapping,
-  SRGBColorSpace,
-} from "ek3d/constants";
+import { ToneMapping, Mapping, ShadowMap, Wrapping, ColorSpace } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
@@ -78,11 +72,11 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 0.5;
 if (renderer.shadowMap) {
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = PCFShadowMap;
+  renderer.shadowMap.type = ShadowMap.PCF;
 }
 const orbit = new OrbitControls<PerspectiveCamera>(camera, canvas);
 orbit.target.set(0, 1, 0);
@@ -112,7 +106,7 @@ new HDRLoader().load(
       return;
     }
     environment = texture;
-    texture.mapping = EquirectangularReflectionMapping;
+    texture.mapping = Mapping.EquirectangularReflection;
     scene.environment = texture;
     scene.environmentIntensity = 1.5;
     const loader = new TextureLoader();
@@ -120,11 +114,11 @@ new HDRLoader().load(
       if (disposed) map.dispose();
     };
     const diffuse = loader.load("/examples/textures/floors/FloorsCheckerboard_S_Diffuse.jpg", disposeStale);
-    diffuse.colorSpace = SRGBColorSpace;
+    diffuse.colorSpace = ColorSpace.SRGB;
     const normal = loader.load("/examples/textures/floors/FloorsCheckerboard_S_Normal.jpg", disposeStale);
     for (const map of [diffuse, normal]) {
       map.repeat.set(16, 16);
-      map.wrapS = map.wrapT = RepeatWrapping;
+      map.wrapS = map.wrapT = Wrapping.Repeat;
       map.anisotropy = renderer.capabilities.getMaxAnisotropy();
     }
     const geometry = new PlaneGeometry(50, 50, 50, 50);

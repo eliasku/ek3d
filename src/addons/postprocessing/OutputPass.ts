@@ -1,13 +1,4 @@
-import {
-  AgXToneMapping,
-  ACESFilmicToneMapping,
-  CineonToneMapping,
-  CustomToneMapping,
-  LinearToneMapping,
-  NeutralToneMapping,
-  ReinhardToneMapping,
-  SRGBTransfer,
-} from "../../constants";
+import { ToneMapping, Transfer, ColorSpace } from "../../constants";
 import { ColorManagement } from "../../math/ColorManagement";
 import { RawShaderMaterial } from "../../materials/RawShaderMaterial";
 import { cloneUniforms } from "../../renderers/shaders/UniformsUtils";
@@ -36,7 +27,7 @@ export class OutputPass extends Pass {
   uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
   material: RawShaderMaterial;
   _fsQuad: FullScreenQuad;
-  _outputColorSpace: string | null;
+  _outputColorSpace: ColorSpace | null;
   _toneMapping: number | null;
 
   /**
@@ -102,16 +93,16 @@ export class OutputPass extends Pass {
 
       this.material.defines = {};
 
-      if (ColorManagement.getTransfer(this._outputColorSpace) === SRGBTransfer)
+      if (ColorManagement.getTransfer(this._outputColorSpace) === Transfer.SRGB)
         this.material.defines.SRGB_TRANSFER = "";
 
-      if (this._toneMapping === LinearToneMapping) this.material.defines.LINEAR_TONE_MAPPING = "";
-      else if (this._toneMapping === ReinhardToneMapping) this.material.defines.REINHARD_TONE_MAPPING = "";
-      else if (this._toneMapping === CineonToneMapping) this.material.defines.CINEON_TONE_MAPPING = "";
-      else if (this._toneMapping === ACESFilmicToneMapping) this.material.defines.ACES_FILMIC_TONE_MAPPING = "";
-      else if (this._toneMapping === AgXToneMapping) this.material.defines.AGX_TONE_MAPPING = "";
-      else if (this._toneMapping === NeutralToneMapping) this.material.defines.NEUTRAL_TONE_MAPPING = "";
-      else if (this._toneMapping === CustomToneMapping) this.material.defines.CUSTOM_TONE_MAPPING = "";
+      if (this._toneMapping === ToneMapping.Linear) this.material.defines.LINEAR_TONE_MAPPING = "";
+      else if (this._toneMapping === ToneMapping.Reinhard) this.material.defines.REINHARD_TONE_MAPPING = "";
+      else if (this._toneMapping === ToneMapping.Cineon) this.material.defines.CINEON_TONE_MAPPING = "";
+      else if (this._toneMapping === ToneMapping.ACESFilmic) this.material.defines.ACES_FILMIC_TONE_MAPPING = "";
+      else if (this._toneMapping === ToneMapping.AgX) this.material.defines.AGX_TONE_MAPPING = "";
+      else if (this._toneMapping === ToneMapping.Neutral) this.material.defines.NEUTRAL_TONE_MAPPING = "";
+      else if (this._toneMapping === ToneMapping.Custom) this.material.defines.CUSTOM_TONE_MAPPING = "";
 
       this.material.needsUpdate = true;
     }

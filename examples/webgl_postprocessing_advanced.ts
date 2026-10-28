@@ -17,7 +17,7 @@ import { VerticalBlurShader } from "ek3d/addons/shaders/VerticalBlurShader";
 import { VignetteShader } from "ek3d/addons/shaders/VignetteShader";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
@@ -51,7 +51,7 @@ const loader = new TextureLoader();
 const bgTexture = loader.load("/examples/textures/cube/SwedishRoyalCastle/pz.jpg", (map) => {
   if (disposed) map.dispose();
 });
-bgTexture.colorSpace = SRGBColorSpace;
+bgTexture.colorSpace = ColorSpace.SRGB;
 const bg = new Mesh(new PlaneGeometry(1, 1), new MeshBasicMaterial({ map: bgTexture, depthTest: false }));
 bg.position.z = -500;
 bg.scale.set(innerWidth, innerHeight, 1);
@@ -59,7 +59,7 @@ background.add(bg);
 const diffuse = loader.load("/examples/models/gltf/LeePerrySmith/Map-COL.jpg", (map) => {
   if (disposed) map.dispose();
 });
-diffuse.colorSpace = SRGBColorSpace;
+diffuse.colorSpace = ColorSpace.SRGB;
 const normal = loader.load("/examples/models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg", (map) => {
   if (disposed) map.dispose();
 });

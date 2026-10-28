@@ -1,6 +1,6 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { LinearFilter, LinearMipmapLinearFilter, SRGBColorSpace } from "ek3d/constants";
+import { TextureFilter, ColorSpace } from "ek3d/constants";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { CubeTextureLoader } from "ek3d/loaders/CubeTextureLoader";
 import { LoadingManager } from "ek3d/loaders/LoadingManager";
@@ -58,9 +58,9 @@ for (let level = 0; level < 9; level++) {
 function createScene(): void {
   const [texture, ...mipmaps] = textures;
   texture.mipmaps = mipmaps;
-  texture.colorSpace = SRGBColorSpace;
-  texture.minFilter = LinearMipmapLinearFilter;
-  texture.magFilter = LinearFilter;
+  texture.colorSpace = ColorSpace.SRGB;
+  texture.minFilter = TextureFilter.LinearMipmapLinear;
+  texture.magFilter = TextureFilter.Linear;
   texture.generateMipmaps = false;
   texture.needsUpdate = true;
   const sphere = new SphereGeometry(100, 128, 128);

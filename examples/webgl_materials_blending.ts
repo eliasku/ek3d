@@ -1,4 +1,4 @@
-import { AdditiveBlending, MultiplyBlending, NoBlending, NormalBlending, SubtractiveBlending } from "ek3d/constants";
+import { Blending } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 import { Mesh } from "ek3d/objects/Mesh";
@@ -6,11 +6,11 @@ import { blendingScene, labelMaterial } from "./materials-blending-common";
 
 const { scene, load, cleanup } = blendingScene(70, 600);
 const blendings = [
-  { name: "No", constant: NoBlending },
-  { name: "Normal", constant: NormalBlending },
-  { name: "Additive", constant: AdditiveBlending },
-  { name: "Subtractive", constant: SubtractiveBlending },
-  { name: "Multiply", constant: MultiplyBlending },
+  { name: "No", constant: Blending.No },
+  { name: "Normal", constant: Blending.Normal },
+  { name: "Additive", constant: Blending.Additive },
+  { name: "Subtractive", constant: Blending.Subtractive },
+  { name: "Multiply", constant: Blending.Multiply },
 ];
 const maps = [
   "uv_grid_opengl.jpg",

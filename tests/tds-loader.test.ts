@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, test, vi } from "vite-plus/test";
-import { AdditiveBlending, DoubleSide } from "../src/constants";
+import { Blending, Side } from "../src/constants";
 import { BufferAttribute } from "../src/core/BufferAttribute";
 import { TDSLoader } from "../src/addons/loaders/TDSLoader";
 import { MeshPhongMaterial } from "../src/materials/MeshPhongMaterial";
@@ -87,8 +87,8 @@ test("3DS chunks produce geometry, groups, textures and material properties", ()
   const material = mesh.material;
   assert.ok(material instanceof MeshPhongMaterial, "expected a single phong material");
   assert.equal(material.name, "RedMat");
-  assert.equal(material.side, DoubleSide);
-  assert.equal(material.blending, AdditiveBlending);
+  assert.equal(material.side, Side.Double);
+  assert.equal(material.blending, Blending.Additive);
   assert.equal(material.wireframe, true);
   assert.equal(material.wireframeLinewidth, 4);
   assert.equal(material.shininess, 50);

@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { RoomEnvironment } from "ek3d/addons/environments/RoomEnvironment";
-import { NeutralToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
@@ -51,7 +51,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.toneMapping = NeutralToneMapping;
+renderer.toneMapping = ToneMapping.Neutral;
 renderer.toneMappingExposure = 1;
 
 const environment = new RoomEnvironment();

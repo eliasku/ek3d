@@ -1,4 +1,4 @@
-import { LinearFilter, LinearMipmapLinearFilter } from "../../constants";
+import { TextureFilter } from "../../constants";
 import { DataTextureLoader } from "../../loaders/DataTextureLoader";
 import type { DataTextureData } from "../../loaders/DataTextureLoader";
 import type { LoadingManager } from "../../loaders/LoadingManager";
@@ -36,8 +36,8 @@ export class TIFFLoader extends DataTextureLoader {
       height: image.height,
       data,
       flipY: true,
-      magFilter: LinearFilter,
-      minFilter: LinearMipmapLinearFilter,
+      magFilter: TextureFilter.Linear,
+      minFilter: TextureFilter.LinearMipmapLinear,
     };
   }
 }

@@ -2,13 +2,13 @@ import assert from "node:assert/strict";
 import { afterEach, test, vi } from "vite-plus/test";
 import { LUT3dlLoader } from "../src/addons/loaders/LUT3dlLoader";
 import { LUTCubeLoader } from "../src/addons/loaders/LUTCubeLoader";
-import { FloatType } from "../src/constants";
+import { TextureType } from "../src/constants";
 import { LoadingManager } from "../src/loaders/LoadingManager";
 
 afterEach(() => vi.unstubAllGlobals());
 
 test("3DL reorders blue-fastest rows and scales the declared texture type", () => {
-  const loader = new LUT3dlLoader().setType(FloatType);
+  const loader = new LUT3dlLoader().setType(TextureType.Float);
   const lut = loader.parse("0 1\n0 0 0\n4 0 0\n0 4 0\n4 4 0\n0 0 4\n4 0 4\n0 4 4\n4 4 4\n");
   assert.equal(lut.size, 2);
   assert.deepEqual(

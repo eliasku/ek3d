@@ -71,7 +71,7 @@ assert.equal(
 
 const root = new URL("../", import.meta.url);
 const files = ["vite.config.ts"];
-for (const directory of ["src", "feature-testbed", "examples", "tests", "scripts"]) {
+for (const directory of ["src", "testbed", "examples", "tests", "scripts"]) {
   if (directory === "examples" && !existsSync(new URL("examples/", root))) continue;
   for (const name of await readdir(new URL(`${directory}/`, root), { recursive: true })) {
     if (/\.tsx?$/.test(name)) files.push(`${directory}/${name}`);

@@ -1,13 +1,4 @@
-import {
-  AddEquation,
-  HalfFloatType,
-  NearestFilter,
-  NoBlending,
-  NormalBlending,
-  OneMinusSrcAlphaFactor,
-  SrcAlphaFactor,
-  UnsignedShortType,
-} from "../../constants";
+import { Equation, TextureType, TextureFilter, Blending, Factor } from "../../constants";
 import { Color } from "../../math/Color";
 import { DepthTexture } from "../../textures/DepthTexture";
 import { MeshBasicMaterial } from "../../materials/MeshBasicMaterial";
@@ -233,18 +224,18 @@ export class SSRPass extends Pass {
     const depthTexture = new DepthTexture(
       this.width,
       this.height,
-      UnsignedShortType,
+      TextureType.UnsignedShort,
       undefined,
       undefined,
       undefined,
-      NearestFilter,
-      NearestFilter,
+      TextureFilter.Nearest,
+      TextureFilter.Nearest,
     );
 
     this.beautyRenderTarget = new WebGLRenderTarget(this.width, this.height, {
-      minFilter: NearestFilter,
-      magFilter: NearestFilter,
-      type: HalfFloatType,
+      minFilter: TextureFilter.Nearest,
+      magFilter: TextureFilter.Nearest,
+      type: TextureType.HalfFloat,
       depthTexture: depthTexture,
       depthBuffer: true,
     });
@@ -252,32 +243,32 @@ export class SSRPass extends Pass {
     // for bouncing
 
     this.prevRenderTarget = new WebGLRenderTarget(this.width, this.height, {
-      minFilter: NearestFilter,
-      magFilter: NearestFilter,
+      minFilter: TextureFilter.Nearest,
+      magFilter: TextureFilter.Nearest,
       depthBuffer: false,
     });
 
     // normal render target
 
     this.normalRenderTarget = new WebGLRenderTarget(this.width, this.height, {
-      minFilter: NearestFilter,
-      magFilter: NearestFilter,
-      type: HalfFloatType,
+      minFilter: TextureFilter.Nearest,
+      magFilter: TextureFilter.Nearest,
+      type: TextureType.HalfFloat,
     });
 
     // metalness render target
 
     this.metalnessRenderTarget = new WebGLRenderTarget(this.width, this.height, {
-      minFilter: NearestFilter,
-      magFilter: NearestFilter,
-      type: HalfFloatType,
+      minFilter: TextureFilter.Nearest,
+      magFilter: TextureFilter.Nearest,
+      type: TextureType.HalfFloat,
     });
 
     // ssr render target
 
     this.ssrRenderTarget = new WebGLRenderTarget(this.width, this.height, {
-      minFilter: NearestFilter,
-      magFilter: NearestFilter,
+      minFilter: TextureFilter.Nearest,
+      magFilter: TextureFilter.Nearest,
       depthBuffer: false,
     });
 
@@ -295,7 +286,7 @@ export class SSRPass extends Pass {
       uniforms: cloneUniforms(SSRShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
       vertexShader: SSRShader.vertexShader,
       fragmentShader: SSRShader.fragmentShader,
-      blending: NoBlending,
+      blending: Blending.No,
     } as never);
 
     this.ssrMaterial.uniforms!["tDiffuse"].value = this.beautyRenderTarget.texture;
@@ -314,7 +305,7 @@ export class SSRPass extends Pass {
     // normal material
 
     this.normalMaterial = new MeshNormalMaterial();
-    this.normalMaterial.blending = NoBlending;
+    this.normalMaterial.blending = Blending.No;
 
     // metalnessOn material
 
@@ -351,7 +342,7 @@ export class SSRPass extends Pass {
       uniforms: cloneUniforms(SSRDepthShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
       vertexShader: SSRDepthShader.vertexShader,
       fragmentShader: SSRDepthShader.fragmentShader,
-      blending: NoBlending,
+      blending: Blending.No,
     } as never);
     this.depthRenderMaterial.uniforms["tDepth"].value = this.beautyRenderTarget.depthTexture;
     this.depthRenderMaterial.uniforms["cameraNear"].value = this.camera.near;
@@ -366,12 +357,12 @@ export class SSRPass extends Pass {
       transparent: true,
       depthTest: false,
       depthWrite: false,
-      blendSrc: SrcAlphaFactor,
-      blendDst: OneMinusSrcAlphaFactor,
-      blendEquation: AddEquation,
-      blendSrcAlpha: SrcAlphaFactor,
-      blendDstAlpha: OneMinusSrcAlphaFactor,
-      blendEquationAlpha: AddEquation,
+      blendSrc: Factor.SrcAlpha,
+      blendDst: Factor.OneMinusSrcAlpha,
+      blendEquation: Equation.Add,
+      blendSrcAlpha: Factor.SrcAlpha,
+      blendDstAlpha: Factor.OneMinusSrcAlpha,
+      blendEquationAlpha: Equation.Add,
     } as never);
 
     this.fsQuad = new FullScreenQuad(null);
@@ -546,27 +537,27 @@ export class SSRPass extends Pass {
       case SSRPass.OUTPUT.Default:
         if (this.bouncing) {
           this.copyMaterial.uniforms["tDiffuse"].value = this.beautyRenderTarget.texture;
-          this.copyMaterial.blending = NoBlending;
+          this.copyMaterial.blending = Blending.No;
           this._renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
 
           this.copyMaterial.uniforms["tDiffuse"].value = this.blur
             ? this.blurRenderTarget2.texture
             : this.ssrRenderTarget.texture;
-          this.copyMaterial.blending = NormalBlending;
+          this.copyMaterial.blending = Blending.Normal;
           this._renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
 
           this.copyMaterial.uniforms["tDiffuse"].value = this.prevRenderTarget.texture;
-          this.copyMaterial.blending = NoBlending;
+          this.copyMaterial.blending = Blending.No;
           this._renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
         } else {
           this.copyMaterial.uniforms["tDiffuse"].value = this.beautyRenderTarget.texture;
-          this.copyMaterial.blending = NoBlending;
+          this.copyMaterial.blending = Blending.No;
           this._renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
 
           this.copyMaterial.uniforms["tDiffuse"].value = this.blur
             ? this.blurRenderTarget2.texture
             : this.ssrRenderTarget.texture;
-          this.copyMaterial.blending = NormalBlending;
+          this.copyMaterial.blending = Blending.Normal;
           this._renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
         }
 
@@ -576,18 +567,18 @@ export class SSRPass extends Pass {
         this.copyMaterial.uniforms["tDiffuse"].value = this.blur
           ? this.blurRenderTarget2.texture
           : this.ssrRenderTarget.texture;
-        this.copyMaterial.blending = NoBlending;
+        this.copyMaterial.blending = Blending.No;
         this._renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
 
         if (this.bouncing) {
           this.copyMaterial.uniforms["tDiffuse"].value = this.blur
             ? this.blurRenderTarget2.texture
             : this.beautyRenderTarget.texture;
-          this.copyMaterial.blending = NoBlending;
+          this.copyMaterial.blending = Blending.No;
           this._renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
 
           this.copyMaterial.uniforms["tDiffuse"].value = this.ssrRenderTarget.texture;
-          this.copyMaterial.blending = NormalBlending;
+          this.copyMaterial.blending = Blending.Normal;
           this._renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
         }
 
@@ -595,7 +586,7 @@ export class SSRPass extends Pass {
 
       case SSRPass.OUTPUT.Beauty:
         this.copyMaterial.uniforms["tDiffuse"].value = this.beautyRenderTarget.texture;
-        this.copyMaterial.blending = NoBlending;
+        this.copyMaterial.blending = Blending.No;
         this._renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
         break;
 
@@ -605,13 +596,13 @@ export class SSRPass extends Pass {
 
       case SSRPass.OUTPUT.Normal:
         this.copyMaterial.uniforms["tDiffuse"].value = this.normalRenderTarget.texture;
-        this.copyMaterial.blending = NoBlending;
+        this.copyMaterial.blending = Blending.No;
         this._renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
         break;
 
       case SSRPass.OUTPUT.Metalness:
         this.copyMaterial.uniforms["tDiffuse"].value = this.metalnessRenderTarget.texture;
-        this.copyMaterial.blending = NoBlending;
+        this.copyMaterial.blending = Blending.No;
         this._renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
         break;
 

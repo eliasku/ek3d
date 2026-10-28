@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { BackSide, DoubleSide, NearestFilter, RepeatWrapping } from "ek3d/constants";
+import { Side, TextureFilter, Wrapping } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
@@ -43,12 +43,12 @@ function createLight(color: number): PointLight {
   context.fillStyle = "white";
   context.fillRect(0, 1, 2, 1);
   const texture = new CanvasTexture(pattern);
-  texture.magFilter = NearestFilter;
-  texture.wrapT = texture.wrapS = RepeatWrapping;
+  texture.magFilter = TextureFilter.Nearest;
+  texture.wrapT = texture.wrapS = Wrapping.Repeat;
   texture.repeat.set(1, 4.5);
   const sphere = new Mesh(
     new SphereGeometry(2, 32, 8),
-    new MeshPhongMaterial({ side: DoubleSide, alphaMap: texture, alphaTest: 0.5 }),
+    new MeshPhongMaterial({ side: Side.Double, alphaMap: texture, alphaTest: 0.5 }),
   );
   sphere.castShadow = sphere.receiveShadow = true;
   light.add(sphere);
@@ -60,7 +60,7 @@ const lights = [pointLight, pointLight2];
 scene.add(pointLight, pointLight2);
 const room = new Mesh(
   new BoxGeometry(30, 30, 30),
-  new MeshPhongMaterial({ color: 0xa0adaf, shininess: 10, specular: 0x111111, side: BackSide }),
+  new MeshPhongMaterial({ color: 0xa0adaf, shininess: 10, specular: 0x111111, side: Side.Back }),
 );
 room.position.y = 10;
 room.receiveShadow = true;

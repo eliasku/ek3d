@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { OBJLoader } from "ek3d/addons/loaders/OBJLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { CubeRefractionMapping, MixOperation } from "ek3d/constants";
+import { Mapping, Combine } from "ek3d/constants";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { PointLight } from "ek3d/lights/PointLight";
 import { CubeTextureLoader } from "ek3d/loaders/CubeTextureLoader";
@@ -54,7 +54,7 @@ const refraction = loader.load(
   undefined,
   reportFailure,
 );
-refraction.mapping = CubeRefractionMapping;
+refraction.mapping = Mapping.CubeRefraction;
 scene.background = reflection;
 scene.add(new AmbientLight(0xffffff, 3));
 const pointLight = new PointLight(0xffffff, 200);
@@ -62,7 +62,7 @@ scene.add(pointLight);
 const materials = [
   new MeshLambertMaterial({ color: 0xffffff, envMap: reflection }),
   new MeshLambertMaterial({ color: 0xfff700, envMap: refraction, refractionRatio: 0.95 }),
-  new MeshLambertMaterial({ color: 0xffaa00, envMap: reflection, combine: MixOperation, reflectivity: 0.3 }),
+  new MeshLambertMaterial({ color: 0xffaa00, envMap: reflection, combine: Combine.Mix, reflectivity: 0.3 }),
 ];
 new OBJLoader(manager).load(
   "/examples/models/obj/walt/WaltHead.obj",

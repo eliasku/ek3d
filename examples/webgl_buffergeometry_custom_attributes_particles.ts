@@ -1,6 +1,6 @@
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { AdditiveBlending, DynamicDrawUsage } from "ek3d/constants";
+import { Blending, BufferUsage } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
@@ -56,7 +56,7 @@ const material = new ShaderMaterial({
       gl_FragColor = vec4(vColor, 1.0) * texture2D(pointTexture, gl_PointCoord);
     }
   `,
-  blending: AdditiveBlending,
+  blending: Blending.Additive,
   depthTest: false,
   transparent: true,
   vertexColors: true,
@@ -79,7 +79,7 @@ for (let i = 0; i < count; i++) {
 const geometry = new BufferGeometry();
 geometry.setAttribute("position", new BufferAttribute(positions, 3));
 geometry.setAttribute("color", new BufferAttribute(colors, 3));
-const sizeAttribute = new BufferAttribute(sizes, 1).setUsage(DynamicDrawUsage);
+const sizeAttribute = new BufferAttribute(sizes, 1).setUsage(BufferUsage.DynamicDraw);
 geometry.setAttribute("size", sizeAttribute);
 const particles = new Points(geometry, material);
 scene.add(particles);

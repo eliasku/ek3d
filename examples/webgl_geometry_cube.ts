@@ -1,5 +1,5 @@
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
@@ -32,7 +32,7 @@ const texture = new TextureLoader().load(
     console.error(error);
   },
 );
-texture.colorSpace = SRGBColorSpace;
+texture.colorSpace = ColorSpace.SRGB;
 const geometry = new BoxGeometry();
 const material = new MeshBasicMaterial({ map: texture });
 const mesh = new Mesh(geometry, material);

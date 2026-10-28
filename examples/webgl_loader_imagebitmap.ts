@@ -1,5 +1,5 @@
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { GridHelper } from "ek3d/helpers/GridHelper";
 import { ImageBitmapLoader } from "ek3d/loaders/ImageBitmapLoader";
@@ -60,7 +60,7 @@ function addCube(image: HTMLImageElement | ImageBitmap, bitmap: boolean): void {
   }
   const texture = new Texture(image);
   texture.needsUpdate = true;
-  texture.colorSpace = SRGBColorSpace;
+  texture.colorSpace = ColorSpace.SRGB;
   const material = new MeshBasicMaterial({ color: bitmap ? 0xffffff : 0xff8888, map: texture });
   materials.push(material);
   if (image instanceof ImageBitmap) {

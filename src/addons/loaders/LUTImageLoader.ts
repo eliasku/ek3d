@@ -1,4 +1,4 @@
-import { ClampToEdgeWrapping, LinearFilter, RGBAFormat, UnsignedByteType } from "../../constants";
+import { Wrapping, TextureFilter, PixelFormat, TextureType } from "../../constants";
 import { Loader } from "../../loaders/Loader";
 import { TextureLoader } from "../../loaders/TextureLoader";
 import { Data3DTexture } from "../../textures/Data3DTexture";
@@ -55,10 +55,10 @@ export class LUTImageLoader extends Loader<{ size: number; texture3D: Data3DText
 
   parse(dataArray: Uint8ClampedArray, size: number): { size: number; texture3D: Data3DTexture } {
     const texture3D = new Data3DTexture(new Uint8Array(dataArray), size, size, size);
-    texture3D.format = RGBAFormat;
-    texture3D.type = UnsignedByteType;
-    texture3D.magFilter = texture3D.minFilter = LinearFilter;
-    texture3D.wrapS = texture3D.wrapT = texture3D.wrapR = ClampToEdgeWrapping;
+    texture3D.format = PixelFormat.RGBA;
+    texture3D.type = TextureType.UnsignedByte;
+    texture3D.magFilter = texture3D.minFilter = TextureFilter.Linear;
+    texture3D.wrapS = texture3D.wrapT = texture3D.wrapR = Wrapping.ClampToEdge;
     texture3D.generateMipmaps = false;
     texture3D.needsUpdate = true;
     return { size, texture3D };

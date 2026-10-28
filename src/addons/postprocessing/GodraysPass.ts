@@ -1,11 +1,4 @@
-import {
-  BasicDepthPacking,
-  DepthFormat,
-  HalfFloatType,
-  NearestFilter,
-  RGBAFormat,
-  UnsignedIntType,
-} from "../../constants";
+import { DepthPacking, PixelFormat, TextureType, TextureFilter } from "../../constants";
 import { PerspectiveCamera } from "../../cameras/PerspectiveCamera";
 import { DirectionalLight } from "../../lights/DirectionalLight";
 import { PointLight } from "../../lights/PointLight";
@@ -112,10 +105,10 @@ export class GodraysPass extends Pass {
     this.camera = camera;
     this.params = { ...defaults, color: defaults.color.clone() };
     const targetOptions = {
-      minFilter: NearestFilter,
-      magFilter: NearestFilter,
-      format: RGBAFormat,
-      type: HalfFloatType,
+      minFilter: TextureFilter.Nearest,
+      magFilter: TextureFilter.Nearest,
+      format: PixelFormat.RGBA,
+      type: TextureType.HalfFloat,
       generateMipmaps: false,
     };
     this.rays = new WebGLRenderTarget(1, 1, targetOptions);
@@ -214,8 +207,8 @@ export class GodraysPass extends Pass {
     this.setSize(this.width, this.height);
   }
 
-  setDepthTexture(depthTexture: Texture, depthPacking: number = BasicDepthPacking): void {
-    if (depthPacking !== BasicDepthPacking) throw new Error("Only BasicDepthPacking is supported");
+  setDepthTexture(depthTexture: Texture, depthPacking: DepthPacking = DepthPacking.Basic): void {
+    if (depthPacking !== DepthPacking.Basic) throw new Error("Only BasicDepthPacking is supported");
     this.depthTexture = depthTexture;
   }
 
@@ -243,11 +236,11 @@ export class GodraysPass extends Pass {
       target?.depthTexture?.dispose();
       target?.dispose();
       target = new WebGLRenderTarget(width, height);
-      target.depthTexture = new DepthTexture(width, height, UnsignedIntType);
-      target.depthTexture.format = DepthFormat;
+      target.depthTexture = new DepthTexture(width, height, TextureType.UnsignedInt);
+      target.depthTexture.format = PixelFormat.Depth;
       target.depthTexture.compareFunction = null;
-      target.depthTexture.minFilter = NearestFilter;
-      target.depthTexture.magFilter = NearestFilter;
+      target.depthTexture.minFilter = TextureFilter.Nearest;
+      target.depthTexture.magFilter = TextureFilter.Nearest;
     }
     renderer.initRenderTarget(target);
     renderer.copyTextureToTexture(source, target.depthTexture!);

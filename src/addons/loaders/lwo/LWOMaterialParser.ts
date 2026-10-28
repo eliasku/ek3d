@@ -1,18 +1,7 @@
 import type { TextureLoader } from "../../../loaders/TextureLoader";
 import type { Texture } from "../../../textures/Texture";
 import type { LWOAttributes, LWOForm, LWOSurface, LWOTree } from "./IFFParser";
-import {
-  AddOperation,
-  BackSide,
-  ClampToEdgeWrapping,
-  DoubleSide,
-  EquirectangularReflectionMapping,
-  EquirectangularRefractionMapping,
-  FrontSide,
-  MirroredRepeatWrapping,
-  RepeatWrapping,
-  SRGBColorSpace,
-} from "../../../constants";
+import { Combine, Side, Wrapping, Mapping, ColorSpace } from "../../../constants";
 import { Color } from "../../../math/Color";
 import { Vector2 } from "../../../math/Vector2";
 import { MeshPhongMaterial } from "../../../materials/MeshPhongMaterial";
@@ -74,7 +63,7 @@ type MaterialParams = {
   clearcoatRoughness?: number;
   refractionRatio?: number;
   reflectivity?: number;
-  combine?: number;
+  combine?: Combine;
   shininess?: number;
 };
 type AttributeParams = MaterialParams & { color: Color };
@@ -131,15 +120,15 @@ export class LWOMaterialParser {
 
   // The handedness conversion switches front and back faces.
   private getSide(attributes: LWOAttributes): number | undefined {
-    if (!attributes.side) return BackSide;
+    if (!attributes.side) return Side.Back;
     switch (attributes.side) {
       case 0:
       case 1:
-        return BackSide;
+        return Side.Back;
       case 2:
-        return FrontSide;
+        return Side.Front;
       case 3:
-        return DoubleSide;
+        return Side.Double;
     }
   }
 
@@ -185,7 +174,7 @@ export class LWOMaterialParser {
       switch (name) {
         case "Color":
           maps.map = texture;
-          texture.colorSpace = SRGBColorSpace;
+          texture.colorSpace = ColorSpace.SRGB;
           break;
         case "Roughness":
           maps.roughnessMap = texture;
@@ -193,12 +182,12 @@ export class LWOMaterialParser {
           break;
         case "Specular":
           maps.specularMap = texture;
-          texture.colorSpace = SRGBColorSpace;
+          texture.colorSpace = ColorSpace.SRGB;
           maps.specular = 0xffffff;
           break;
         case "Luminous":
           maps.emissiveMap = texture;
-          texture.colorSpace = SRGBColorSpace;
+          texture.colorSpace = ColorSpace.SRGB;
           maps.emissive = 0x808080;
           break;
         case "Luminous Color":
@@ -239,7 +228,7 @@ export class LWOMaterialParser {
         switch (name) {
           case "Color":
             maps.map = texture;
-            texture.colorSpace = SRGBColorSpace;
+            texture.colorSpace = ColorSpace.SRGB;
             break;
           case "Diffuse":
             maps.aoMap = texture;
@@ -250,12 +239,12 @@ export class LWOMaterialParser {
             break;
           case "Specular":
             maps.specularMap = texture;
-            texture.colorSpace = SRGBColorSpace;
+            texture.colorSpace = ColorSpace.SRGB;
             maps.specular = 0xffffff;
             break;
           case "Luminosity":
             maps.emissiveMap = texture;
-            texture.colorSpace = SRGBColorSpace;
+            texture.colorSpace = ColorSpace.SRGB;
             maps.emissive = 0x808080;
             break;
           case "Metallic":
@@ -316,7 +305,7 @@ export class LWOMaterialParser {
     if (attributes.Diffuse) params.color.multiplyScalar(attributes.Diffuse.value);
     if (attributes.Reflection) {
       params.reflectivity = attributes.Reflection.value;
-      params.combine = AddOperation;
+      params.combine = Combine.Add;
     }
     if (attributes.Luminosity) {
       params.emissiveIntensity = attributes.Luminosity.value;
@@ -338,14 +327,14 @@ export class LWOMaterialParser {
     if (connections.envMap) {
       const envMap = this.loadTexture(connections.envMap);
       if (attributes.transparent && attributes.opacity! < 0.999) {
-        envMap.mapping = EquirectangularRefractionMapping;
+        envMap.mapping = Mapping.EquirectangularRefraction;
         if (attributes.reflectivity !== undefined) {
           delete attributes.reflectivity;
           delete attributes.combine;
         }
         if (attributes.metalness !== undefined) attributes.metalness = 1;
         attributes.opacity = 1;
-      } else envMap.mapping = EquirectangularReflectionMapping;
+      } else envMap.mapping = Mapping.EquirectangularReflection;
       maps.envMap = envMap;
     }
   }
@@ -371,13 +360,13 @@ export class LWOMaterialParser {
     switch (num) {
       case 0:
         console.warn('LWOLoader: "Reset" texture wrapping type is not supported in three.js');
-        return ClampToEdgeWrapping;
+        return Wrapping.ClampToEdge;
       case 1:
-        return RepeatWrapping;
+        return Wrapping.Repeat;
       case 2:
-        return MirroredRepeatWrapping;
+        return Wrapping.MirroredRepeat;
       case 3:
-        return ClampToEdgeWrapping;
+        return Wrapping.ClampToEdge;
     }
   }
 

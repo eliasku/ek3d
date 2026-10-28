@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { Scene } from "ek3d/scenes/Scene";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
@@ -15,7 +16,7 @@ import { Data3DTexture } from "ek3d/textures/Data3DTexture";
 import { DataArrayTexture } from "ek3d/textures/DataArrayTexture";
 import { CubeTexture } from "ek3d/textures/CubeTexture";
 import type { Texture } from "ek3d/textures/Texture";
-import { GLSL1, GLSL3, NearestFilter } from "ek3d/constants";
+import { GLSL, TextureFilter } from "ek3d/constants";
 
 function check(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -47,19 +48,19 @@ export function verifyCustomShaders() {
   }> = [];
   const sample = (expected: number[], label: string) => {
     renderer.render(scene, camera);
-    gl.readPixels(8, 8, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
-    check(gl.getError() === gl.NO_ERROR, `${label}: unexpected GL error`);
+    gl.readPixels(8, 8, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
+    check(gl.getError() === GL.NO_ERROR, `${label}: unexpected GL error`);
     check(
       pixel.every((value, i) => Math.abs(value - expected[i]) <= 2),
       `${label}: ${pixel.join(",")} != ${expected.join(",")}`,
     );
   };
-  const currentProgram = () => gl.getParameter(gl.CURRENT_PROGRAM) as WebGLProgram;
+  const currentProgram = () => gl.getParameter(GL.CURRENT_PROGRAM) as WebGLProgram;
   try {
     // GLSL1 ShaderMaterial is translated by the renderer; RawShaderMaterial stays GLSL1.
     for (const raw of [false, true]) {
-      for (const glslVersion of [GLSL1, GLSL3] as const) {
-        const modern = glslVersion === GLSL3;
+      for (const glslVersion of [GLSL.GLSL1, GLSL.GLSL3] as const) {
+        const modern = glslVersion === GLSL.GLSL3;
         const material = new (raw ? RawShaderMaterial : ShaderMaterial)({
           glslVersion,
           uniforms: { tint: { value: new Vector3(0.25, 0.5, 0.75) } },
@@ -132,7 +133,7 @@ export function verifyCustomShaders() {
       booleanVector: { value: [true, false] },
     };
     const structured = new ShaderMaterial({
-      glslVersion: GLSL3,
+      glslVersion: GLSL.GLSL3,
       uniforms,
       vertexShader: "void main() { gl_Position = vec4(position, 1.0); }",
       fragmentShader: `
@@ -205,7 +206,7 @@ export function verifyCustomShaders() {
     const cube = new CubeTexture(faces);
     textures.push(red, green, volume, layers, cube, ...faces);
     for (const texture of textures) {
-      texture.minFilter = texture.magFilter = NearestFilter;
+      texture.minFilter = texture.magFilter = TextureFilter.Nearest;
       texture.generateMipmaps = false;
       texture.needsUpdate = true;
     }
@@ -216,7 +217,7 @@ export function verifyCustomShaders() {
       layers: { value: layers },
     };
     const sampler = new RawShaderMaterial({
-      glslVersion: GLSL3,
+      glslVersion: GLSL.GLSL3,
       uniforms: samplerUniforms,
       vertexShader: "precision highp float; in vec3 position; void main() { gl_Position = vec4(position, 1.0); }",
       fragmentShader: `precision highp float; precision highp sampler3D; precision highp sampler2DArray;
@@ -233,7 +234,7 @@ export function verifyCustomShaders() {
     green.needsUpdate = true;
     sample([102, 51, 204, 255], "sampler texture update");
     const shared = new RawShaderMaterial({
-      glslVersion: GLSL3,
+      glslVersion: GLSL.GLSL3,
       uniforms: samplerUniforms,
       vertexShader: sampler.vertexShader,
       fragmentShader: sampler.fragmentShader,
@@ -257,7 +258,7 @@ export function verifyCustomShaders() {
 
     for (const kind of ["compile", "link"]) {
       const broken = new RawShaderMaterial({
-        glslVersion: GLSL3,
+        glslVersion: GLSL.GLSL3,
         vertexShader:
           "precision highp float; in vec3 position; out vec3 mismatch; void main() { mismatch = position; gl_Position = vec4(position, 1.0); }",
         fragmentShader:
@@ -271,9 +272,9 @@ export function verifyCustomShaders() {
       renderer.debug.onShaderError = (context, program, vertex, fragment) => {
         diagnostics.push({
           kind,
-          vertex: context.getShaderParameter(vertex, context.COMPILE_STATUS) === true,
-          fragment: context.getShaderParameter(fragment, context.COMPILE_STATUS) === true,
-          linked: context.getProgramParameter(program, context.LINK_STATUS) === true,
+          vertex: context.getShaderParameter(vertex, GL.COMPILE_STATUS) === true,
+          fragment: context.getShaderParameter(fragment, GL.COMPILE_STATUS) === true,
+          linked: context.getProgramParameter(program, GL.LINK_STATUS) === true,
           programLog: context.getProgramInfoLog(program) ?? "",
           vertexLog: context.getShaderInfoLog(vertex) ?? "",
           fragmentLog: context.getShaderInfoLog(fragment) ?? "",
@@ -290,8 +291,8 @@ export function verifyCustomShaders() {
         `${kind}: missing real driver error log`,
       );
       // Invalid programs may produce INVALID_OPERATION when the renderer attempts the draw.
-      for (let error = gl.getError(); error !== gl.NO_ERROR; error = gl.getError()) {
-        check(error === gl.INVALID_OPERATION, `${kind}: unexpected GL error ${error}`);
+      for (let error = gl.getError(); error !== GL.NO_ERROR; error = gl.getError()) {
+        check(error === GL.INVALID_OPERATION, `${kind}: unexpected GL error ${error}`);
       }
       broken.vertexShader =
         "precision highp float; in vec3 position; void main() { gl_Position = vec4(position, 1.0); }";

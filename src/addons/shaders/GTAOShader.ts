@@ -1,4 +1,4 @@
-import { RepeatWrapping } from "../../constants";
+import { Wrapping } from "../../constants";
 import { DataTexture } from "../../textures/DataTexture";
 import { Matrix4 } from "../../math/Matrix4";
 import { Vector2 } from "../../math/Vector2";
@@ -363,8 +363,8 @@ export function generateMagicSquareNoise(size: number = 5): DataTexture {
   }
 
   const noiseTexture = new DataTexture(data, noiseSize, noiseSize);
-  noiseTexture.wrapS = RepeatWrapping;
-  noiseTexture.wrapT = RepeatWrapping;
+  noiseTexture.wrapS = Wrapping.Repeat;
+  noiseTexture.wrapT = Wrapping.Repeat;
   noiseTexture.needsUpdate = true;
 
   return noiseTexture;

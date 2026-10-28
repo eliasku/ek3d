@@ -1,5 +1,5 @@
 import { DragControls } from "ek3d/addons/controls/DragControls";
-import { PCFShadowMap, TOUCH } from "ek3d/constants";
+import { ShadowMap, TOUCH } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
@@ -79,7 +79,7 @@ const renderer = new WebGLRenderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap!.enabled = true;
-renderer.shadowMap!.type = PCFShadowMap;
+renderer.shadowMap!.type = ShadowMap.PCF;
 
 const controls = new DragControls([...objects], camera, canvas);
 controls.rotateSpeed = 2;

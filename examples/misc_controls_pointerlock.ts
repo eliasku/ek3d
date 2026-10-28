@@ -1,5 +1,5 @@
 import { PointerLockControls } from "ek3d/addons/controls/PointerLockControls";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
@@ -153,7 +153,7 @@ position = floorGeometry.attributes.position as BufferAttribute;
 const colorsFloor: number[] = [];
 
 for (let i = 0, l = position.count; i < l; i++) {
-  color.setHSL(Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75, SRGBColorSpace);
+  color.setHSL(Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75, ColorSpace.SRGB);
   colorsFloor.push(color.r, color.g, color.b);
 }
 
@@ -172,7 +172,7 @@ position = boxGeometry.attributes.position as BufferAttribute;
 const colorsBox: number[] = [];
 
 for (let i = 0, l = position.count; i < l; i++) {
-  color.setHSL(Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75, SRGBColorSpace);
+  color.setHSL(Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75, ColorSpace.SRGB);
   colorsBox.push(color.r, color.g, color.b);
 }
 
@@ -184,7 +184,7 @@ for (let i = 0; i < 500; i++) {
     flatShading: true,
     vertexColors: true,
   });
-  boxMaterial.color.setHSL(Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75, SRGBColorSpace);
+  boxMaterial.color.setHSL(Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75, ColorSpace.SRGB);
 
   const box = new Mesh(boxGeometry, boxMaterial);
   box.position.x = Math.floor(Math.random() * 20 - 10) * 20;

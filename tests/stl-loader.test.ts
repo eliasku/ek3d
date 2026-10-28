@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { afterEach, test, vi } from "vite-plus/test";
 import { STLGeometry, STLLoader } from "../src/addons/loaders/STLLoader";
 import { BufferAttribute } from "../src/core/BufferAttribute";
-import { SRGBColorSpace } from "../src/constants";
+import { ColorSpace } from "../src/constants";
 import { LoadingManager } from "../src/loaders/LoadingManager";
 import { Color } from "../src/math/Color";
 
@@ -98,8 +98,8 @@ test("binary color headers set hasColors, alpha and sRGB facet colors, defaultin
   assert.deepEqual(normals, [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0]);
 
   const colors = Array.from(attribute(geometry, "color").array);
-  const unique = new Color().setRGB(1, 0, 0, SRGBColorSpace);
-  const fallback = new Color().setRGB(10 / 255, 20 / 255, 30 / 255, SRGBColorSpace);
+  const unique = new Color().setRGB(1, 0, 0, ColorSpace.SRGB);
+  const fallback = new Color().setRGB(10 / 255, 20 / 255, 30 / 255, ColorSpace.SRGB);
   assert.deepEqual(colors.slice(0, 3), [unique.r, unique.g, unique.b]);
   assert.deepEqual(colors.slice(9, 12), [Math.fround(fallback.r), Math.fround(fallback.g), Math.fround(fallback.b)]);
 });

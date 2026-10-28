@@ -1,6 +1,6 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { CylinderGeometry } from "ek3d/geometries/CylinderGeometry";
 import { DodecahedronGeometry } from "ek3d/geometries/DodecahedronGeometry";
@@ -51,7 +51,7 @@ for (let i = 0; i < 40; i++) {
   controls.enablePan = false;
   controls.enableZoom = false;
   const material = new MeshStandardMaterial({
-    color: new Color().setHSL(Math.random(), 1, 0.75, SRGBColorSpace),
+    color: new Color().setHSL(Math.random(), 1, 0.75, ColorSpace.SRGB),
     roughness: 0.5,
     metalness: 0,
     flatShading: true,

@@ -1,4 +1,4 @@
-import { HalfFloatType } from "../../constants";
+import { TextureType } from "../../constants";
 import { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
 import { SSAARenderPass, _JitterVectors } from "./SSAARenderPass";
 import type { Camera } from "../../cameras/Camera";
@@ -83,13 +83,15 @@ export class TAARenderPass extends SSAARenderPass {
     const jitterOffsets = _JitterVectors[5];
 
     if (this._sampleRenderTarget === null) {
-      this._sampleRenderTarget = new WebGLRenderTarget(readBuffer.width, readBuffer.height, { type: HalfFloatType });
+      this._sampleRenderTarget = new WebGLRenderTarget(readBuffer.width, readBuffer.height, {
+        type: TextureType.HalfFloat,
+      });
       this._sampleRenderTarget.texture.name = "TAARenderPass.sample";
     }
 
     if (this._holdRenderTarget === null) {
       this._holdRenderTarget = new WebGLRenderTarget(readBuffer.width, readBuffer.height, {
-        type: HalfFloatType,
+        type: TextureType.HalfFloat,
         depthBuffer: false,
       });
       this._holdRenderTarget.texture.name = "TAARenderPass.hold";

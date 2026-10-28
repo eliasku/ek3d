@@ -1,14 +1,6 @@
 import { DataTexture } from "../../textures/DataTexture";
 import { toHalfFloat } from "../../extras/DataUtils";
-import {
-  ClampToEdgeWrapping,
-  FloatType,
-  HalfFloatType,
-  LinearFilter,
-  NearestFilter,
-  RGBAFormat,
-  UVMapping,
-} from "../../constants";
+import { Wrapping, TextureType, TextureFilter, PixelFormat, Mapping } from "../../constants";
 
 export interface LTCTextures {
   LTC_FLOAT_1: DataTexture;
@@ -2762,26 +2754,26 @@ export function createLTCTextures(): LTCTextures {
     ltc_float_1,
     64,
     64,
-    RGBAFormat,
-    FloatType,
-    UVMapping,
-    ClampToEdgeWrapping,
-    ClampToEdgeWrapping,
-    LinearFilter,
-    NearestFilter,
+    PixelFormat.RGBA,
+    TextureType.Float,
+    Mapping.UV,
+    Wrapping.ClampToEdge,
+    Wrapping.ClampToEdge,
+    TextureFilter.Linear,
+    TextureFilter.Nearest,
     1,
   );
   const LTC_FLOAT_2 = new DataTexture(
     ltc_float_2,
     64,
     64,
-    RGBAFormat,
-    FloatType,
-    UVMapping,
-    ClampToEdgeWrapping,
-    ClampToEdgeWrapping,
-    LinearFilter,
-    NearestFilter,
+    PixelFormat.RGBA,
+    TextureType.Float,
+    Mapping.UV,
+    Wrapping.ClampToEdge,
+    Wrapping.ClampToEdge,
+    TextureFilter.Linear,
+    TextureFilter.Nearest,
     1,
   );
   LTC_FLOAT_1.needsUpdate = true;
@@ -2798,26 +2790,26 @@ export function createLTCTextures(): LTCTextures {
     ltc_half_1,
     64,
     64,
-    RGBAFormat,
-    HalfFloatType,
-    UVMapping,
-    ClampToEdgeWrapping,
-    ClampToEdgeWrapping,
-    LinearFilter,
-    NearestFilter,
+    PixelFormat.RGBA,
+    TextureType.HalfFloat,
+    Mapping.UV,
+    Wrapping.ClampToEdge,
+    Wrapping.ClampToEdge,
+    TextureFilter.Linear,
+    TextureFilter.Nearest,
     1,
   );
   const LTC_HALF_2 = new DataTexture(
     ltc_half_2,
     64,
     64,
-    RGBAFormat,
-    HalfFloatType,
-    UVMapping,
-    ClampToEdgeWrapping,
-    ClampToEdgeWrapping,
-    LinearFilter,
-    NearestFilter,
+    PixelFormat.RGBA,
+    TextureType.HalfFloat,
+    Mapping.UV,
+    Wrapping.ClampToEdge,
+    Wrapping.ClampToEdge,
+    TextureFilter.Linear,
+    TextureFilter.Nearest,
     1,
   );
   LTC_HALF_1.needsUpdate = true;

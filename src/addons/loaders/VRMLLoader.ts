@@ -1,4 +1,4 @@
-import { BackSide, ClampToEdgeWrapping, DoubleSide, FrontSide, RepeatWrapping, SRGBColorSpace } from "../../constants";
+import { Side, Wrapping, ColorSpace } from "../../constants";
 import { OrthographicCamera } from "../../cameras/OrthographicCamera";
 import { PerspectiveCamera } from "../../cameras/PerspectiveCamera";
 import { Object3D } from "../../core/Object3D";
@@ -265,18 +265,18 @@ export class VRMLLoader extends Loader<Scene> {
       const radius = 10000;
       if (skyColor) {
         const geometry = new SphereGeometry(radius, 32, 16);
-        const mat = new MeshBasicMaterial({ fog: false, side: BackSide, depthWrite: false, depthTest: false });
+        const mat = new MeshBasicMaterial({ fog: false, side: Side.Back, depthWrite: false, depthTest: false });
         if (skyColor.length > 3) {
           paintFaces(geometry, radius, skyAngle as number[], toColorArray(skyColor), true);
           mat.vertexColors = true;
-        } else mat.color.setRGB(skyColor[0], skyColor[1], skyColor[2], SRGBColorSpace);
+        } else mat.color.setRGB(skyColor[0], skyColor[1], skyColor[2], ColorSpace.SRGB);
         group.add(new Mesh(geometry, mat));
       }
       if (groundColor && groundColor.length > 0) {
         const geometry = new SphereGeometry(radius, 32, 16, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI);
         const mat = new MeshBasicMaterial({
           fog: false,
-          side: BackSide,
+          side: Side.Back,
           vertexColors: true,
           depthWrite: false,
           depthTest: false,
@@ -316,7 +316,7 @@ export class VRMLLoader extends Loader<Scene> {
           ? new Points(geometry, lineMat as PointsMaterial)
           : new LineSegments(geometry, lineMat as LineBasicMaterial);
       }
-      if (geometry._solid !== undefined) mat.side = geometry._solid ? FrontSide : DoubleSide;
+      if (geometry._solid !== undefined) mat.side = geometry._solid ? Side.Front : Side.Double;
       if (geometry.attributes.color !== undefined) mat.vertexColors = true;
       return new Mesh(geometry, mat);
     };
@@ -375,13 +375,13 @@ export class VRMLLoader extends Loader<Scene> {
           case "ambientIntensity":
             break;
           case "diffuseColor":
-            result.diffuseColor = new Color().setRGB(v[0], v[1], v[2], SRGBColorSpace);
+            result.diffuseColor = new Color().setRGB(v[0], v[1], v[2], ColorSpace.SRGB);
             break;
           case "emissiveColor":
-            result.emissiveColor = new Color().setRGB(v[0], v[1], v[2], SRGBColorSpace);
+            result.emissiveColor = new Color().setRGB(v[0], v[1], v[2], ColorSpace.SRGB);
             break;
           case "specularColor":
-            result.specularColor = new Color().setRGB(v[0], v[1], v[2], SRGBColorSpace);
+            result.specularColor = new Color().setRGB(v[0], v[1], v[2], ColorSpace.SRGB);
             break;
           case "shininess":
             result.shininess = v[0];
@@ -397,18 +397,18 @@ export class VRMLLoader extends Loader<Scene> {
     };
     const imageTexture = (node: VRMLNode): Texture | undefined => {
       let texture: Texture | undefined,
-        wrapS: number = RepeatWrapping,
-        wrapT: number = RepeatWrapping;
+        wrapS: number = Wrapping.Repeat,
+        wrapT: number = Wrapping.Repeat;
       for (const field of node.fields) {
         switch (field.name) {
           case "url":
             if (field.values[0]) texture = textureLoader.load(field.values[0] as string);
             break;
           case "repeatS":
-            if (field.values[0] === false) wrapS = ClampToEdgeWrapping;
+            if (field.values[0] === false) wrapS = Wrapping.ClampToEdge;
             break;
           case "repeatT":
-            if (field.values[0] === false) wrapT = ClampToEdgeWrapping;
+            if (field.values[0] === false) wrapT = Wrapping.ClampToEdge;
             break;
           default:
             unknownField(field.name);
@@ -417,14 +417,14 @@ export class VRMLLoader extends Loader<Scene> {
       if (texture) {
         texture.wrapS = wrapS;
         texture.wrapT = wrapT;
-        texture.colorSpace = SRGBColorSpace;
+        texture.colorSpace = ColorSpace.SRGB;
       }
       return texture;
     };
     const pixelTexture = (node: VRMLNode): PixelTexture | undefined => {
       let texture: PixelTexture | undefined,
-        wrapS: number = RepeatWrapping,
-        wrapT: number = RepeatWrapping;
+        wrapS: number = Wrapping.Repeat,
+        wrapT: number = Wrapping.Repeat;
       for (const field of node.fields) {
         switch (field.name) {
           case "image": {
@@ -459,16 +459,16 @@ export class VRMLLoader extends Loader<Scene> {
               bytes[offset + 3] = color.a;
             }
             texture = new DataTexture(bytes, width, height) as PixelTexture;
-            texture.colorSpace = SRGBColorSpace;
+            texture.colorSpace = ColorSpace.SRGB;
             texture.needsUpdate = true;
             texture.__type = type >= 1 && type <= 4 ? type : undefined;
             break;
           }
           case "repeatS":
-            if (field.values[0] === false) wrapS = ClampToEdgeWrapping;
+            if (field.values[0] === false) wrapS = Wrapping.ClampToEdge;
             break;
           case "repeatT":
-            if (field.values[0] === false) wrapT = ClampToEdgeWrapping;
+            if (field.values[0] === false) wrapT = Wrapping.ClampToEdge;
             break;
           default:
             unknownField(field.name);

@@ -10,7 +10,7 @@ import { LUTPass } from "ek3d/addons/postprocessing/LUTPass";
 import { OutputPass } from "ek3d/addons/postprocessing/OutputPass";
 import { RenderPass } from "ek3d/addons/postprocessing/RenderPass";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping } from "ek3d/constants";
+import { ToneMapping, Mapping } from "ek3d/constants";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { createDFGLUT } from "ek3d/renderers/shaders/DFGLUTData";
 import { standardShader } from "ek3d/renderers/shaders/StandardShader";
@@ -52,7 +52,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 const composer = new EffectComposer(renderer);
 const renderPass = new RenderPass(scene, camera);
 const outputPass = new OutputPass();
@@ -92,7 +92,7 @@ async function loadScene(): Promise<void> {
     return;
   }
   environment = texture;
-  texture.mapping = EquirectangularReflectionMapping;
+  texture.mapping = Mapping.EquirectangularReflection;
   scene.background = texture;
   scene.environment = texture;
   const gltf = await new GLTFLoader().loadAsync("/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf");

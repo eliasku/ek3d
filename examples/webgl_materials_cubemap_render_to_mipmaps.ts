@@ -1,16 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { CubeCamera } from "ek3d/cameras/CubeCamera";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import {
-  BackSide,
-  CubeReflectionMapping,
-  HalfFloatType,
-  LinearFilter,
-  LinearMipmapLinearFilter,
-  LinearSRGBColorSpace,
-  NoBlending,
-  RGBAFormat,
-} from "ek3d/constants";
+import { Side, Mapping, TextureType, TextureFilter, ColorSpace, Blending, PixelFormat } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { CubeTextureLoader } from "ek3d/loaders/CubeTextureLoader";
@@ -57,16 +48,16 @@ const texture = new CubeTextureLoader(manager).load(
       return;
     }
     target = new WebGLCubeRenderTarget(512, {
-      magFilter: LinearFilter,
-      minFilter: LinearMipmapLinearFilter,
+      magFilter: TextureFilter.Linear,
+      minFilter: TextureFilter.LinearMipmapLinear,
       generateMipmaps: false,
-      type: HalfFloatType,
-      format: RGBAFormat,
-      colorSpace: LinearSRGBColorSpace,
+      type: TextureType.HalfFloat,
+      format: PixelFormat.RGBA,
+      colorSpace: ColorSpace.LinearSRGB,
       depthBuffer: false,
     });
     for (let i = 0; i < Math.log2(512) + 1; i++) target.texture.mipmaps.push({});
-    target.texture.mapping = CubeReflectionMapping;
+    target.texture.mapping = Mapping.CubeReflection;
     const geometry = new BoxGeometry(5, 5, 5);
     const material = new ShaderMaterial({
       name: "CubemapFilterShader",
@@ -89,8 +80,8 @@ void main() {
   else if (mipIndex == 4.0) color.rgb = vec3(1.0, 1.0, 0.0);
   gl_FragColor = textureCube(cubeTexture, normalize(vWorldDirection), 0.0) * color;
 }`,
-      side: BackSide,
-      blending: NoBlending,
+      side: Side.Back,
+      blending: Blending.No,
     });
     const mesh = new Mesh(geometry, material);
     const cubeCamera = new CubeCamera(1, 10, target);

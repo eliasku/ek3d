@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { ConvexGeometry } from "ek3d/addons/geometries/ConvexGeometry";
 import { mergeVertices } from "ek3d/addons/utils/BufferGeometryUtils";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide, SRGBColorSpace } from "ek3d/constants";
+import { Side, ColorSpace } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { DodecahedronGeometry } from "ek3d/geometries/DodecahedronGeometry";
@@ -63,7 +63,7 @@ const texture = new TextureLoader().load(
     console.error(error);
   },
 );
-texture.colorSpace = SRGBColorSpace;
+texture.colorSpace = ColorSpace.SRGB;
 group.add(
   new Points(
     new BufferGeometry().setFromPoints(vertices),
@@ -73,7 +73,7 @@ group.add(
 group.add(
   new Mesh(
     new ConvexGeometry(vertices),
-    new MeshLambertMaterial({ color: 0xffffff, opacity: 0.5, side: DoubleSide, transparent: true }),
+    new MeshLambertMaterial({ color: 0xffffff, opacity: 0.5, side: Side.Double, transparent: true }),
   ),
 );
 const renderer = new WebGLRenderer({

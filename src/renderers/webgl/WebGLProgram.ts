@@ -1,26 +1,9 @@
+import { GL } from "../../GL";
 import tonemapping_pars_fragment_chunk from "../shaders/ShaderChunk/tonemapping_pars_fragment.glsl";
 import colorspace_pars_fragment from "../shaders/ShaderChunk/colorspace_pars_fragment.glsl";
 import { WebGLUniforms } from "./WebGLUniforms";
 import { WebGLShader } from "./WebGLShader";
-import {
-  NoToneMapping,
-  AddOperation,
-  MixOperation,
-  MultiplyOperation,
-  CubeRefractionMapping,
-  PCFShadowMap,
-  VSMShadowMap,
-  AgXToneMapping,
-  ACESFilmicToneMapping,
-  NeutralToneMapping,
-  CineonToneMapping,
-  CustomToneMapping,
-  ReinhardToneMapping,
-  LinearToneMapping,
-  GLSL3,
-  LinearTransfer,
-  SRGBTransfer,
-} from "../../constants";
+import { ToneMapping, Combine, Mapping, ShadowMap, GLSL, Transfer } from "../../constants";
 import { ColorManagement } from "../../math/ColorManagement";
 import { Vector3 } from "../../math/Vector3";
 import { Matrix3 } from "../../math/Matrix3";
@@ -65,9 +48,9 @@ function getEncodingComponents(colorSpace?: any) {
   ColorManagement._getMatrix(_m0, ColorManagement.workingColorSpace, colorSpace);
   const encodingMatrix = `mat3( ${_m0.elements.map((v: number) => v.toFixed(4)).join(",")} )`;
   switch (ColorManagement.getTransfer(colorSpace)) {
-    case LinearTransfer:
+    case Transfer.Linear:
       return [encodingMatrix, "LinearTransferOETF"];
-    case SRGBTransfer:
+    case Transfer.SRGB:
       return [encodingMatrix, "sRGBTransferOETF"];
     default:
       warn("WebGLProgram: Unsupported color space: ", colorSpace);
@@ -75,7 +58,7 @@ function getEncodingComponents(colorSpace?: any) {
   }
 }
 function getShaderErrors(gl?: any, shader?: any, type?: any) {
-  const status = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+  const status = gl.getShaderParameter(shader, GL.COMPILE_STATUS);
   const shaderInfoLog = gl.getShaderInfoLog(shader) || "";
   const errors = shaderInfoLog.trim();
   if (status && errors === "") return "";
@@ -98,13 +81,13 @@ function getTexelEncodingFunction(functionName?: any, colorSpace?: any) {
   ].join("\n");
 }
 const toneMappingFunctions = {
-  [LinearToneMapping]: "Linear",
-  [ReinhardToneMapping]: "Reinhard",
-  [CineonToneMapping]: "Cineon",
-  [ACESFilmicToneMapping]: "ACESFilmic",
-  [AgXToneMapping]: "AgX",
-  [NeutralToneMapping]: "Neutral",
-  [CustomToneMapping]: "Custom",
+  [ToneMapping.Linear]: "Linear",
+  [ToneMapping.Reinhard]: "Reinhard",
+  [ToneMapping.Cineon]: "Cineon",
+  [ToneMapping.ACESFilmic]: "ACESFilmic",
+  [ToneMapping.AgX]: "AgX",
+  [ToneMapping.Neutral]: "Neutral",
+  [ToneMapping.Custom]: "Custom",
 };
 function getToneMappingFunction(functionName?: any, toneMapping?: any) {
   const toneMappingName = (toneMappingFunctions as any)[toneMapping];
@@ -145,14 +128,14 @@ function generateDefines(defines?: any) {
 }
 function fetchAttributeLocations(gl?: any, program?: any) {
   const attributes: any = {};
-  const n = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
+  const n = gl.getProgramParameter(program, GL.ACTIVE_ATTRIBUTES);
   for (let i = 0; i < n; i++) {
     const info = gl.getActiveAttrib(program, i);
     const name = info.name;
     let locationSize = 1;
-    if (info.type === gl.FLOAT_MAT2) locationSize = 2;
-    if (info.type === gl.FLOAT_MAT3) locationSize = 3;
-    if (info.type === gl.FLOAT_MAT4) locationSize = 4;
+    if (info.type === GL.FLOAT_MAT2) locationSize = 2;
+    if (info.type === GL.FLOAT_MAT3) locationSize = 3;
+    if (info.type === GL.FLOAT_MAT4) locationSize = 4;
     // log( 'WebGLProgram: ACTIVE VERTEX ATTRIBUTE:', name, i );
     (attributes as any)[name] = {
       type: info.type,
@@ -242,23 +225,23 @@ function generatePrecision(parameters?: any) {
   return precisionstring;
 }
 const shadowMapTypeDefines = {
-  [PCFShadowMap]: "SHADOWMAP_TYPE_PCF",
-  [VSMShadowMap]: "SHADOWMAP_TYPE_VSM",
+  [ShadowMap.PCF]: "SHADOWMAP_TYPE_PCF",
+  [ShadowMap.VSM]: "SHADOWMAP_TYPE_VSM",
 };
 function generateShadowMapTypeDefine(parameters?: any) {
   return (shadowMapTypeDefines as any)[parameters.shadowMapType] || "SHADOWMAP_TYPE_BASIC";
 }
 const envMapModeDefines = {
-  [CubeRefractionMapping]: "ENVMAP_MODE_REFRACTION",
+  [Mapping.CubeRefraction]: "ENVMAP_MODE_REFRACTION",
 };
 function generateEnvMapModeDefine(parameters?: any) {
   if (parameters.envMap === false) return "ENVMAP_MODE_REFLECTION";
   return (envMapModeDefines as any)[parameters.envMapMode] || "ENVMAP_MODE_REFLECTION";
 }
 const envMapBlendingDefines = {
-  [MultiplyOperation]: "ENVMAP_BLENDING_MULTIPLY",
-  [MixOperation]: "ENVMAP_BLENDING_MIX",
-  [AddOperation]: "ENVMAP_BLENDING_ADD",
+  [Combine.Multiply]: "ENVMAP_BLENDING_MULTIPLY",
+  [Combine.Mix]: "ENVMAP_BLENDING_MIX",
+  [Combine.Add]: "ENVMAP_BLENDING_ADD",
 };
 function generateEnvMapBlendingDefine(parameters?: any) {
   if (parameters.envMap === false) return "ENVMAP_BLENDING_NONE";
@@ -516,9 +499,9 @@ export function WebGLProgram(this: any, renderer?: any, cacheKey?: any, paramete
       "uniform mat4 viewMatrix;",
       "uniform vec3 cameraPosition;",
       "uniform bool isOrthographic;",
-      parameters.toneMapping !== NoToneMapping ? "#define TONE_MAPPING" : "",
-      parameters.toneMapping !== NoToneMapping ? tonemapping_pars_fragment_chunk.get() : "", // this code is required here because it is used by the toneMapping() function defined below
-      parameters.toneMapping !== NoToneMapping ? getToneMappingFunction("toneMapping", parameters.toneMapping) : "",
+      parameters.toneMapping !== ToneMapping.No ? "#define TONE_MAPPING" : "",
+      parameters.toneMapping !== ToneMapping.No ? tonemapping_pars_fragment_chunk.get() : "", // this code is required here because it is used by the toneMapping() function defined below
+      parameters.toneMapping !== ToneMapping.No ? getToneMappingFunction("toneMapping", parameters.toneMapping) : "",
       parameters.dithering ? "#define DITHERING" : "",
       parameters.opaque ? "#define OPAQUE" : "",
       colorspace_pars_fragment, // this code is required here because it is used by the various encoding/decoding function defined below
@@ -548,8 +531,8 @@ export function WebGLProgram(this: any, renderer?: any, cacheKey?: any, paramete
     prefixFragment =
       [
         "#define varying in",
-        parameters.glslVersion === GLSL3 ? "" : "layout(location = 0) out highp vec4 pc_fragColor;",
-        parameters.glslVersion === GLSL3 ? "" : "#define gl_FragColor pc_fragColor",
+        parameters.glslVersion === GLSL.GLSL3 ? "" : "layout(location = 0) out highp vec4 pc_fragColor;",
+        parameters.glslVersion === GLSL.GLSL3 ? "" : "#define gl_FragColor pc_fragColor",
         "#define gl_FragDepthEXT gl_FragDepth",
         "#define texture2D texture",
         "#define textureCube texture",
@@ -569,8 +552,8 @@ export function WebGLProgram(this: any, renderer?: any, cacheKey?: any, paramete
   // log( '*VERTEX*', vertexGlsl );
   // log( '*FRAGMENT*', fragmentGlsl );
   const program = gl.createProgram();
-  const glVertexShader = WebGLShader(gl, gl.VERTEX_SHADER, vertexGlsl);
-  const glFragmentShader = WebGLShader(gl, gl.FRAGMENT_SHADER, fragmentGlsl);
+  const glVertexShader = WebGLShader(gl, GL.VERTEX_SHADER, vertexGlsl);
+  const glFragmentShader = WebGLShader(gl, GL.FRAGMENT_SHADER, fragmentGlsl);
   gl.attachShader(program, glVertexShader);
   gl.attachShader(program, glFragmentShader);
   // Force a particular attribute to index 0.
@@ -592,7 +575,7 @@ export function WebGLProgram(this: any, renderer?: any, cacheKey?: any, paramete
       const fragmentLog = fragmentShaderInfoLog.trim();
       let runnable = true;
       let haveDiagnostics = true;
-      if (gl.getProgramParameter(program, gl.LINK_STATUS) === false) {
+      if (gl.getProgramParameter(program, GL.LINK_STATUS) === false) {
         runnable = false;
         if (typeof renderer.debug.onShaderError === "function") {
           renderer.debug.onShaderError(gl, program, glVertexShader, glFragmentShader);
@@ -605,7 +588,7 @@ export function WebGLProgram(this: any, renderer?: any, cacheKey?: any, paramete
               gl.getError() +
               " - " +
               "VALIDATE_STATUS " +
-              gl.getProgramParameter(program, gl.VALIDATE_STATUS) +
+              gl.getProgramParameter(program, GL.VALIDATE_STATUS) +
               "\n\n" +
               "Material Name: " +
               self.name +

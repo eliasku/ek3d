@@ -4,7 +4,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { DRACOLoader } from "ek3d/addons/loaders/DRACOLoader";
 import { DRACO_GLTF_CONFIG } from "ek3d/addons/loaders/DRACOLoader";
-import { ACESFilmicToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
@@ -59,7 +59,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 
 const scene = new Scene();
 

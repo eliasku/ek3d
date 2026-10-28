@@ -1,12 +1,4 @@
-import {
-  ClampToEdgeWrapping,
-  HalfFloatType,
-  LinearFilter,
-  LinearMipMapLinearFilter,
-  LinearSRGBColorSpace,
-  RGBAFormat,
-  UVMapping,
-} from "../../constants";
+import { Wrapping, TextureType, TextureFilter, ColorSpace, PixelFormat, Mapping } from "../../constants";
 import { Loader } from "../../loaders/Loader";
 import type { LoadingManager } from "../../loaders/LoadingManager";
 import { DataTexture } from "../../textures/DataTexture";
@@ -69,7 +61,7 @@ interface JPEGSection {
  * ```typescript
  * const loader = new UltraHDRLoader();
  * const texture = await loader.loadAsync( 'textures/equirectangular/ice_planet_close.jpg' );
- * texture.mapping = EquirectangularReflectionMapping;
+ * texture.mapping = Mapping.EquirectangularReflection;
  *
  * scene.background = texture;
  * scene.environment = texture;
@@ -81,9 +73,9 @@ export class UltraHDRLoader extends Loader<DataTexture, string> {
   /**
    * The texture type.
    *
-   * @default HalfFloatType
+   * @default TextureType.HalfFloat
    */
-  type: number;
+  type: TextureType;
 
   /**
    * Constructs a new Ultra HDR loader.
@@ -93,7 +85,7 @@ export class UltraHDRLoader extends Loader<DataTexture, string> {
   constructor(manager?: LoadingManager) {
     super(manager);
 
-    this.type = HalfFloatType;
+    this.type = TextureType.HalfFloat;
   }
 
   /**
@@ -260,7 +252,7 @@ export class UltraHDRLoader extends Loader<DataTexture, string> {
             width,
             height,
             data: hdrBuffer,
-            format: RGBAFormat,
+            format: PixelFormat.RGBA,
             type: this.type,
           });
         },
@@ -290,18 +282,18 @@ export class UltraHDRLoader extends Loader<DataTexture, string> {
     onError?: (error: unknown) => void,
   ): DataTexture {
     const texture = new DataTexture(
-      this.type === HalfFloatType ? new Uint16Array() : new Float32Array(),
+      this.type === TextureType.HalfFloat ? new Uint16Array() : new Float32Array(),
       0,
       0,
-      RGBAFormat,
+      PixelFormat.RGBA,
       this.type,
-      UVMapping,
-      ClampToEdgeWrapping,
-      ClampToEdgeWrapping,
-      LinearFilter,
-      LinearMipMapLinearFilter,
+      Mapping.UV,
+      Wrapping.ClampToEdge,
+      Wrapping.ClampToEdge,
+      TextureFilter.Linear,
+      TextureFilter.LinearMipMapLinear,
       1,
-      LinearSRGBColorSpace,
+      ColorSpace.LinearSRGB,
     );
     texture.generateMipmaps = true;
     texture.flipY = true;
@@ -558,7 +550,7 @@ export class UltraHDRLoader extends Loader<DataTexture, string> {
         const offsetHDR = metadata.offsetHDR as number;
         const invGamma = 1.0 / (metadata.gamma as number);
         const useGammaOne = metadata.gamma === 1.0;
-        const isHalfFloat = this.type === HalfFloatType;
+        const isHalfFloat = this.type === TextureType.HalfFloat;
         const toHalfFloatLocal = toHalfFloat;
         const srgbToLinear = this._srgbToLinear.bind(this);
 

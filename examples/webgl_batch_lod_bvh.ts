@@ -10,7 +10,7 @@ import {
   type MeshoptSimplifierRuntime,
 } from "ek3d/addons/utils/SimplifyGeometryLOD";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping, WebGLCoordinateSystem } from "ek3d/constants";
+import { ToneMapping, CoordinateSystem } from "ek3d/constants";
 import { Raycaster } from "ek3d/core/Raycaster";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
 import { TorusKnotGeometry } from "ek3d/geometries/TorusKnotGeometry";
@@ -42,7 +42,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 0.8;
 const scene = new Scene();
 const room = new RoomEnvironment();
@@ -135,7 +135,7 @@ async function init(): Promise<void> {
     batch.setColorAt(id, color.setHSL(Math.random(), 0.6, 0.5));
   }
   computeBatchedBoundsTree.call(batch);
-  batch.computeBVH(WebGLCoordinateSystem);
+  batch.computeBVH(CoordinateSystem.WebGL);
   scene.add(batch);
   for (const group of levels) for (const geometry of group) geometry.dispose();
   const config = { freeze: false, useBVH: true, useLOD: true };

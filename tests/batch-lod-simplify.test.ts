@@ -11,7 +11,7 @@ import { TorusKnotGeometry } from "../src/geometries/TorusKnotGeometry";
 import { BufferGeometry } from "../src/core/BufferGeometry";
 
 test("meshoptimizer LODs preserve the source and decrease index count", async () => {
-  const source = readFileSync("examples/public/examples/libs/meshoptimizer/meshopt_simplifier.js", "utf8");
+  const source = readFileSync("public/examples/libs/meshoptimizer/meshopt_simplifier.js", "utf8");
   const url = "data:text/javascript;base64," + Buffer.from(source).toString("base64");
   // The public runtime is intentionally loaded outside the module graph.
   const module = (await import(/* @vite-ignore */ url)) as { MeshoptSimplifier: MeshoptSimplifierRuntime };

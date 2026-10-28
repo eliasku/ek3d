@@ -8,7 +8,7 @@ import { OutputPass } from "ek3d/addons/postprocessing/OutputPass";
 import { RenderPass } from "ek3d/addons/postprocessing/RenderPass";
 import { TexturePass } from "ek3d/addons/postprocessing/TexturePass";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { PointLight } from "ek3d/lights/PointLight";
 import { CubeTextureLoader } from "ek3d/loaders/CubeTextureLoader";
@@ -80,7 +80,7 @@ const texture = new TextureLoader().load("/examples/textures/hardwood2_diffuse.j
     map.dispose();
     return;
   }
-  map.colorSpace = SRGBColorSpace;
+  map.colorSpace = ColorSpace.SRGB;
 });
 const texturePass = new TexturePass(texture);
 const cubePass = new CubeTexturePass(camera, null);

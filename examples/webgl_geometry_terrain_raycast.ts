@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { ImprovedNoise } from "ek3d/addons/math/ImprovedNoise";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ClampToEdgeWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Wrapping, ColorSpace } from "ek3d/constants";
 import type { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { Raycaster } from "ek3d/core/Raycaster";
 import { ConeGeometry } from "ek3d/geometries/ConeGeometry";
@@ -89,8 +89,8 @@ for (let i = 0; i < scaledImage.data.length; i += 4) {
 }
 scaledContext.putImageData(scaledImage, 0, 0);
 const texture = new CanvasTexture(scaled);
-texture.wrapS = texture.wrapT = ClampToEdgeWrapping;
-texture.colorSpace = SRGBColorSpace;
+texture.wrapS = texture.wrapT = Wrapping.ClampToEdge;
+texture.colorSpace = ColorSpace.SRGB;
 const mesh = new Mesh(geometry, new MeshBasicMaterial({ map: texture }));
 scene.add(mesh);
 const helperGeometry = new ConeGeometry(20, 100, 3);

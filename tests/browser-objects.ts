@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { Scene } from "ek3d/scenes/Scene";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
@@ -18,7 +19,7 @@ import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { dashedShader } from "ek3d/renderers/shaders/DashedShader";
 import { pointsShader } from "ek3d/renderers/shaders/PointsShader";
 import { spriteShader } from "ek3d/renderers/shaders/SpriteShader";
-import { LinearSRGBColorSpace, NearestFilter } from "ek3d/constants";
+import { ColorSpace, TextureFilter } from "ek3d/constants";
 
 function check(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -64,7 +65,7 @@ export async function verifyObjectRendering() {
   const map = new DataTexture(mapData, 1, 1);
   const alphaMap = new DataTexture(alphaData, 1, 1);
   for (const texture of [map, alphaMap]) {
-    texture.minFilter = texture.magFilter = NearestFilter;
+    texture.minFilter = texture.magFilter = TextureFilter.Nearest;
     texture.needsUpdate = true;
   }
   const gl = renderer.getContext();
@@ -73,8 +74,8 @@ export async function verifyObjectRendering() {
     scene.add(object);
     renderer.render(scene, view);
     const pixels = new Uint8Array(64 * 64 * 4);
-    gl.readPixels(0, 0, 64, 64, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-    check(gl.getError() === gl.NO_ERROR, `${object.type} produced a GL error`);
+    gl.readPixels(0, 0, 64, 64, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+    check(gl.getError() === GL.NO_ERROR, `${object.type} produced a GL error`);
     return pixels;
   };
   const lit = (pixels: Uint8Array, x: number, y: number) => {
@@ -119,17 +120,17 @@ export async function verifyObjectRendering() {
       label,
     );
   const buffer = (attribute = "position") => {
-    const program = gl.getParameter(gl.CURRENT_PROGRAM) as WebGLProgram;
+    const program = gl.getParameter(GL.CURRENT_PROGRAM) as WebGLProgram;
     const location = gl.getAttribLocation(program, attribute);
     check(location >= 0, `Missing active ${attribute} attribute`);
-    const handle = gl.getVertexAttrib(location, gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING) as WebGLBuffer;
+    const handle = gl.getVertexAttrib(location, GL.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING) as WebGLBuffer;
     check(gl.isBuffer(handle), `Missing GPU ${attribute} buffer`);
     return handle;
   };
   try {
     renderer.setPixelRatio(1);
     renderer.setSize(64, 64);
-    renderer.outputColorSpace = LinearSRGBColorSpace;
+    renderer.outputColorSpace = ColorSpace.LinearSRGB;
     renderer.setClearColor(0x000000, 1);
     for (const object of [points, sprite]) {
       renderer.shaders = {};
@@ -304,7 +305,7 @@ export async function verifyObjectRendering() {
         buffers.add(buffer());
         if (object === dash) buffers.add(buffer("lineDistance"));
         if (object === sprite) {
-          const index = gl.getParameter(gl.ELEMENT_ARRAY_BUFFER_BINDING) as WebGLBuffer;
+          const index = gl.getParameter(GL.ELEMENT_ARRAY_BUFFER_BINDING) as WebGLBuffer;
           check(gl.isBuffer(index), "Sprite has no GPU index buffer");
           buffers.add(index);
         }
@@ -396,7 +397,7 @@ export async function verifyObjectRendering() {
       "Restored object disposal retained resource accounting",
     );
     const glError = gl.getError();
-    check(glError === gl.NO_ERROR, "Object lifecycle produced a GL error");
+    check(glError === GL.NO_ERROR, "Object lifecycle produced a GL error");
     return {
       explicitDescriptors: ["PointsMaterial", "SpriteMaterial"],
       lineModes: ["LINE_STRIP", "LINE_LOOP", "LINES"],

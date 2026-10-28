@@ -3,7 +3,7 @@ import type { Matrix4 } from "../math/Matrix4";
 import { Vector3 } from "../math/Vector3";
 import { Vector2 } from "../math/Vector2";
 import { denormalize, normalize, getNormalizationScale } from "../math/MathUtils";
-import { StaticDrawUsage, FloatType } from "../constants";
+import { BufferUsage, TextureType } from "../constants";
 import { fromHalfFloat, toHalfFloat } from "../extras/DataUtils";
 import { EventDispatcher } from "./EventDispatcher";
 const _vector = /*@__PURE__*/ new Vector3();
@@ -33,9 +33,9 @@ export class BufferAttribute extends EventDispatcher {
   itemSize: number;
   count: number;
   normalized: boolean;
-  usage: number;
+  usage: BufferUsage;
   updateRanges: { start: number; count: number }[];
-  gpuType: number;
+  gpuType: TextureType;
   version: number;
   _normalizationScale: number | undefined;
   id!: number;
@@ -119,9 +119,9 @@ export class BufferAttribute extends EventDispatcher {
      * Note: After the initial use of a buffer, its usage cannot be changed. Instead,
      * instantiate a new one and set the desired usage before the next render.
      *
-     * @default StaticDrawUsage
+     * @default BufferUsage.StaticDraw
      */
-    this.usage = StaticDrawUsage;
+    this.usage = BufferUsage.StaticDraw;
     /**
      * This can be used to only update some components of stored vectors (for example, just the
      * component related to color). Use the `addUpdateRange()` function to add ranges to this array.
@@ -134,9 +134,9 @@ export class BufferAttribute extends EventDispatcher {
      * Note: this only has an effect for integer arrays and is not configurable for float arrays.
      * For lower precision float types, use `Float16BufferAttribute`.
      *
-     * @default FloatType
+     * @default TextureType.Float
      */
-    this.gpuType = FloatType;
+    this.gpuType = TextureType.Float;
     /**
      * A version number, incremented every time the `needsUpdate` is set to `true`.
      *

@@ -10,7 +10,7 @@ import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { Scene } from "ek3d/scenes/Scene";
-import { NearestFilter, SRGBColorSpace } from "ek3d/constants";
+import { TextureFilter, ColorSpace } from "ek3d/constants";
 
 const canvas = document.querySelector<HTMLCanvasElement>("#scene")!;
 
@@ -35,11 +35,11 @@ mesh1.position.x = -100;
 scene.add(mesh1);
 
 const texture = await new TextureLoader().loadAsync("/examples/textures/brick_diffuse.jpg");
-texture.minFilter = NearestFilter;
-texture.magFilter = NearestFilter;
+texture.minFilter = TextureFilter.Nearest;
+texture.magFilter = TextureFilter.Nearest;
 texture.anisotropy = 1;
 texture.generateMipmaps = false;
-texture.colorSpace = SRGBColorSpace;
+texture.colorSpace = ColorSpace.SRGB;
 
 const material2 = new MeshBasicMaterial({ map: texture });
 

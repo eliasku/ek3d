@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { CopyShader } from "ek3d/addons/shaders/CopyShader";
 import { LuminosityShader } from "ek3d/addons/shaders/LuminosityShader";
 import { ColorifyShader } from "ek3d/addons/shaders/ColorifyShader";
@@ -36,11 +37,11 @@ export function verifyAddonShaders() {
   function sample(material: ShaderMaterial, expected: number[], label: string): void {
     mesh.material = material;
     renderer.render(scene, camera);
-    gl.readPixels(2, 2, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+    gl.readPixels(2, 2, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
     if (!pixel.every((channel, i) => Math.abs(channel - expected[i]) <= 2)) {
       throw new Error(`${label}: ${pixel.join(",")} != ${expected.join(",")}`);
     }
-    if (gl.getError() !== gl.NO_ERROR) throw new Error(`${label}: WebGL error`);
+    if (gl.getError() !== GL.NO_ERROR) throw new Error(`${label}: WebGL error`);
   }
   try {
     for (const material of materials) (material.uniforms.tDiffuse ?? material.uniforms.texture).value = texture;

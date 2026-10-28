@@ -6,7 +6,7 @@ import {
   PIZ_COMPRESSION,
   NO_COMPRESSION,
 } from "ek3d/addons/exporters/EXRExporter";
-import { FloatType, HalfFloatType } from "ek3d/constants";
+import { TextureType } from "ek3d/constants";
 import { startHDRExporterExample } from "./exporter-hdr";
 import { loadExporterRuntime } from "./exporter-runtime";
 
@@ -14,7 +14,7 @@ loadExporterRuntime<{ zlibSync(data: Uint8Array): Uint8Array }>("/examples/libs/
   .then((runtime) => {
     const exporter = new EXRExporter(runtime);
     const options = (type: string, compression: string) => ({
-      type: type === "HalfFloatType" ? HalfFloatType : FloatType,
+      type: type === "HalfFloatType" ? TextureType.HalfFloat : TextureType.Float,
       compression: (
         {
           ZIP: ZIP_COMPRESSION,

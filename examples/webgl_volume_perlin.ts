@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { ImprovedNoise } from "ek3d/addons/math/ImprovedNoise";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { BackSide, GLSL3, LinearFilter, RedFormat } from "ek3d/constants";
+import { Side, GLSL, TextureFilter, PixelFormat } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { RawShaderMaterial } from "ek3d/materials/RawShaderMaterial";
 import { Vector3 } from "ek3d/math/Vector3";
@@ -164,9 +164,9 @@ for (let z = 0; z < size; z++)
       data[i++] = noise.noise(vector.x * 6.5, vector.y * 6.5, vector.z * 6.5) * 128 + 128;
     }
 const texture = new Data3DTexture(data, size, size, size);
-texture.format = RedFormat;
-texture.minFilter = LinearFilter;
-texture.magFilter = LinearFilter;
+texture.format = PixelFormat.Red;
+texture.minFilter = TextureFilter.Linear;
+texture.magFilter = TextureFilter.Linear;
 texture.unpackAlignment = 1;
 texture.needsUpdate = true;
 const uniforms = {
@@ -177,11 +177,11 @@ const uniforms = {
   refine: { value: true },
 };
 const material = new RawShaderMaterial({
-  glslVersion: GLSL3,
+  glslVersion: GLSL.GLSL3,
   uniforms,
   vertexShader,
   fragmentShader,
-  side: BackSide,
+  side: Side.Back,
   transparent: false,
 });
 const mesh = new Mesh(new BoxGeometry(1, 1, 1), material);

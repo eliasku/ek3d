@@ -1,17 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 import { getEnvironment } from "./WebGLEnvironmentAccess";
-import {
-  BackSide,
-  DoubleSide,
-  ObjectSpaceNormalMap,
-  TangentSpaceNormalMap,
-  NoToneMapping,
-  NormalBlending,
-  SRGBTransfer,
-  RGFormat,
-  RG11_EAC_Format,
-  RED_GREEN_RGTC2_Format,
-} from "../../constants";
+import { Side, NormalMap, ToneMapping, Blending, Transfer, PixelFormat } from "../../constants";
 import { Layers } from "../../core/Layers";
 import { WebGLProgram } from "./WebGLProgram";
 import { WebGLShaderCache } from "./WebGLShaderCache";
@@ -19,7 +8,7 @@ import { cloneUniforms } from "../shaders/UniformsUtils";
 import { ColorManagement } from "../../math/ColorManagement";
 import { warn } from "../../utils";
 function isPackedRGFormat(format?: any) {
-  return format === RGFormat || format === RG11_EAC_Format || format === RED_GREEN_RGTC2_Format;
+  return format === PixelFormat.RG || format === PixelFormat.RG11_EAC || format === PixelFormat.RED_GREEN_RGTC2;
 }
 export function WebGLPrograms(
   renderer?: any,
@@ -138,7 +127,7 @@ export function WebGLPrograms(
     const HAS_ALPHATEST = material.alphaTest > 0;
     const HAS_ALPHAHASH = !!material.alphaHash;
     const HAS_EXTENSIONS = !!material.extensions;
-    let toneMapping = NoToneMapping;
+    let toneMapping = ToneMapping.No;
     if (material.toneMapped) {
       if (currentRenderTarget === null) {
         toneMapping = renderer.toneMapping;
@@ -181,11 +170,11 @@ export function WebGLPrograms(
       normalMap: HAS_NORMALMAP,
       displacementMap: HAS_DISPLACEMENTMAP,
       emissiveMap: HAS_EMISSIVEMAP,
-      normalMapObjectSpace: HAS_NORMALMAP && material.normalMapType === ObjectSpaceNormalMap,
-      normalMapTangentSpace: HAS_NORMALMAP && material.normalMapType === TangentSpaceNormalMap,
+      normalMapObjectSpace: HAS_NORMALMAP && material.normalMapType === NormalMap.ObjectSpace,
+      normalMapTangentSpace: HAS_NORMALMAP && material.normalMapType === NormalMap.TangentSpace,
       packedNormalMap:
         HAS_NORMALMAP &&
-        material.normalMapType === TangentSpaceNormalMap &&
+        material.normalMapType === NormalMap.TangentSpace &&
         isPackedRGFormat(material.normalMap.format),
       metalnessMap: HAS_METALNESSMAP,
       roughnessMap: HAS_ROUGHNESSMAP,
@@ -213,7 +202,7 @@ export function WebGLPrograms(
       thicknessMap: HAS_THICKNESSMAP,
       gradientMap: HAS_GRADIENTMAP,
       opaque:
-        material.transparent === false && material.blending === NormalBlending && material.alphaToCoverage === false,
+        material.transparent === false && material.blending === Blending.Normal && material.alphaToCoverage === false,
       alphaMap: HAS_ALPHAMAP,
       alphaTest: HAS_ALPHATEST,
       alphaHash: HAS_ALPHAHASH,
@@ -295,14 +284,14 @@ export function WebGLPrograms(
       decodeVideoTexture:
         HAS_MAP &&
         material.map.isVideoTexture === true &&
-        ColorManagement.getTransfer(material.map.colorSpace) === SRGBTransfer,
+        ColorManagement.getTransfer(material.map.colorSpace) === Transfer.SRGB,
       decodeVideoTextureEmissive:
         HAS_EMISSIVEMAP &&
         material.emissiveMap.isVideoTexture === true &&
-        ColorManagement.getTransfer(material.emissiveMap.colorSpace) === SRGBTransfer,
+        ColorManagement.getTransfer(material.emissiveMap.colorSpace) === Transfer.SRGB,
       premultipliedAlpha: material.premultipliedAlpha,
-      doubleSided: material.side === DoubleSide,
-      flipSided: material.side === BackSide,
+      doubleSided: material.side === Side.Double,
+      flipSided: material.side === Side.Back,
       useDepthPacking: material.depthPacking >= 0,
       depthPacking: material.depthPacking || 0,
       index0AttributeName: material.index0AttributeName,

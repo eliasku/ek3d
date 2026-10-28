@@ -1,4 +1,4 @@
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import type { BufferAttribute } from "../../core/BufferAttribute";
 import type { InterleavedBufferAttribute } from "../../core/InterleavedBufferAttribute";
 import type { Object3D } from "../../core/Object3D";
@@ -88,7 +88,7 @@ export class OBJExporter {
           if (colors !== undefined) {
             color.fromBufferAttribute(colors, i);
 
-            ColorManagement.workingToColorSpace(color, SRGBColorSpace);
+            ColorManagement.workingToColorSpace(color, ColorSpace.SRGB);
 
             output += " " + color.r + " " + color.g + " " + color.b;
           }
@@ -244,7 +244,7 @@ export class OBJExporter {
           if (colors !== undefined) {
             color.fromBufferAttribute(colors, i);
 
-            ColorManagement.workingToColorSpace(color, SRGBColorSpace);
+            ColorManagement.workingToColorSpace(color, ColorSpace.SRGB);
 
             output += " " + color.r + " " + color.g + " " + color.b;
           }

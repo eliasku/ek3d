@@ -1,6 +1,6 @@
 import type { Uniform } from "./Uniform";
 import { EventDispatcher } from "./EventDispatcher";
-import { StaticDrawUsage } from "../constants";
+import { BufferUsage } from "../constants";
 let _id = 0;
 /**
  * A class for managing multiple uniforms in a single group. The renderer will process
@@ -13,7 +13,7 @@ let _id = 0;
 export class UniformsGroup extends EventDispatcher {
   isUniformsGroup: boolean;
   name: string;
-  usage: number;
+  usage: BufferUsage;
   uniforms: (Uniform | Uniform[])[];
   id!: number;
 
@@ -44,9 +44,9 @@ export class UniformsGroup extends EventDispatcher {
     /**
      * The buffer usage.
      *
-     * @default StaticDrawUsage
+     * @default BufferUsage.StaticDraw
      */
-    this.usage = StaticDrawUsage;
+    this.usage = BufferUsage.StaticDraw;
     /**
      * An array holding the uniforms.
      *

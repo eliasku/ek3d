@@ -5,7 +5,7 @@ import { NumberKeyframeTrack } from "ek3d/animation/tracks/NumberKeyframeTrack";
 import { QuaternionKeyframeTrack } from "ek3d/animation/tracks/QuaternionKeyframeTrack";
 import { VectorKeyframeTrack } from "ek3d/animation/tracks/VectorKeyframeTrack";
 import { AxesHelper } from "ek3d/helpers/AxesHelper";
-import { InterpolateDiscrete } from "ek3d/constants";
+import { Interpolation } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
@@ -77,7 +77,12 @@ const quaternionKF = new QuaternionKeyframeTrack(
 );
 
 // COLOR
-const colorKF = new ColorKeyframeTrack(".material.color", [0, 1, 2], [1, 0, 0, 0, 1, 0, 0, 0, 1], InterpolateDiscrete);
+const colorKF = new ColorKeyframeTrack(
+  ".material.color",
+  [0, 1, 2],
+  [1, 0, 0, 0, 1, 0, 0, 0, 1],
+  Interpolation.Discrete,
+);
 
 // OPACITY
 const opacityKF = new NumberKeyframeTrack(".material.opacity", [0, 1, 2], [1, 0, 1]);

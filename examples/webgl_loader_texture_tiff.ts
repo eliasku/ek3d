@@ -1,7 +1,7 @@
 import { TIFFLoader } from "ek3d/addons/loaders/TIFFLoader";
 import type { TIFFRuntime } from "ek3d/addons/loaders/TIFFLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { LoadingManager } from "ek3d/loaders/LoadingManager";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
@@ -61,7 +61,7 @@ async function loadTextures(): Promise<void> {
           texture.dispose();
           return;
         }
-        texture.colorSpace = SRGBColorSpace;
+        texture.colorSpace = ColorSpace.SRGB;
         const mesh = new Mesh(geometry, new MeshBasicMaterial({ map: texture }));
         mesh.position.x = (index - 1) * 1.5;
         scene.add(mesh);

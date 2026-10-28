@@ -3,7 +3,7 @@ import { Color } from "../../math/Color";
 import { Matrix4 } from "../../math/Matrix4";
 import { Vector2 } from "../../math/Vector2";
 import { Vector3 } from "../../math/Vector3";
-import { RGFormat } from "../../constants";
+import { PixelFormat } from "../../constants";
 function UniformsCache() {
   const lights: any = {};
   return {
@@ -188,7 +188,7 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
       const distance = light.distance;
       let shadowMap: any = null;
       if (light.shadow && light.shadow.map) {
-        if (light.shadow.map.texture.format === RGFormat) {
+        if (light.shadow.map.texture.format === PixelFormat.RG) {
           // VSM uses color texture with blurred mean/std_dev
           shadowMap = light.shadow.map.texture;
         } else {

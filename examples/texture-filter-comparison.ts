@@ -1,11 +1,5 @@
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import {
-  LinearFilter,
-  NearestFilter,
-  NearestMipmapNearestFilter,
-  RepeatWrapping,
-  SRGBColorSpace,
-} from "ek3d/constants";
+import { TextureFilter, Wrapping, ColorSpace } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
@@ -48,12 +42,12 @@ export function textureFilterComparison(manualMipmaps: boolean): void {
       ...["#0f0", "#00f", "#400", "#040", "#004", "#044", "#404"].map((color, index) => mipmap(64 >> index, color)),
     ];
   }
-  floorTexture.colorSpace = SRGBColorSpace;
+  floorTexture.colorSpace = ColorSpace.SRGB;
   floorTexture.repeat.set(1000, 1000);
-  floorTexture.wrapS = floorTexture.wrapT = RepeatWrapping;
+  floorTexture.wrapS = floorTexture.wrapT = Wrapping.Repeat;
   const nearestFloor = floorTexture.clone();
-  nearestFloor.magFilter = NearestFilter;
-  nearestFloor.minFilter = manualMipmaps ? NearestMipmapNearestFilter : NearestFilter;
+  nearestFloor.magFilter = TextureFilter.Nearest;
+  nearestFloor.minFilter = manualMipmaps ? TextureFilter.NearestMipmapNearest : TextureFilter.Nearest;
   if (!manualMipmaps) nearestFloor.generateMipmaps = false;
   const floors = [floorTexture, nearestFloor].map((texture, index) => {
     const mesh = new Mesh(
@@ -65,8 +59,8 @@ export function textureFilterComparison(manualMipmaps: boolean): void {
     return mesh;
   });
   const nearestPainting = new Texture();
-  nearestPainting.colorSpace = SRGBColorSpace;
-  nearestPainting.minFilter = nearestPainting.magFilter = NearestFilter;
+  nearestPainting.colorSpace = ColorSpace.SRGB;
+  nearestPainting.minFilter = nearestPainting.magFilter = TextureFilter.Nearest;
   let disposed = false;
   let loaded = false;
   let frames = 0;
@@ -105,8 +99,8 @@ export function textureFilterComparison(manualMipmaps: boolean): void {
       console.error(error);
     },
   );
-  painting.colorSpace = SRGBColorSpace;
-  painting.minFilter = painting.magFilter = LinearFilter;
+  painting.colorSpace = ColorSpace.SRGB;
+  painting.minFilter = painting.magFilter = TextureFilter.Linear;
   const renderer = new WebGLRenderer({
     canvas,
     antialias: true,

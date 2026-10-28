@@ -1,4 +1,4 @@
-import { FloatType, HalfFloatType, LinearFilter, LinearSRGBColorSpace } from "../../constants";
+import { TextureType, TextureFilter, ColorSpace } from "../../constants";
 import { DataTextureLoader } from "../../loaders/DataTextureLoader";
 import type { DataTextureData } from "../../loaders/DataTextureLoader";
 import type { LoadingManager } from "../../loaders/LoadingManager";
@@ -292,12 +292,12 @@ function RGBEByteToRGBHalf(
  *
  * ```typescript
  * import { HDRLoader } from 'ek3d/addons/loaders/HDRLoader';
- * import { EquirectangularReflectionMapping } from 'ek3d/constants';
+ * import { Mapping } from 'ek3d/constants';
  * import { Scene } from 'ek3d/scenes/Scene';
  *
  * const loader = new HDRLoader();
  * const envMap = await loader.loadAsync( 'textures/equirectangular/blouberg_sunrise_2_1k.hdr' );
- * envMap.mapping = EquirectangularReflectionMapping;
+ * envMap.mapping = Mapping.EquirectangularReflection;
  *
  * const scene = new Scene();
  * scene.environment = envMap;
@@ -309,9 +309,9 @@ export class HDRLoader extends DataTextureLoader {
   /**
    * The texture type.
    *
-   * @default HalfFloatType
+   * @default TextureType.HalfFloat
    */
-  type: number;
+  type: TextureType;
 
   /**
    * Constructs a new RGBE/HDR loader.
@@ -321,7 +321,7 @@ export class HDRLoader extends DataTextureLoader {
   constructor(manager?: LoadingManager) {
     super(manager);
 
-    this.type = HalfFloatType;
+    this.type = TextureType.HalfFloat;
   }
 
   /**
@@ -348,7 +348,7 @@ export class HDRLoader extends DataTextureLoader {
     let numElements: number;
 
     switch (this.type) {
-      case FloatType: {
+      case TextureType.Float: {
         numElements = image_rgba_data.length / 4;
         const floatArray = new Float32Array(numElements * 4);
 
@@ -357,10 +357,10 @@ export class HDRLoader extends DataTextureLoader {
         }
 
         data = floatArray;
-        type = FloatType;
+        type = TextureType.Float;
         break;
       }
-      case HalfFloatType: {
+      case TextureType.HalfFloat: {
         numElements = image_rgba_data.length / 4;
         const halfArray = new Uint16Array(numElements * 4);
 
@@ -369,7 +369,7 @@ export class HDRLoader extends DataTextureLoader {
         }
 
         data = halfArray;
-        type = HalfFloatType;
+        type = TextureType.HalfFloat;
         break;
       }
       default:
@@ -384,9 +384,9 @@ export class HDRLoader extends DataTextureLoader {
       gamma: rgbe_header_info.gamma,
       exposure: rgbe_header_info.exposure,
       type: type,
-      colorSpace: LinearSRGBColorSpace,
-      minFilter: LinearFilter,
-      magFilter: LinearFilter,
+      colorSpace: ColorSpace.LinearSRGB,
+      minFilter: TextureFilter.Linear,
+      magFilter: TextureFilter.Linear,
       generateMipmaps: false,
       flipY: true,
     };

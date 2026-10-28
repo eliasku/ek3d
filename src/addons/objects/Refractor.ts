@@ -1,4 +1,4 @@
-import { HalfFloatType } from "../../constants";
+import { TextureType } from "../../constants";
 import { Color } from "../../math/Color";
 import { Matrix4 } from "../../math/Matrix4";
 import { Plane } from "../../math/Plane";
@@ -171,7 +171,7 @@ ${chunk_colorspace_fragment}
 
     const renderTarget = new WebGLRenderTarget(textureWidth, textureHeight, {
       samples: multisample,
-      type: HalfFloatType,
+      type: TextureType.HalfFloat,
     });
 
     // material

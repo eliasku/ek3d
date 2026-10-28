@@ -11,7 +11,7 @@ import { LineBasicMaterial } from "../../materials/LineBasicMaterial";
 import { LineSegments } from "../../objects/LineSegments";
 import { Mesh } from "../../objects/Mesh";
 import { MeshStandardMaterial } from "../../materials/MeshStandardMaterial";
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 
 // Special surface finish tag types.
 // Note: "MATERIAL" tag (e.g. GLITTER, SPECKLE) is not implemented
@@ -35,7 +35,7 @@ const FILE_LOCATION_NOT_FOUND = 6;
 const MAIN_COLOUR_CODE = "16";
 const MAIN_EDGE_COLOUR_CODE = "24";
 
-const COLOR_SPACE_LDRAW = SRGBColorSpace;
+const COLOR_SPACE_LDRAW = ColorSpace.SRGB;
 
 const _tempVec0 = new Vector3();
 const _tempVec1 = new Vector3();

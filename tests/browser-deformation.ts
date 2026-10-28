@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { WebGLShadowMap } from "ek3d/renderers/webgl/WebGLShadowMap";
 import { Scene } from "ek3d/scenes/Scene";
@@ -24,7 +25,7 @@ import { normalShader } from "ek3d/renderers/shaders/NormalShader";
 import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
 import { depthShader } from "ek3d/renderers/shaders/DepthShader";
 import { distanceShader } from "ek3d/renderers/shaders/DistanceShader";
-import { LinearSRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { configureShadowScene } from "./browser-fixtures";
 
 function check(condition: boolean, message: string) {
@@ -122,8 +123,8 @@ export async function verifyDeformationRendering() {
   const point = new PointLight(0xffffff, 150);
   const readPixels = (width = 64, height = 64) => {
     const pixels = new Uint8Array(width * height * 4);
-    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-    check(gl.getError() === gl.NO_ERROR, "Deformation produced a GL error");
+    gl.readPixels(0, 0, width, height, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+    check(gl.getError() === GL.NO_ERROR, "Deformation produced a GL error");
     return pixels;
   };
   const draw = (mesh?: Mesh) => {
@@ -145,12 +146,12 @@ export async function verifyDeformationRendering() {
       label,
     );
   const texture = (name: string, binding: number) => {
-    const program = gl.getParameter(gl.CURRENT_PROGRAM) as WebGLProgram;
+    const program = gl.getParameter(GL.CURRENT_PROGRAM) as WebGLProgram;
     const location = gl.getUniformLocation(program, name);
     if (location === null) throw new Error(`Missing active ${name} sampler`);
     const unit = gl.getUniform(program, location) as number;
-    const active = gl.getParameter(gl.ACTIVE_TEXTURE) as number;
-    gl.activeTexture(gl.TEXTURE0 + unit);
+    const active = gl.getParameter(GL.ACTIVE_TEXTURE) as number;
+    gl.activeTexture(GL.TEXTURE0 + unit);
     const handle = gl.getParameter(binding) as WebGLTexture;
     gl.activeTexture(active);
     check(gl.isTexture(handle), `Missing GPU ${name} texture`);
@@ -159,14 +160,14 @@ export async function verifyDeformationRendering() {
   const allocation = () => {
     draw(skinned.mesh);
     return {
-      bone: texture("boneTexture", gl.TEXTURE_BINDING_2D),
-      morph: texture("morphTargetsTexture", gl.TEXTURE_BINDING_2D_ARRAY),
+      bone: texture("boneTexture", GL.TEXTURE_BINDING_2D),
+      morph: texture("morphTargetsTexture", GL.TEXTURE_BINDING_2D_ARRAY),
     };
   };
   try {
     renderer.setPixelRatio(1);
     renderer.setSize(64, 64, false);
-    renderer.outputColorSpace = LinearSRGBColorSpace;
+    renderer.outputColorSpace = ColorSpace.LinearSRGB;
     renderer.setClearColor(0x000000, 1);
     const initialMorph = draw(morphMesh);
     color(initialMorph, 16, 32, [255, 0, 0], "Base morph color/position");
@@ -212,8 +213,8 @@ export async function verifyDeformationRendering() {
     color(initialInstances, 16, 40, [0, 0, 0], "First instance inherited second morph");
     color(initialInstances, 48, 40, [255, 255, 255], "Second instance full morph");
     color(initialInstances, 48, 24, [0, 0, 0], "Second instance retained base morph");
-    const firstInstanceTexture = texture("morphTexture", gl.TEXTURE_BINDING_2D);
-    const sharedInstanceMorph = texture("morphTargetsTexture", gl.TEXTURE_BINDING_2D_ARRAY);
+    const firstInstanceTexture = texture("morphTexture", GL.TEXTURE_BINDING_2D);
+    const sharedInstanceMorph = texture("morphTargetsTexture", GL.TEXTURE_BINDING_2D_ARRAY);
     instances.setMorphAt(0, instancePose);
     instancePose.morphTargetInfluences![0] = 0.5;
     instances.setMorphAt(1, instancePose);
@@ -234,10 +235,10 @@ export async function verifyDeformationRendering() {
     instances.setMorphAt(1, instancePose);
     instances.morphTexture!.needsUpdate = true;
     same(draw(instances), instanceSnapshot, "Instance morph disposal/reallocation pixels");
-    const reallocatedInstanceTexture = texture("morphTexture", gl.TEXTURE_BINDING_2D);
+    const reallocatedInstanceTexture = texture("morphTexture", GL.TEXTURE_BINDING_2D);
     check(reallocatedInstanceTexture !== firstInstanceTexture, "Instance morph reused deleted influence texture");
     check(
-      texture("morphTargetsTexture", gl.TEXTURE_BINDING_2D_ARRAY) === sharedInstanceMorph,
+      texture("morphTargetsTexture", GL.TEXTURE_BINDING_2D_ARRAY) === sharedInstanceMorph,
       "Instance morph reallocation replaced shared target data",
     );
 
@@ -314,8 +315,8 @@ export async function verifyDeformationRendering() {
       shadowScene.remove(directional, point);
       shadowScene.add(light);
       caster.mesh.onAfterShadow = () => {
-        texture("boneTexture", gl.TEXTURE_BINDING_2D);
-        texture("morphTargetsTexture", gl.TEXTURE_BINDING_2D_ARRAY);
+        texture("boneTexture", GL.TEXTURE_BINDING_2D);
+        texture("morphTargetsTexture", GL.TEXTURE_BINDING_2D_ARRAY);
         shadowPasses.add(light.type);
       };
       for (const mode of ["skin", "morph"]) {
@@ -400,8 +401,8 @@ export async function verifyDeformationRendering() {
     );
     same(draw(skinned.mesh), snapshot, "Restored disposal/reallocation changed pixels");
     same(draw(instances), instanceSnapshot, "Context restoration changed per-instance morph pixels");
-    const restoredInstanceTexture = texture("morphTexture", gl.TEXTURE_BINDING_2D);
-    const restoredInstanceMorph = texture("morphTargetsTexture", gl.TEXTURE_BINDING_2D_ARRAY);
+    const restoredInstanceTexture = texture("morphTexture", GL.TEXTURE_BINDING_2D);
+    const restoredInstanceMorph = texture("morphTargetsTexture", GL.TEXTURE_BINDING_2D_ARRAY);
     check(
       restoredInstanceTexture !== reallocatedInstanceTexture && restoredInstanceMorph !== sharedInstanceMorph,
       "Instance morph restoration reused stale textures",

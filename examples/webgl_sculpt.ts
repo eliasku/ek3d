@@ -3,7 +3,7 @@ import { GLTFExporter } from "ek3d/addons/exporters/GLTFExporter";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Sculptor, type SculptorTool } from "ek3d/addons/misc/Sculptor";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { CircleGeometry } from "ek3d/geometries/CircleGeometry";
 import { IcosahedronGeometry } from "ek3d/geometries/IcosahedronGeometry";
 import { RingGeometry } from "ek3d/geometries/RingGeometry";
@@ -68,7 +68,7 @@ sculptor.addEventListener("end", () => {
 
 const cursorMaterial = new MeshBasicMaterial({
   color: 0xcc0000,
-  side: DoubleSide,
+  side: Side.Double,
   depthTest: false,
   depthWrite: false,
 });

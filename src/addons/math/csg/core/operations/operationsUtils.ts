@@ -1,7 +1,7 @@
 import { Ray } from "../../../../../math/Ray";
 import { Matrix4 } from "../../../../../math/Matrix4";
 import { Line3 } from "../../../../../math/Line3";
-import { DoubleSide } from "../../../../../constants";
+import { Side } from "../../../../../constants";
 import type { Triangle } from "../../../../../math/Triangle";
 import type { MeshBVH } from "../../../bvh/core/MeshBVH";
 import type { Brush, CSGGeometry } from "../Brush";
@@ -50,7 +50,7 @@ export function getHitSide(tri: Triangle, bvh: MeshBVH, matrix: Matrix4 | null =
     _ray.direction.transformDirection(matrix);
   }
 
-  const hit = bvh.raycastFirst(_ray, DoubleSide);
+  const hit = bvh.raycastFirst(_ray, Side.Double);
   const hitBackSide = Boolean(hit && _ray.direction.dot(hit.face!.normal) > 0);
   return hitBackSide ? BACK_SIDE : FRONT_SIDE;
 }

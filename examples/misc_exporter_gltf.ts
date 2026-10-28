@@ -5,14 +5,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import * as TextureUtils from "ek3d/addons/utils/WebGLTextureUtils";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
-import {
-  ACESFilmicToneMapping,
-  DoubleSide,
-  LinearFilter,
-  RepeatWrapping,
-  RGBAFormat,
-  SRGBColorSpace,
-} from "ek3d/constants";
+import { ToneMapping, Side, TextureFilter, Wrapping, PixelFormat, ColorSpace } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import type { Object3D } from "ek3d/core/Object3D";
@@ -82,7 +75,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 const scene1 = new Scene();
 scene1.name = "Scene1";
 const scene2 = new Scene();
@@ -111,8 +104,8 @@ axes.name = "AxesHelper";
 scene1.add(axes);
 const textures = new TextureLoader();
 const mapGrid = textures.load("/examples/textures/uv_grid_opengl.jpg");
-mapGrid.wrapS = mapGrid.wrapT = RepeatWrapping;
-mapGrid.colorSpace = SRGBColorSpace;
+mapGrid.wrapS = mapGrid.wrapT = Wrapping.Repeat;
+mapGrid.colorSpace = ColorSpace.SRGB;
 const data = new Uint8Array(100 * 100 * 4);
 for (let y = 0; y < 100; y++)
   for (let x = 0; x < 100; x++) {
@@ -121,8 +114,8 @@ for (let y = 0; y < 100; y++)
     data[i + 1] = Math.round(255 - (255 * y) / 99);
     data[i + 3] = 255;
   }
-const gradient = new DataTexture(data, 100, 100, RGBAFormat);
-gradient.minFilter = gradient.magFilter = LinearFilter;
+const gradient = new DataTexture(data, 100, 100, PixelFormat.RGBA);
+gradient.minFilter = gradient.magFilter = TextureFilter.Linear;
 gradient.needsUpdate = true;
 function addMesh(
   geometry: BufferGeometry,
@@ -188,7 +181,7 @@ addMesh(
 );
 const wood = new MeshStandardMaterial({
   map: textures.load("/examples/textures/hardwood2_diffuse.jpg"),
-  side: DoubleSide,
+  side: Side.Double,
 });
 const cube = addMesh(new BoxGeometry(40, 100, 100), wood, -200, 400, "Cube");
 const subCube = new Mesh(new BoxGeometry(40, 40, 40, 2, 2, 2), wood);
@@ -247,7 +240,7 @@ ortho.position.set(600, 400, 0);
 ortho.lookAt(0, 0, 0);
 ortho.name = "OrthographicCamera";
 scene1.add(ortho);
-const lambert = new MeshLambertMaterial({ color: 0xffff00, side: DoubleSide });
+const lambert = new MeshLambertMaterial({ color: 0xffff00, side: Side.Double });
 addMesh(new CircleGeometry(50, 20, 0, Math.PI * 2), lambert, 200, -400);
 addMesh(new RingGeometry(10, 50, 20, 5, 0, Math.PI * 2), lambert, 0, -400);
 addMesh(new CylinderGeometry(25, 75, 100, 40, 5), lambert, -200, -400);
@@ -280,7 +273,7 @@ context.fillStyle = "#FFD500";
 context.fillRect(16, 16, 32, 32);
 const webpTexture = new CanvasTexture(image);
 webpTexture.userData.mimeType = "image/webp";
-webpTexture.colorSpace = SRGBColorSpace;
+webpTexture.colorSpace = ColorSpace.SRGB;
 const webpBox = addMesh(new BoxGeometry(100, 100, 100), new MeshBasicMaterial({ map: webpTexture }), 400, 0, "WebPBox");
 let model: Object3D | null = null;
 let coffeemat: Object3D | null = null;

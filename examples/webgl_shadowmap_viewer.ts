@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { ShadowMapViewer } from "ek3d/addons/utils/ShadowMapViewer";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { BasicShadowMap } from "ek3d/constants";
+import { ShadowMap } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { TorusKnotGeometry } from "ek3d/geometries/TorusKnotGeometry";
@@ -82,7 +82,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.shadowMap!.enabled = true;
-renderer.shadowMap!.type = BasicShadowMap;
+renderer.shadowMap!.type = ShadowMap.Basic;
 const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 2, 0);
 controls.update();

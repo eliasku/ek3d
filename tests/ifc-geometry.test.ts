@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "vite-plus/test";
 import { ifcGeometryToBuffer } from "../examples/ifc-geometry";
-import { SRGBColorSpace } from "../src/constants";
+import { ColorSpace } from "../src/constants";
 import { BufferAttribute } from "../src/core/BufferAttribute";
 import { Color } from "../src/math/Color";
 
@@ -18,7 +18,7 @@ test("IFC geometry preserves normals, linear RGBA and indices after WASM memory 
   assert.deepEqual(Array.from(positions.array), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
   assert.deepEqual(Array.from(normals.array), [0, 1, 0, 1, 0, 0, 0, 0, 1]);
   assert.deepEqual(Array.from(geometry.index!.array), [0, 2, 1]);
-  const color = new Color().setRGB(0.5, 0.25, 1, SRGBColorSpace);
+  const color = new Color().setRGB(0.5, 0.25, 1, ColorSpace.SRGB);
   const rgba = geometry.getAttribute("color");
   assert.ok(rgba instanceof BufferAttribute);
   for (let i = 0; i < 3; i++) {

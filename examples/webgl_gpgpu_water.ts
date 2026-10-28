@@ -8,14 +8,14 @@ import { SimplexNoise } from "ek3d/addons/math/SimplexNoise";
 import { GPUComputationRenderer } from "ek3d/addons/misc/GPUComputationRenderer";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import {
-  ACESFilmicToneMapping,
-  ClampToEdgeWrapping,
-  DoubleSide,
-  EquirectangularReflectionMapping,
-  NearestFilter,
-  RGBAFormat,
-  UnsignedByteType,
-  VSMShadowMap,
+  ToneMapping,
+  Wrapping,
+  Side,
+  Mapping,
+  TextureFilter,
+  PixelFormat,
+  TextureType,
+  ShadowMap,
 } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { TorusGeometry } from "ek3d/geometries/TorusGeometry";
@@ -86,7 +86,7 @@ if (!selectedShadowMap) throw new Error("Missing shadow renderer");
 const shadowMap = selectedShadowMap;
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 0.5;
 const sun = new DirectionalLight(0xffffff, 4);
 sun.position.set(-1, 2.6, 1.4);
@@ -147,7 +147,7 @@ async function init(): Promise<void> {
     return;
   }
   environment = env;
-  env.mapping = EquirectangularReflectionMapping;
+  env.mapping = Mapping.EquirectangularReflection;
   scene.background = env;
   scene.environment = env;
   scene.backgroundBlurriness = 0.3;
@@ -175,7 +175,7 @@ async function init(): Promise<void> {
     roughness: 0,
     transparent: true,
     opacity: 0.8,
-    side: DoubleSide,
+    side: Side.Double,
   });
   waterMaterial.defines = { STANDARD: "", USE_UV: "", WIDTH: WIDTH.toFixed(1), BOUNDS: BOUNDS.toFixed(1) };
   const heightmap: { value: Texture | null } = { value: null };
@@ -242,12 +242,12 @@ async function init(): Promise<void> {
   readShader.defines.WIDTH = WIDTH.toFixed(1);
   readShader.defines.BOUNDS = BOUNDS.toFixed(1);
   const target = new WebGLRenderTarget(4, 1, {
-    wrapS: ClampToEdgeWrapping,
-    wrapT: ClampToEdgeWrapping,
-    minFilter: NearestFilter,
-    magFilter: NearestFilter,
-    format: RGBAFormat,
-    type: UnsignedByteType,
+    wrapS: Wrapping.ClampToEdge,
+    wrapT: Wrapping.ClampToEdge,
+    minFilter: TextureFilter.Nearest,
+    magFilter: TextureFilter.Nearest,
+    format: PixelFormat.RGBA,
+    type: TextureType.UnsignedByte,
     depthBuffer: false,
   });
   readTarget = target;
@@ -290,7 +290,7 @@ async function init(): Promise<void> {
   gui.add(settings, "shadow").onChange(() => {
     shadowMap.enabled = sun.castShadow = settings.shadow;
     if (settings.shadow) {
-      shadowMap.type = VSMShadowMap;
+      shadowMap.type = ShadowMap.VSM;
       const shadow = sun.shadow;
       shadow.mapSize.set(2048, 2048);
       shadow.radius = 2;

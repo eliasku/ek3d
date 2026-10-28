@@ -1,4 +1,5 @@
-import { HalfFloatType, NoBlending } from "../../constants";
+import { GL } from "../../GL";
+import { TextureType, Blending } from "../../constants";
 import { Timer } from "../../core/Timer";
 import { Vector2 } from "../../math/Vector2";
 import { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
@@ -74,7 +75,7 @@ export class EffectComposer {
       this._height = size.height;
 
       renderTarget = new WebGLRenderTarget(this._width * this._pixelRatio, this._height * this._pixelRatio, {
-        type: HalfFloatType,
+        type: TextureType.HalfFloat,
       });
       renderTarget.texture.name = "EffectComposer.rt1";
     } else {
@@ -116,7 +117,7 @@ export class EffectComposer {
      * @private
      */
     this.copyPass = new ShaderPass(CopyShader);
-    this.copyPass.material!.blending = NoBlending;
+    this.copyPass.material!.blending = Blending.No;
 
     /**
      * The internal timer for managing time data.
@@ -214,14 +215,13 @@ export class EffectComposer {
 
       if (pass.needsSwap) {
         if (maskActive) {
-          const context = this.renderer.getContext();
           const stencil = this.renderer.state.buffers.stencil;
 
-          stencil.setFunc(context.NOTEQUAL, 1, 0xffffffff);
+          stencil.setFunc(GL.NOTEQUAL, 1, 0xffffffff);
 
           this.copyPass.render(this.renderer, this.writeBuffer, this.readBuffer, deltaTime, maskActive);
 
-          stencil.setFunc(context.EQUAL, 1, 0xffffffff);
+          stencil.setFunc(GL.EQUAL, 1, 0xffffffff);
         }
 
         this.swapBuffers();

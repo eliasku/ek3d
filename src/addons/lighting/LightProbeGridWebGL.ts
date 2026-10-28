@@ -1,6 +1,6 @@
 import { CubeCamera } from "../../cameras/CubeCamera";
 import { OrthographicCamera } from "../../cameras/OrthographicCamera";
-import { FloatType, HalfFloatType, LinearFilter, NearestFilter, RGBAFormat } from "../../constants";
+import { TextureType, TextureFilter, PixelFormat } from "../../constants";
 import { PlaneGeometry } from "../../geometries/PlaneGeometry";
 import { Light } from "../../lights/Light";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
@@ -328,10 +328,10 @@ export class LightProbeGridWebGL extends Light {
     const atlasDepth = 7 * (nz + 2 * ATLAS_PADDING);
 
     const rt = new WebGL3DRenderTarget(nx, ny, atlasDepth, {
-      format: RGBAFormat,
-      type: FloatType,
-      minFilter: LinearFilter,
-      magFilter: LinearFilter,
+      format: PixelFormat.RGBA,
+      type: TextureType.Float,
+      minFilter: TextureFilter.Linear,
+      magFilter: TextureFilter.Linear,
       generateMipmaps: false,
       depthBuffer: false,
     });
@@ -565,9 +565,9 @@ function _ensureRepackResources() {
 function _ensureBakeResources(options: LightProbeGridBakeOptions) {
   if (!_emptyAtlas) {
     _emptyAtlas = new Data3DTexture(new Uint16Array(4), 1, 1, 1);
-    _emptyAtlas.type = HalfFloatType;
-    _emptyAtlas.minFilter = LinearFilter;
-    _emptyAtlas.magFilter = LinearFilter;
+    _emptyAtlas.type = TextureType.HalfFloat;
+    _emptyAtlas.minFilter = TextureFilter.Linear;
+    _emptyAtlas.magFilter = TextureFilter.Linear;
     _emptyAtlas.needsUpdate = true;
   }
 
@@ -576,7 +576,7 @@ function _ensureBakeResources(options: LightProbeGridBakeOptions) {
   if (!_cubeRenderTarget || cubemapSize !== _cachedCubemapSize || near !== _cachedNear || far !== _cachedFar) {
     if (_cubeRenderTarget) _cubeRenderTarget.dispose();
 
-    _cubeRenderTarget = new WebGLCubeRenderTarget(cubemapSize, { type: HalfFloatType });
+    _cubeRenderTarget = new WebGLCubeRenderTarget(cubemapSize, { type: TextureType.HalfFloat });
     _cubeCamera = new CubeCamera(near, far, _cubeRenderTarget);
     _cachedCubemapSize = cubemapSize;
     _cachedNear = near;
@@ -591,9 +591,9 @@ function _ensureBatchTarget(totalProbes: number) {
     if (_batchTarget) _batchTarget.dispose();
 
     _batchTarget = new WebGLRenderTarget(9, totalProbes, {
-      type: FloatType,
-      minFilter: NearestFilter,
-      magFilter: NearestFilter,
+      type: TextureType.Float,
+      minFilter: TextureFilter.Nearest,
+      magFilter: TextureFilter.Nearest,
       depthBuffer: false,
     });
 

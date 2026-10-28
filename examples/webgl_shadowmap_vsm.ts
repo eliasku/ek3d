@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { VSMShadowMap } from "ek3d/constants";
+import { ShadowMap } from "ek3d/constants";
 import { CylinderGeometry } from "ek3d/geometries/CylinderGeometry";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { TorusKnotGeometry } from "ek3d/geometries/TorusKnotGeometry";
@@ -34,7 +34,7 @@ const renderer = new WebGLRenderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap!.enabled = true;
-renderer.shadowMap!.type = VSMShadowMap;
+renderer.shadowMap!.type = ShadowMap.VSM;
 const camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
 camera.position.set(0, 10, 30);
 const scene = new Scene();

@@ -1,4 +1,4 @@
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { ShaderMaterial } from "ek3d/materials/ShaderMaterial";
@@ -38,7 +38,7 @@ const uniforms = {
   time: { value: 1 },
   delta: { value: 0 },
 };
-const material = new ShaderMaterial({ uniforms, vertexShader: birdVS, fragmentShader: birdFS, side: DoubleSide });
+const material = new ShaderMaterial({ uniforms, vertexShader: birdVS, fragmentShader: birdFS, side: Side.Double });
 try {
   const sim = createBirdSimulation(canvas, width, 0xffffff, false);
   const mesh = new Mesh(geometry, material);

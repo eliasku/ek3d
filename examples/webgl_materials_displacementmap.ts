@@ -3,7 +3,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { OBJLoader } from "ek3d/addons/loaders/OBJLoader";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { PointLight } from "ek3d/lights/PointLight";
 import { CubeTextureLoader } from "ek3d/loaders/CubeTextureLoader";
@@ -99,7 +99,7 @@ const material = new MeshStandardMaterial({
   displacementBias: -0.428408,
   envMap: cube,
   envMapIntensity: settings.envMapIntensity,
-  side: DoubleSide,
+  side: Side.Double,
 });
 new OBJLoader(manager).load(
   base + "ninjaHead_Low.obj",

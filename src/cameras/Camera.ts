@@ -1,4 +1,4 @@
-import { WebGLCoordinateSystem } from "../constants";
+import { CoordinateSystem } from "../constants";
 import { Matrix4 } from "../math/Matrix4";
 import { Object3D } from "../core/Object3D";
 import { Vector3 } from "../math/Vector3";
@@ -18,7 +18,7 @@ export class Camera extends Object3D {
   matrixWorldInverse: Matrix4;
   projectionMatrix: Matrix4;
   projectionMatrixInverse: Matrix4;
-  coordinateSystem: number;
+  coordinateSystem: CoordinateSystem;
   _reversedDepth: boolean;
   isPerspectiveCamera?: boolean;
 
@@ -54,7 +54,7 @@ export class Camera extends Object3D {
      * The coordinate system in which the camera is used.
      *
      */
-    this.coordinateSystem = WebGLCoordinateSystem;
+    this.coordinateSystem = CoordinateSystem.WebGL;
     this._reversedDepth = false;
   }
   /**

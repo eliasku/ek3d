@@ -5,15 +5,7 @@ import { OBJLoader } from "ek3d/addons/loaders/OBJLoader";
 import { VelocityShader } from "ek3d/addons/shaders/VelocityShader";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import {
-  BackSide,
-  BasicDepthPacking,
-  DoubleSide,
-  FrontSide,
-  RGBADepthPacking,
-  RGBDepthPacking,
-  RGDepthPacking,
-} from "ek3d/constants";
+import { Side, DepthPacking } from "ek3d/constants";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { PointLight } from "ek3d/lights/PointLight";
 import { LoadingManager } from "ek3d/loaders/LoadingManager";
@@ -98,9 +90,9 @@ const displacementMap = textureLoader.load(
   undefined,
   fail,
 );
-const displacement = { displacementMap, displacementScale: 2.436143, displacementBias: -0.428408, side: DoubleSide };
+const displacement = { displacementMap, displacementScale: 2.436143, displacementBias: -0.428408, side: Side.Double };
 const velocity = Object.assign(
-  new ShaderMaterial({ ...VelocityShader, uniforms: cloneUniforms(VelocityShader.uniforms), side: DoubleSide }),
+  new ShaderMaterial({ ...VelocityShader, uniforms: cloneUniforms(VelocityShader.uniforms), side: Side.Double }),
   { displacementMap },
 );
 velocity.uniforms.displacementMap.value = displacementMap;
@@ -118,13 +110,13 @@ const materials: Record<string, Material> = {
   }),
   normal: new MeshNormalMaterial({ ...displacement, normalMap, normalScale: new Vector2(1, -1) }),
   velocity,
-  depthBasic: new MeshDepthMaterial({ ...displacement, depthPacking: BasicDepthPacking }),
-  depthRGBA: new MeshDepthMaterial({ ...displacement, depthPacking: RGBADepthPacking }),
-  depthRGB: new MeshDepthMaterial({ ...displacement, depthPacking: RGBDepthPacking }),
-  depthRG: new MeshDepthMaterial({ ...displacement, depthPacking: RGDepthPacking }),
+  depthBasic: new MeshDepthMaterial({ ...displacement, depthPacking: DepthPacking.Basic }),
+  depthRGBA: new MeshDepthMaterial({ ...displacement, depthPacking: DepthPacking.RGBA }),
+  depthRGB: new MeshDepthMaterial({ ...displacement, depthPacking: DepthPacking.RGB }),
+  depthRG: new MeshDepthMaterial({ ...displacement, depthPacking: DepthPacking.RG }),
 };
 const params = { material: "normal", camera: "perspective", side: "double" };
-const sides = { front: FrontSide, back: BackSide, double: DoubleSide };
+const sides = { front: Side.Front, back: Side.Back, double: Side.Double };
 let mesh: Mesh<Material> | undefined;
 const previousWorld = new Matrix4();
 new OBJLoader(manager).load(

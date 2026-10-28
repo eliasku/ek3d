@@ -1,4 +1,4 @@
-import { ClampToEdgeWrapping, FloatType, NearestFilter, RGBAFormat } from "../../constants";
+import { Wrapping, TextureType, TextureFilter, PixelFormat } from "../../constants";
 import { DataTexture } from "../../textures/DataTexture";
 import type { Texture } from "../../textures/Texture";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
@@ -13,10 +13,10 @@ export interface GPUComputationVariable {
   material: ShaderMaterial;
   dependencies: GPUComputationVariable[] | null;
   renderTargets: WebGLRenderTarget[];
-  wrapS: number | null;
-  wrapT: number | null;
-  minFilter: number;
-  magFilter: number;
+  wrapS: Wrapping | null;
+  wrapT: Wrapping | null;
+  minFilter: TextureFilter;
+  magFilter: TextureFilter;
 }
 
 /** Computes variables in float textures using ping-pong render targets. */
@@ -26,7 +26,7 @@ export class GPUComputationRenderer {
   private sizeX: number;
   private sizeY: number;
   private renderer: WebGLRenderer;
-  private dataType: number;
+  private dataType: TextureType;
   private passThruUniforms: { passThruTexture: { value: Texture | null } };
   private passThruShader: ShaderMaterial;
   private quad: FullScreenQuad;
@@ -37,7 +37,7 @@ export class GPUComputationRenderer {
     this.renderer = renderer;
     this.variables = [];
     this.currentTextureIndex = 0;
-    this.dataType = FloatType;
+    this.dataType = TextureType.Float;
     this.passThruUniforms = { passThruTexture: { value: null } };
     this.passThruShader = this.createShaderMaterial(
       `
@@ -65,8 +65,8 @@ void main() {
       renderTargets: [],
       wrapS: null,
       wrapT: null,
-      minFilter: NearestFilter,
-      magFilter: NearestFilter,
+      minFilter: TextureFilter.Nearest,
+      magFilter: TextureFilter.Nearest,
     };
     this.variables.push(variable);
     return variable;
@@ -165,17 +165,17 @@ void main() {
   createRenderTarget(
     width: number = this.sizeX,
     height: number = this.sizeY,
-    wrapS: number | null = ClampToEdgeWrapping,
-    wrapT: number | null = ClampToEdgeWrapping,
-    minFilter: number = NearestFilter,
-    magFilter: number = NearestFilter,
+    wrapS: Wrapping | null = Wrapping.ClampToEdge,
+    wrapT: Wrapping | null = Wrapping.ClampToEdge,
+    minFilter: TextureFilter = TextureFilter.Nearest,
+    magFilter: TextureFilter = TextureFilter.Nearest,
   ): WebGLRenderTarget {
     return new WebGLRenderTarget(width || this.sizeX, height || this.sizeY, {
-      wrapS: wrapS || ClampToEdgeWrapping,
-      wrapT: wrapT || ClampToEdgeWrapping,
-      minFilter: minFilter || NearestFilter,
-      magFilter: magFilter || NearestFilter,
-      format: RGBAFormat,
+      wrapS: wrapS || Wrapping.ClampToEdge,
+      wrapT: wrapT || Wrapping.ClampToEdge,
+      minFilter: minFilter || TextureFilter.Nearest,
+      magFilter: magFilter || TextureFilter.Nearest,
+      format: PixelFormat.RGBA,
       type: this.dataType,
       depthBuffer: false,
     });
@@ -186,8 +186,8 @@ void main() {
       new Float32Array(this.sizeX * this.sizeY * 4),
       this.sizeX,
       this.sizeY,
-      RGBAFormat,
-      FloatType,
+      PixelFormat.RGBA,
+      TextureType.Float,
     );
     texture.needsUpdate = true;
     return texture;

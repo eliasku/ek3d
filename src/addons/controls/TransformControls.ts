@@ -1,4 +1,4 @@
-import { DoubleSide } from "../../constants";
+import { Side } from "../../constants";
 import type { OrthographicCamera } from "../../cameras/OrthographicCamera";
 import type { PerspectiveCamera } from "../../cameras/PerspectiveCamera";
 import { Float32BufferAttribute } from "../../core/BufferAttribute";
@@ -1642,7 +1642,7 @@ class TransformControlsPlane extends Mesh<MeshBasicMaterial> {
       new MeshBasicMaterial({
         visible: false,
         wireframe: true,
-        side: DoubleSide,
+        side: Side.Double,
         transparent: true,
         opacity: 0.1,
         toneMapped: false,

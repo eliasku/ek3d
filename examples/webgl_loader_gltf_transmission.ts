@@ -4,7 +4,7 @@ import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { UltraHDRLoader } from "ek3d/addons/loaders/UltraHDRLoader";
 import { DRACOLoader } from "ek3d/addons/loaders/DRACOLoader";
 import { DRACO_GLTF_CONFIG } from "ek3d/addons/loaders/DRACOLoader";
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping } from "ek3d/constants";
+import { ToneMapping, Mapping } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { WebGLEnvironments } from "ek3d/renderers/webgl/WebGLEnvironments";
@@ -49,7 +49,7 @@ function init(): void {
   new UltraHDRLoader().setPath("/examples/textures/equirectangular/").load("royal_esplanade_2k.hdr.jpg", function (
     texture: DataTexture,
   ) {
-    texture.mapping = EquirectangularReflectionMapping;
+    texture.mapping = Mapping.EquirectangularReflection;
 
     scene.background = texture;
     scene.backgroundBlurriness = 0.35;
@@ -90,7 +90,7 @@ function init(): void {
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setAnimationLoop(animate);
-  renderer.toneMapping = ACESFilmicToneMapping;
+  renderer.toneMapping = ToneMapping.ACESFilmic;
   renderer.toneMappingExposure = 1;
 
   controls = new OrbitControls<PerspectiveCamera>(camera, canvas);

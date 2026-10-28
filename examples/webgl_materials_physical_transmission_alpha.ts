@@ -3,7 +3,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { UltraHDRLoader } from "ek3d/addons/loaders/UltraHDRLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping } from "ek3d/constants";
+import { ToneMapping, Mapping } from "ek3d/constants";
 import { LoadingManager } from "ek3d/loaders/LoadingManager";
 import { MeshPhysicalMaterial } from "ek3d/materials/MeshPhysicalMaterial";
 import { Mesh } from "ek3d/objects/Mesh";
@@ -37,7 +37,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 const controls = new OrbitControls(camera, canvas);
 controls.minDistance = 5;
 controls.maxDistance = 20;
@@ -63,7 +63,7 @@ new UltraHDRLoader(manager).load(
       return;
     }
     environment = texture;
-    texture.mapping = EquirectangularReflectionMapping;
+    texture.mapping = Mapping.EquirectangularReflection;
     scene.environment = texture;
     new GLTFLoader(manager).load(
       "/examples/models/gltf/DragonAttenuation.glb",

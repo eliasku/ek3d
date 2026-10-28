@@ -1,4 +1,4 @@
-import { HalfFloatType, LinearFilter, NearestFilter } from "../../constants";
+import { TextureType, TextureFilter } from "../../constants";
 import { Texture } from "../../textures/Texture";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { cloneUniforms } from "../../renderers/shaders/UniformsUtils";
@@ -42,13 +42,13 @@ export class SMAAPass extends Pass {
 
     this._edgesRT = new WebGLRenderTarget(1, 1, {
       depthBuffer: false,
-      type: HalfFloatType,
+      type: TextureType.HalfFloat,
     });
     this._edgesRT.texture.name = "SMAAPass.edges";
 
     this._weightsRT = new WebGLRenderTarget(1, 1, {
       depthBuffer: false,
-      type: HalfFloatType,
+      type: TextureType.HalfFloat,
     });
     this._weightsRT.texture.name = "SMAAPass.weights";
 
@@ -64,7 +64,7 @@ export class SMAAPass extends Pass {
     this._areaTexture = new Texture();
     this._areaTexture.name = "SMAAPass.area";
     this._areaTexture.image = areaTextureImage;
-    this._areaTexture.minFilter = LinearFilter;
+    this._areaTexture.minFilter = TextureFilter.Linear;
     this._areaTexture.generateMipmaps = false;
     this._areaTexture.flipY = false;
 
@@ -78,8 +78,8 @@ export class SMAAPass extends Pass {
     this._searchTexture = new Texture();
     this._searchTexture.name = "SMAAPass.search";
     this._searchTexture.image = searchTextureImage;
-    this._searchTexture.magFilter = NearestFilter;
-    this._searchTexture.minFilter = NearestFilter;
+    this._searchTexture.magFilter = TextureFilter.Nearest;
+    this._searchTexture.minFilter = TextureFilter.Nearest;
     this._searchTexture.generateMipmaps = false;
     this._searchTexture.flipY = false;
 

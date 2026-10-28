@@ -1,6 +1,6 @@
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { RepeatWrapping } from "ek3d/constants";
+import { Wrapping } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
@@ -39,7 +39,7 @@ const texture = new TextureLoader().load(
     console.error(error);
   },
 );
-texture.wrapS = texture.wrapT = RepeatWrapping;
+texture.wrapS = texture.wrapT = Wrapping.Repeat;
 const uniforms = {
   amplitude: { value: 1 },
   color: { value: new Color(0xff2200) },

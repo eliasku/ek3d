@@ -5,10 +5,10 @@ import { VRMLLoader } from "../src/addons/loaders/VRMLLoader";
 import type { ChevrotainRuntime } from "../src/addons/loaders/vrml-parser";
 import { Mesh } from "../src/objects/Mesh";
 import { MeshPhongMaterial } from "../src/materials/MeshPhongMaterial";
-import { DoubleSide } from "../src/constants";
+import { Side } from "../src/constants";
 
 // Load the same public runtime the browser uses, without importing a publicDir asset through Vite.
-const source = readFileSync("examples/public/examples/libs/chevrotain.module.min.js");
+const source = readFileSync("public/examples/libs/chevrotain.module.min.js");
 const url = `data:text/javascript;base64,${source.toString("base64")}`;
 const runtimeModule: { default: ChevrotainRuntime } = await import(/* @vite-ignore */ url);
 const runtime = runtimeModule.default;
@@ -59,7 +59,7 @@ Shape {
   assert.ok(position);
   assert.equal(position.count, 6);
   assert.ok(!Array.isArray(mesh.material));
-  assert.equal(mesh.material.side, DoubleSide);
+  assert.equal(mesh.material.side, Side.Double);
 });
 
 test("VRML reports malformed input", () => {

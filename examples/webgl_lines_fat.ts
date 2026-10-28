@@ -6,7 +6,7 @@ import { LineMaterial } from "ek3d/addons/lines/LineMaterial";
 import { hilbert3D } from "ek3d/addons/utils/GeometryUtils";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { Float32BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { CatmullRomCurve3 } from "ek3d/extras/curves/CatmullRomCurve3";
@@ -54,7 +54,7 @@ for (let i = 0; i < divisions; i++) {
   const t = i / divisions;
   spline.getPoint(t, point);
   positions.push(point.x, point.y, point.z);
-  color.setHSL(t, 1, 0.5, SRGBColorSpace);
+  color.setHSL(t, 1, 0.5, ColorSpace.SRGB);
   colors.push(color.r, color.g, color.b);
 }
 const geometry = new LineGeometry();

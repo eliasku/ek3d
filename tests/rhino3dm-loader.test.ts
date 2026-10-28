@@ -7,7 +7,7 @@ import { TextureLoader } from "../src/loaders/TextureLoader";
 import { Texture } from "../src/textures/Texture";
 import { MeshPhysicalMaterial } from "../src/materials/MeshPhysicalMaterial";
 import { SpotLight } from "../src/lights/SpotLight";
-import { ClampToEdgeWrapping, RepeatWrapping } from "../src/constants";
+import { Wrapping } from "../src/constants";
 
 const attributes = {
   id: "mesh",
@@ -251,8 +251,8 @@ test("maps PBR textures and reports unsupported texture types", () => {
   assert.equal(mat.opacity, 0.5);
   assert.equal(mat.transparent, true);
   assert.equal(mat.transmission, 0);
-  assert.equal(maps.get("Bump")?.wrapS, RepeatWrapping);
-  assert.equal(maps.get("Bump")?.wrapT, ClampToEdgeWrapping);
+  assert.equal(maps.get("Bump")?.wrapS, Wrapping.Repeat);
+  assert.equal(maps.get("Bump")?.wrapT, Wrapping.ClampToEdge);
   assert.deepEqual(maps.get("Bump")?.repeat.toArray(), [2, 3]);
   assert.match(loader.warnings[0].message, /Unknown/);
 });

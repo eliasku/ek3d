@@ -1,6 +1,6 @@
 import { Texture } from "./Texture";
 import { TextureSource } from "./TextureSource";
-import { NearestFilter } from "../constants";
+import { TextureFilter } from "../constants";
 /**
  * This class can only be used in combination with `copyFramebufferToTexture()` methods
  * of renderers. It extracts the contents of the current bound framebuffer and provides it
@@ -52,19 +52,19 @@ export class FramebufferTexture extends Texture {
     /**
      * How the texture is sampled when a texel covers more than one pixel.
      *
-     * Overwritten and set to `NearestFilter` by default to disable filtering.
+     * Overwritten and set to `TextureFilter.Nearest` by default to disable filtering.
      *
-     * @default NearestFilter
+     * @default TextureFilter.Nearest
      */
-    this.magFilter = NearestFilter;
+    this.magFilter = TextureFilter.Nearest;
     /**
      * How the texture is sampled when a texel covers less than one pixel.
      *
-     * Overwritten and set to `NearestFilter` by default to disable filtering.
+     * Overwritten and set to `TextureFilter.Nearest` by default to disable filtering.
      *
-     * @default NearestFilter
+     * @default TextureFilter.Nearest
      */
-    this.minFilter = NearestFilter;
+    this.minFilter = TextureFilter.Nearest;
     /**
      * Whether to generate mipmaps (if possible) for a texture.
      *

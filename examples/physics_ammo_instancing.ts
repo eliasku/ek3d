@@ -2,7 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { AmmoPhysics, type AmmoRuntime } from "ek3d/addons/physics/AmmoPhysics";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DynamicDrawUsage } from "ek3d/constants";
+import { BufferUsage } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { IcosahedronGeometry } from "ek3d/geometries/IcosahedronGeometry";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
@@ -93,7 +93,7 @@ async function init(): Promise<void> {
   const matrix = new Matrix4();
   const color = new Color();
   for (const mesh of [boxes, spheres]) {
-    mesh.instanceMatrix.setUsage(DynamicDrawUsage);
+    mesh.instanceMatrix.setUsage(BufferUsage.DynamicDraw);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     mesh.userData.physics = { mass: 1 };

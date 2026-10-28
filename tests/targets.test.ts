@@ -9,7 +9,7 @@ import { DepthTexture } from "../src/textures/DepthTexture";
 import { WebGLArrayRenderTarget as UpstreamArray } from "../upstream/three.js/src/renderers/WebGLArrayRenderTarget.js";
 import { WebGL3DRenderTarget as Upstream3D } from "../upstream/three.js/src/renderers/WebGL3DRenderTarget.js";
 import { RenderTarget3D as UpstreamCommon } from "../upstream/three.js/src/core/RenderTarget3D.js";
-import { NearestFilter, RepeatWrapping, RGBAFormat, UnsignedByteType } from "../src/constants";
+import { TextureFilter, Wrapping, PixelFormat, TextureType } from "../src/constants";
 
 const pairs = [
   [WebGLArrayRenderTarget, UpstreamArray],
@@ -19,7 +19,12 @@ const pairs = [
 
 for (const [Target, Upstream] of pairs) {
   test(`${Target.name} preserves upstream dimensions, sampling and option defaults`, () => {
-    const options = { minFilter: NearestFilter, magFilter: NearestFilter, wrapR: RepeatWrapping, depthBuffer: false };
+    const options = {
+      minFilter: TextureFilter.Nearest,
+      magFilter: TextureFilter.Nearest,
+      wrapR: Wrapping.Repeat,
+      depthBuffer: false,
+    };
     const actual = new Target(7, 5, 3, options);
     const expected = new Upstream(7, 5, 3, options);
     assert.deepEqual([actual.width, actual.height, actual.depth], [expected.width, expected.height, expected.depth]);
@@ -28,8 +33,8 @@ for (const [Target, Upstream] of pairs) {
       assert.equal(actual.texture[key], Reflect.get(expected.texture, key), key);
     assert.equal(actual.texture.isRenderTargetTexture, true);
     assert.equal(actual.texture.renderTarget, actual);
-    assert.equal(actual.texture.format, RGBAFormat);
-    assert.equal(actual.texture.type, UnsignedByteType);
+    assert.equal(actual.texture.format, PixelFormat.RGBA);
+    assert.equal(actual.texture.type, TextureType.UnsignedByte);
     assert.equal(actual.depthBuffer, false);
     assert.deepEqual(actual.viewport.toArray(), [0, 0, 7, 5]);
     assert.deepEqual(actual.scissor.toArray(), [0, 0, 7, 5]);
@@ -68,7 +73,7 @@ for (const [Target, Upstream] of pairs) {
     const depth = new DepthTexture(7, 5);
     target.depthTexture = depth;
     target.scissorTest = true;
-    target.texture.wrapR = RepeatWrapping;
+    target.texture.wrapR = Wrapping.Repeat;
     const copy = target.clone();
     assert.ok(copy instanceof Target);
     assert.notEqual(copy.texture, target.texture);
@@ -76,7 +81,7 @@ for (const [Target, Upstream] of pairs) {
     assert.notEqual(copy.texture.image, target.texture.image);
     assert.deepEqual(copy.texture.image, target.texture.image);
     assert.equal(copy.texture.renderTarget, copy);
-    assert.equal(copy.texture.wrapR, RepeatWrapping);
+    assert.equal(copy.texture.wrapR, Wrapping.Repeat);
     assert.equal(copy.scissorTest, true);
     assert.notEqual(copy.depthTexture, depth);
     assert.equal(copy.depthTexture?.renderTarget, copy);

@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { VOXLoader, buildData3DTexture } from "ek3d/addons/loaders/VOXLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { BackSide, GLSL3 } from "ek3d/constants";
+import { Side, GLSL } from "ek3d/constants";
 import { Object3D } from "ek3d/core/Object3D";
 import { Timer } from "ek3d/core/Timer";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
@@ -181,11 +181,11 @@ new VOXLoader().load(
       textures.push(texture);
       const uniforms = { map: { value: texture }, cameraPos: { value: new Vector3() } };
       const material = new RawShaderMaterial({
-        glslVersion: GLSL3,
+        glslVersion: GLSL.GLSL3,
         uniforms,
         vertexShader,
         fragmentShader,
-        side: BackSide,
+        side: Side.Back,
       });
       const mesh = new InstancedMesh(new BoxGeometry(1, 1, 1), material, 50000);
       mesh.onBeforeRender = () => {

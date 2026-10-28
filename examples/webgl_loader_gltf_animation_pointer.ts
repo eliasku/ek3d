@@ -10,7 +10,7 @@ import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
 import { Color } from "ek3d/math/Color";
 import { AnimationMixer } from "ek3d/animation/AnimationMixer";
-import { NeutralToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { WebGLEnvironments } from "ek3d/renderers/webgl/WebGLEnvironments";
 import { createDFGLUT } from "ek3d/renderers/shaders/DFGLUTData";
@@ -55,7 +55,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.toneMapping = NeutralToneMapping;
+renderer.toneMapping = ToneMapping.Neutral;
 
 const pmremGenerator = new PMREMGenerator(renderer);
 

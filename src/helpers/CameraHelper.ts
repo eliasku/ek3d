@@ -6,7 +6,7 @@ import { Color } from "../math/Color";
 import { LineBasicMaterial } from "../materials/LineBasicMaterial";
 import { BufferGeometry } from "../core/BufferGeometry";
 import { Float32BufferAttribute } from "../core/BufferAttribute";
-import { WebGLCoordinateSystem } from "../constants";
+import { CoordinateSystem } from "../constants";
 const _vector = /*@__PURE__*/ new Vector3();
 const _camera = /*@__PURE__*/ new Camera();
 /**
@@ -209,7 +209,7 @@ export class CameraHelper extends LineSegments<LineBasicMaterial> {
       nearZ = 1;
       farZ = 0;
     } else {
-      if (this.camera.coordinateSystem === WebGLCoordinateSystem) {
+      if (this.camera.coordinateSystem === CoordinateSystem.WebGL) {
         nearZ = -1;
         farZ = 1;
       } else {

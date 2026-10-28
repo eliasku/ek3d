@@ -4,7 +4,7 @@ import { Color } from "ek3d/math/Color";
 import { Fog } from "ek3d/scenes/Fog";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { Float32BufferAttribute, Int16BufferAttribute } from "ek3d/core/BufferAttribute";
-import { IntType, DoubleSide, GLSL3 } from "ek3d/constants";
+import { TextureType, Side, GLSL } from "ek3d/constants";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { ShaderMaterial } from "ek3d/materials/ShaderMaterial";
 import { Mesh } from "ek3d/objects/Mesh";
@@ -88,7 +88,7 @@ function init(): void {
   geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
   geometry.setAttribute("uv", new Float32BufferAttribute(uvs, 2));
   const textureIndex = new Int16BufferAttribute(textureIndices, 1);
-  textureIndex.gpuType = IntType;
+  textureIndex.gpuType = TextureType.Int;
   geometry.setAttribute("textureIndex", textureIndex);
 
   geometry.computeBoundingSphere();
@@ -136,8 +136,8 @@ function init(): void {
 
 						}
 					`,
-    side: DoubleSide,
-    glslVersion: GLSL3,
+    side: Side.Double,
+    glslVersion: GLSL.GLSL3,
   });
 
   // mesh

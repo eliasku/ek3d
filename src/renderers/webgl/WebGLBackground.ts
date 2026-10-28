@@ -6,7 +6,7 @@ import type { WebGLRenderer } from "../WebGLRenderer";
 import { getEnvironment } from "./WebGLEnvironmentAccess";
 import { backgroundShader } from "../shaders/BackgroundShader";
 import { backgroundCubeShader } from "../shaders/BackgroundCubeShader";
-import { BackSide, FrontSide, SRGBTransfer } from "../../constants";
+import { Side, Transfer } from "../../constants";
 import { BoxGeometry } from "../../geometries/BoxGeometry";
 import { PlaneGeometry } from "../../geometries/PlaneGeometry";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
@@ -96,7 +96,7 @@ export function WebGLBackground(
             uniforms: cloneUniforms(backgroundCubeShader.uniforms),
             vertexShader: backgroundCubeShader.vertexShader,
             fragmentShader: backgroundCubeShader.fragmentShader,
-            side: BackSide,
+            side: Side.Back,
             depthTest: false,
             depthWrite: false,
             fog: false,
@@ -126,7 +126,7 @@ export function WebGLBackground(
       if (background.isRenderTargetTexture === false) {
         boxMesh.material.uniforms.backgroundRotation.value.premultiply(_m);
       }
-      boxMesh.material.toneMapped = ColorManagement.getTransfer(background.colorSpace) !== SRGBTransfer;
+      boxMesh.material.toneMapped = ColorManagement.getTransfer(background.colorSpace) !== Transfer.SRGB;
       if (
         currentBackground !== background ||
         currentBackgroundVersion !== background.version ||
@@ -149,7 +149,7 @@ export function WebGLBackground(
             uniforms: cloneUniforms(backgroundShader.uniforms),
             vertexShader: backgroundShader.vertexShader,
             fragmentShader: backgroundShader.fragmentShader,
-            side: FrontSide,
+            side: Side.Front,
             depthTest: false,
             depthWrite: false,
             fog: false,
@@ -167,7 +167,7 @@ export function WebGLBackground(
       }
       planeMesh.material.uniforms.t2D.value = background;
       planeMesh.material.uniforms.backgroundIntensity.value = (scene as any).backgroundIntensity;
-      planeMesh.material.toneMapped = ColorManagement.getTransfer(background.colorSpace) !== SRGBTransfer;
+      planeMesh.material.toneMapped = ColorManagement.getTransfer(background.colorSpace) !== Transfer.SRGB;
       if (background.matrixAutoUpdate === true) {
         background.updateMatrix();
       }

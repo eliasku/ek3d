@@ -1,4 +1,4 @@
-import { BackSide } from "../../constants";
+import { Side } from "../../constants";
 import { getUnlitUniformColorSpace } from "../shaders/UniformsUtils";
 import { Matrix3 } from "../../math/Matrix3";
 import { Matrix4 } from "../../math/Matrix4";
@@ -96,7 +96,7 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
       uniforms.bumpMap.value = material.bumpMap;
       refreshTransformUniform(material.bumpMap, uniforms.bumpMapTransform);
       uniforms.bumpScale.value = material.bumpScale;
-      if (material.side === BackSide) {
+      if (material.side === Side.Back) {
         uniforms.bumpScale.value *= -1;
       }
     }
@@ -104,7 +104,7 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
       uniforms.normalMap.value = material.normalMap;
       refreshTransformUniform(material.normalMap, uniforms.normalMapTransform);
       uniforms.normalScale.value.copy(material.normalScale);
-      if (material.side === BackSide) {
+      if (material.side === Side.Back) {
         uniforms.normalScale.value.negate();
       }
     }
@@ -257,7 +257,7 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
         uniforms.clearcoatNormalMap.value = material.clearcoatNormalMap;
         refreshTransformUniform(material.clearcoatNormalMap, uniforms.clearcoatNormalMapTransform);
         uniforms.clearcoatNormalScale.value.copy(material.clearcoatNormalScale);
-        if (material.side === BackSide) {
+        if (material.side === Side.Back) {
           uniforms.clearcoatNormalScale.value.negate();
         }
       }

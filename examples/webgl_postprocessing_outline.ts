@@ -9,7 +9,7 @@ import { RenderPass } from "ek3d/addons/postprocessing/RenderPass";
 import { ShaderPass } from "ek3d/addons/postprocessing/ShaderPass";
 import { FXAAShader } from "ek3d/addons/shaders/FXAAShader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide, RepeatWrapping } from "ek3d/constants";
+import { Side, Wrapping } from "ek3d/constants";
 import { Object3D } from "ek3d/core/Object3D";
 import { Raycaster } from "ek3d/core/Raycaster";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
@@ -103,7 +103,7 @@ for (let i = 0; i < 20; i++) {
   mesh.scale.multiplyScalar(Math.random() * 0.3 + 0.1);
   group.add(mesh);
 }
-const floor = new Mesh(new PlaneGeometry(12, 12), new MeshLambertMaterial({ side: DoubleSide }));
+const floor = new Mesh(new PlaneGeometry(12, 12), new MeshLambertMaterial({ side: Side.Double }));
 floor.rotation.x = -Math.PI / 2;
 floor.position.y = -1.5;
 floor.receiveShadow = true;
@@ -122,8 +122,8 @@ const pattern = new TextureLoader().load("/examples/textures/tri_pattern.jpg", (
     texture.dispose();
     return;
   }
-  texture.wrapS = RepeatWrapping;
-  texture.wrapT = RepeatWrapping;
+  texture.wrapS = Wrapping.Repeat;
+  texture.wrapT = Wrapping.Repeat;
   outline.patternTexture = texture;
 });
 composer.addPass(new OutputPass());

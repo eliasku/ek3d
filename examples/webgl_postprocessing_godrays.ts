@@ -5,7 +5,7 @@ import { EffectComposer } from "ek3d/addons/postprocessing/EffectComposer";
 import { GodraysPass } from "ek3d/addons/postprocessing/GodraysPass";
 import { RenderPass } from "ek3d/addons/postprocessing/RenderPass";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide, HalfFloatType, UnsignedIntType } from "ek3d/constants";
+import { Side, TextureType } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
@@ -63,7 +63,7 @@ const sphere = new Mesh(new SphereGeometry(0.5, 16, 16), new MeshBasicMaterial({
 sphere.position.copy(light.position);
 scene.add(sphere);
 const backdropGeometry = new PlaneGeometry(400, 200);
-const backdropMaterial = new MeshBasicMaterial({ color: 0x200808, side: DoubleSide });
+const backdropMaterial = new MeshBasicMaterial({ color: 0x200808, side: Side.Double });
 for (const [x, y, z, ry, rx, sx, sy] of [
   [-200, 100, 0, Math.PI / 2, 0, 1, 1],
   [200, 100, 0, Math.PI / 2, 0, 1, 1],
@@ -79,8 +79,8 @@ for (const [x, y, z, ry, rx, sx, sy] of [
   wall.receiveShadow = true;
   scene.add(wall);
 }
-const target = new WebGLRenderTarget(innerWidth, innerHeight, { type: HalfFloatType });
-target.depthTexture = new DepthTexture(target.width, target.height, UnsignedIntType);
+const target = new WebGLRenderTarget(innerWidth, innerHeight, { type: TextureType.HalfFloat });
+target.depthTexture = new DepthTexture(target.width, target.height, TextureType.UnsignedInt);
 const composer = new EffectComposer(renderer, target);
 composer.addPass(new RenderPass(scene, camera));
 const godrays = new GodraysPass(light, camera, {
@@ -123,7 +123,7 @@ new GLTFLoader().load(
       for (const entry of Array.isArray(material) ? material : [material]) replacedMaterials.add(entry);
     }
     pillars.material = new MeshStandardMaterial({ color: 0x333333 });
-    base.material = new MeshStandardMaterial({ color: 0x333333, side: DoubleSide });
+    base.material = new MeshStandardMaterial({ color: 0x333333, side: Side.Double });
     gltf.scene.traverse((object) => {
       if (object instanceof Mesh) {
         object.castShadow = true;

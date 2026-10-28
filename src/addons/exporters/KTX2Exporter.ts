@@ -3,19 +3,7 @@ import { DataTexture } from "../../textures/DataTexture";
 import type { Data3DTexture } from "../../textures/Data3DTexture";
 import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
 import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
-import {
-  FloatType,
-  HalfFloatType,
-  UnsignedByteType,
-  RGBAFormat,
-  RGFormat,
-  RedFormat,
-  NoColorSpace,
-  LinearSRGBColorSpace,
-  SRGBColorSpace,
-  SRGBTransfer,
-  REVISION,
-} from "../../constants";
+import { TextureType, PixelFormat, ColorSpace, Transfer, REVISION } from "../../constants";
 import type { KTX2Container } from "../loaders/KTX2Container";
 
 /** The ktx-parse runtime is supplied by the consumer, not bundled with ek3d. */
@@ -66,11 +54,11 @@ export class KTX2Exporter {
       const count = channelCount(target.texture.format);
       const size = target.width * target.height * count;
       const data =
-        target.texture.type === FloatType
+        target.texture.type === TextureType.Float
           ? new Float32Array(size)
-          : target.texture.type === HalfFloatType
+          : target.texture.type === TextureType.HalfFloat
             ? new Uint16Array(size)
-            : target.texture.type === UnsignedByteType
+            : target.texture.type === TextureType.UnsignedByte
               ? new Uint8Array(size)
               : null;
       if (!data)
@@ -87,40 +75,49 @@ export class KTX2Exporter {
     const count = channelCount(texture.format);
     const w = this.writer;
     const formats: Record<number, Record<number, Record<string, number>>> = {
-      [RGBAFormat]: {
-        [FloatType]: {
-          [NoColorSpace]: w.VK_FORMAT_R32G32B32A32_SFLOAT,
-          [LinearSRGBColorSpace]: w.VK_FORMAT_R32G32B32A32_SFLOAT,
+      [PixelFormat.RGBA]: {
+        [TextureType.Float]: {
+          [ColorSpace.No]: w.VK_FORMAT_R32G32B32A32_SFLOAT,
+          [ColorSpace.LinearSRGB]: w.VK_FORMAT_R32G32B32A32_SFLOAT,
         },
-        [HalfFloatType]: {
-          [NoColorSpace]: w.VK_FORMAT_R16G16B16A16_SFLOAT,
-          [LinearSRGBColorSpace]: w.VK_FORMAT_R16G16B16A16_SFLOAT,
+        [TextureType.HalfFloat]: {
+          [ColorSpace.No]: w.VK_FORMAT_R16G16B16A16_SFLOAT,
+          [ColorSpace.LinearSRGB]: w.VK_FORMAT_R16G16B16A16_SFLOAT,
         },
-        [UnsignedByteType]: {
-          [NoColorSpace]: w.VK_FORMAT_R8G8B8A8_UNORM,
-          [LinearSRGBColorSpace]: w.VK_FORMAT_R8G8B8A8_UNORM,
-          [SRGBColorSpace]: w.VK_FORMAT_R8G8B8A8_SRGB,
-        },
-      },
-      [RGFormat]: {
-        [FloatType]: { [NoColorSpace]: w.VK_FORMAT_R32G32_SFLOAT, [LinearSRGBColorSpace]: w.VK_FORMAT_R32G32_SFLOAT },
-        [HalfFloatType]: {
-          [NoColorSpace]: w.VK_FORMAT_R16G16_SFLOAT,
-          [LinearSRGBColorSpace]: w.VK_FORMAT_R16G16_SFLOAT,
-        },
-        [UnsignedByteType]: {
-          [NoColorSpace]: w.VK_FORMAT_R8G8_UNORM,
-          [LinearSRGBColorSpace]: w.VK_FORMAT_R8G8_UNORM,
-          [SRGBColorSpace]: w.VK_FORMAT_R8G8_SRGB,
+        [TextureType.UnsignedByte]: {
+          [ColorSpace.No]: w.VK_FORMAT_R8G8B8A8_UNORM,
+          [ColorSpace.LinearSRGB]: w.VK_FORMAT_R8G8B8A8_UNORM,
+          [ColorSpace.SRGB]: w.VK_FORMAT_R8G8B8A8_SRGB,
         },
       },
-      [RedFormat]: {
-        [FloatType]: { [NoColorSpace]: w.VK_FORMAT_R32_SFLOAT, [LinearSRGBColorSpace]: w.VK_FORMAT_R32_SFLOAT },
-        [HalfFloatType]: { [NoColorSpace]: w.VK_FORMAT_R16_SFLOAT, [LinearSRGBColorSpace]: w.VK_FORMAT_R16_SFLOAT },
-        [UnsignedByteType]: {
-          [NoColorSpace]: w.VK_FORMAT_R8_UNORM,
-          [LinearSRGBColorSpace]: w.VK_FORMAT_R8_UNORM,
-          [SRGBColorSpace]: w.VK_FORMAT_R8_SRGB,
+      [PixelFormat.RG]: {
+        [TextureType.Float]: {
+          [ColorSpace.No]: w.VK_FORMAT_R32G32_SFLOAT,
+          [ColorSpace.LinearSRGB]: w.VK_FORMAT_R32G32_SFLOAT,
+        },
+        [TextureType.HalfFloat]: {
+          [ColorSpace.No]: w.VK_FORMAT_R16G16_SFLOAT,
+          [ColorSpace.LinearSRGB]: w.VK_FORMAT_R16G16_SFLOAT,
+        },
+        [TextureType.UnsignedByte]: {
+          [ColorSpace.No]: w.VK_FORMAT_R8G8_UNORM,
+          [ColorSpace.LinearSRGB]: w.VK_FORMAT_R8G8_UNORM,
+          [ColorSpace.SRGB]: w.VK_FORMAT_R8G8_SRGB,
+        },
+      },
+      [PixelFormat.Red]: {
+        [TextureType.Float]: {
+          [ColorSpace.No]: w.VK_FORMAT_R32_SFLOAT,
+          [ColorSpace.LinearSRGB]: w.VK_FORMAT_R32_SFLOAT,
+        },
+        [TextureType.HalfFloat]: {
+          [ColorSpace.No]: w.VK_FORMAT_R16_SFLOAT,
+          [ColorSpace.LinearSRGB]: w.VK_FORMAT_R16_SFLOAT,
+        },
+        [TextureType.UnsignedByte]: {
+          [ColorSpace.No]: w.VK_FORMAT_R8_UNORM,
+          [ColorSpace.LinearSRGB]: w.VK_FORMAT_R8_UNORM,
+          [ColorSpace.SRGB]: w.VK_FORMAT_R8_SRGB,
         },
       },
     };
@@ -149,9 +146,9 @@ export class KTX2Exporter {
     const desc = container.dataFormatDescriptor[0];
     desc.colorModel = w.KHR_DF_MODEL_RGBSDA;
     desc.colorPrimaries =
-      texture.colorSpace === NoColorSpace ? w.KHR_DF_PRIMARIES_UNSPECIFIED : w.KHR_DF_PRIMARIES_BT709;
+      texture.colorSpace === ColorSpace.No ? w.KHR_DF_PRIMARIES_UNSPECIFIED : w.KHR_DF_PRIMARIES_BT709;
     desc.transferFunction =
-      ColorManagement.getTransfer(texture.colorSpace) === SRGBTransfer
+      ColorManagement.getTransfer(texture.colorSpace) === Transfer.SRGB
         ? w.KHR_DF_TRANSFER_SRGB
         : w.KHR_DF_TRANSFER_LINEAR;
     desc.texelBlockDimension = [0, 0, 0, 0];
@@ -166,15 +163,15 @@ export class KTX2Exporter {
       let channelType = channels[i];
       if (channelType === w.KHR_DF_CHANNEL_RGBSDA_ALPHA && desc.transferFunction !== w.KHR_DF_TRANSFER_LINEAR)
         channelType |= w.KHR_DF_SAMPLE_DATATYPE_LINEAR;
-      if (texture.type === FloatType || texture.type === HalfFloatType)
+      if (texture.type === TextureType.Float || texture.type === TextureType.HalfFloat)
         channelType |= w.KHR_DF_SAMPLE_DATATYPE_FLOAT | w.KHR_DF_SAMPLE_DATATYPE_SIGNED;
       desc.samples.push({
         channelType,
         bitOffset: i * array.BYTES_PER_ELEMENT * 8,
         bitLength: array.BYTES_PER_ELEMENT * 8 - 1,
         samplePosition: [0, 0, 0, 0],
-        sampleLower: texture.type === UnsignedByteType ? 0 : 0xbf800000,
-        sampleUpper: texture.type === UnsignedByteType ? 255 : 0x3f800000,
+        sampleLower: texture.type === TextureType.UnsignedByte ? 0 : 0xbf800000,
+        sampleUpper: texture.type === TextureType.UnsignedByte ? 255 : 0x3f800000,
       });
     }
     container.levelCount = 1;
@@ -190,8 +187,8 @@ export class KTX2Exporter {
 }
 
 function channelCount(format: number): number {
-  if (format === RGBAFormat) return 4;
-  if (format === RGFormat) return 2;
-  if (format === RedFormat) return 1;
+  if (format === PixelFormat.RGBA) return 4;
+  if (format === PixelFormat.RG) return 2;
+  if (format === PixelFormat.Red) return 1;
   throw new Error("THREE.KTX2Exporter: Supported formats are RGBAFormat, RGFormat, or RedFormat.");
 }

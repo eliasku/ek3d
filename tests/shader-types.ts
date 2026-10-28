@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { ShaderMaterial } from "ek3d/materials/ShaderMaterial";
 import type { ShaderMaterialParameters } from "ek3d/materials/ShaderMaterial";
 import { RawShaderMaterial } from "ek3d/materials/RawShaderMaterial";
@@ -9,11 +10,11 @@ import { DataTexture } from "ek3d/textures/DataTexture";
 import { Data3DTexture } from "ek3d/textures/Data3DTexture";
 import { DataArrayTexture } from "ek3d/textures/DataArrayTexture";
 import { CubeTexture } from "ek3d/textures/CubeTexture";
-import { GLSL1, GLSL3 } from "ek3d/constants";
+import { GLSL } from "ek3d/constants";
 
 declare const canvas: HTMLCanvasElement;
 const parameters: ShaderMaterialParameters = {
-  glslVersion: GLSL3,
+  glslVersion: GLSL.GLSL3,
   uniforms: {
     time: { value: 0, needsUpdate: false },
     tint: new Uniform(new Vector3(1, 0, 0)),
@@ -35,10 +36,10 @@ material.uniforms.time.needsUpdate = true;
 raw.uniforms.time.needsUpdate = false;
 material.uniformsNeedUpdate = true;
 material.needsUpdate = true;
-raw.glslVersion = GLSL1;
+raw.glslVersion = GLSL.GLSL1;
 const renderer = new WebGLRenderer({ canvas, shaderChunks: { custom: "const float gain = 1.0;" } });
 renderer.debug.onShaderError = (gl, program, vertex, fragment) => {
-  const link: boolean = gl.getProgramParameter(program, gl.LINK_STATUS);
+  const link: boolean = gl.getProgramParameter(program, GL.LINK_STATUS);
   const vertexLog: string | null = gl.getShaderInfoLog(vertex);
   const fragmentLog: string | null = gl.getShaderInfoLog(fragment);
   const programLog: string | null = gl.getProgramInfoLog(program);

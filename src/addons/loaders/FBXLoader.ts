@@ -5,7 +5,7 @@ import { NumberKeyframeTrack } from "../../animation/tracks/NumberKeyframeTrack"
 import { QuaternionKeyframeTrack } from "../../animation/tracks/QuaternionKeyframeTrack";
 import { VectorKeyframeTrack } from "../../animation/tracks/VectorKeyframeTrack";
 import { PerspectiveCamera } from "../../cameras/PerspectiveCamera";
-import { ClampToEdgeWrapping, EquirectangularReflectionMapping, RepeatWrapping, SRGBColorSpace } from "../../constants";
+import { Wrapping, Mapping, ColorSpace } from "../../constants";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { Float32BufferAttribute, Uint16BufferAttribute } from "../../core/BufferAttribute";
 import { Object3D } from "../../core/Object3D";
@@ -808,8 +808,8 @@ class FBXTreeParser {
     // http://download.autodesk.com/us/fbx/SDKdocs/FBX_SDK_Help/files/fbxsdkref/class_k_fbx_texture.html#889640e63e2e681259ea81061b85143a
     // 0: repeat(default), 1: clamp
 
-    texture.wrapS = valueU === 0 ? RepeatWrapping : ClampToEdgeWrapping;
-    texture.wrapT = valueV === 0 ? RepeatWrapping : ClampToEdgeWrapping;
+    texture.wrapS = valueU === 0 ? Wrapping.Repeat : Wrapping.ClampToEdge;
+    texture.wrapT = valueV === 0 ? Wrapping.Repeat : Wrapping.ClampToEdge;
 
     if (textureNode.Scaling !== undefined) {
       const values = textureNode.Scaling.value;
@@ -935,7 +935,7 @@ class FBXTreeParser {
     if (materialNode.Diffuse) {
       parameters.color = ColorManagement.colorSpaceToWorking(
         new Color().fromArray(materialNode.Diffuse.value),
-        SRGBColorSpace,
+        ColorSpace.SRGB,
       );
     } else if (
       materialNode.DiffuseColor &&
@@ -944,7 +944,7 @@ class FBXTreeParser {
       // The blender exporter exports diffuse here instead of in materialNode.Diffuse
       parameters.color = ColorManagement.colorSpaceToWorking(
         new Color().fromArray(materialNode.DiffuseColor.value),
-        SRGBColorSpace,
+        ColorSpace.SRGB,
       );
     }
 
@@ -955,7 +955,7 @@ class FBXTreeParser {
     if (materialNode.Emissive) {
       parameters.emissive = ColorManagement.colorSpaceToWorking(
         new Color().fromArray(materialNode.Emissive.value),
-        SRGBColorSpace,
+        ColorSpace.SRGB,
       );
     } else if (
       materialNode.EmissiveColor &&
@@ -964,7 +964,7 @@ class FBXTreeParser {
       // The blender exporter exports emissive color here instead of in materialNode.Emissive
       parameters.emissive = ColorManagement.colorSpaceToWorking(
         new Color().fromArray(materialNode.EmissiveColor.value),
-        SRGBColorSpace,
+        ColorSpace.SRGB,
       );
     }
 
@@ -1001,13 +1001,13 @@ class FBXTreeParser {
     if (materialNode.Specular) {
       parameters.specular = ColorManagement.colorSpaceToWorking(
         new Color().fromArray(materialNode.Specular.value),
-        SRGBColorSpace,
+        ColorSpace.SRGB,
       );
     } else if (materialNode.SpecularColor && materialNode.SpecularColor.type === "Color") {
       // The blender exporter exports specular color here instead of in materialNode.Specular
       parameters.specular = ColorManagement.colorSpaceToWorking(
         new Color().fromArray(materialNode.SpecularColor.value),
-        SRGBColorSpace,
+        ColorSpace.SRGB,
       );
     }
 
@@ -1027,7 +1027,7 @@ class FBXTreeParser {
         case "Maya|TEX_color_map":
           parameters.map = this.getTexture(textureMap, child.ID);
           if (parameters.map !== undefined) {
-            parameters.map.colorSpace = SRGBColorSpace;
+            parameters.map.colorSpace = ColorSpace.SRGB;
           }
 
           break;
@@ -1039,7 +1039,7 @@ class FBXTreeParser {
         case "EmissiveColor":
           parameters.emissiveMap = this.getTexture(textureMap, child.ID);
           if (parameters.emissiveMap !== undefined) {
-            parameters.emissiveMap.colorSpace = SRGBColorSpace;
+            parameters.emissiveMap.colorSpace = ColorSpace.SRGB;
           }
 
           break;
@@ -1052,8 +1052,8 @@ class FBXTreeParser {
         case "ReflectionColor":
           parameters.envMap = this.getTexture(textureMap, child.ID);
           if (parameters.envMap !== undefined) {
-            parameters.envMap.mapping = EquirectangularReflectionMapping;
-            parameters.envMap.colorSpace = SRGBColorSpace;
+            parameters.envMap.mapping = Mapping.EquirectangularReflection;
+            parameters.envMap.colorSpace = ColorSpace.SRGB;
           }
 
           break;
@@ -1061,7 +1061,7 @@ class FBXTreeParser {
         case "SpecularColor":
           parameters.specularMap = this.getTexture(textureMap, child.ID);
           if (parameters.specularMap !== undefined) {
-            parameters.specularMap.colorSpace = SRGBColorSpace;
+            parameters.specularMap.colorSpace = ColorSpace.SRGB;
           }
 
           break;
@@ -1524,7 +1524,7 @@ class FBXTreeParser {
       let color: number | Color = 0xffffff;
 
       if (lightAttribute.Color !== undefined) {
-        color = ColorManagement.colorSpaceToWorking(new Color().fromArray(lightAttribute.Color.value), SRGBColorSpace);
+        color = ColorManagement.colorSpaceToWorking(new Color().fromArray(lightAttribute.Color.value), ColorSpace.SRGB);
       }
 
       let intensity: number = lightAttribute.Intensity === undefined ? 1 : lightAttribute.Intensity.value / 100;
@@ -1840,7 +1840,7 @@ class FBXTreeParser {
       const b = ambient[2];
 
       if (r !== 0 || g !== 0 || b !== 0) {
-        const color = new Color().setRGB(r, g, b, SRGBColorSpace);
+        const color = new Color().setRGB(r, g, b, ColorSpace.SRGB);
         sceneGraph.add(new AmbientLight(color, 1));
       }
     }
@@ -2568,7 +2568,7 @@ class GeometryParser {
 
     for (let i = 0, c = new Color(); i < buffer.length; i += 4) {
       c.fromArray(buffer, i);
-      ColorManagement.colorSpaceToWorking(c, SRGBColorSpace);
+      ColorManagement.colorSpaceToWorking(c, ColorSpace.SRGB);
       c.toArray(buffer, i);
     }
 

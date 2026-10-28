@@ -2,7 +2,7 @@ import { MeshSurfaceSampler } from "ek3d/addons/math/MeshSurfaceSampler";
 import { GLTFLoader, type GLTF } from "ek3d/addons/loaders/GLTFLoader";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
-import { DynamicDrawUsage } from "ek3d/constants";
+import { BufferUsage } from "ek3d/constants";
 import type { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { Object3D } from "ek3d/core/Object3D";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
@@ -115,8 +115,8 @@ loader.load(
     }
 
     // Instance matrices will be updated every frame.
-    stemMesh.instanceMatrix.setUsage(DynamicDrawUsage);
-    blossomMesh.instanceMatrix.setUsage(DynamicDrawUsage);
+    stemMesh.instanceMatrix.setUsage(BufferUsage.DynamicDraw);
+    blossomMesh.instanceMatrix.setUsage(BufferUsage.DynamicDraw);
 
     resample();
 

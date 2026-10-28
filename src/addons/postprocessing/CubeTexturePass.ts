@@ -1,4 +1,4 @@
-import { BackSide } from "../../constants";
+import { Side } from "../../constants";
 import { BoxGeometry } from "../../geometries/BoxGeometry";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { cloneUniforms } from "../../renderers/shaders/UniformsUtils";
@@ -123,7 +123,7 @@ export class CubeTexturePass extends Pass {
       fragmentShader: cubeShader.fragmentShader,
       depthTest: false,
       depthWrite: false,
-      side: BackSide,
+      side: Side.Back,
     });
 
     // The renderer samples the envMap uniform for background-like materials.

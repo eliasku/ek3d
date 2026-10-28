@@ -1,5 +1,5 @@
 import { DataTexture } from "../../textures/DataTexture";
-import { RGFormat, HalfFloatType, LinearFilter, ClampToEdgeWrapping } from "../../constants";
+import { PixelFormat, TextureType, TextureFilter, Wrapping } from "../../constants";
 /** Create an independent DFG texture and backing array; the caller owns disposal. */
 export function createDFGLUT(): DataTexture {
   const DATA = new Uint16Array([
@@ -41,12 +41,12 @@ export function createDFGLUT(): DataTexture {
     0x3bdd, 0x01df, 0x3bb7, 0x031c, 0x3b79, 0x047c, 0x3b1d, 0x05d4, 0x3aa0, 0x06d5, 0x3a08, 0x075a, 0x395d, 0x075e,
     0x38aa, 0x06f7, 0x37f4, 0x0648, 0x36ac, 0x0576, 0x3586, 0x049f,
   ]);
-  const lut = new DataTexture(DATA, 16, 16, RGFormat, HalfFloatType);
+  const lut = new DataTexture(DATA, 16, 16, PixelFormat.RG, TextureType.HalfFloat);
   lut.name = "DFG_LUT";
-  lut.minFilter = LinearFilter;
-  lut.magFilter = LinearFilter;
-  lut.wrapS = ClampToEdgeWrapping;
-  lut.wrapT = ClampToEdgeWrapping;
+  lut.minFilter = TextureFilter.Linear;
+  lut.magFilter = TextureFilter.Linear;
+  lut.wrapS = Wrapping.ClampToEdge;
+  lut.wrapT = Wrapping.ClampToEdge;
   lut.generateMipmaps = false;
   lut.needsUpdate = true;
   return lut;

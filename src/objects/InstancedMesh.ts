@@ -9,7 +9,7 @@ import { Box3 } from "../math/Box3";
 import { Matrix4 } from "../math/Matrix4";
 import { Sphere } from "../math/Sphere";
 import { DataTexture } from "../textures/DataTexture";
-import { FloatType, RedFormat } from "../constants";
+import { TextureType, PixelFormat } from "../constants";
 const _instanceLocalMatrix = /*@__PURE__*/ new Matrix4();
 const _instanceWorldMatrix = /*@__PURE__*/ new Matrix4();
 const _instanceIntersects: Intersection[] = [];
@@ -261,7 +261,13 @@ export class InstancedMesh extends Mesh {
     const objectInfluences = object.morphTargetInfluences;
     const len = objectInfluences.length + 1; // morphBaseInfluence + all influences
     if (this.morphTexture === null) {
-      this.morphTexture = new DataTexture(new Float32Array(len * this.count), len, this.count, RedFormat, FloatType);
+      this.morphTexture = new DataTexture(
+        new Float32Array(len * this.count),
+        len,
+        this.count,
+        PixelFormat.Red,
+        TextureType.Float,
+      );
     }
     const array = this.morphTexture!.source.data.data;
     let morphInfluencesSum = 0;

@@ -1,4 +1,4 @@
-import { FloatType } from "../../constants";
+import { TextureType } from "../../constants";
 import { DataArrayTexture } from "../../textures/DataArrayTexture";
 import { Vector4 } from "../../math/Vector4";
 import { Vector2 } from "../../math/Vector2";
@@ -32,7 +32,7 @@ export function WebGLMorphtargets(gl?: any, capabilities?: any, textures?: any) 
       }
       const buffer = new Float32Array(width * height * 4 * morphTargetsCount);
       const texture = new DataArrayTexture(buffer, width, height, morphTargetsCount);
-      texture.type = FloatType;
+      texture.type = TextureType.Float;
       texture.needsUpdate = true;
       // fill buffer
       const vertexDataStride = vertexDataCount * 4;

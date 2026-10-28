@@ -3,10 +3,10 @@ import { Scene } from "ek3d/scenes/Scene";
 import { Color } from "ek3d/math/Color";
 import { HemisphereLight } from "ek3d/lights/HemisphereLight";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { Float32BufferAttribute } from "ek3d/core/BufferAttribute";
 import { MeshPhongMaterial } from "ek3d/materials/MeshPhongMaterial";
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { Mesh } from "ek3d/objects/Mesh";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { Stats } from "ek3d/addons/libs/Stats";
@@ -71,7 +71,7 @@ function init(): void {
       const r = x / size + 0.5;
       const g = y / size + 0.5;
 
-      _color.setRGB(r, g, 1, SRGBColorSpace);
+      _color.setRGB(r, g, 1, ColorSpace.SRGB);
 
       colors.push(_color.r, _color.g, _color.b);
     }
@@ -99,7 +99,7 @@ function init(): void {
   geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
 
   const material = new MeshPhongMaterial({
-    side: DoubleSide,
+    side: Side.Double,
     vertexColors: true,
   });
 

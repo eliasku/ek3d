@@ -1,4 +1,4 @@
-import { BackSide } from "../../constants";
+import { Side } from "../../constants";
 import { SphereGeometry } from "../../geometries/SphereGeometry";
 import { MeshBasicMaterial } from "../../materials/MeshBasicMaterial";
 import type { Color } from "../../math/Color";
@@ -10,7 +10,7 @@ export class ColorEnvironment extends Scene {
   constructor(color: number | Color = 0xffffff) {
     super();
     this.name = "ColorEnvironment";
-    this.add(new Mesh(new SphereGeometry(1, 16, 16), new MeshBasicMaterial({ color, side: BackSide })));
+    this.add(new Mesh(new SphereGeometry(1, 16, 16), new MeshBasicMaterial({ color, side: Side.Back })));
   }
 
   dispose(): void {

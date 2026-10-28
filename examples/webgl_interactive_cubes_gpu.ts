@@ -2,7 +2,7 @@ import { TrackballControls } from "ek3d/addons/controls/TrackballControls";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { mergeGeometries } from "ek3d/addons/utils/BufferGeometryUtils";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { GLSL3, IntType, RGBAIntegerFormat } from "ek3d/constants";
+import { GLSL, TextureType, PixelFormat } from "ek3d/constants";
 import { Float32BufferAttribute, Int16BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
@@ -36,9 +36,13 @@ const light = new DirectionalLight(0xffffff, 3);
 light.position.set(0, 500, 2000);
 scene.add(light);
 const pickingScene = new Scene();
-const target = new WebGLRenderTarget(1, 1, { type: IntType, format: RGBAIntegerFormat, internalFormat: "RGBA32I" });
+const target = new WebGLRenderTarget(1, 1, {
+  type: TextureType.Int,
+  format: PixelFormat.RGBAInteger,
+  internalFormat: "RGBA32I",
+});
 const pickingMaterial = new ShaderMaterial({
-  glslVersion: GLSL3,
+  glslVersion: GLSL.GLSL3,
   vertexShader: `attribute int id;
 flat varying int vid;
 void main() { vid = id; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
@@ -71,7 +75,7 @@ for (let i = 0; i < 5000; i++) {
   }
   ids.fill(i);
   const id = new Int16BufferAttribute(ids, 1);
-  id.gpuType = IntType;
+  id.gpuType = TextureType.Int;
   geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
   geometry.setAttribute("id", id);
   geometries.push(geometry);

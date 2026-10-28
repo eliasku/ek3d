@@ -1,7 +1,7 @@
 import { ArcballControls } from "ek3d/addons/controls/ArcballControls";
 import { OBJLoader } from "ek3d/addons/loaders/OBJLoader";
 import { HDRLoader } from "ek3d/addons/loaders/HDRLoader";
-import { EquirectangularReflectionMapping, SRGBColorSpace, RepeatWrapping, ReinhardToneMapping } from "ek3d/constants";
+import { Mapping, ColorSpace, Wrapping, ToneMapping } from "ek3d/constants";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { MeshStandardMaterial } from "ek3d/materials/MeshStandardMaterial";
@@ -98,7 +98,7 @@ renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.toneMapping = ReinhardToneMapping;
+renderer.toneMapping = ToneMapping.Reinhard;
 renderer.toneMappingExposure = 3;
 (canvas as HTMLCanvasElement).style.background =
   "linear-gradient( 180deg, rgba( 0,0,0,1 ) 0%, rgba( 128,128,255,1 ) 100% )";
@@ -117,16 +117,16 @@ new OBJLoader().setPath("/examples/models/obj/cerberus/").load("Cerberus.obj", f
   material.metalness = 1;
 
   const diffuseMap = textureLoader.load("Cerberus_A.jpg", render);
-  diffuseMap.colorSpace = SRGBColorSpace;
+  diffuseMap.colorSpace = ColorSpace.SRGB;
   material.map = diffuseMap;
 
   material.metalnessMap = material.roughnessMap = textureLoader.load("Cerberus_RM.jpg", render);
   material.normalMap = textureLoader.load("Cerberus_N.jpg", render);
 
-  material.map!.wrapS = RepeatWrapping;
-  material.roughnessMap!.wrapS = RepeatWrapping;
-  material.metalnessMap!.wrapS = RepeatWrapping;
-  material.normalMap!.wrapS = RepeatWrapping;
+  material.map!.wrapS = Wrapping.Repeat;
+  material.roughnessMap!.wrapS = Wrapping.Repeat;
+  material.metalnessMap!.wrapS = Wrapping.Repeat;
+  material.normalMap!.wrapS = Wrapping.Repeat;
 
   group.traverse(function (child: Mesh) {
     if (child.isMesh) {
@@ -140,7 +140,7 @@ new OBJLoader().setPath("/examples/models/obj/cerberus/").load("Cerberus.obj", f
   render();
 
   new HDRLoader().setPath("/examples/textures/equirectangular/").load("venice_sunset_1k.hdr", function (hdrEquirect) {
-    hdrEquirect.mapping = EquirectangularReflectionMapping;
+    hdrEquirect.mapping = Mapping.EquirectangularReflection;
 
     scene.environment = hdrEquirect;
 

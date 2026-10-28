@@ -3,7 +3,7 @@ import { TextGeometry } from "ek3d/addons/geometries/TextGeometry";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { FontLoader } from "ek3d/addons/loaders/FontLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { BackSide, RedFormat } from "ek3d/constants";
+import { Side, PixelFormat } from "ek3d/constants";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { PointLight } from "ek3d/lights/PointLight";
@@ -48,7 +48,7 @@ let disposed = false;
 let frames = 0;
 canvas.dataset.state = "loading";
 const outline = new ShaderMaterial({
-  side: BackSide,
+  side: Side.Back,
   vertexShader: `void main() {
     vec4 pos = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     vec4 pos2 = projectionMatrix * modelViewMatrix * vec4(position - normal, 1.0);
@@ -69,7 +69,7 @@ new FontLoader(manager).load(
     for (let alpha = 0, index = 0; alpha <= 1; alpha += 0.2, index++) {
       const colors = new Uint8Array(index + 2);
       for (let c = 0; c < colors.length; c++) colors[c] = (c / colors.length) * 256;
-      const gradientMap = new DataTexture(colors, colors.length, 1, RedFormat);
+      const gradientMap = new DataTexture(colors, colors.length, 1, PixelFormat.Red);
       gradientMap.needsUpdate = true;
       for (let beta = 0; beta <= 1; beta += 0.2)
         for (let gamma = 0; gamma <= 1; gamma += 0.2) {

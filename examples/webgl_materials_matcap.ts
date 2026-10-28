@@ -2,7 +2,7 @@ import { EXRLoader } from "ek3d/addons/loaders/EXRLoader";
 import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
-import { ACESFilmicToneMapping, SRGBColorSpace } from "ek3d/constants";
+import { ToneMapping, ColorSpace } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { Color } from "ek3d/math/Color";
 import { Mesh } from "ek3d/objects/Mesh";
@@ -58,7 +58,7 @@ async function init(): Promise<void> {
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   // tone mapping
-  renderer.toneMapping = ACESFilmicToneMapping;
+  renderer.toneMapping = ToneMapping.ACESFilmic;
   renderer.toneMappingExposure = API.exposure;
 
   // scene
@@ -235,7 +235,7 @@ function handleJPG(dataUrl: string): void {
 
     const texture = new Texture(img);
 
-    texture.colorSpace = SRGBColorSpace;
+    texture.colorSpace = ColorSpace.SRGB;
 
     updateMatcap(texture);
   };

@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { FontLoader } from "ek3d/addons/loaders/FontLoader";
 import { TextGeometry } from "ek3d/addons/geometries/TextGeometry";
 import { LoadingManager } from "ek3d/loaders/LoadingManager";
@@ -95,7 +96,7 @@ export async function verifyFontText() {
     renderer.setSize(viewport, viewport);
     renderer.render(scene, camera);
     const pixels = new Uint8Array(viewport * viewport * 4);
-    gl.readPixels(0, 0, viewport, viewport, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+    gl.readPixels(0, 0, viewport, viewport, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
     const sample = (x: number, y: number) => {
       const px = Math.min(viewport - 1, Math.max(0, Math.floor(((x - left) / (right - left)) * viewport)));
       const py = Math.min(viewport - 1, Math.max(0, Math.floor(((y - bottom) / (top - bottom)) * viewport)));
@@ -114,7 +115,7 @@ export async function verifyFontText() {
     const stem = sample(box.min.x + (box.max.x - box.min.x) * 0.08, (box.min.y + box.max.y) / 2);
     check(stem > 200, `glyph stem must be filled, sampled ${stem}`);
     const glError = gl.getError();
-    check(glError === gl.NO_ERROR, "text rendering must not raise a WebGL error");
+    check(glError === GL.NO_ERROR, "text rendering must not raise a WebGL error");
     checks.push("hole interiors stay empty while glyph faces render");
 
     const corruptURL = "data:application/json,%7Bbroken";

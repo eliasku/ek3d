@@ -3,7 +3,7 @@ import { LightProbeGridHelperWebGL } from "ek3d/addons/helpers/LightProbeGridHel
 import { LightProbeGridWebGL } from "ek3d/addons/lighting/LightProbeGridWebGL";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping, BackSide } from "ek3d/constants";
+import { ToneMapping, Side } from "ek3d/constants";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { ConeGeometry } from "ek3d/geometries/ConeGeometry";
 import { CylinderGeometry } from "ek3d/geometries/CylinderGeometry";
@@ -31,7 +31,7 @@ const camera = new PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 100);
 camera.position.set(0, 2.5, 16);
 // Materials
 
-const wallMaterial = new MeshStandardMaterial({ color: 0xcccccc, side: BackSide });
+const wallMaterial = new MeshStandardMaterial({ color: 0xcccccc, side: Side.Back });
 const whiteMat = new MeshStandardMaterial({ color: 0xeeeeee });
 
 // Room shell: x=-8 to 8, z=-4 to 4, y=0 to 5
@@ -209,7 +209,7 @@ const renderer = new WebGLRenderer({
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap!.enabled = true;
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 2.5, 0);
 controls.update();

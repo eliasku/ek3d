@@ -1,4 +1,4 @@
-import { FrontSide, HalfFloatType } from "../../constants";
+import { Side, TextureType } from "../../constants";
 import { Color } from "../../math/Color";
 import { Matrix4 } from "../../math/Matrix4";
 import { Plane } from "../../math/Plane";
@@ -62,7 +62,7 @@ export interface WaterOptions {
   /** The distortion scale. */
   distortionScale?: number;
   /** The water material's `side` property. */
-  side?: number;
+  side?: Side;
   /** Whether the water should be affected by fog or not. */
   fog?: boolean;
 }
@@ -144,11 +144,11 @@ export class Water extends Mesh<ShaderMaterial> {
     const waterColor = new Color(options.waterColor !== undefined ? options.waterColor : 0x7f7f7f);
     const eye = options.eye !== undefined ? options.eye : new Vector3(0, 0, 0);
     const distortionScale = options.distortionScale !== undefined ? options.distortionScale : 20.0;
-    const side = options.side !== undefined ? options.side : FrontSide;
+    const side = options.side !== undefined ? options.side : Side.Front;
     const fog = options.fog !== undefined ? options.fog : false;
 
     const textureMatrix = new Matrix4();
-    const renderTarget = new WebGLRenderTarget(textureWidth, textureHeight, { type: HalfFloatType });
+    const renderTarget = new WebGLRenderTarget(textureWidth, textureHeight, { type: TextureType.HalfFloat });
 
     const mirrorShader = {
       name: "MirrorShader",

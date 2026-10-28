@@ -1,6 +1,7 @@
-import { IntType } from "../../constants";
+import { GL } from "../../GL";
+import { TextureType } from "../../constants";
 export function WebGLBindingStates(gl?: any, attributes?: any) {
-  const maxVertexAttributes = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
+  const maxVertexAttributes = gl.getParameter(GL.MAX_VERTEX_ATTRIBS);
   const bindingStates: any = {};
   const defaultState = createBindingState(null);
   let currentState = defaultState;
@@ -15,13 +16,13 @@ export function WebGLBindingStates(gl?: any, attributes?: any) {
     updateBuffers = needsUpdate(object, geometry, program, index);
     if (updateBuffers) saveCache(object, geometry, program, index);
     if (index !== null) {
-      attributes.update(index, gl.ELEMENT_ARRAY_BUFFER);
+      attributes.update(index, GL.ELEMENT_ARRAY_BUFFER);
     }
     if (updateBuffers || forceUpdate) {
       forceUpdate = false;
       setupVertexAttributes(object, material, program, geometry);
       if (index !== null) {
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, attributes.get(index).buffer);
+        gl.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, attributes.get(index).buffer);
       }
     }
   }
@@ -203,7 +204,7 @@ export function WebGLBindingStates(gl?: any, attributes?: any) {
           const type = attribute.type;
           const bytesPerElement = attribute.bytesPerElement;
           // check for integer attributes
-          const integer = type === gl.INT || type === gl.UNSIGNED_INT || geometryAttribute.gpuType === IntType;
+          const integer = type === GL.INT || type === GL.UNSIGNED_INT || geometryAttribute.gpuType === TextureType.Int;
           if (geometryAttribute.isInterleavedBufferAttribute) {
             // interleaved attributes can also view a buffer attribute, e.g. the columns of instance matrices
             const data = geometryAttribute.data;
@@ -221,7 +222,7 @@ export function WebGLBindingStates(gl?: any, attributes?: any) {
                 enableAttribute(programAttribute.location + i);
               }
             }
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bindBuffer(GL.ARRAY_BUFFER, buffer);
             for (let i = 0; i < programAttribute.locationSize; i++) {
               vertexAttribPointer(
                 programAttribute.location + i,
@@ -246,7 +247,7 @@ export function WebGLBindingStates(gl?: any, attributes?: any) {
                 enableAttribute(programAttribute.location + i);
               }
             }
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bindBuffer(GL.ARRAY_BUFFER, buffer);
             for (let i = 0; i < programAttribute.locationSize; i++) {
               vertexAttribPointer(
                 programAttribute.location + i,

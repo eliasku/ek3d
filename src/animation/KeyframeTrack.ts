@@ -3,7 +3,7 @@ import type { AnimationBufferConstructor } from "../math/Interpolant";
 import type { Interpolant } from "../math/Interpolant";
 import type { InterpolantSettings } from "../math/Interpolant";
 import type { NumericAnimationBuffer } from "../math/Interpolant";
-import { InterpolateLinear, InterpolateSmooth, InterpolateDiscrete, InterpolateBezier } from "../constants";
+import { Interpolation } from "../constants";
 import { CubicInterpolant } from "../math/interpolants/CubicInterpolant";
 import { LinearInterpolant } from "../math/interpolants/LinearInterpolant";
 import { DiscreteInterpolant } from "../math/interpolants/DiscreteInterpolant";
@@ -65,10 +65,10 @@ export class KeyframeTrack {
   }
 
   /** The default interpolation type. */
-  get DefaultInterpolation(): number {
-    return InterpolateLinear;
+  get DefaultInterpolation(): Interpolation {
+    return Interpolation.Linear;
   }
-  set DefaultInterpolation(value: number) {
+  set DefaultInterpolation(value: Interpolation) {
     Object.defineProperty(this, "DefaultInterpolation", {
       value,
       writable: true,
@@ -85,7 +85,7 @@ export class KeyframeTrack {
    * @param values - A list of keyframe values.
    * @param [interpolation] - The interpolation type.
    */
-  constructor(name: string, times: NumericAnimationBuffer, values: AnimationBuffer, interpolation?: number) {
+  constructor(name: string, times: NumericAnimationBuffer, values: AnimationBuffer, interpolation?: Interpolation) {
     if (name === undefined) throw new Error("THREE.KeyframeTrack: track name is undefined");
     if (times === undefined || times.length === 0)
       throw new Error("THREE.KeyframeTrack: no keyframes in track named " + name);
@@ -213,20 +213,20 @@ export class KeyframeTrack {
    * @param interpolation - The interpolation type.
    * @return A reference to this keyframe track.
    */
-  setInterpolation(interpolation: number): this {
+  setInterpolation(interpolation: Interpolation): this {
     let factoryMethod: any;
     /* oxlint-disable typescript/unbound-method -- Store the original factory as this.createInterpolant, preserving its receiver and identity. */
     switch (interpolation) {
-      case InterpolateDiscrete:
+      case Interpolation.Discrete:
         factoryMethod = this.InterpolantFactoryMethodDiscrete;
         break;
-      case InterpolateLinear:
+      case Interpolation.Linear:
         factoryMethod = this.InterpolantFactoryMethodLinear;
         break;
-      case InterpolateSmooth:
+      case Interpolation.Smooth:
         factoryMethod = this.InterpolantFactoryMethodSmooth;
         break;
-      case InterpolateBezier:
+      case Interpolation.Bezier:
         factoryMethod = this.InterpolantFactoryMethodBezier;
         break;
     }
@@ -256,13 +256,13 @@ export class KeyframeTrack {
     /* oxlint-disable typescript/unbound-method -- Compare factory identities without invoking or binding them. */
     switch (this.createInterpolant) {
       case this.InterpolantFactoryMethodDiscrete:
-        return InterpolateDiscrete;
+        return Interpolation.Discrete;
       case this.InterpolantFactoryMethodLinear:
-        return InterpolateLinear;
+        return Interpolation.Linear;
       case this.InterpolantFactoryMethodSmooth:
-        return InterpolateSmooth;
+        return Interpolation.Smooth;
       case this.InterpolantFactoryMethodBezier:
-        return InterpolateBezier;
+        return Interpolation.Bezier;
     }
     /* oxlint-enable typescript/unbound-method */
   }
@@ -407,7 +407,7 @@ export class KeyframeTrack {
     const times = this.times.slice(),
       values = this.values.slice(),
       stride = this.getValueSize(),
-      smoothInterpolation = this.getInterpolation() === InterpolateSmooth,
+      smoothInterpolation = this.getInterpolation() === Interpolation.Smooth,
       lastIndex = times.length - 1;
     let writeIndex = 1;
     for (let i = 1; i < lastIndex; ++i) {

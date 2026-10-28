@@ -3,7 +3,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { SunLight } from "ek3d/addons/lights/SunLight";
 import { Sky } from "ek3d/addons/objects/Sky";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { Object3D } from "ek3d/core/Object3D";
 import { Timer } from "ek3d/core/Timer";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
@@ -51,7 +51,7 @@ const renderer = new WebGLRenderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap!.enabled = true;
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 0.6;
 
 const scene = new Scene();

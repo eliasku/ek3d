@@ -13,7 +13,7 @@ import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { WebGLRenderTarget } from "ek3d/renderers/WebGLRenderTarget";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { Scene } from "ek3d/scenes/Scene";
-import { LinearFilter, SRGBColorSpace } from "ek3d/constants";
+import { TextureFilter, ColorSpace } from "ek3d/constants";
 
 const canvas = document.querySelector<HTMLCanvasElement>("#scene");
 if (canvas === null) throw new Error("Missing masking example canvas");
@@ -51,11 +51,11 @@ const maskPass2 = new MaskPass(scene2, camera);
 
 const loader = new TextureLoader();
 const texture1 = await loader.loadAsync("/examples/textures/masking-layer1.png");
-texture1.colorSpace = SRGBColorSpace;
-texture1.minFilter = LinearFilter;
+texture1.colorSpace = ColorSpace.SRGB;
+texture1.minFilter = TextureFilter.Linear;
 texture1.generateMipmaps = false;
 const texture2 = await loader.loadAsync("/examples/textures/masking-layer2.png");
-texture2.colorSpace = SRGBColorSpace;
+texture2.colorSpace = ColorSpace.SRGB;
 
 const texturePass1 = new TexturePass(texture1);
 const texturePass2 = new TexturePass(texture2);

@@ -3,7 +3,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { MD2Character } from "ek3d/addons/misc/MD2Character";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Wrapping, ColorSpace } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
@@ -80,9 +80,9 @@ const groundTexture = new TextureLoader().load(
   undefined,
   fail,
 );
-groundTexture.wrapS = groundTexture.wrapT = RepeatWrapping;
+groundTexture.wrapS = groundTexture.wrapT = Wrapping.Repeat;
 groundTexture.repeat.set(8, 8);
-groundTexture.colorSpace = SRGBColorSpace;
+groundTexture.colorSpace = ColorSpace.SRGB;
 const groundGeometry = new PlaneGeometry(20, 20);
 const groundMaterial = new MeshPhongMaterial({ color: 0xffffff, map: groundTexture });
 const ground = new Mesh(groundGeometry, groundMaterial);

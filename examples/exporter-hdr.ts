@@ -1,14 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { HDRLoader } from "ek3d/addons/loaders/HDRLoader";
-import {
-  AgXToneMapping,
-  EquirectangularReflectionMapping,
-  FloatType,
-  HalfFloatType,
-  NoToneMapping,
-  RGBAFormat,
-} from "ek3d/constants";
+import { ToneMapping, Mapping, TextureType, PixelFormat } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
@@ -44,11 +37,11 @@ export function startHDRExporterExample(exporter: HDRExampleExporter): void {
   });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.toneMapping = exporter.extension === "ktx2" ? AgXToneMapping : NoToneMapping;
+  renderer.toneMapping = exporter.extension === "ktx2" ? ToneMapping.AgX : ToneMapping.No;
   const camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
   camera.position.set(10, 0, 0);
   const scene = new Scene();
-  const renderTarget = new WebGLRenderTarget(1024, 512, { type: HalfFloatType });
+  const renderTarget = new WebGLRenderTarget(1024, 512, { type: TextureType.HalfFloat });
   const controls = new OrbitControls<PerspectiveCamera>(camera, canvas);
   controls.enableDamping = true;
   controls.rotateSpeed = -0.25;
@@ -68,7 +61,7 @@ export function startHDRExporterExample(exporter: HDRExampleExporter): void {
       data[index + 3] = 1;
     }
   }
-  const texture = new DataTexture(data, size, size, RGBAFormat, FloatType);
+  const texture = new DataTexture(data, size, size, PixelFormat.RGBA, TextureType.Float);
   texture.needsUpdate = true;
   const material = new MeshBasicMaterial({ map: texture });
   const geometry = new PlaneGeometry(50, 50);
@@ -98,7 +91,7 @@ export function startHDRExporterExample(exporter: HDRExampleExporter): void {
         loaded.dispose();
         return;
       }
-      loaded.mapping = EquirectangularReflectionMapping;
+      loaded.mapping = Mapping.EquirectangularReflection;
       environment = loaded;
       if (params.target === "render-target") scene.background = loaded;
       canvas.dataset.state = "rendered";
@@ -122,7 +115,7 @@ export function startHDRExporterExample(exporter: HDRExampleExporter): void {
     controls.enabled = target;
     scene.background = target ? environment : new Color(0, 0, 0);
     mesh.visible = !target;
-    if (exporter.extension === "ktx2") renderer.toneMapping = target ? AgXToneMapping : NoToneMapping;
+    if (exporter.extension === "ktx2") renderer.toneMapping = target ? ToneMapping.AgX : ToneMapping.No;
   }
   async function exportFile(): Promise<void> {
     try {

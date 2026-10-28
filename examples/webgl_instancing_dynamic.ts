@@ -1,5 +1,5 @@
 import { RoomEnvironment } from "ek3d/addons/environments/RoomEnvironment";
-import { NeutralToneMapping, SRGBColorSpace, DynamicDrawUsage } from "ek3d/constants";
+import { ToneMapping, ColorSpace, BufferUsage } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { Object3D } from "ek3d/core/Object3D";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
@@ -73,7 +73,7 @@ function init(): void {
   });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.toneMapping = NeutralToneMapping;
+  renderer.toneMapping = ToneMapping.Neutral;
   renderer.setAnimationLoop(animate);
 
   camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
@@ -91,13 +91,13 @@ function init(): void {
 
   const loader = new TextureLoader();
   const texture = loader.load("/examples/textures/edge3.jpg");
-  texture.colorSpace = SRGBColorSpace;
+  texture.colorSpace = ColorSpace.SRGB;
 
   const geometry = new BoxGeometry();
   const material = new MeshStandardMaterial({ map: texture });
 
   mesh = new InstancedMesh(geometry, material, count);
-  mesh.instanceMatrix.setUsage(DynamicDrawUsage); // will be updated every frame
+  mesh.instanceMatrix.setUsage(BufferUsage.DynamicDraw); // will be updated every frame
   scene.add(mesh);
 
   let i = 0;

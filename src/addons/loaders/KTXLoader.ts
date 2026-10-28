@@ -114,10 +114,10 @@ class KhronosTextureContainer {
  *
  * ```typescript
  * import { KTXLoader } from "ek3d/addons/loaders/KTXLoader";
- * import { SRGBColorSpace } from "ek3d/constants";
+ * import { ColorSpace } from "ek3d/constants";
  *
  * const map = await new KTXLoader().loadAsync("textures/compressed/disturb_BC1.ktx");
- * map.colorSpace = SRGBColorSpace; // only for color textures
+ * map.colorSpace = ColorSpace.SRGB; // only for color textures
  * ```
  */
 export class KTXLoader extends CompressedTextureLoader {

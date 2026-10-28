@@ -32,14 +32,7 @@ import { Mesh } from "../../../objects/Mesh";
 import { Skeleton } from "../../../objects/Skeleton";
 import { SkinnedMesh } from "../../../objects/SkinnedMesh";
 import { Texture } from "../../../textures/Texture";
-import {
-  ClampToEdgeWrapping,
-  LinearSRGBColorSpace,
-  MirroredRepeatWrapping,
-  NoColorSpace,
-  RepeatWrapping,
-  SRGBColorSpace,
-} from "../../../constants";
+import { Wrapping, ColorSpace } from "../../../constants";
 import type { USDAData, USDAValue } from "./USDAParser";
 import type { USDCData, USDCValue } from "./USDCParser";
 
@@ -1098,7 +1091,7 @@ export class USDComposer {
     if (displayColor && displayColor.length >= 3) {
       const applyDisplayColor = (mat: MeshPhysicalMaterial) => {
         if (mat.color && mat.color.r === 1 && mat.color.g === 1 && mat.color.b === 1 && !mat.map) {
-          mat.color.setRGB(displayColor[0], displayColor[1], displayColor[2], LinearSRGBColorSpace);
+          mat.color.setRGB(displayColor[0], displayColor[1], displayColor[2], ColorSpace.LinearSRGB);
         }
       };
 
@@ -2485,9 +2478,9 @@ export class USDComposer {
     };
 
     // Diffuse color / base color map
-    applyTexture("inputs:diffuseColor", "map", SRGBColorSpace, (color) => {
+    applyTexture("inputs:diffuseColor", "map", ColorSpace.SRGB, (color) => {
       if (Array.isArray(color) && color.length >= 3) {
-        material.color.setRGB(color[0], color[1], color[2], LinearSRGBColorSpace);
+        material.color.setRGB(color[0], color[1], color[2], ColorSpace.LinearSRGB);
       }
     });
 
@@ -2495,14 +2488,14 @@ export class USDComposer {
     if (material.map && material.map.userData.scale) {
       const scale = material.map.userData.scale;
       if (Array.isArray(scale) && scale.length >= 3) {
-        material.color.setRGB(scale[0], scale[1], scale[2], LinearSRGBColorSpace);
+        material.color.setRGB(scale[0], scale[1], scale[2], ColorSpace.LinearSRGB);
       }
     }
 
     // Emissive
-    applyTexture("inputs:emissiveColor", "emissiveMap", SRGBColorSpace, (color) => {
+    applyTexture("inputs:emissiveColor", "emissiveMap", ColorSpace.SRGB, (color) => {
       if (Array.isArray(color) && color.length >= 3) {
-        material.emissive.setRGB(color[0], color[1], color[2], LinearSRGBColorSpace);
+        material.emissive.setRGB(color[0], color[1], color[2], ColorSpace.LinearSRGB);
       }
     });
 
@@ -2510,7 +2503,7 @@ export class USDComposer {
       if (material.emissiveMap.userData.scale) {
         const scale = material.emissiveMap.userData.scale;
         if (Array.isArray(scale) && scale.length >= 3) {
-          material.emissive.setRGB(scale[0], scale[1], scale[2], LinearSRGBColorSpace);
+          material.emissive.setRGB(scale[0], scale[1], scale[2], ColorSpace.LinearSRGB);
         }
       } else {
         material.emissive.set(0xffffff);
@@ -2518,7 +2511,7 @@ export class USDComposer {
     }
 
     // Normal map
-    applyTexture("inputs:normal", "normalMap", NoColorSpace, null);
+    applyTexture("inputs:normal", "normalMap", ColorSpace.No, null);
 
     // Apply normal map scale from UsdUVTexture scale input
     if (material.normalMap && material.normalMap.userData.scale) {
@@ -2528,7 +2521,7 @@ export class USDComposer {
     }
 
     // Roughness
-    const hasRoughnessMap = applyTexture("inputs:roughness", "roughnessMap", NoColorSpace, (value) => {
+    const hasRoughnessMap = applyTexture("inputs:roughness", "roughnessMap", ColorSpace.No, (value) => {
       material.roughness = value as number;
     });
 
@@ -2537,7 +2530,7 @@ export class USDComposer {
     }
 
     // Metallic
-    const hasMetalnessMap = applyTexture("inputs:metallic", "metalnessMap", NoColorSpace, (value) => {
+    const hasMetalnessMap = applyTexture("inputs:metallic", "metalnessMap", ColorSpace.No, (value) => {
       material.metalness = value as number;
     });
 
@@ -2546,7 +2539,7 @@ export class USDComposer {
     }
 
     // Occlusion
-    applyTexture("inputs:occlusion", "aoMap", NoColorSpace, null);
+    applyTexture("inputs:occlusion", "aoMap", ColorSpace.No, null);
 
     // IOR
     if (fields["inputs:ior"] !== undefined) {
@@ -2554,9 +2547,9 @@ export class USDComposer {
     }
 
     // Specular color
-    applyTexture("inputs:specularColor", "specularColorMap", SRGBColorSpace, (color) => {
+    applyTexture("inputs:specularColor", "specularColorMap", ColorSpace.SRGB, (color) => {
       if (Array.isArray(color) && color.length >= 3) {
-        material.specularColor.setRGB(color[0], color[1], color[2], LinearSRGBColorSpace);
+        material.specularColor.setRGB(color[0], color[1], color[2], ColorSpace.LinearSRGB);
       }
     });
 
@@ -2564,7 +2557,7 @@ export class USDComposer {
     if (material.specularColorMap && material.specularColorMap.userData.scale) {
       const scale = material.specularColorMap.userData.scale;
       if (Array.isArray(scale) && scale.length >= 3) {
-        material.specularColor.setRGB(scale[0], scale[1], scale[2], LinearSRGBColorSpace);
+        material.specularColor.setRGB(scale[0], scale[1], scale[2], ColorSpace.LinearSRGB);
       }
     }
 
@@ -2628,9 +2621,9 @@ export class USDComposer {
     };
 
     // Base color (diffuse)
-    applyTexture("inputs:base_color", "map", SRGBColorSpace, (color) => {
+    applyTexture("inputs:base_color", "map", ColorSpace.SRGB, (color) => {
       if (Array.isArray(color) && color.length >= 3) {
-        material.color.setRGB(color[0], color[1], color[2], LinearSRGBColorSpace);
+        material.color.setRGB(color[0], color[1], color[2], ColorSpace.LinearSRGB);
       }
     });
 
@@ -2638,28 +2631,28 @@ export class USDComposer {
     if (material.map && material.map.userData.scale) {
       const scale = material.map.userData.scale;
       if (Array.isArray(scale) && scale.length >= 3) {
-        material.color.setRGB(scale[0], scale[1], scale[2], LinearSRGBColorSpace);
+        material.color.setRGB(scale[0], scale[1], scale[2], ColorSpace.LinearSRGB);
       }
     }
 
     // Base metalness
-    applyTexture("inputs:base_metalness", "metalnessMap", NoColorSpace, (value) => {
+    applyTexture("inputs:base_metalness", "metalnessMap", ColorSpace.No, (value) => {
       if (typeof value === "number") {
         material.metalness = value as number;
       }
     });
 
     // Specular roughness
-    applyTexture("inputs:specular_roughness", "roughnessMap", NoColorSpace, (value) => {
+    applyTexture("inputs:specular_roughness", "roughnessMap", ColorSpace.No, (value) => {
       if (typeof value === "number") {
         material.roughness = value as number;
       }
     });
 
     // Emission color
-    const hasEmissionMap = applyTexture("inputs:emission_color", "emissiveMap", SRGBColorSpace, (color) => {
+    const hasEmissionMap = applyTexture("inputs:emission_color", "emissiveMap", ColorSpace.SRGB, (color) => {
       if (Array.isArray(color) && color.length >= 3) {
-        material.emissive.setRGB(color[0], color[1], color[2], LinearSRGBColorSpace);
+        material.emissive.setRGB(color[0], color[1], color[2], ColorSpace.LinearSRGB);
       }
     });
 
@@ -2694,7 +2687,7 @@ export class USDComposer {
           transmissionColor[0],
           transmissionColor[1],
           transmissionColor[2],
-          LinearSRGBColorSpace,
+          ColorSpace.LinearSRGB,
         );
         material.attenuationDistance = transmissionDepth || 1.0;
       }
@@ -2760,7 +2753,7 @@ export class USDComposer {
     const specularColor = fields["inputs:specular_color"];
 
     if (specularColor !== undefined && Array.isArray(specularColor)) {
-      material.specularColor.setRGB(specularColor[0], specularColor[1], specularColor[2], LinearSRGBColorSpace);
+      material.specularColor.setRGB(specularColor[0], specularColor[1], specularColor[2], ColorSpace.LinearSRGB);
     }
 
     // Anisotropy
@@ -2771,7 +2764,7 @@ export class USDComposer {
     }
 
     // Geometry normal (normal map)
-    applyTexture("inputs:geometry_normal", "normalMap", NoColorSpace, null);
+    applyTexture("inputs:geometry_normal", "normalMap", ColorSpace.No, null);
   }
 
   _getTextureFromOpenPBRConnection(connPath: string): Texture | null {
@@ -3112,10 +3105,10 @@ export class USDComposer {
   }
 
   _getWrapMode(wrapValue: unknown): Texture["wrapS"] {
-    if (wrapValue === "repeat") return RepeatWrapping;
-    if (wrapValue === "mirror") return MirroredRepeatWrapping;
-    if (wrapValue === "clamp") return ClampToEdgeWrapping;
-    return RepeatWrapping;
+    if (wrapValue === "repeat") return Wrapping.Repeat;
+    if (wrapValue === "mirror") return Wrapping.MirroredRepeat;
+    if (wrapValue === "clamp") return Wrapping.ClampToEdge;
+    return Wrapping.Repeat;
   }
 
   _buildSkeleton(path: string): SkeletonData | null {

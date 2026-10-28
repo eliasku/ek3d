@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { EffectComposer } from "ek3d/addons/postprocessing/EffectComposer";
 import { OutputPass } from "ek3d/addons/postprocessing/OutputPass";
 import { RenderPass } from "ek3d/addons/postprocessing/RenderPass";
@@ -62,11 +63,11 @@ export function verifyPostprocessing() {
     const readPixels = () => {
       const size = renderer.getDrawingBufferSize(new Vector2());
       const pixels = new Uint8Array(size.x * size.y * 4);
-      const previous = gl.getParameter(gl.READ_FRAMEBUFFER_BINDING) as WebGLFramebuffer | null;
-      gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
-      gl.readPixels(0, 0, size.x, size.y, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-      gl.bindFramebuffer(gl.READ_FRAMEBUFFER, previous);
-      check(gl.getError() === gl.NO_ERROR, "Postprocessing produced a WebGL error");
+      const previous = gl.getParameter(GL.READ_FRAMEBUFFER_BINDING) as WebGLFramebuffer | null;
+      gl.bindFramebuffer(GL.READ_FRAMEBUFFER, null);
+      gl.readPixels(0, 0, size.x, size.y, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+      gl.bindFramebuffer(GL.READ_FRAMEBUFFER, previous);
+      check(gl.getError() === GL.NO_ERROR, "Postprocessing produced a WebGL error");
       return pixels;
     };
 
@@ -107,7 +108,7 @@ export function verifyPostprocessing() {
     readPixels();
 
     const glError = gl.getError();
-    check(glError === gl.NO_ERROR, "Postprocessing rendering produced a WebGL error");
+    check(glError === GL.NO_ERROR, "Postprocessing rendering produced a WebGL error");
     return { glError: 0 };
   } finally {
     composer.dispose();

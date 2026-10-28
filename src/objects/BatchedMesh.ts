@@ -11,7 +11,7 @@ import { TextureSource } from "../textures/TextureSource";
 import { BufferAttribute } from "../core/BufferAttribute";
 import { BufferGeometry } from "../core/BufferGeometry";
 import { DataTexture } from "../textures/DataTexture";
-import { FloatType, RedIntegerFormat, UnsignedIntType, RGBAFormat } from "../constants";
+import { TextureType, PixelFormat } from "../constants";
 import { Matrix4 } from "../math/Matrix4";
 import { Mesh } from "./Mesh";
 import { ColorManagement } from "../math/ColorManagement";
@@ -368,14 +368,14 @@ export class BatchedMesh extends Mesh {
     size = Math.ceil(size / 4) * 4;
     size = Math.max(size, 4);
     const matricesArray = new Float32Array(size * size * 4); // 4 floats per RGBA pixel
-    const matricesTexture = new DataTexture(matricesArray, size, size, RGBAFormat, FloatType);
+    const matricesTexture = new DataTexture(matricesArray, size, size, PixelFormat.RGBA, TextureType.Float);
     this._matricesTexture = matricesTexture;
   }
   _initIndirectTexture() {
     let size = Math.sqrt(this._maxInstanceCount);
     size = Math.ceil(size);
     const indirectArray = new Uint32Array(size * size);
-    const indirectTexture = new DataTexture(indirectArray, size, size, RedIntegerFormat, UnsignedIntType);
+    const indirectTexture = new DataTexture(indirectArray, size, size, PixelFormat.RedInteger, TextureType.UnsignedInt);
     this._indirectTexture = indirectTexture;
   }
   _initColorsTexture() {
@@ -383,7 +383,7 @@ export class BatchedMesh extends Mesh {
     size = Math.ceil(size);
     // 4 floats per RGBA pixel initialized to white
     const colorsArray = new Float32Array(size * size * 4).fill(1);
-    const colorsTexture = new DataTexture(colorsArray, size, size, RGBAFormat, FloatType);
+    const colorsTexture = new DataTexture(colorsArray, size, size, PixelFormat.RGBA, TextureType.Float);
     colorsTexture.colorSpace = ColorManagement.workingColorSpace;
     this._colorsTexture = colorsTexture;
   }

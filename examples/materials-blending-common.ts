@@ -1,5 +1,5 @@
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Wrapping, ColorSpace } from "ek3d/constants";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
@@ -31,8 +31,8 @@ export function blendingScene(fov: number, z: number) {
   ctx.fillStyle = "#777";
   ctx.fillRect(96, 96, 32, 32);
   const background = new CanvasTexture(backgroundCanvas);
-  background.colorSpace = SRGBColorSpace;
-  background.wrapS = background.wrapT = RepeatWrapping;
+  background.colorSpace = ColorSpace.SRGB;
+  background.wrapS = background.wrapT = Wrapping.Repeat;
   background.repeat.set(64, 32);
   scene.background = background;
   const renderer = new WebGLRenderer({
@@ -69,7 +69,7 @@ export function blendingScene(fov: number, z: number) {
         console.error(error);
       },
     );
-    texture.colorSpace = SRGBColorSpace;
+    texture.colorSpace = ColorSpace.SRGB;
     return texture;
   }
   function resize() {
@@ -112,6 +112,6 @@ export function labelMaterial(text: string, background: string, custom = false) 
   ctx.font = custom ? "bold 11pt arial" : "bold 12pt arial";
   ctx.fillText(text, custom ? 8 : 10, 22);
   const map = new CanvasTexture(canvas);
-  map.colorSpace = SRGBColorSpace;
+  map.colorSpace = ColorSpace.SRGB;
   return new MeshBasicMaterial({ map, transparent: true });
 }

@@ -7590,7 +7590,7 @@
       "category": "candidate",
       "reason": "Iteration 34 implements native progressive mesh/texture LOD loading from licensed Needle commit 4d423859641a275d322318b0164bc6dce48d36a4 (3.5.0-rc), deliberately replacing unlicensed 3.2.0. The default main-thread example preserves all three concurrent models and their transforms/animations. Knight base plus 89 LOD files are local under CC BY 4.0; Mobile Home and Peachy Balloon need authorized complete resource graphs. Optional worker transport is explicitly consumer-injected, not vendor getWorker/query compatibility. Remains candidate until the complete authorized resource closure is available.",
       "implementation_path": "examples/webgl_loader_gltf_progressive_lod.ts",
-      "resource_manifest": "examples/public/examples/models/gltf/progressive/resources.json"
+      "resource_manifest": "public/examples/models/gltf/progressive/resources.json"
     },
     {
       "path": "examples/webgl_loader_gltf_sheen.html",

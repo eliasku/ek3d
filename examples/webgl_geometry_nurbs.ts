@@ -1,5 +1,5 @@
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide, RepeatWrapping, SRGBColorSpace } from "ek3d/constants";
+import { Side, Wrapping, ColorSpace } from "ek3d/constants";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
@@ -97,10 +97,10 @@ const map = new TextureLoader().load(
     console.error(error);
   },
 );
-map.wrapS = map.wrapT = RepeatWrapping;
+map.wrapS = map.wrapT = Wrapping.Repeat;
 map.anisotropy = 16;
-map.colorSpace = SRGBColorSpace;
-const material = new MeshLambertMaterial({ map, side: DoubleSide });
+map.colorSpace = ColorSpace.SRGB;
+const material = new MeshLambertMaterial({ map, side: Side.Double });
 const nurbsSurface = new NURBSSurface(2, 3, knotsU, knotsV, surface);
 const surfaceMesh = new Mesh(
   new ParametricGeometry((u, v, target) => nurbsSurface.getPoint(u, v, target), 20, 20),

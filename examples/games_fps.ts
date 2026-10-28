@@ -5,7 +5,7 @@ import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { Capsule } from "ek3d/addons/math/Capsule";
 import { Octree } from "ek3d/addons/math/Octree";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping, VSMShadowMap } from "ek3d/constants";
+import { ToneMapping, ShadowMap } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { IcosahedronGeometry } from "ek3d/geometries/IcosahedronGeometry";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
@@ -74,10 +74,10 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 if (!renderer.shadowMap) throw new Error("Missing shadow renderer");
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = VSMShadowMap;
+renderer.shadowMap.type = ShadowMap.VSM;
 const stats = new Stats();
 document.body.appendChild(stats.dom);
 

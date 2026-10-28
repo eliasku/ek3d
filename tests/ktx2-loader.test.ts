@@ -1,7 +1,7 @@
 import { assert, test } from "vitest";
 import { KTX2Loader } from "../src/addons/loaders/KTX2Loader";
 import { DataTexture } from "../src/textures/DataTexture";
-import { RGBAFormat, UnsignedByteType, SRGBColorSpace, NearestMipmapNearestFilter } from "../src/constants";
+import { PixelFormat, TextureType, ColorSpace, TextureFilter } from "../src/constants";
 import { read } from "../src/addons/loaders/KTX2Container";
 import type { KTX2Container } from "../src/addons/loaders/KTX2Container";
 import fs from "node:fs";
@@ -21,10 +21,10 @@ test("KTX2Loader raw path creates a DataTexture with mipmaps and color space", a
   const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
   const texture = await anyLoader._createTexture(buffer as ArrayBuffer);
   assert.ok(texture instanceof DataTexture);
-  assert.equal(texture.format, RGBAFormat);
-  assert.equal(texture.type, UnsignedByteType);
-  assert.equal(texture.colorSpace, SRGBColorSpace);
-  assert.equal(texture.minFilter, NearestMipmapNearestFilter);
+  assert.equal(texture.format, PixelFormat.RGBA);
+  assert.equal(texture.type, TextureType.UnsignedByte);
+  assert.equal(texture.colorSpace, ColorSpace.SRGB);
+  assert.equal(texture.minFilter, TextureFilter.NearestMipmapNearest);
   assert.equal(texture.mipmaps.length, container.levels.length);
   // premultiply flag from DFD
   assert.equal(texture.premultiplyAlpha, false);

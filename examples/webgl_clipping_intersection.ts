@@ -1,7 +1,7 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { DoubleSide, SRGBColorSpace } from "ek3d/constants";
+import { Side, ColorSpace } from "ek3d/constants";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { PlaneHelper } from "ek3d/helpers/PlaneHelper";
 import { HemisphereLight } from "ek3d/lights/HemisphereLight";
@@ -50,8 +50,8 @@ const group = new Group();
 const materials: MeshPhongMaterial[] = [];
 for (let i = 1; i <= 30; i += 2) {
   const material = new MeshPhongMaterial({
-    color: new Color().setHSL(Math.random(), 0.5, 0.5, SRGBColorSpace),
-    side: DoubleSide,
+    color: new Color().setHSL(Math.random(), 0.5, 0.5, ColorSpace.SRGB),
+    side: Side.Double,
     clippingPlanes: clipPlanes,
     clipIntersection: params.clipIntersection,
     alphaToCoverage: true,

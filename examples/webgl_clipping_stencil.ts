@@ -2,16 +2,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import {
-  AlwaysStencilFunc,
-  BackSide,
-  DecrementWrapStencilOp,
-  DoubleSide,
-  FrontSide,
-  IncrementWrapStencilOp,
-  NotEqualStencilFunc,
-  ReplaceStencilOp,
-} from "ek3d/constants";
+import { StencilFunc, Side, StencilOp } from "ek3d/constants";
 import type { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { Timer } from "ek3d/core/Timer";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
@@ -71,15 +62,15 @@ function createPlaneStencilGroup(geometry: BufferGeometry, plane: Plane, renderO
   base.depthTest = false;
   base.colorWrite = false;
   base.stencilWrite = true;
-  base.stencilFunc = AlwaysStencilFunc;
+  base.stencilFunc = StencilFunc.Always;
   const back = base.clone();
-  back.side = BackSide;
+  back.side = Side.Back;
   back.clippingPlanes = [plane];
-  back.stencilFail = back.stencilZFail = back.stencilZPass = IncrementWrapStencilOp;
+  back.stencilFail = back.stencilZFail = back.stencilZPass = StencilOp.IncrementWrap;
   const front = base.clone();
-  front.side = FrontSide;
+  front.side = Side.Front;
   front.clippingPlanes = [plane];
-  front.stencilFail = front.stencilZFail = front.stencilZPass = DecrementWrapStencilOp;
+  front.stencilFail = front.stencilZFail = front.stencilZPass = StencilOp.DecrementWrap;
   base.dispose();
   const backMesh = new Mesh(geometry, back);
   const frontMesh = new Mesh(geometry, front);
@@ -100,10 +91,10 @@ const planeObjects = planes.map((plane, i) => {
     clippingPlanes: planes.filter((other) => other !== plane),
     stencilWrite: true,
     stencilRef: 0,
-    stencilFunc: NotEqualStencilFunc,
-    stencilFail: ReplaceStencilOp,
-    stencilZFail: ReplaceStencilOp,
-    stencilZPass: ReplaceStencilOp,
+    stencilFunc: StencilFunc.NotEqual,
+    stencilFail: StencilOp.Replace,
+    stencilZFail: StencilOp.Replace,
+    stencilZPass: StencilOp.Replace,
   });
   const mesh = new Mesh(planeGeometry, material);
   mesh.onAfterRender = (renderer) => renderer.clearStencil();
@@ -120,7 +111,7 @@ const material = new MeshStandardMaterial({
   roughness: 0.75,
   clippingPlanes: planes,
   clipShadows: true,
-  shadowSide: DoubleSide,
+  shadowSide: Side.Double,
 });
 const clipped = new Mesh(geometry, material);
 clipped.castShadow = true;
@@ -128,7 +119,7 @@ clipped.renderOrder = 6;
 object.add(clipped);
 const ground = new Mesh(
   new PlaneGeometry(9, 9, 1, 1),
-  new ShadowMaterial({ color: 0x000000, opacity: 0.25, side: DoubleSide }),
+  new ShadowMaterial({ color: 0x000000, opacity: 0.25, side: Side.Double }),
 );
 ground.rotation.x = -Math.PI / 2;
 ground.position.y = -1;

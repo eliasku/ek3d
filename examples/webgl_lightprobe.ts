@@ -3,7 +3,7 @@ import { LightProbeHelper } from "ek3d/addons/helpers/LightProbeHelper";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { LightProbeGenerator } from "ek3d/addons/lights/LightProbeGenerator";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { NoToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
 import { LightProbe } from "ek3d/lights/LightProbe";
@@ -36,7 +36,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = NoToneMapping;
+renderer.toneMapping = ToneMapping.No;
 const controls = new OrbitControls(camera, canvas);
 controls.minDistance = 10;
 controls.maxDistance = 50;

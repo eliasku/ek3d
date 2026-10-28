@@ -246,7 +246,7 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
      * contains strength as `[0, 1]` to be multiplied by `anisotropy`.
      *
      * `anisotropyMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -256,7 +256,7 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
      * for per-pixel control over a coating's intensity.
      *
      * `clearcoatMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -272,7 +272,7 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
      * `clearcoatRoughness`, for per-pixel control over a coating's roughness.
      *
      * `clearcoatRoughnessMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -288,7 +288,7 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
      * Can be used to enable independent normals for the clear coat layer.
      *
      * `clearcoatNormalMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -298,7 +298,7 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
      * for per-pixel control over the diffuse roughness.
      *
      * `diffuseRoughnessMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -334,7 +334,7 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
      * control over iridescence.
      *
      * `iridescenceMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -368,7 +368,7 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
      * - Values in-between will linearly interpolate between both values.
      *
      * `iridescenceThicknessMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -385,7 +385,7 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
      *
      * `sheenColorMap` represents color data, and the texture must be assigned a
      * {@link Texture#colorSpace}. Most `sheenColorMap` textures set
-     * `texture.colorSpace = SRGBColorSpace`.
+     * `texture.colorSpace = ColorSpace.SRGB`.
      *
      * @default null
      */
@@ -401,7 +401,7 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
      * over sheen roughness.
      *
      * `sheenRoughnessMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -411,7 +411,7 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
      * optical transparency.
      *
      * `transmissionMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -429,7 +429,7 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
      * be multiplied by `thickness`.
      *
      * `thicknessMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -461,7 +461,7 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
      * for per-pixel control over specular intensity.
      *
      * `specularIntensityMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = NoColorSpace` (default).
+     * `texture.colorSpace = ColorSpace.No` (default).
      *
      * @default null
      */
@@ -478,7 +478,7 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
      *
      * `specularColorMap` represents color data, and the texture must be assigned a
      * {@link Texture#colorSpace}. Most `specularColorMap` textures set
-     * `texture.colorSpace = SRGBColorSpace`.
+     * `texture.colorSpace = ColorSpace.SRGB`.
      *
      * @default null
      */

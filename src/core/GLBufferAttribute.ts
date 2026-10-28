@@ -24,7 +24,7 @@ export class GLBufferAttribute {
    * Constructs a new GL buffer attribute.
    *
    * @param buffer - The native WebGL buffer.
-   * @param type - The native data type (e.g. `gl.FLOAT`).
+   * @param type - The native data type (e.g. `GL.FLOAT`).
    * @param itemSize - The item size.
    * @param elementSize - The corresponding size (in bytes) for the given `type` parameter.
    * @param count - The expected number of vertices in VBO.
@@ -77,7 +77,7 @@ export class GLBufferAttribute {
     this.count = count;
     /**
      * Applies to integer data only. Indicates how the underlying data in the buffer maps to
-     * the values in the GLSL code. For instance, if `buffer` contains data of `gl.UNSIGNED_SHORT`,
+     * the values in the GLSL code. For instance, if `buffer` contains data of `GL.UNSIGNED_SHORT`,
      * and `normalized` is `true`, the values `0 - +65535` in the buffer data will be mapped to
      * `0.0f - +1.0f` in the GLSL attribute. If `normalized` is `false`, the values will be converted
      * to floats unmodified, i.e. `65535` becomes `65535.0f`.
@@ -113,7 +113,7 @@ export class GLBufferAttribute {
   /**
    * Sets the given native data type and element size.
    *
-   * @param type - The native data type (e.g. `gl.FLOAT`).
+   * @param type - The native data type (e.g. `GL.FLOAT`).
    * @param elementSize - The corresponding size (in bytes) for the given `type` parameter.
    * @return A reference to this instance.
    */

@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 import { existsSync } from "node:fs";
 import ts from "typescript6";
 import { dependencyGraph, cycles, parse } from "../scripts/module-graph";
+import { build } from "vite-plus";
+import { constEnums } from "../scripts/const-enums";
 
 const root = new URL("../", import.meta.url);
 
@@ -134,4 +136,26 @@ test("runtime graph rejects missing modules and external dependencies", () => {
     () => dependencyGraph(new Map([["entry.ts", 'import { value } from "external";']])),
     /external dependency/,
   );
+});
+
+test("production compilation inlines imported engine and WebGL const enums", async () => {
+  const result = await build({
+    configFile: false,
+    logLevel: "silent",
+    plugins: [constEnums()],
+    build: {
+      write: false,
+      minify: false,
+      lib: { entry: fileURLToPath(new URL("src/renderers/webgl/WebGLState.ts", root)), formats: ["es"] },
+    },
+  });
+  const [bundle] = Array.isArray(result) ? result : [result];
+  assert.ok("output" in bundle);
+  const code = bundle.output
+    .filter((chunk) => chunk.type === "chunk")
+    .map((chunk) => chunk.code)
+    .join("\n");
+  assert.doesNotMatch(code, /\b(?:CullFace|MAX_COMBINED_TEXTURE_IMAGE_UNITS|TEXTURE_CUBE_MAP_POSITIVE_X)\b/);
+  assert.match(code, /getParameter\(35661\b/);
+  assert.match(code, /cullFace\(1029\b/);
 });

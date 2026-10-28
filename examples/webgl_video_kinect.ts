@@ -1,6 +1,6 @@
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { AdditiveBlending, NearestFilter } from "ek3d/constants";
+import { Blending, TextureFilter } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { ShaderMaterial } from "ek3d/materials/ShaderMaterial";
@@ -28,7 +28,7 @@ for (const [src, type] of [
   video.appendChild(source);
 }
 const texture = new VideoTexture(video);
-texture.minFilter = NearestFilter;
+texture.minFilter = TextureFilter.Nearest;
 texture.generateMipmaps = false;
 const width = 640,
   height = 480;
@@ -68,7 +68,7 @@ void main() {
   vec4 color = texture2D(map, vUv);
   gl_FragColor = vec4(color.r, color.g, color.b, 0.2);
 }`,
-  blending: AdditiveBlending,
+  blending: Blending.Additive,
   depthTest: false,
   depthWrite: false,
   transparent: true,

@@ -1,5 +1,5 @@
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { LinearFilter, SRGBColorSpace } from "ek3d/constants";
+import { TextureFilter, ColorSpace } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
@@ -29,7 +29,7 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 const data = new Uint8Array(32 * 32 * 4);
 const dataTexture = new DataTexture(data, 32, 32);
-dataTexture.colorSpace = SRGBColorSpace;
+dataTexture.colorSpace = ColorSpace.SRGB;
 const position = new Vector2();
 const color = new Color();
 let disposed = false;
@@ -43,8 +43,8 @@ new TextureLoader()
       texture.dispose();
       return;
     }
-    texture.colorSpace = SRGBColorSpace;
-    texture.minFilter = LinearFilter;
+    texture.colorSpace = ColorSpace.SRGB;
+    texture.minFilter = TextureFilter.Linear;
     texture.generateMipmaps = false;
     scene.add(new Mesh(new PlaneGeometry(2, 2), new MeshBasicMaterial({ map: texture })));
     renderer.setAnimationLoop((time) => {

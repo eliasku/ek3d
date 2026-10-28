@@ -1,4 +1,4 @@
-import { SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import { Path } from "../../extras/core/Path";
 import { ShapePath } from "../../extras/core/ShapePath";
 import { FileLoader } from "../../loaders/FileLoader";
@@ -219,7 +219,7 @@ export class SVGLoader extends Loader<SVGResult> {
       const path = primitive(node);
       if (path) {
         if (style.fill !== undefined && style.fill !== "none" && !style.fill.startsWith("url"))
-          path.color.setStyle(style.fill, SRGBColorSpace);
+          path.color.setStyle(style.fill, ColorSpace.SRGB);
         transformSVGPath(path, transform);
         const loaded = path as SVGLoadedPath;
         loaded.userData = {

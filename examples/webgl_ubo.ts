@@ -11,7 +11,7 @@ import { RawShaderMaterial } from "ek3d/materials/RawShaderMaterial";
 import { Mesh } from "ek3d/objects/Mesh";
 import { Color } from "ek3d/math/Color";
 import { Vector3 } from "ek3d/math/Vector3";
-import { GLSL3, SRGBColorSpace } from "ek3d/constants";
+import { GLSL, ColorSpace } from "ek3d/constants";
 import { disposeObject } from "./dispose-object";
 
 const selected = document.querySelector<HTMLCanvasElement>("#scene");
@@ -30,7 +30,7 @@ const geometry2 = new BoxGeometry();
 const texture = new TextureLoader().load("/examples/textures/crate.gif", (loaded) => {
   if (disposed) loaded.dispose();
 });
-texture.colorSpace = SRGBColorSpace;
+texture.colorSpace = ColorSpace.SRGB;
 const viewGroup = new UniformsGroup().setName("ViewData");
 viewGroup.add(new Uniform(camera.projectionMatrix)).add(new Uniform(camera.matrixWorldInverse));
 const lightGroup = new UniformsGroup().setName("LightingData");
@@ -114,7 +114,7 @@ void main()  {
 
 }
     `,
-  glslVersion: GLSL3,
+  glslVersion: GLSL.GLSL3,
 });
 const material2 = new RawShaderMaterial({
   uniforms: { modelMatrix: { value: null }, normalMatrix: { value: null }, diffuseMap: { value: null } },
@@ -193,7 +193,7 @@ void main()  {
 
 }
     `,
-  glslVersion: GLSL3,
+  glslVersion: GLSL.GLSL3,
 });
 const meshes: Mesh<RawShaderMaterial>[] = [];
 for (let i = 0; i < 200; i++) {

@@ -7,7 +7,7 @@ import { LinearInterpolant } from "../math/interpolants/LinearInterpolant";
 import { PropertyBinding } from "./PropertyBinding";
 import { PropertyMixer } from "./PropertyMixer";
 import { AnimationClip } from "./AnimationClip";
-import { NormalAnimationBlendMode } from "../constants";
+import { AnimationBlendMode } from "../constants";
 const _controlInterpolantsResultBuffer = new Float32Array(1);
 /**
  * `AnimationMixer` is a player for animations on a particular object in
@@ -361,13 +361,17 @@ export class AnimationMixer extends EventDispatcher {
    * @param [blendMode] - The blend mode.
    * @return The animation action.
    */
-  clipAction(clip: AnimationClip, optionalRoot?: Object3D | AnimationObjectGroup, blendMode?: number): AnimationAction;
+  clipAction(
+    clip: AnimationClip,
+    optionalRoot?: Object3D | AnimationObjectGroup,
+    blendMode?: AnimationBlendMode,
+  ): AnimationAction;
   clipAction(
     clip: AnimationClip | string,
     optionalRoot?: Object3D | AnimationObjectGroup,
-    blendMode?: number,
+    blendMode?: AnimationBlendMode,
   ): AnimationAction | null;
-  clipAction(clip?: any, optionalRoot?: any, blendMode?: number): AnimationAction | null {
+  clipAction(clip?: any, optionalRoot?: any, blendMode?: AnimationBlendMode): AnimationAction | null {
     const root = optionalRoot || this._root,
       rootUuid = root.uuid;
     let clipObject = typeof clip === "string" ? AnimationClip.findByName(root, clip) : clip;
@@ -378,7 +382,7 @@ export class AnimationMixer extends EventDispatcher {
       if (clipObject !== null) {
         blendMode = clipObject.blendMode;
       } else {
-        blendMode = NormalAnimationBlendMode;
+        blendMode = AnimationBlendMode.Normal;
       }
     }
     if (actionsForClip !== undefined) {

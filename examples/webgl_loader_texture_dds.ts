@@ -1,5 +1,5 @@
 import { DDSLoader } from "ek3d/addons/loaders/DDSLoader";
-import { AdditiveBlending, CubeReflectionMapping, DoubleSide, LinearFilter, SRGBColorSpace } from "ek3d/constants";
+import { Blending, Mapping, Side, TextureFilter, ColorSpace } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { BoxGeometry } from "ek3d/geometries/BoxGeometry";
 import { TorusGeometry } from "ek3d/geometries/TorusGeometry";
@@ -75,7 +75,7 @@ function loadMap(url: string, supported: boolean, label: string, colorTexture: b
     (loaded) => {
       pending = Math.max(0, pending - 1);
       loaded.anisotropy = 4;
-      if (colorTexture) loaded.colorSpace = SRGBColorSpace;
+      if (colorTexture) loaded.colorSpace = ColorSpace.SRGB;
       if (!disposed) renderer.render(scene, camera);
     },
     undefined,
@@ -96,10 +96,10 @@ function loadCube(url: string, label: string, assign: (texture: CompressedTextur
     url,
     (loaded) => {
       pending = Math.max(0, pending - 1);
-      loaded.magFilter = LinearFilter;
-      loaded.minFilter = LinearFilter;
-      loaded.mapping = CubeReflectionMapping;
-      loaded.colorSpace = SRGBColorSpace;
+      loaded.magFilter = TextureFilter.Linear;
+      loaded.minFilter = TextureFilter.Linear;
+      loaded.mapping = Mapping.CubeReflection;
+      loaded.colorSpace = ColorSpace.SRGB;
       assign(loaded);
       if (!disposed) renderer.render(scene, camera);
     },
@@ -149,16 +149,16 @@ const map10 = loadMap(
 const map11 = loadMap("/examples/textures/wave_normals_24bit_uncompressed.dds", true, "wave_normals_24bit", false);
 
 // DDS levels without mipmaps cannot be filtered with a mipmap filter.
-if (map1) map1.minFilter = map1.magFilter = LinearFilter;
-if (map5) map5.minFilter = map5.magFilter = LinearFilter;
+if (map1) map1.minFilter = map1.magFilter = TextureFilter.Linear;
+if (map5) map5.minFilter = map5.magFilter = TextureFilter.Linear;
 
 const material1 = new MeshBasicMaterial({ map: map1 });
 const material2 = new MeshBasicMaterial({ map: map2 });
-const material3 = new MeshBasicMaterial({ map: map3, alphaTest: 0.5, side: DoubleSide });
+const material3 = new MeshBasicMaterial({ map: map3, alphaTest: 0.5, side: Side.Double });
 const material4 = new MeshBasicMaterial({
   map: map4,
-  side: DoubleSide,
-  blending: AdditiveBlending,
+  side: Side.Double,
+  blending: Blending.Additive,
   depthTest: false,
   transparent: true,
 });

@@ -1,6 +1,6 @@
 import { EXRLoader } from "ek3d/addons/loaders/EXRLoader";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
-import { ReinhardToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
@@ -47,7 +47,7 @@ async function init(): Promise<void> {
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  renderer.toneMapping = ReinhardToneMapping;
+  renderer.toneMapping = ToneMapping.Reinhard;
   renderer.toneMappingExposure = params.exposure;
 
   scene = new Scene();

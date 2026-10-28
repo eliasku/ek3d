@@ -1,6 +1,6 @@
 import type { WebGLCubeRenderTarget } from "../renderers/WebGLCubeRenderTarget";
 import type { WebGLRenderer } from "../renderers/WebGLRenderer";
-import { WebGLCoordinateSystem } from "../constants";
+import { CoordinateSystem } from "../constants";
 import { Object3D } from "../core/Object3D";
 import { PerspectiveCamera } from "./PerspectiveCamera";
 const fov = -90; // negative fov is not an error
@@ -13,7 +13,7 @@ const aspect = 1;
  * ```typescript
  * import { BoxGeometry } from 'ek3d/geometries/BoxGeometry';
  * import { CubeCamera } from 'ek3d/cameras/CubeCamera';
- * import { LinearMipmapLinearFilter } from 'ek3d/constants';
+ * import { TextureFilter } from 'ek3d/constants';
  * import { Mesh } from 'ek3d/objects/Mesh';
  * import { MeshLambertMaterial } from 'ek3d/materials/MeshLambertMaterial';
  * import { PerspectiveCamera } from 'ek3d/cameras/PerspectiveCamera';
@@ -29,7 +29,7 @@ const aspect = 1;
  * const carGeometry = new BoxGeometry( 2, 1, 4 );
  *
  * // Create cube render target
- * const cubeRenderTarget = new WebGLCubeRenderTarget( 256, { generateMipmaps: true, minFilter: LinearMipmapLinearFilter } );
+ * const cubeRenderTarget = new WebGLCubeRenderTarget( 256, { generateMipmaps: true, minFilter: TextureFilter.LinearMipmapLinear } );
  *
  * // Create cube camera
  * const cubeCamera = new CubeCamera( 1, 100000, cubeRenderTarget );
@@ -53,7 +53,7 @@ const aspect = 1;
  */
 export class CubeCamera extends Object3D<PerspectiveCamera> {
   renderTarget: WebGLCubeRenderTarget;
-  coordinateSystem: number | null;
+  coordinateSystem: CoordinateSystem | null;
   activeMipmapLevel: number;
 
   /**
@@ -110,7 +110,7 @@ export class CubeCamera extends Object3D<PerspectiveCamera> {
     const cameras = this.children.concat();
     const [cameraPX, cameraNX, cameraPY, cameraNY, cameraPZ, cameraNZ] = cameras;
     for (const camera of cameras) this.remove(camera);
-    if (coordinateSystem === WebGLCoordinateSystem) {
+    if (coordinateSystem === CoordinateSystem.WebGL) {
       cameraPX.up.set(0, 1, 0);
       cameraPX.lookAt(1, 0, 0);
       cameraNX.up.set(0, 1, 0);

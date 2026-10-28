@@ -1,4 +1,4 @@
-import { RGBAFormat, FloatType } from "../constants";
+import { PixelFormat, TextureType } from "../constants";
 import { Bone } from "./Bone";
 import { Matrix4 } from "../math/Matrix4";
 import { DataTexture } from "../textures/DataTexture";
@@ -180,7 +180,7 @@ export class Skeleton {
     size = Math.max(size, 4);
     const boneMatrices = new Float32Array(size * size * 4); // 4 floats per RGBA pixel
     boneMatrices.set(this.boneMatrices); // copy current values
-    const boneTexture = new DataTexture(boneMatrices, size, size, RGBAFormat, FloatType);
+    const boneTexture = new DataTexture(boneMatrices, size, size, PixelFormat.RGBA, TextureType.Float);
     boneTexture.needsUpdate = true;
     this.boneMatrices = boneMatrices;
     this.boneTexture = boneTexture;

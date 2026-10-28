@@ -1,7 +1,7 @@
 import { DataTextureLoader } from "../../loaders/DataTextureLoader";
 import type { DataTextureData } from "../../loaders/DataTextureLoader";
 import type { LoadingManager } from "../../loaders/LoadingManager";
-import { LinearMipmapLinearFilter } from "../../constants";
+import { TextureFilter } from "../../constants";
 
 const TGA_TYPE_NO_DATA = 0;
 const TGA_TYPE_INDEXED = 1;
@@ -50,10 +50,10 @@ type RowWriter = (
  *
  * ```typescript
  * import { TGALoader } from "ek3d/addons/loaders/TGALoader";
- * import { SRGBColorSpace } from "ek3d/constants";
+ * import { ColorSpace } from "ek3d/constants";
  *
  * const texture = await new TGALoader().loadAsync("textures/crate_color8.tga");
- * texture.colorSpace = SRGBColorSpace; // only for color textures
+ * texture.colorSpace = ColorSpace.SRGB; // only for color textures
  * ```
  */
 export class TGALoader extends DataTextureLoader {
@@ -364,7 +364,7 @@ export class TGALoader extends DataTextureLoader {
       height: header.height,
       flipY: true,
       generateMipmaps: true,
-      minFilter: LinearMipmapLinearFilter,
+      minFilter: TextureFilter.LinearMipmapLinear,
     };
   }
 }

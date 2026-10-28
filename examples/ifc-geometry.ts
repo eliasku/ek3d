@@ -1,6 +1,6 @@
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { Color } from "ek3d/math/Color";
 
 export interface IFCColor {
@@ -17,7 +17,7 @@ export function ifcGeometryToBuffer(color: IFCColor, vertices: Float32Array, ind
   const positions = new Float32Array(count * 3);
   const normals = new Float32Array(count * 3);
   const colors = new Float32Array(count * 4);
-  const linear = new Color().setRGB(color.x, color.y, color.z, SRGBColorSpace);
+  const linear = new Color().setRGB(color.x, color.y, color.z, ColorSpace.SRGB);
   for (let v = 0; v < count; v++) {
     const src = v * 6;
     const dst = v * 3;

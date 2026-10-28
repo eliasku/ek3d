@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { WebGLCoordinateSystem } from "../../../constants";
+import { CoordinateSystem } from "../../../constants";
 
 export interface BatchBVHNode {
   box: Float32Array;
@@ -74,9 +74,9 @@ function overlaps(a: ArrayLike<number>, b: ArrayLike<number>): boolean {
 
 export class BatchFrustum {
   readonly array: Float32Array = new Float32Array(24);
-  readonly coordinateSystem: number;
+  readonly coordinateSystem: CoordinateSystem;
 
-  constructor(coordinateSystem: number) {
+  constructor(coordinateSystem: CoordinateSystem) {
     this.coordinateSystem = coordinateSystem;
   }
 
@@ -90,7 +90,7 @@ export class BatchFrustum {
       this.setPlane(5, m[3] - m[2], m[7] - m[6], m[11] - m[10], m[15] - m[14]);
     } else {
       this.setPlane(4, m[3] - m[2], m[7] - m[6], m[11] - m[10], m[15] - m[14]);
-      if (coordinateSystem === WebGLCoordinateSystem) {
+      if (coordinateSystem === CoordinateSystem.WebGL) {
         this.setPlane(5, m[3] + m[2], m[7] + m[6], m[11] + m[10], m[15] + m[14]);
       } else if (coordinateSystem === 2001) {
         this.setPlane(5, m[2], m[6], m[10], m[14]);
@@ -148,7 +148,7 @@ export class BatchBVH {
   root: BatchNode | null = null;
   readonly frustum: BatchFrustum;
 
-  constructor(coordinateSystem: number = WebGLCoordinateSystem) {
+  constructor(coordinateSystem: CoordinateSystem = CoordinateSystem.WebGL) {
     this.frustum = new BatchFrustum(coordinateSystem);
   }
 

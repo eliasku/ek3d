@@ -1,6 +1,6 @@
 import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { SRGBColorSpace } from "ek3d/constants";
+import { ColorSpace } from "ek3d/constants";
 import { Float32BufferAttribute } from "ek3d/core/BufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { Timer } from "ek3d/core/Timer";
@@ -53,7 +53,7 @@ const views = Array.from(document.querySelectorAll<HTMLDivElement>(".view"), (el
   context.fillStyle = colors[Math.floor(colors.length * Math.random())];
   context.fill();
   const texture = new CanvasTexture(sprite);
-  texture.colorSpace = SRGBColorSpace;
+  texture.colorSpace = ColorSpace.SRGB;
   scene.add(new Points(geometry, new PointsMaterial({ size: 0.25, map: texture, transparent: true, alphaTest: 0.1 })));
   const camera = new PerspectiveCamera(75, 1, 0.1, 100);
   camera.position.set(0, 0, 24);

@@ -1,3 +1,4 @@
+import { GL } from "ek3d/GL";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { OrthographicCamera } from "ek3d/cameras/OrthographicCamera";
@@ -95,8 +96,8 @@ export function verifyHelpers() {
     if ("update" in helper) helper.update();
     renderer.render(scene, camera);
     const pixels = new Uint8Array(size * size * 4);
-    gl.readPixels(0, 0, size, size, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-    check(gl.getError() === gl.NO_ERROR, `${helper.type}: WebGL error`);
+    gl.readPixels(0, 0, size, size, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+    check(gl.getError() === GL.NO_ERROR, `${helper.type}: WebGL error`);
     return pixels;
   };
   const count = (pixels: Uint8Array) => {
@@ -109,10 +110,10 @@ export function verifyHelpers() {
       const frame = draw(helper);
       coverage[helper.type] = count(frame);
       check(coverage[helper.type] > 5, `${helper.type}: helper produced no visible geometry`);
-      const program = gl.getParameter(gl.CURRENT_PROGRAM) as WebGLProgram;
-      check(gl.getProgramParameter(program, gl.LINK_STATUS), `${helper.type}: program did not link`);
+      const program = gl.getParameter(GL.CURRENT_PROGRAM) as WebGLProgram;
+      check(gl.getProgramParameter(program, GL.LINK_STATUS), `${helper.type}: program did not link`);
       const location = gl.getAttribLocation(program, "position");
-      const buffer = gl.getVertexAttrib(location, gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING) as WebGLBuffer;
+      const buffer = gl.getVertexAttrib(location, GL.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING) as WebGLBuffer;
       check(gl.isBuffer(buffer), `${helper.type}: missing native position buffer`);
       nativeBuffers.add(buffer);
       helper.visible = false;
@@ -175,7 +176,7 @@ export function verifyHelpers() {
       scene.remove(replacement);
       replacement.dispose();
     }
-    check(gl.getError() === gl.NO_ERROR, "Helper lifecycle left a WebGL error");
+    check(gl.getError() === GL.NO_ERROR, "Helper lifecycle left a WebGL error");
     return { glError: 0, coverage, nativeBuffers: nativeBuffers.size, updates: 4 };
   } finally {
     scene.clear();

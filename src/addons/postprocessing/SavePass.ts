@@ -1,4 +1,4 @@
-import { HalfFloatType, NoBlending } from "../../constants";
+import { TextureType, Blending } from "../../constants";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { cloneUniforms } from "../../renderers/shaders/UniformsUtils";
 import { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
@@ -42,13 +42,14 @@ export class SavePass extends Pass {
       uniforms: this.uniforms,
       vertexShader: CopyShader.vertexShader,
       fragmentShader: CopyShader.fragmentShader,
-      blending: NoBlending,
+      blending: Blending.No,
     });
 
     /**
      * The render target which is used to save the read buffer.
      */
-    this.renderTarget = renderTarget ?? new WebGLRenderTarget(1, 1, { type: HalfFloatType, depthBuffer: false });
+    this.renderTarget =
+      renderTarget ?? new WebGLRenderTarget(1, 1, { type: TextureType.HalfFloat, depthBuffer: false });
     if (renderTarget === undefined) {
       // will be resized later
       this.renderTarget.texture.name = "SavePass.rt";

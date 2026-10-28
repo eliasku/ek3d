@@ -8,7 +8,7 @@ import { BufferGeometry } from "ek3d/core/BufferGeometry";
 import { Vector3 } from "ek3d/math/Vector3";
 import { Float32BufferAttribute } from "ek3d/core/BufferAttribute";
 import { MeshPhongMaterial } from "ek3d/materials/MeshPhongMaterial";
-import { DoubleSide } from "ek3d/constants";
+import { Side } from "ek3d/constants";
 import { Mesh } from "ek3d/objects/Mesh";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { Stats } from "ek3d/addons/libs/Stats";
@@ -146,7 +146,7 @@ function init(): void {
     color: 0xd5d5d5,
     specular: 0xffffff,
     shininess: 250,
-    side: DoubleSide,
+    side: Side.Double,
     vertexColors: true,
     transparent: true,
   });

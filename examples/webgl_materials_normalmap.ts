@@ -9,7 +9,7 @@ import { ShaderPass } from "ek3d/addons/postprocessing/ShaderPass";
 import { BleachBypassShader } from "ek3d/addons/shaders/BleachBypassShader";
 import { ColorCorrectionShader } from "ek3d/addons/shaders/ColorCorrectionShader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { HalfFloatType, SRGBColorSpace } from "ek3d/constants";
+import { TextureType, ColorSpace } from "ek3d/constants";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
 import { PointLight } from "ek3d/lights/PointLight";
@@ -60,9 +60,9 @@ canvas.dataset.state = "loading";
 const loader = new TextureLoader(manager);
 const base = "/examples/models/gltf/LeePerrySmith/";
 const diffuse = loader.load(base + "Map-COL.jpg", undefined, undefined, onError);
-diffuse.colorSpace = SRGBColorSpace;
+diffuse.colorSpace = ColorSpace.SRGB;
 const specular = loader.load(base + "Map-SPEC.jpg", undefined, undefined, onError);
-specular.colorSpace = SRGBColorSpace;
+specular.colorSpace = ColorSpace.SRGB;
 const normal = loader.load(base + "Infinite-Level_02_Tangent_SmoothUV.jpg", undefined, undefined, onError);
 const material = new MeshPhongMaterial({
   color: 0xefefef,
@@ -104,7 +104,7 @@ color.uniforms!["mulRGB"].value.set(1.1, 1.1, 1.1);
 const composer = new EffectComposer(
   renderer,
   new WebGLRenderTarget(innerWidth, innerHeight, {
-    type: HalfFloatType,
+    type: TextureType.HalfFloat,
     depthTexture: new DepthTexture(innerWidth, innerHeight),
   }),
 );

@@ -1,5 +1,5 @@
 import type { LoadingManager } from "./LoadingManager";
-import { LinearFilter, LinearMipmapLinearFilter, ClampToEdgeWrapping } from "../constants";
+import { TextureFilter, Wrapping } from "../constants";
 import { FileLoader } from "./FileLoader";
 import { DataTexture } from "../textures/DataTexture";
 import type { DataTextureImage, DataTextureImageData } from "../textures/DataTexture";
@@ -101,10 +101,10 @@ export abstract class DataTextureLoader extends Loader<DataTexture, string> {
       texture.image.height = texData.height;
       texture.image.data = texData.data;
     }
-    texture.wrapS = texData.wrapS !== undefined ? texData.wrapS : ClampToEdgeWrapping;
-    texture.wrapT = texData.wrapT !== undefined ? texData.wrapT : ClampToEdgeWrapping;
-    texture.magFilter = texData.magFilter !== undefined ? texData.magFilter : LinearFilter;
-    texture.minFilter = texData.minFilter !== undefined ? texData.minFilter : LinearFilter;
+    texture.wrapS = texData.wrapS !== undefined ? texData.wrapS : Wrapping.ClampToEdge;
+    texture.wrapT = texData.wrapT !== undefined ? texData.wrapT : Wrapping.ClampToEdge;
+    texture.magFilter = texData.magFilter !== undefined ? texData.magFilter : TextureFilter.Linear;
+    texture.minFilter = texData.minFilter !== undefined ? texData.minFilter : TextureFilter.Linear;
     texture.anisotropy = texData.anisotropy !== undefined ? texData.anisotropy : 1;
     if (texData.colorSpace !== undefined) {
       texture.colorSpace = texData.colorSpace;
@@ -120,10 +120,10 @@ export abstract class DataTextureLoader extends Loader<DataTexture, string> {
     }
     if (texData.mipmaps !== undefined) {
       texture.mipmaps = texData.mipmaps;
-      texture.minFilter = LinearMipmapLinearFilter; // presumably...
+      texture.minFilter = TextureFilter.LinearMipmapLinear; // presumably...
     }
     if (texData.mipmapCount === 1) {
-      texture.minFilter = LinearFilter;
+      texture.minFilter = TextureFilter.Linear;
     }
     if (texData.generateMipmaps !== undefined) {
       texture.generateMipmaps = texData.generateMipmaps;
@@ -148,14 +148,14 @@ export interface DataTextureData {
   gamma?: number;
   /** Exposure value parsed from the format header, if any. */
   exposure?: number;
-  /** Horizontal wrapping mode. Defaults to ClampToEdgeWrapping. */
-  wrapS?: number;
-  /** Vertical wrapping mode. Defaults to ClampToEdgeWrapping. */
-  wrapT?: number;
-  /** Magnification filter. Defaults to LinearFilter. */
-  magFilter?: number;
-  /** Minification filter. Defaults to LinearFilter; supplied mipmaps select LinearMipmapLinearFilter. */
-  minFilter?: number;
+  /** Horizontal wrapping mode. Defaults to Wrapping.ClampToEdge. */
+  wrapS?: Wrapping;
+  /** Vertical wrapping mode. Defaults to Wrapping.ClampToEdge. */
+  wrapT?: Wrapping;
+  /** Magnification filter. Defaults to TextureFilter.Linear. */
+  magFilter?: TextureFilter;
+  /** Minification filter. Defaults to TextureFilter.Linear; supplied mipmaps select TextureFilter.LinearMipmapLinear. */
+  minFilter?: TextureFilter;
   /** Anisotropic filtering level. Defaults to 1. */
   anisotropy?: number;
   /** Color space of the texture pixels. */
@@ -168,7 +168,7 @@ export interface DataTextureData {
   type?: number;
   /** Texture data and dimensions for each mip level. */
   mipmaps?: DataTexture["mipmaps"];
-  /** Number of mip levels; one selects LinearFilter. */
+  /** Number of mip levels; one selects TextureFilter.Linear. */
   mipmapCount?: number;
   /** Whether the GPU should generate mipmaps. */
   generateMipmaps?: boolean;

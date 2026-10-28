@@ -1,12 +1,7 @@
 import type { Texture } from "../../textures/Texture";
 import type { WebGLEnvironmentProvider } from "./WebGLEnvironmentAccess";
 import type { WebGLRenderer } from "../WebGLRenderer";
-import {
-  CubeReflectionMapping,
-  CubeRefractionMapping,
-  EquirectangularReflectionMapping,
-  EquirectangularRefractionMapping,
-} from "../../constants";
+import { Mapping } from "../../constants";
 import { PMREMGenerator } from "../../extras/PMREMGenerator";
 import { WebGLCubeRenderTarget } from "../WebGLCubeRenderTarget";
 export function WebGLEnvironments(renderer: WebGLRenderer): WebGLEnvironmentProvider & { dispose(): void } {
@@ -34,7 +29,7 @@ export function WebGLEnvironments(renderer: WebGLRenderer): WebGLEnvironmentProv
   function getCube(texture: Texture): Texture | null {
     if (texture && texture.isTexture) {
       const mapping = texture.mapping;
-      if (mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping) {
+      if (mapping === Mapping.EquirectangularReflection || mapping === Mapping.EquirectangularRefraction) {
         if (cubeMaps.has(texture)) {
           const cubemap = cubeMaps.get(texture).texture;
           return mapTextureMapping(cubemap, texture.mapping);
@@ -64,8 +59,8 @@ export function WebGLEnvironments(renderer: WebGLRenderer): WebGLEnvironmentProv
     if (texture && texture.isTexture && texture.isPMREMTexture !== true) {
       const mapping = texture.mapping;
       const isEquirectMap =
-        mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping;
-      const isCubeMap = mapping === CubeReflectionMapping || mapping === CubeRefractionMapping;
+        mapping === Mapping.EquirectangularReflection || mapping === Mapping.EquirectangularRefraction;
+      const isCubeMap = mapping === Mapping.CubeReflection || mapping === Mapping.CubeRefraction;
       // equirect/cube map to PMREM conversion
       if (isEquirectMap || isCubeMap) {
         let renderTarget = pmremMaps.get(texture);
@@ -103,11 +98,11 @@ export function WebGLEnvironments(renderer: WebGLRenderer): WebGLEnvironmentProv
     }
     return texture;
   }
-  function mapTextureMapping(texture: Texture, mapping: number) {
-    if (mapping === EquirectangularReflectionMapping) {
-      texture.mapping = CubeReflectionMapping;
-    } else if (mapping === EquirectangularRefractionMapping) {
-      texture.mapping = CubeRefractionMapping;
+  function mapTextureMapping(texture: Texture, mapping: Mapping) {
+    if (mapping === Mapping.EquirectangularReflection) {
+      texture.mapping = Mapping.CubeReflection;
+    } else if (mapping === Mapping.EquirectangularRefraction) {
+      texture.mapping = Mapping.CubeRefraction;
     }
     return texture;
   }

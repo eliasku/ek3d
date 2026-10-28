@@ -6,7 +6,7 @@ import { IcosahedronGeometry } from "ek3d/geometries/IcosahedronGeometry";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { PointLight } from "ek3d/lights/PointLight";
 import { MeshPhongMaterial } from "ek3d/materials/MeshPhongMaterial";
-import { RepeatWrapping } from "ek3d/constants";
+import { Wrapping } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { TextureLoader } from "ek3d/loaders/TextureLoader";
 import { Mesh } from "ek3d/objects/Mesh";
@@ -47,7 +47,7 @@ scene.add(refractor);
 const loader = new TextureLoader();
 const dudvMap: Texture = await loader.loadAsync("/examples/textures/waterdudv.jpg");
 
-dudvMap.wrapS = dudvMap.wrapT = RepeatWrapping;
+dudvMap.wrapS = dudvMap.wrapT = Wrapping.Repeat;
 refractor.material.uniforms.tDudv.value = dudvMap;
 
 //

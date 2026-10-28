@@ -2,7 +2,7 @@ import { TextGeometry } from "ek3d/addons/geometries/TextGeometry";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { FontLoader } from "ek3d/addons/loaders/FontLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { AdditiveBlending } from "ek3d/constants";
+import { Blending } from "ek3d/constants";
 import { Float32BufferAttribute } from "ek3d/core/BufferAttribute";
 import { ShaderMaterial } from "ek3d/materials/ShaderMaterial";
 import { Color } from "ek3d/math/Color";
@@ -39,7 +39,7 @@ const material = new ShaderMaterial({
     void main() { vColor = customColor; gl_Position = projectionMatrix * modelViewMatrix * vec4(position + amplitude * displacement, 1.0); }`,
   fragmentShader: `uniform vec3 color; uniform float opacity; varying vec3 vColor;
     void main() { gl_FragColor = vec4(vColor * color, opacity); }`,
-  blending: AdditiveBlending,
+  blending: Blending.Additive,
   depthTest: false,
   transparent: true,
 });

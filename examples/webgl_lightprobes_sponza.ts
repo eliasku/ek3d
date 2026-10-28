@@ -6,7 +6,7 @@ import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { Sky } from "ek3d/addons/objects/Sky";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping } from "ek3d/constants";
+import { ToneMapping } from "ek3d/constants";
 import { Timer } from "ek3d/core/Timer";
 import { Light } from "ek3d/lights/Light";
 import { LoadingManager } from "ek3d/loaders/LoadingManager";
@@ -52,7 +52,7 @@ const renderer = new WebGLRenderer({
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap!.enabled = true;
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 const controls = new FirstPersonControls(camera, canvas);
 controls.movementSpeed = 2;
 controls.lookSpeed = 0.2;

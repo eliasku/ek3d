@@ -1,5 +1,5 @@
 import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
-import { FloatType, RGBAFormat, SRGBColorSpace } from "ek3d/constants";
+import { TextureType, PixelFormat, ColorSpace } from "ek3d/constants";
 import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { InterleavedBufferAttribute } from "ek3d/core/InterleavedBufferAttribute";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
@@ -77,7 +77,7 @@ new GLTFLoader().load(
           data[offset + 3] = 1;
         }
       }
-      const animation = new DataTexture(data, textureWidth, textureHeight, RGBAFormat, FloatType);
+      const animation = new DataTexture(data, textureWidth, textureHeight, PixelFormat.RGBA, TextureType.Float);
       animation.needsUpdate = true;
       const total = position.count * count;
       const positions = new Float32Array(total * 3),
@@ -134,11 +134,11 @@ new GLTFLoader().load(
         }
       })();
       const hemi = new HemisphereLight(colors[selected], 0xffffff, 4.5);
-      hemi.color.setHSL(0.6, 1, 0.6, SRGBColorSpace);
-      hemi.groundColor.setHSL(0.095, 1, 0.75, SRGBColorSpace);
+      hemi.color.setHSL(0.6, 1, 0.6, ColorSpace.SRGB);
+      hemi.groundColor.setHSL(0.095, 1, 0.75, ColorSpace.SRGB);
       hemi.position.set(0, 50, 0);
       const light = new DirectionalLight(0x00ced1, 2);
-      light.color.setHSL(0.1, 1, 0.95, SRGBColorSpace);
+      light.color.setHSL(0.1, 1, 0.95, ColorSpace.SRGB);
       light.position.set(-1, 1.75, 1).multiplyScalar(30);
       sim.scene.add(hemi, light);
       const mesh = new Mesh(geometry, material);

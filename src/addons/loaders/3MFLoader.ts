@@ -1,12 +1,4 @@
-import {
-  ClampToEdgeWrapping,
-  LinearFilter,
-  LinearMipmapLinearFilter,
-  MirroredRepeatWrapping,
-  NearestFilter,
-  RepeatWrapping,
-  SRGBColorSpace,
-} from "../../constants";
+import { Wrapping, TextureFilter, ColorSpace } from "../../constants";
 import { BufferAttribute, Float32BufferAttribute } from "../../core/BufferAttribute";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { CylinderGeometry } from "../../geometries/CylinderGeometry";
@@ -309,19 +301,23 @@ export class ThreeMFLoader extends Loader<Group, string> {
         undefined,
         () => URL.revokeObjectURL(uri),
       );
-      texture.colorSpace = SRGBColorSpace;
+      texture.colorSpace = ColorSpace.SRGB;
       const wrap = (value: string | null) =>
         value === "mirror"
-          ? MirroredRepeatWrapping
+          ? Wrapping.MirroredRepeat
           : value === "none" || value === "clamp"
-            ? ClampToEdgeWrapping
-            : RepeatWrapping;
+            ? Wrapping.ClampToEdge
+            : Wrapping.Repeat;
       texture.wrapS = wrap(textureNode.getAttribute("tilestyleu"));
       texture.wrapT = wrap(textureNode.getAttribute("tilestylev"));
       const filter = textureNode.getAttribute("filter");
-      texture.magFilter = filter === "nearest" ? NearestFilter : LinearFilter;
+      texture.magFilter = filter === "nearest" ? TextureFilter.Nearest : TextureFilter.Linear;
       texture.minFilter =
-        filter === "nearest" ? NearestFilter : filter === "linear" ? LinearFilter : LinearMipmapLinearFilter;
+        filter === "nearest"
+          ? TextureFilter.Nearest
+          : filter === "linear"
+            ? TextureFilter.Linear
+            : TextureFilter.LinearMipmapLinear;
       if (filter === "nearest" || filter === "linear") texture.generateMipmaps = false;
       textures.set(textureNode, texture);
       return texture;
@@ -348,7 +344,7 @@ export class ThreeMFLoader extends Loader<Group, string> {
             });
       material.name = base.getAttribute("name") ?? "";
       const value = required(base, "displaycolor");
-      material.color.setStyle(value.substring(0, 7), SRGBColorSpace);
+      material.color.setStyle(value.substring(0, 7), ColorSpace.SRGB);
       if (value.length === 9) material.opacity = parseInt(value.substring(7, 9), 16) / 255;
       materials.set(base, material);
       return material;
@@ -395,7 +391,7 @@ export class ThreeMFLoader extends Loader<Group, string> {
         if (kind === "colorgroup") {
           const color = new Color();
           for (const prop of props) {
-            color.setStyle(required(prop, "color").substring(0, 7), SRGBColorSpace);
+            color.setStyle(required(prop, "color").substring(0, 7), ColorSpace.SRGB);
             colorValues.push(color.r, color.g, color.b);
           }
         } else if (kind === "texture2dgroup") {

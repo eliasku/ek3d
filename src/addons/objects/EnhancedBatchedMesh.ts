@@ -1,3 +1,4 @@
+import { CoordinateSystem } from "../../constants";
 import type { Camera } from "../../cameras/Camera";
 import type { PerspectiveCamera } from "../../cameras/PerspectiveCamera";
 import { BufferGeometry } from "../../core/BufferGeometry";
@@ -46,7 +47,7 @@ export class BatchedMeshBVH {
   private readonly direction: Float32Array = new Float32Array(3);
   private readonly boxArray: Float32Array = new Float32Array(6);
 
-  constructor(target: EnhancedBatchedMesh, coordinateSystem: number, margin = 0, accurateCulling = true) {
+  constructor(target: EnhancedBatchedMesh, coordinateSystem: CoordinateSystem, margin = 0, accurateCulling = true) {
     this.target = target;
     this.bvh = new BatchBVH(coordinateSystem);
     this.margin = margin;
@@ -227,7 +228,7 @@ export class EnhancedBatchedMesh extends BatchedMesh {
     return this;
   }
 
-  computeBVH(coordinateSystem: number, config: { margin?: number; accurateCulling?: boolean } = {}): void {
+  computeBVH(coordinateSystem: CoordinateSystem, config: { margin?: number; accurateCulling?: boolean } = {}): void {
     this.bvh = new BatchedMeshBVH(this, coordinateSystem, config.margin, config.accurateCulling);
     this.bvh.create();
   }

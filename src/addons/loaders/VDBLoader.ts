@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { FloatType, LinearFilter, RGBAFormat, RedFormat } from "../../constants";
+import { TextureType, TextureFilter, PixelFormat } from "../../constants";
 import { fromHalfFloat } from "../../extras/DataUtils";
 import { FileLoader } from "../../loaders/FileLoader";
 import { Loader } from "../../loaders/Loader";
@@ -478,10 +478,10 @@ function readGrid(reader: Reader, name: string, valueType: VDBValueType, saveFlo
   for (const child of children) fillNode(dense, child);
 
   const texture = new Data3DTexture(data, width, height, depth);
-  texture.format = stride === 1 ? RedFormat : RGBAFormat;
-  texture.type = FloatType;
-  texture.minFilter = LinearFilter;
-  texture.magFilter = LinearFilter;
+  texture.format = stride === 1 ? PixelFormat.Red : PixelFormat.RGBA;
+  texture.type = TextureType.Float;
+  texture.minFilter = TextureFilter.Linear;
+  texture.magFilter = TextureFilter.Linear;
   texture.unpackAlignment = 1;
   texture.needsUpdate = true;
 

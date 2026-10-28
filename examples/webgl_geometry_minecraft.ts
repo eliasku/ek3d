@@ -1,7 +1,7 @@
 import { FirstPersonControls } from "ek3d/addons/controls/FirstPersonControls";
 import { ImprovedNoise } from "ek3d/addons/math/ImprovedNoise";
 import { mergeGeometries } from "ek3d/addons/utils/BufferGeometryUtils";
-import { SRGBColorSpace, DoubleSide, NearestFilter } from "ek3d/constants";
+import { ColorSpace, Side, TextureFilter } from "ek3d/constants";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
@@ -108,10 +108,10 @@ for (const g of geometries) g.dispose();
 for (const g of [pxGeometry, nxGeometry, pyGeometry, pzGeometry, nzGeometry]) g.dispose();
 
 const texture = await new TextureLoader().loadAsync("/examples/textures/minecraft/atlas.png");
-texture.colorSpace = SRGBColorSpace;
-texture.magFilter = NearestFilter;
+texture.colorSpace = ColorSpace.SRGB;
+texture.magFilter = TextureFilter.Nearest;
 
-const lambertMaterial = new MeshLambertMaterial({ map: texture, side: DoubleSide });
+const lambertMaterial = new MeshLambertMaterial({ map: texture, side: Side.Double });
 const mesh = new Mesh(geometry, lambertMaterial);
 scene.add(mesh);
 

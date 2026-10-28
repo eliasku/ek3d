@@ -167,7 +167,7 @@ export class TrackballControls<TObject extends TrackballCamera = TrackballCamera
    *
    * @default {LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN}
    */
-  mouseButtons: { LEFT: number; MIDDLE: number; RIGHT: number };
+  mouseButtons: { LEFT: MOUSE; MIDDLE: MOUSE; RIGHT: MOUSE };
 
   /**
    * The focus point of the controls.

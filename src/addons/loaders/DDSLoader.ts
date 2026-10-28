@@ -2,15 +2,7 @@ import { CompressedTextureLoader } from "../../loaders/CompressedTextureLoader";
 import type { CompressedTextureData } from "../../loaders/CompressedTextureLoader";
 import type { CompressedTextureMipmap } from "../../textures/CompressedTexture";
 import type { LoadingManager } from "../../loaders/LoadingManager";
-import {
-  RGBA_S3TC_DXT3_Format,
-  RGBA_S3TC_DXT5_Format,
-  RGB_ETC1_Format,
-  RGB_BPTC_SIGNED_Format,
-  RGB_BPTC_UNSIGNED_Format,
-  RGB_S3TC_DXT1_Format,
-  RGBAFormat,
-} from "../../constants";
+import { PixelFormat } from "../../constants";
 
 // All values and structures referenced from:
 // http://msdn.microsoft.com/en-us/library/bb943991.aspx
@@ -128,10 +120,10 @@ function loadRGBMip(buffer: ArrayBuffer, dataOffset: number, width: number, heig
  *
  * ```typescript
  * import { DDSLoader } from "ek3d/addons/loaders/DDSLoader";
- * import { SRGBColorSpace } from "ek3d/constants";
+ * import { ColorSpace } from "ek3d/constants";
  *
  * const map = await new DDSLoader().loadAsync("textures/compressed/disturb_dxt1_nomip.dds");
- * map.colorSpace = SRGBColorSpace; // only for color textures
+ * map.colorSpace = ColorSpace.SRGB; // only for color textures
  * ```
  */
 export class DDSLoader extends CompressedTextureLoader {
@@ -173,19 +165,19 @@ export class DDSLoader extends CompressedTextureLoader {
     switch (fourCC) {
       case FOURCC_DXT1:
         blockBytes = 8;
-        format = RGB_S3TC_DXT1_Format;
+        format = PixelFormat.RGB_S3TC_DXT1;
         break;
       case FOURCC_DXT3:
         blockBytes = 16;
-        format = RGBA_S3TC_DXT3_Format;
+        format = PixelFormat.RGBA_S3TC_DXT3;
         break;
       case FOURCC_DXT5:
         blockBytes = 16;
-        format = RGBA_S3TC_DXT5_Format;
+        format = PixelFormat.RGBA_S3TC_DXT5;
         break;
       case FOURCC_ETC1:
         blockBytes = 8;
-        format = RGB_ETC1_Format;
+        format = PixelFormat.RGB_ETC1;
         break;
       case FOURCC_DX10: {
         dataOffset += EXTENDED_HEADER_LENGTH_INT * 4;
@@ -196,10 +188,10 @@ export class DDSLoader extends CompressedTextureLoader {
         const dxgiFormat = extendedHeader[OFF_DXGI_FORMAT];
         if (dxgiFormat === DXGI_FORMAT_BC6H_SF16) {
           blockBytes = 16;
-          format = RGB_BPTC_SIGNED_Format;
+          format = PixelFormat.RGB_BPTC_SIGNED;
         } else if (dxgiFormat === DXGI_FORMAT_BC6H_UF16) {
           blockBytes = 16;
-          format = RGB_BPTC_UNSIGNED_Format;
+          format = PixelFormat.RGB_BPTC_UNSIGNED;
         } else {
           throw new Error("THREE.DDSLoader: Unsupported DXGI_FORMAT code " + dxgiFormat);
         }
@@ -215,7 +207,7 @@ export class DDSLoader extends CompressedTextureLoader {
         ) {
           isRGBAUncompressed = true;
           blockBytes = 64;
-          format = RGBAFormat;
+          format = PixelFormat.RGBA;
         } else if (
           header[OFF_RGB_BIT_COUNT] === 24 &&
           header[OFF_R_BIT_MASK] & 0xff0000 &&
@@ -224,7 +216,7 @@ export class DDSLoader extends CompressedTextureLoader {
         ) {
           isRGBUncompressed = true;
           blockBytes = 64;
-          format = RGBAFormat;
+          format = PixelFormat.RGBA;
         } else {
           throw new Error("THREE.DDSLoader: Unsupported FourCC code " + int32ToFourCC(fourCC));
         }

@@ -5,7 +5,7 @@ import { ColorManagement } from "../../math/ColorManagement";
 import { FileLoader } from "../../loaders/FileLoader";
 import { Loader } from "../../loaders/Loader";
 import type { LoadingManager } from "../../loaders/LoadingManager";
-import { LinearSRGBColorSpace, SRGBColorSpace } from "../../constants";
+import { ColorSpace } from "../../constants";
 import { InterleavedBuffer } from "../../core/InterleavedBuffer";
 import { InterleavedBufferAttribute } from "../../core/InterleavedBufferAttribute";
 import { LoaderUtils } from "../../loaders/LoaderUtils";
@@ -281,7 +281,7 @@ export class DRACOLoader extends Loader<BufferGeometry, string> {
    * @param onError - Executed when errors occur.
    */
   parse(buffer: ArrayBuffer, onLoad?: DRACOOnLoad, onError: (error: unknown) => void = () => {}): void {
-    this.decodeDracoFile(buffer, onLoad ?? (() => {}), null, null, SRGBColorSpace, onError).catch(onError);
+    this.decodeDracoFile(buffer, onLoad ?? (() => {}), null, null, ColorSpace.SRGB, onError).catch(onError);
   }
 
   //
@@ -291,7 +291,7 @@ export class DRACOLoader extends Loader<BufferGeometry, string> {
     callback: DRACOOnLoad,
     attributeIDs: Record<string, string | number> | null = null,
     attributeTypes: Record<string, string> | null = null,
-    vertexColorSpace: string = LinearSRGBColorSpace,
+    vertexColorSpace: string = ColorSpace.LinearSRGB,
     onError: (error: unknown) => void = () => {},
   ): Promise<void> {
     const taskConfig = {
@@ -391,7 +391,7 @@ export class DRACOLoader extends Loader<BufferGeometry, string> {
       }
 
       if (name === "color") {
-        this._assignVertexColorSpace(attribute, vertexColorSpace ?? LinearSRGBColorSpace);
+        this._assignVertexColorSpace(attribute, vertexColorSpace ?? ColorSpace.LinearSRGB);
 
         attribute.normalized = array instanceof Float32Array === false;
       }
@@ -408,13 +408,13 @@ export class DRACOLoader extends Loader<BufferGeometry, string> {
     // file is passed into .load() or .parse(). GLTFLoader uses internal APIs
     // to decode geometry, and vertex colors are already Linear-sRGB in there.
 
-    if (inputColorSpace !== SRGBColorSpace) return;
+    if (inputColorSpace !== ColorSpace.SRGB) return;
 
     const _color = new Color();
 
     for (let i = 0, il = attribute.count; i < il; i++) {
       _color.fromBufferAttribute(attribute, i);
-      ColorManagement.colorSpaceToWorking(_color, SRGBColorSpace);
+      ColorManagement.colorSpaceToWorking(_color, ColorSpace.SRGB);
       attribute.setXYZ(i, _color.r, _color.g, _color.b);
     }
   }

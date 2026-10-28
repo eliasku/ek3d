@@ -4,7 +4,7 @@ import { test } from "vite-plus/test";
 import { PDBLoader } from "../src/addons/loaders/PDBLoader";
 import { VTKLoader } from "../src/addons/loaders/VTKLoader";
 import { BufferAttribute } from "../src/core/BufferAttribute";
-import { SRGBColorSpace } from "../src/constants";
+import { ColorSpace } from "../src/constants";
 import { Color } from "../src/math/Color";
 import type { BufferGeometry } from "../src/core/BufferGeometry";
 
@@ -75,8 +75,8 @@ test("VTK ASCII preserves upstream cell-color conversion and expansion", () => {
     "0.5 0.5 0.5",
   ].join("\n");
   const geometry = new VTKLoader().parse(new TextEncoder().encode(text).buffer as ArrayBuffer);
-  const linear = new Color().setRGB(0.5, 0.5, 0.5, SRGBColorSpace);
-  const twice = new Color().setRGB(linear.r, linear.g, linear.b, SRGBColorSpace);
+  const linear = new Color().setRGB(0.5, 0.5, 0.5, ColorSpace.SRGB);
+  const twice = new Color().setRGB(linear.r, linear.g, linear.b, ColorSpace.SRGB);
   const colors = attribute(geometry, "color");
   assert.equal(geometry.index, null);
   assert.equal(colors.count, 3);

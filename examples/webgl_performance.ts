@@ -5,7 +5,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { Stats } from "ek3d/addons/libs/Stats";
 import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { UltraHDRLoader } from "ek3d/addons/loaders/UltraHDRLoader";
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping } from "ek3d/constants";
+import { ToneMapping, Mapping } from "ek3d/constants";
 import { standardShader } from "ek3d/renderers/shaders/StandardShader";
 import { physicalShader } from "ek3d/renderers/shaders/PhysicalShader";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
@@ -35,7 +35,7 @@ const renderer = new WebGLRenderer({
   },
 });
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 1;
 const controls = new OrbitControls(camera, canvas);
 controls.minDistance = 2;
@@ -61,7 +61,7 @@ new UltraHDRLoader().load(
       return;
     }
     environment = texture;
-    texture.mapping = EquirectangularReflectionMapping;
+    texture.mapping = Mapping.EquirectangularReflection;
     scene.environment = texture;
     new GLTFLoader().load(
       "/examples/models/gltf/dungeon_warkarma.glb",

@@ -1,18 +1,4 @@
-import {
-  AddEquation,
-  CustomBlending,
-  DepthStencilFormat,
-  DstAlphaFactor,
-  DstColorFactor,
-  HalfFloatType,
-  NearestFilter,
-  NoBlending,
-  UnsignedByteType,
-  UnsignedInt248Type,
-  ZeroFactor,
-  RGBAFormat,
-  RepeatWrapping,
-} from "../../constants";
+import { Equation, Blending, PixelFormat, Factor, TextureType, TextureFilter, Wrapping } from "../../constants";
 import { Color } from "../../math/Color";
 import { DataTexture } from "../../textures/DataTexture";
 import { DepthTexture } from "../../textures/DepthTexture";
@@ -218,7 +204,10 @@ export class GTAOPass extends Pass {
     this.gtaoNoiseTexture = generateMagicSquareNoise();
     this.pdNoiseTexture = this._generateNoise();
 
-    this.gtaoRenderTarget = new WebGLRenderTarget(this.width, this.height, { type: HalfFloatType, depthBuffer: false });
+    this.gtaoRenderTarget = new WebGLRenderTarget(this.width, this.height, {
+      type: TextureType.HalfFloat,
+      depthBuffer: false,
+    });
     this.pdRenderTarget = this.gtaoRenderTarget.clone();
 
     this.gtaoMaterial = new ShaderMaterial({
@@ -226,7 +215,7 @@ export class GTAOPass extends Pass {
       uniforms: cloneUniforms(GTAOShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
       vertexShader: GTAOShader.vertexShader,
       fragmentShader: GTAOShader.fragmentShader,
-      blending: NoBlending,
+      blending: Blending.No,
       depthTest: false,
       depthWrite: false,
     } as never);
@@ -237,7 +226,7 @@ export class GTAOPass extends Pass {
     this.gtaoMaterial.uniforms!["cameraFar"].value = this.camera.far;
 
     this.normalMaterial = new MeshNormalMaterial();
-    this.normalMaterial.blending = NoBlending;
+    this.normalMaterial.blending = Blending.No;
 
     this.pdMaterial = new ShaderMaterial({
       defines: { ...PoissonDenoiseShader.defines },
@@ -260,7 +249,7 @@ export class GTAOPass extends Pass {
       uniforms: cloneUniforms(GTAODepthShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
       vertexShader: GTAODepthShader.vertexShader,
       fragmentShader: GTAODepthShader.fragmentShader,
-      blending: NoBlending,
+      blending: Blending.No,
     } as never);
     this.depthRenderMaterial.uniforms!["cameraNear"].value = this.camera.near;
     this.depthRenderMaterial.uniforms!["cameraFar"].value = this.camera.far;
@@ -272,12 +261,12 @@ export class GTAOPass extends Pass {
       transparent: true,
       depthTest: false,
       depthWrite: false,
-      blendSrc: DstColorFactor,
-      blendDst: ZeroFactor,
-      blendEquation: AddEquation,
-      blendSrcAlpha: DstAlphaFactor,
-      blendDstAlpha: ZeroFactor,
-      blendEquationAlpha: AddEquation,
+      blendSrc: Factor.DstColor,
+      blendDst: Factor.Zero,
+      blendEquation: Equation.Add,
+      blendSrcAlpha: Factor.DstAlpha,
+      blendDstAlpha: Factor.Zero,
+      blendEquationAlpha: Equation.Add,
     } as never);
 
     this.blendMaterial = new ShaderMaterial({
@@ -287,13 +276,13 @@ export class GTAOPass extends Pass {
       transparent: true,
       depthTest: false,
       depthWrite: false,
-      blending: CustomBlending,
-      blendSrc: DstColorFactor,
-      blendDst: ZeroFactor,
-      blendEquation: AddEquation,
-      blendSrcAlpha: DstAlphaFactor,
-      blendDstAlpha: ZeroFactor,
-      blendEquationAlpha: AddEquation,
+      blending: Blending.Custom,
+      blendSrc: Factor.DstColor,
+      blendDst: Factor.Zero,
+      blendEquation: Equation.Add,
+      blendSrcAlpha: Factor.DstAlpha,
+      blendDstAlpha: Factor.Zero,
+      blendEquationAlpha: Equation.Add,
     } as never);
 
     this._fsQuad = new FullScreenQuad(null);
@@ -381,19 +370,19 @@ export class GTAOPass extends Pass {
         const depthTextureInternal = new DepthTexture(
           this.width,
           this.height,
-          UnsignedInt248Type,
+          TextureType.UnsignedInt248,
           undefined,
           undefined,
           undefined,
-          NearestFilter,
-          NearestFilter,
+          TextureFilter.Nearest,
+          TextureFilter.Nearest,
           undefined,
-          DepthStencilFormat,
+          PixelFormat.DepthStencil,
         );
         this.normalRenderTarget = new WebGLRenderTarget(this.width, this.height, {
-          minFilter: NearestFilter,
-          magFilter: NearestFilter,
-          type: HalfFloatType,
+          minFilter: TextureFilter.Nearest,
+          magFilter: TextureFilter.Nearest,
+          type: TextureType.HalfFloat,
           depthTexture: depthTextureInternal,
         });
       }
@@ -569,19 +558,19 @@ export class GTAOPass extends Pass {
 
       case GTAOPass.OUTPUT.Diffuse:
         this.copyMaterial.uniforms["tDiffuse"].value = readBuffer.texture;
-        this.copyMaterial.blending = NoBlending;
+        this.copyMaterial.blending = Blending.No;
         this._renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
         break;
 
       case GTAOPass.OUTPUT.AO:
         this.copyMaterial.uniforms["tDiffuse"].value = this.gtaoRenderTarget.texture;
-        this.copyMaterial.blending = NoBlending;
+        this.copyMaterial.blending = Blending.No;
         this._renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
         break;
 
       case GTAOPass.OUTPUT.Denoise:
         this.copyMaterial.uniforms["tDiffuse"].value = this.pdRenderTarget.texture;
-        this.copyMaterial.blending = NoBlending;
+        this.copyMaterial.blending = Blending.No;
         this._renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
         break;
 
@@ -593,13 +582,13 @@ export class GTAOPass extends Pass {
 
       case GTAOPass.OUTPUT.Normal:
         this.copyMaterial.uniforms["tDiffuse"].value = this.normalTexture || null;
-        this.copyMaterial.blending = NoBlending;
+        this.copyMaterial.blending = Blending.No;
         this._renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
         break;
 
       case GTAOPass.OUTPUT.Default:
         this.copyMaterial.uniforms["tDiffuse"].value = readBuffer.texture;
-        this.copyMaterial.blending = NoBlending;
+        this.copyMaterial.blending = Blending.No;
         this._renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
 
         this.blendMaterial.uniforms["intensity"].value = this.blendIntensity;
@@ -719,9 +708,9 @@ export class GTAOPass extends Pass {
       }
     }
 
-    const noiseTexture = new DataTexture(data, size, size, RGBAFormat, UnsignedByteType);
-    noiseTexture.wrapS = RepeatWrapping;
-    noiseTexture.wrapT = RepeatWrapping;
+    const noiseTexture = new DataTexture(data, size, size, PixelFormat.RGBA, TextureType.UnsignedByte);
+    noiseTexture.wrapS = Wrapping.Repeat;
+    noiseTexture.wrapT = Wrapping.Repeat;
     noiseTexture.needsUpdate = true;
 
     return noiseTexture;

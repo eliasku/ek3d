@@ -1,10 +1,5 @@
 import type { Texture } from "../../textures/Texture";
-import {
-  CubeReflectionMapping,
-  CubeRefractionMapping,
-  EquirectangularReflectionMapping,
-  EquirectangularRefractionMapping,
-} from "../../constants";
+import { Mapping } from "../../constants";
 
 export interface WebGLEnvironmentProvider {
   get(texture: Texture | null | undefined, usePMREM?: boolean): Texture | null;
@@ -20,8 +15,8 @@ export function getEnvironment(
   if (texture.isTexture && !(usePMREM && texture.isPMREMTexture === true)) {
     const mapping = texture.mapping;
     const equirectangular =
-      mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping;
-    const cube = mapping === CubeReflectionMapping || mapping === CubeRefractionMapping;
+      mapping === Mapping.EquirectangularReflection || mapping === Mapping.EquirectangularRefraction;
+    const cube = mapping === Mapping.CubeReflection || mapping === Mapping.CubeRefraction;
     if (equirectangular || (usePMREM && cube)) throw new Error("Environment maps require createEnvironments.");
   }
   return texture;

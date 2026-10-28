@@ -2,7 +2,7 @@ import { GLTFLoader, type GLTF, type MeshoptDecoderLike } from "ek3d/addons/load
 import { KTX2Loader } from "ek3d/addons/loaders/KTX2Loader";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import { ACESFilmicToneMapping, SRGBColorSpace } from "ek3d/constants";
+import { ToneMapping, ColorSpace } from "ek3d/constants";
 import { Object3D } from "ek3d/core/Object3D";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { AmbientLight } from "ek3d/lights/AmbientLight";
@@ -25,7 +25,7 @@ import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { normalShader } from "ek3d/renderers/shaders/NormalShader";
 import { Scene } from "ek3d/scenes/Scene";
 import { VideoTexture } from "ek3d/textures/VideoTexture";
-import type * as Vision from "./public/examples/libs/mediapipe/vision_bundle.mjs";
+import type * as Vision from "../public/examples/libs/mediapipe/vision_bundle.mjs";
 import { disposeObject } from "./dispose-object";
 import { applyBlendshapes } from "./webgl_morphtargets_webcam_blendshapes";
 
@@ -54,7 +54,7 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 const camera = new PerspectiveCamera(63, window.innerWidth / window.innerHeight, 1, 10000);
 const scene = new Scene();
 scene.background = new Color(0x666666);
@@ -74,7 +74,7 @@ const video = document.createElement("video");
 video.playsInline = true;
 video.muted = true;
 const texture = new VideoTexture(video);
-texture.colorSpace = SRGBColorSpace;
+texture.colorSpace = ColorSpace.SRGB;
 const videoMesh = new Mesh(
   new PlaneGeometry(1, 1),
   new MeshBasicMaterial({ map: texture, depthTest: false, depthWrite: false }),

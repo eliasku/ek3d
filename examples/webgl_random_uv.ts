@@ -4,13 +4,7 @@ import { DRACOLoader, DRACO_GLTF_CONFIG } from "ek3d/addons/loaders/DRACOLoader"
 import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { HDRLoader } from "ek3d/addons/loaders/HDRLoader";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
-import {
-  ACESFilmicToneMapping,
-  EquirectangularReflectionMapping,
-  RepeatWrapping,
-  SRGBColorSpace,
-  VSMShadowMap,
-} from "ek3d/constants";
+import { ToneMapping, Mapping, Wrapping, ColorSpace, ShadowMap } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { DirectionalLight } from "ek3d/lights/DirectionalLight";
 import { LoadingManager } from "ek3d/loaders/LoadingManager";
@@ -56,10 +50,10 @@ const renderer = new WebGLRenderer({
 });
 renderer.setPixelRatio(devicePixelRatio);
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMapping = ToneMapping.ACESFilmic;
 renderer.toneMappingExposure = 0.7;
 renderer.shadowMap!.enabled = true;
-renderer.shadowMap!.type = VSMShadowMap;
+renderer.shadowMap!.type = ShadowMap.VSM;
 const light = new DirectionalLight(0xffffff, 3);
 light.position.set(-0.5, 1, 0.8);
 light.castShadow = true;
@@ -106,8 +100,8 @@ manager.onLoad = () => {
 const textures = new TextureLoader(manager);
 const map = textures.load("/examples/textures/jade.jpg", render, undefined, fail);
 controls.addEventListener("change", render);
-map.colorSpace = SRGBColorSpace;
-map.wrapS = map.wrapT = RepeatWrapping;
+map.colorSpace = ColorSpace.SRGB;
+map.wrapS = map.wrapT = Wrapping.Repeat;
 map.repeat.set(20, 20);
 map.flipY = false;
 const dissolveMap = textures.load("/examples/textures/shaderball_ds.jpg", render, undefined, fail);
@@ -120,7 +114,7 @@ const env = new HDRLoader(manager).load(
       texture.dispose();
       return;
     }
-    texture.mapping = EquirectangularReflectionMapping;
+    texture.mapping = Mapping.EquirectangularReflection;
     scene.background = scene.environment = texture;
     scene.backgroundBlurriness = 0.5;
     scene.backgroundIntensity = 1;
