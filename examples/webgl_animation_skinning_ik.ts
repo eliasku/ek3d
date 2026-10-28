@@ -3,7 +3,7 @@ import { OrbitControls } from "ek3d/addons/controls/OrbitControls";
 import { TransformControls } from "ek3d/addons/controls/TransformControls";
 import { GUI } from "ek3d/addons/libs/lil-gui/GUI";
 import { Stats } from "ek3d/addons/libs/Stats";
-import { DRACOLoader } from "ek3d/addons/loaders/DRACOLoader";
+import { DRACOLoader, DRACO_GLTF_CONFIG } from "ek3d/addons/loaders/DRACOLoader";
 import { GLTFLoader } from "ek3d/addons/loaders/GLTFLoader";
 import { CubeCamera } from "ek3d/cameras/CubeCamera";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
@@ -72,7 +72,7 @@ transform.addEventListener("mouseUp", () => {
 });
 const stats = new Stats();
 document.body.appendChild(stats.dom);
-const draco = new DRACOLoader().setDecoderPath("/examples/libs/draco/gltf/");
+const draco = new DRACOLoader().setDecoderPath(DRACO_GLTF_CONFIG);
 const loader = new GLTFLoader().setDRACOLoader(draco);
 const cubeTarget = new WebGLCubeRenderTarget(1024);
 const cubeCamera = new CubeCamera(0.05, 50, cubeTarget);
