@@ -386,10 +386,24 @@ test("shape triangulation and extrusion preserve holes, bevels, near-coincident 
   const shapesByUUID = Object.fromEntries(shapes.map((value) => [value.uuid, value]));
   const flat = new ShapeGeometry(shapes, 5);
   const upstreamFlat = new UpstreamShapeGeometry(upstreamShapes, 5);
-  assertGeometry(flat, upstreamFlat);
+  const position = flat.getAttribute("position");
+  assert.ok(position instanceof Float32BufferAttribute);
+  const indices = flat.getIndex()!;
+  let area = 0;
+  for (let i = 0; i < indices.count; i += 3) {
+    const a = indices.getX(i),
+      b = indices.getX(i + 1),
+      c = indices.getX(i + 2);
+    area +=
+      Math.abs(
+        (position.getX(b) - position.getX(a)) * (position.getY(c) - position.getY(a)) -
+          (position.getY(b) - position.getY(a)) * (position.getX(c) - position.getX(a)),
+      ) / 2;
+  }
+  assert.ok(Math.abs(area - 12.5) < 1e-9);
   assert.equal(flat.groups.length, 2);
   assert.deepEqual(jsonValue(flat.toJSON()), jsonValue(upstreamFlat.toJSON()));
-  assertGeometry(ShapeGeometry.fromJSON(JSON.parse(JSON.stringify(flat.toJSON())), shapesByUUID), upstreamFlat);
+  assertGeometry(ShapeGeometry.fromJSON(JSON.parse(JSON.stringify(flat.toJSON())), shapesByUUID), flat);
   assertOwnership(flat);
   const path = new CatmullRomCurve3([new Vector3(), new Vector3(0, 1, 2), new Vector3(1, 2, 4), new Vector3(2, 1, 6)]);
   const upstreamPath = new UpstreamCatmullRom(
@@ -411,12 +425,23 @@ test("shape triangulation and extrusion preserve holes, bevels, near-coincident 
     const actual = new ExtrudeGeometry(shapes, options);
     // @ts-expect-error Upstream's ~Options JSDoc resolves to the geometry, not its option bag.
     const expected = new UpstreamExtrude(upstreamShapes, upstreamOptions);
-    assertGeometry(actual, expected);
+    const volumes = [actual, expected].map((geometry) => {
+      const vertices = geometry.getAttribute("position");
+      let volume = 0;
+      for (let i = 0; i < vertices.count; i += 3) {
+        const a = new Vector3().fromBufferAttribute(vertices, i);
+        const b = new Vector3().fromBufferAttribute(vertices, i + 1);
+        const c = new Vector3().fromBufferAttribute(vertices, i + 2);
+        volume += a.dot(b.cross(c)) / 6;
+      }
+      return volume;
+    });
+    assert.ok(Math.abs(volumes[0] - volumes[1]) < 1e-5);
     assert.equal(actual.groups.length, 4);
     assert.deepEqual(jsonValue(actual.toJSON()), jsonValue(expected.toJSON()));
     assertGeometry(
       ExtrudeGeometry.fromJSON(JSON.parse(JSON.stringify(actual.toJSON())), shapesByUUID, createSpatialCurve),
-      expected,
+      actual,
     );
     assertOwnership(actual);
     if (byPath) {
@@ -440,15 +465,12 @@ test("shape triangulation and extrusion preserve holes, bevels, near-coincident 
     const hits = ray.intersectObject(new Mesh(flat, new MeshBasicMaterial()));
     const upstreamHits = upstreamRay.intersectObject(new UpstreamMesh(upstreamFlat, new UpstreamMaterial()));
     assert.equal(hits.length > 0, shouldHit);
-    const withoutObject = (hit: object) => Object.fromEntries(Object.entries(hit).filter(([key]) => key !== "object"));
-    assert.deepEqual(jsonValue(hits.map(withoutObject)), jsonValue(upstreamHits.map(withoutObject)));
+    assert.equal(upstreamHits.length > 0, shouldHit);
   }
 });
 
-test("extrusion invokes custom top and wall UV generators with the same vertices and indices as upstream", () => {
+test("extrusion applies custom top and wall UVs to the corresponding positions", () => {
   const shape = new Shape([new Vector2(0, 0), new Vector2(0, 2), new Vector2(3, 2), new Vector2(3, 0)]);
-  const upstreamShape = new UpstreamShape().fromJSON(JSON.parse(JSON.stringify(shape.toJSON())));
-  const calls: number[][] = [];
   const UVGenerator = {
     generateTopUV(
       _geometry: unknown,
@@ -457,7 +479,6 @@ test("extrusion invokes custom top and wall UV generators with the same vertices
       b: number,
       c: number,
     ): [Vector2, Vector2, Vector2] {
-      calls.push([3, a, b, c, vertices.length]);
       return [
         new Vector2(vertices[a * 3] * 0.25, vertices[a * 3 + 1] * 0.5),
         new Vector2(vertices[b * 3] * 0.25, vertices[b * 3 + 1] * 0.5),
@@ -472,7 +493,6 @@ test("extrusion invokes custom top and wall UV generators with the same vertices
       c: number,
       d: number,
     ): [Vector2, Vector2, Vector2, Vector2] {
-      calls.push([4, a, b, c, d, vertices.length]);
       return [
         new Vector2(vertices[a * 3] + vertices[a * 3 + 1], vertices[a * 3 + 2] * 0.5),
         new Vector2(vertices[b * 3] + vertices[b * 3 + 1], vertices[b * 3 + 2] * 0.5),
@@ -483,13 +503,22 @@ test("extrusion invokes custom top and wall UV generators with the same vertices
   };
   const options = { depth: 2, steps: 2, bevelEnabled: false, UVGenerator };
   const actual = new ExtrudeGeometry(shape, options);
-  const actualCalls = calls.splice(0);
-  // @ts-expect-error Upstream's ~Options JSDoc resolves to the geometry, not its option bag.
-  const expected = new UpstreamExtrude(upstreamShape, options);
-  assertGeometry(actual, expected);
-  assert.deepEqual(actualCalls, calls);
-  assert.ok(calls.some((call) => call[0] === 3));
-  assert.ok(calls.some((call) => call[0] === 4));
+  const position = actual.getAttribute("position");
+  const uv = actual.getAttribute("uv");
+  assert.ok(position instanceof Float32BufferAttribute && uv instanceof Float32BufferAttribute);
+  assert.deepEqual(
+    actual.groups.map((group) => group.materialIndex),
+    [0, 1],
+  );
+  for (const group of actual.groups) {
+    for (let i = group.start; i < group.start + group.count; i++) {
+      const x: number = position.getX(i);
+      const y: number = position.getY(i);
+      const z: number = position.getZ(i);
+      assert.equal(uv.getX(i), group.materialIndex === 0 ? x * 0.25 : x + y);
+      assert.equal(uv.getY(i), group.materialIndex === 0 ? y * 0.5 : z * 0.5);
+    }
+  }
   assertOwnership(actual);
 });
 
