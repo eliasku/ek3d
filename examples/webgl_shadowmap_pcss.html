@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — percent closer soft shadows</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #cce0ff;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        z-index: 1;
+        top: 10px;
+        width: 100%;
+        text-align: center;
+        pointer-events: none;
+      }
+      #info a {
+        color: #08f;
+        pointer-events: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="info">
+      Percent Closer Soft-Shadows (PCSS) by <a href="https://github.com/spidersharma03">spidersharma03</a>
+    </div>
+    <script type="module" src="./webgl_shadowmap_pcss.ts"></script>
+  </body>
+</html>

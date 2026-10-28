@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — wide gamut</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+      }
+      #wrapper,
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #slider {
+        position: absolute;
+        width: 80px;
+        height: 100%;
+        top: 0;
+        z-index: 1;
+        touch-action: none;
+        cursor: ew-resize;
+      }
+      #slider::before {
+        position: absolute;
+        left: 50%;
+        width: 2px;
+        height: 100%;
+        background: white;
+        content: "";
+      }
+      #slider::after {
+        position: absolute;
+        left: calc(50% - 3px);
+        top: 35%;
+        width: 8px;
+        height: 30%;
+        background: white;
+        border-radius: 4px;
+        content: "";
+      }
+      .label {
+        position: absolute;
+        top: 50%;
+        z-index: 2;
+        color: white;
+        background: #0008;
+        padding: 6px;
+        font: 14px sans-serif;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper">
+      <canvas id="scene"></canvas>
+      <div id="slider"></div>
+      <div class="label" style="left: 1em">sRGB</div>
+      <div class="label" style="right: 1em">Display P3</div>
+    </div>
+    <script type="module" src="./webgl_test_wide_gamut.ts"></script>
+  </body>
+</html>

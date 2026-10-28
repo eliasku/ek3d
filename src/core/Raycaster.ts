@@ -26,6 +26,7 @@ import { error } from "../utils";
 export interface Intersection {
   distance: number;
   point: Vector3;
+  pointOnLine?: Vector3;
   object: Object3D;
   distanceToRay?: number;
   face?: { a: number; b: number; c: number; normal: Vector3; materialIndex: number } | null;
@@ -52,6 +53,7 @@ export class Raycaster {
   params: {
     Mesh: Record<string, unknown>;
     Line: { threshold: number };
+    Line2?: { threshold?: number };
     LOD: Record<string, unknown>;
     Points: { threshold: number };
     Sprite: Record<string, unknown>;

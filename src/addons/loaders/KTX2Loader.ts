@@ -479,11 +479,7 @@ export class KTX2Loader extends Loader<
     if (messageType === "error") return Promise.reject(new Error(error)) as never;
     let texture: CompressedTexture | CompressedArrayTexture | CompressedCubeTexture;
     if (container.faceCount === 6) {
-      texture = new CompressedCubeTexture(
-        faces.map((f) => f.mipmaps.map((m) => ({ data: m.data, width: m.width, height: m.height }))) as never,
-        format as never,
-        type as never,
-      );
+      texture = new CompressedCubeTexture(faces, format, type);
     } else {
       const mipmaps = faces[0].mipmaps;
       texture =

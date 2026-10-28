@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sponza light probes</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      progress {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas><progress id="progress" max="100" value="0"></progress>
+    <script type="module" src="./webgl_lightprobes_sponza.ts"></script>
+  </body>
+</html>

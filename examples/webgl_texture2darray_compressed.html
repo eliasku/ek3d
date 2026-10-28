@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — volume</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div style="position: absolute; top: 0; width: 100%; text-align: center; color: white; pointer-events: none">
+      Loop from Spirited Away by
+      <a style="color: white; pointer-events: auto" href="https://www.ghibli.jp/">Studio Ghibli</a>
+    </div>
+    <script type="module" src="./webgl_texture2darray_compressed.ts"></script>
+  </body>
+</html>

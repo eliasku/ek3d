@@ -1,6 +1,6 @@
 {
   "schema": "addon-scope/v2",
-  "generated_at": "2026-10-27T22:32:18.000Z",
+  "generated_at": "2026-10-28T19:30:38.741Z",
   "source": {
     "artifact": "local://addon-files.json -> .work/addon-inventory.json",
     "schema": "addon-inventory/v1",
@@ -50,23 +50,23 @@
   "totals": {
     "modules": {
       "total": 500,
-      "candidate": 121,
-      "ported": 166,
-      "excluded": 213,
+      "candidate": 48,
+      "ported": 238,
+      "excluded": 214,
       "lines_total": 222616,
-      "candidate_lines": 70304,
-      "ported_lines": 68709,
-      "excluded_lines": 83603,
+      "candidate_lines": 24561,
+      "ported_lines": 114436,
+      "excluded_lines": 83619,
       "by_category": {
         "excluded-aggregate": 1,
-        "candidate": 121,
+        "candidate": 48,
+        "ported": 238,
         "excluded-backend-capability": 1,
-        "ported": 166,
         "excluded-backend": 51,
         "excluded-effect": 4,
         "excluded-directory": 133,
         "excluded-vendor-runtime": 18,
-        "excluded-deprecated": 1,
+        "excluded-deprecated": 2,
         "excluded-renderer": 4
       },
       "needs_adaptation": [
@@ -79,7 +79,7 @@
         "examples/jsm/loaders/KTX2Loader.js"
       ],
       "dependency_edges_to_excluded": 167,
-      "edges_from_pending_candidates": 13
+      "edges_from_pending_candidates": 7
     },
     "shaders": {
       "upstream": 52,
@@ -143,12 +143,12 @@
     },
     "pages": {
       "total": 617,
-      "candidate": 132,
-      "ported": 189,
+      "candidate": 19,
+      "ported": 302,
       "excluded": 296,
       "lines_total": 157006,
-      "candidate_lines": 37262,
-      "ported_lines": 39471,
+      "candidate_lines": 5210,
+      "ported_lines": 71523,
       "excluded_lines": 80273,
       "excluded_by_category": {
         "page-css2d": 1,
@@ -161,15 +161,12 @@
         "page-webgpu": 238,
         "page-webxr": 27
       },
-      "candidates_with_dependency_issues": 1,
-      "candidate_dependency_issues": ["examples/webgl_loader_pdb.html"],
+      "candidates_with_dependency_issues": 0,
+      "candidate_dependency_issues": [],
       "candidate_excluded_dependency_counts": {
-        "examples/jsm/libs/lil-gui.module.min.js": 68,
-        "examples/jsm/libs/stats.module.js": 66,
-        "examples/jsm/libs/tween.module.js": 2,
-        "examples/jsm/renderers/CSS2DRenderer.js": 1,
-        "examples/jsm/libs/meshopt_decoder.module.js": 1,
-        "examples/jsm/libs/fflate.module.js": 2
+        "examples/jsm/libs/stats.module.js": 10,
+        "examples/jsm/libs/lil-gui.module.min.js": 9,
+        "examples/jsm/libs/meshopt_decoder.module.js": 1
       },
       "external_runtime_pages": [
         {
@@ -192,7 +189,7 @@
         }
       ]
     },
-    "progress_note": "Through iteration 24: 166 upstream addon modules and 189 upstream pages ported. This batch adds GeometryUtils and fifty-two pages covering textures/materials, custom points/lines, cameras/clipping, multi-view rendering, render targets, shaders and panoramas. Comprehensive browser interactions remain deferred to the combined pass. The project is non-commercial; third-party redistribution restrictions still apply."
+    "progress_note": "Through iteration 27: 219 upstream addon modules and 291 upstream pages ported. This batch adds 19 addons and 18 pages: Collada/KMZ, SVG, VRML, IK, cascaded shadows, progressive lightmaps, FPS collision, offscreen workers, priority loading, random UVs, watch and four Web Audio examples. Core audio modules and AudioLoader support the audio pages. KMZ, VRML and ProgressiveLightMap use explicitly injected runtimes. Comprehensive page interactions and browser/device coverage remain deferred. Asset-specific redistribution restrictions still apply."
   },
   "module_dependency_review": [
     {
@@ -803,7 +800,7 @@
       "dependents": [
         {
           "path": "examples/jsm/loaders/VRMLLoader.js",
-          "status": "candidate"
+          "status": "ported"
         }
       ]
     },
@@ -837,7 +834,7 @@
         },
         {
           "path": "examples/jsm/loaders/KMZLoader.js",
-          "status": "candidate"
+          "status": "ported"
         },
         {
           "path": "examples/jsm/loaders/materialx/MaterialXArchive.js",
@@ -845,7 +842,7 @@
         },
         {
           "path": "examples/jsm/loaders/NRRDLoader.js",
-          "status": "candidate"
+          "status": "ported"
         },
         {
           "path": "examples/jsm/loaders/SPZLoader.js",
@@ -853,11 +850,11 @@
         },
         {
           "path": "examples/jsm/loaders/USDLoader.js",
-          "status": "candidate"
+          "status": "ported"
         },
         {
           "path": "examples/jsm/loaders/VTKLoader.js",
-          "status": "candidate"
+          "status": "ported"
         }
       ]
     },
@@ -901,7 +898,7 @@
       "dependents": [
         {
           "path": "examples/jsm/misc/ProgressiveLightMap.js",
-          "status": "candidate"
+          "status": "ported"
         },
         {
           "path": "examples/jsm/misc/ProgressiveLightMapGPU.js",
@@ -1487,18 +1484,27 @@
     },
     {
       "path": "examples/jsm/animation/AnimationClipCreator.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/animation/AnimationClipCreator.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/animation/CCDIKSolver.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/animation/CCDIKSolver.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/capabilities/WebGL.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/capabilities/WebGL.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/capabilities/WebGPU.js",
@@ -1563,23 +1569,35 @@
     },
     {
       "path": "examples/jsm/csm/CSM.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/csm/CSM.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/csm/CSMFrustum.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/csm/CSMFrustum.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/csm/CSMHelper.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/csm/CSMHelper.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/csm/CSMShader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/csm/CSMShader.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/csm/CSMShadowNode.js",
@@ -1589,8 +1607,11 @@
     },
     {
       "path": "examples/jsm/curves/CurveExtras.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/curves/CurveExtras.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/curves/NURBSCurve.js",
@@ -1657,8 +1678,11 @@
     },
     {
       "path": "examples/jsm/environments/ColorEnvironment.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/environments/ColorEnvironment.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/environments/DebugEnvironment.js",
@@ -1834,18 +1858,27 @@
     },
     {
       "path": "examples/jsm/geometries/BoxLineGeometry.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/geometries/BoxLineGeometry.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/geometries/ConvexGeometry.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/geometries/ConvexGeometry.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/geometries/DecalGeometry.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/geometries/DecalGeometry.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/geometries/LoftGeometry.js",
@@ -1874,8 +1907,11 @@
     },
     {
       "path": "examples/jsm/geometries/TeapotGeometry.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/geometries/TeapotGeometry.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/geometries/TextGeometry.js",
@@ -1909,13 +1945,19 @@
     },
     {
       "path": "examples/jsm/helpers/LightProbeGridHelperWebGL.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/helpers/LightProbeGridHelperWebGL.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/helpers/LightProbeHelper.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/helpers/LightProbeHelper.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/helpers/LightProbeHelperGPU.js",
@@ -1925,13 +1967,19 @@
     },
     {
       "path": "examples/jsm/helpers/OctreeHelper.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/helpers/OctreeHelper.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/helpers/PositionalAudioHelper.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/helpers/PositionalAudioHelper.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/helpers/RapierHelper.js",
@@ -1940,8 +1988,11 @@
     },
     {
       "path": "examples/jsm/helpers/RectAreaLightHelper.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/helpers/RectAreaLightHelper.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/helpers/TextureHelper.js",
@@ -2813,13 +2864,19 @@
     },
     {
       "path": "examples/jsm/lighting/LightProbeGridUtils.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/lighting/LightProbeGridUtils.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/lighting/LightProbeGridWebGL.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/lighting/LightProbeGridWebGL.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/lighting/vxgi/VXGIConeTracer.js",
@@ -2853,8 +2910,11 @@
     },
     {
       "path": "examples/jsm/lights/LightProbeGenerator.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/lights/LightProbeGenerator.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/lights/RectAreaLightTexturesLib.js",
@@ -2894,38 +2954,59 @@
     },
     {
       "path": "examples/jsm/lines/Line2.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/lines/Line2.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/lines/LineGeometry.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/lines/LineGeometry.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/lines/LineMaterial.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/lines/LineMaterial.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/lines/LineSegments2.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/lines/LineSegments2.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/lines/LineSegmentsGeometry.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/lines/LineSegmentsGeometry.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/lines/Wireframe.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/lines/Wireframe.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/lines/WireframeGeometry2.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/lines/WireframeGeometry2.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/lines/webgpu/Line2.js",
@@ -2985,8 +3066,11 @@
     },
     {
       "path": "examples/jsm/loaders/ColladaLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/ColladaLoader.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/loaders/DDSLoader.js",
@@ -3072,24 +3156,33 @@
     },
     {
       "path": "examples/jsm/loaders/IESLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/IESLoader.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/loaders/JXLLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/JXLLoader.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/loaders/KMZLoader.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "depends_on_excluded": [
         {
           "path": "examples/jsm/libs/fflate.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_path": "src/addons/loaders/KMZLoader.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/loaders/KSPLATLoader.js",
@@ -3183,14 +3276,17 @@
     },
     {
       "path": "examples/jsm/loaders/NRRDLoader.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "depends_on_excluded": [
         {
           "path": "examples/jsm/libs/fflate.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_path": "src/addons/loaders/NRRDLoader.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/loaders/OBJLoader.js",
@@ -3207,8 +3303,11 @@
     },
     {
       "path": "examples/jsm/loaders/PDBLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/PDBLoader.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/loaders/PLYLoader.js",
@@ -3257,8 +3356,11 @@
     },
     {
       "path": "examples/jsm/loaders/SVGLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/SVGLoader.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/loaders/TDSLoader.js",
@@ -3296,19 +3398,23 @@
     },
     {
       "path": "examples/jsm/loaders/USDLoader.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "depends_on_excluded": [
         {
           "path": "examples/jsm/libs/fflate.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_path": "src/addons/loaders/USDLoader.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/loaders/USDZLoader.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "excluded",
+      "category": "excluded-deprecated",
+      "reason": "Deprecated USDZLoader alias; use USDLoader at its canonical path"
     },
     {
       "path": "examples/jsm/loaders/UltraHDRLoader.js",
@@ -3325,25 +3431,31 @@
     },
     {
       "path": "examples/jsm/loaders/VRMLLoader.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "depends_on_excluded": [
         {
           "path": "examples/jsm/libs/chevrotain.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_path": "src/addons/loaders/VRMLLoader.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/loaders/VTKLoader.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "depends_on_excluded": [
         {
           "path": "examples/jsm/libs/fflate.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_path": "src/addons/loaders/VTKLoader.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/loaders/XYZLoader.js",
@@ -3353,13 +3465,19 @@
     },
     {
       "path": "examples/jsm/loaders/collada/ColladaComposer.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/collada/ColladaComposer.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/loaders/collada/ColladaParser.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/collada/ColladaParser.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/loaders/lwo/IFFParser.js",
@@ -3450,18 +3568,27 @@
     },
     {
       "path": "examples/jsm/loaders/usd/USDAParser.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/usd/USDAParser.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/loaders/usd/USDCParser.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/usd/USDCParser.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/loaders/usd/USDComposer.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/loaders/usd/USDComposer.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/materials/LDrawConditionalLineMaterial.js",
@@ -3483,13 +3610,19 @@
     },
     {
       "path": "examples/jsm/math/Capsule.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/math/Capsule.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/math/ColorConverter.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/math/ColorConverter.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/math/ColorSpaces.js",
@@ -3499,8 +3632,11 @@
     },
     {
       "path": "examples/jsm/math/ConvexHull.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/math/ConvexHull.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/math/ImprovedNoise.js",
@@ -3510,8 +3646,11 @@
     },
     {
       "path": "examples/jsm/math/Lut.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/math/Lut.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/math/MeshSurfaceSampler.js",
@@ -3522,13 +3661,19 @@
     },
     {
       "path": "examples/jsm/math/OBB.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/math/OBB.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/math/Octree.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/math/Octree.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/math/SimplexNoise.js",
@@ -3539,13 +3684,19 @@
     },
     {
       "path": "examples/jsm/misc/ConvexObjectBreaker.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/ConvexObjectBreaker.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/misc/GPUComputationRenderer.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/GPUComputationRenderer.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/misc/Gyroscope.js",
@@ -3582,14 +3733,17 @@
     },
     {
       "path": "examples/jsm/misc/ProgressiveLightMap.js",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "depends_on_excluded": [
         {
           "path": "examples/jsm/libs/potpack.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_path": "src/addons/misc/ProgressiveLightMap.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/misc/ProgressiveLightMapGPU.js",
@@ -3610,23 +3764,35 @@
     },
     {
       "path": "examples/jsm/misc/Sculptor.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/Sculptor.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/misc/SculptorMesh.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/SculptorMesh.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/misc/SculptorTools.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/SculptorTools.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/misc/SculptorUtils.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/SculptorUtils.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/misc/TileCreasedNormalsPlugin.js",
@@ -3640,18 +3806,27 @@
     },
     {
       "path": "examples/jsm/misc/Volume.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/Volume.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/misc/VolumeSlice.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/misc/VolumeSlice.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/modifiers/CurveModifier.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/modifiers/CurveModifier.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/modifiers/CurveModifierGPU.js",
@@ -3661,8 +3836,11 @@
     },
     {
       "path": "examples/jsm/modifiers/EdgeSplitModifier.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/modifiers/EdgeSplitModifier.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/modifiers/SimplifyModifier.js",
@@ -3679,8 +3857,11 @@
     },
     {
       "path": "examples/jsm/modifiers/TessellateModifier.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/modifiers/TessellateModifier.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/objects/GaussianSplat.js",
@@ -3702,8 +3883,11 @@
     },
     {
       "path": "examples/jsm/objects/Lensflare.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/objects/Lensflare.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/objects/LensflareMesh.js",
@@ -3713,8 +3897,11 @@
     },
     {
       "path": "examples/jsm/objects/MarchingCubes.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/objects/MarchingCubes.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/objects/Reflector.js",
@@ -3739,8 +3926,11 @@
     },
     {
       "path": "examples/jsm/objects/ShadowMesh.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/objects/ShadowMesh.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/objects/Sky.js",
@@ -3782,23 +3972,35 @@
     },
     {
       "path": "examples/jsm/offscreen/jank.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/offscreen/jank.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/offscreen/offscreen.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/offscreen/offscreen.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/offscreen/scene.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/offscreen/scene.ts",
+      "ported_iteration": 27,
+      "reason": "iteration 27: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/physics/AmmoPhysics.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/physics/AmmoPhysics.ts",
+      "ported_iteration": 28,
+      "reason": "iteration 28: typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/physics/JoltPhysics.js",
@@ -5046,8 +5248,11 @@
     },
     {
       "path": "examples/jsm/utils/CameraUtils.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/utils/CameraUtils.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/utils/ColorUtils.js",
@@ -5087,8 +5292,11 @@
     },
     {
       "path": "examples/jsm/utils/ShadowMapViewer.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/utils/ShadowMapViewer.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/utils/ShadowMapViewerGPU.js",
@@ -5105,13 +5313,19 @@
     },
     {
       "path": "examples/jsm/utils/SortUtils.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/utils/SortUtils.ts",
+      "ported_iteration": 25,
+      "reason": "iteration 25: complete typed addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/utils/UVsDebug.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/utils/UVsDebug.ts",
+      "ported_iteration": 26,
+      "reason": "iteration 26: typed WebGL addon for the bulk example migration"
     },
     {
       "path": "examples/jsm/utils/WebGLTextureUtils.js",
@@ -5373,8 +5587,8 @@
     },
     {
       "path": "examples/games_fps.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -5384,7 +5598,8 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 27
     },
     {
       "path": "examples/index.html",
@@ -5624,74 +5839,81 @@
     },
     {
       "path": "examples/misc_uv_tests.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 26
     },
     {
       "path": "examples/physics_ammo_break.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 28
     },
     {
       "path": "examples/physics_ammo_cloth.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 28
     },
     {
       "path": "examples/physics_ammo_instancing.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 28
     },
     {
       "path": "examples/physics_ammo_rope.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 28
     },
     {
       "path": "examples/physics_ammo_terrain.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 28
     },
     {
       "path": "examples/physics_ammo_volume.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 28
     },
     {
       "path": "examples/physics_jolt_instancing.html",
@@ -5803,29 +6025,33 @@
     },
     {
       "path": "examples/webaudio_orientation.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 27
     },
     {
       "path": "examples/webaudio_sandbox.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 27
     },
     {
       "path": "examples/webaudio_timing.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 27
     },
     {
       "path": "examples/webaudio_visualizer.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 27
     },
     {
       "path": "examples/webgl_animation_keyframes.html",
@@ -5840,19 +6066,20 @@
     },
     {
       "path": "examples/webgl_animation_multiple.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_animation_skinning_additive_blending.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -5862,12 +6089,13 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_animation_skinning_blending.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -5877,12 +6105,13 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_animation_skinning_ik.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -5892,12 +6121,13 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 27
     },
     {
       "path": "examples/webgl_animation_skinning_morph.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -5907,18 +6137,20 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_animation_walk.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_batch_lod_bvh.html",
@@ -6159,14 +6391,15 @@
     },
     {
       "path": "examples/webgl_clipculldistance.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_clipping.html",
@@ -6281,8 +6514,8 @@
     },
     {
       "path": "examples/webgl_decals.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6292,7 +6525,8 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_depth_texture.html",
@@ -6368,14 +6602,15 @@
     },
     {
       "path": "examples/webgl_furnace_test.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_geometries.html",
@@ -6401,19 +6636,21 @@
     },
     {
       "path": "examples/webgl_geometry_colors_lookuptable.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_geometry_convex.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_geometry_csg.html",
@@ -6443,8 +6680,8 @@
     },
     {
       "path": "examples/webgl_geometry_extrude_splines.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6454,7 +6691,8 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_geometry_minecraft.html",
@@ -6491,25 +6729,27 @@
     },
     {
       "path": "examples/webgl_geometry_spline_editor.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_geometry_teapot.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_geometry_terrain.html",
@@ -6550,13 +6790,14 @@
     },
     {
       "path": "examples/webgl_geometry_text_stroke.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_gpgpu_birds.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6566,12 +6807,13 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_gpgpu_birds_gltf.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6581,12 +6823,13 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_gpgpu_protoplanet.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6596,12 +6839,13 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_gpgpu_water.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6611,7 +6855,8 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_helpers.html",
@@ -6643,8 +6888,8 @@
     },
     {
       "path": "examples/webgl_instancing_performance.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6654,7 +6899,8 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_instancing_raycast.html",
@@ -6711,14 +6957,15 @@
     },
     {
       "path": "examples/webgl_interactive_cubes_gpu.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_interactive_cubes_ortho.html",
@@ -6771,63 +7018,69 @@
     },
     {
       "path": "examples/webgl_lensflares.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_lightprobe.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_lightprobe_cubecamera.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_lightprobes.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 28
     },
     {
       "path": "examples/webgl_lightprobes_complex.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 28
     },
     {
       "path": "examples/webgl_lightprobes_sponza.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 28
     },
     {
       "path": "examples/webgl_lights_hemisphere.html",
@@ -6846,8 +7099,8 @@
     },
     {
       "path": "examples/webgl_lights_physical.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6857,51 +7110,56 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_lights_rectarealight.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_lights_spotlight.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_lights_spotlights.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/tween.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_lights_sunlight.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_lines_colors.html",
@@ -6921,30 +7179,32 @@
     },
     {
       "path": "examples/webgl_lines_fat.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_lines_fat_raycasting.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_lines_fat_wireframe.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -6954,7 +7214,8 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_loader_3dm.html",
@@ -7010,19 +7271,20 @@
     },
     {
       "path": "examples/webgl_loader_collada.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 27
     },
     {
       "path": "examples/webgl_loader_collada_kinematics.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -7032,18 +7294,20 @@
           "module": "examples/jsm/libs/tween.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 27
     },
     {
       "path": "examples/webgl_loader_collada_skinning.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 27
     },
     {
       "path": "examples/webgl_loader_draco.html",
@@ -7197,8 +7461,9 @@
     },
     {
       "path": "examples/webgl_loader_kmz.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 27
     },
     {
       "path": "examples/webgl_loader_ldraw.html",
@@ -7248,8 +7513,8 @@
     },
     {
       "path": "examples/webgl_loader_nrrd.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7259,7 +7524,8 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_loader_obj.html",
@@ -7281,8 +7547,8 @@
     },
     {
       "path": "examples/webgl_loader_pdb.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7293,7 +7559,8 @@
           "category": "excluded-renderer"
         }
       ],
-      "dependency_issue": true
+      "dependency_issue": true,
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_loader_ply.html",
@@ -7309,8 +7576,9 @@
     },
     {
       "path": "examples/webgl_loader_priority.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 27
     },
     {
       "path": "examples/webgl_loader_stl.html",
@@ -7326,14 +7594,15 @@
     },
     {
       "path": "examples/webgl_loader_svg.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 27
     },
     {
       "path": "examples/webgl_loader_texture_dds.html",
@@ -7427,8 +7696,9 @@
     },
     {
       "path": "examples/webgl_loader_usdz.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 28
     },
     {
       "path": "examples/webgl_loader_vdb.html",
@@ -7449,8 +7719,8 @@
     },
     {
       "path": "examples/webgl_loader_vrml.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7460,7 +7730,8 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 27
     },
     {
       "path": "examples/webgl_loader_xyz.html",
@@ -7476,8 +7747,8 @@
     },
     {
       "path": "examples/webgl_marchingcubes.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7487,7 +7758,8 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_materials_alphahash.html",
@@ -7534,14 +7806,15 @@
     },
     {
       "path": "examples/webgl_materials_car.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_materials_channels.html",
@@ -7649,8 +7922,8 @@
     },
     {
       "path": "examples/webgl_materials_envmaps_fasthdr.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7660,7 +7933,8 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 28
     },
     {
       "path": "examples/webgl_materials_envmaps_groundprojected.html",
@@ -7702,14 +7976,15 @@
     },
     {
       "path": "examples/webgl_materials_modified.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_materials_normalmap.html",
@@ -7740,25 +8015,27 @@
     },
     {
       "path": "examples/webgl_materials_physical_transmission.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_materials_physical_transmission_alpha.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_materials_subsurface_scattering.html",
@@ -7837,13 +8114,15 @@
     },
     {
       "path": "examples/webgl_materials_video.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_materials_video_webcam.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_materials_wireframe.html",
@@ -7858,14 +8137,15 @@
     },
     {
       "path": "examples/webgl_math_obb.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_math_orientation_transform.html",
@@ -7880,8 +8160,8 @@
     },
     {
       "path": "examples/webgl_mesh_batch.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -7891,7 +8171,8 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_mirror.html",
@@ -7907,36 +8188,39 @@
     },
     {
       "path": "examples/webgl_modifier_curve.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_modifier_curve_instanced.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_modifier_edgesplit.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_modifier_simplifier.html",
@@ -7963,14 +8247,15 @@
     },
     {
       "path": "examples/webgl_modifier_tessellation.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_morphtargets.html",
@@ -8095,35 +8380,39 @@
     },
     {
       "path": "examples/webgl_performance.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_pmrem_cubemap.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_pmrem_equirectangular.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_pmrem_test.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_points_billboards.html",
@@ -8179,8 +8468,9 @@
     },
     {
       "path": "examples/webgl_portal.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_postprocessing.html",
@@ -8204,14 +8494,15 @@
     },
     {
       "path": "examples/webgl_postprocessing_advanced.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_postprocessing_afterimage.html",
@@ -8229,8 +8520,8 @@
     },
     {
       "path": "examples/webgl_postprocessing_backgrounds.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -8240,7 +8531,8 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_postprocessing_dof.html",
@@ -8262,8 +8554,8 @@
     },
     {
       "path": "examples/webgl_postprocessing_dof2.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -8273,7 +8565,8 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_postprocessing_fxaa.html",
@@ -8328,8 +8621,8 @@
     },
     {
       "path": "examples/webgl_postprocessing_outline.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -8339,18 +8632,20 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_postprocessing_pixel.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_postprocessing_procedural.html",
@@ -8476,8 +8771,8 @@
     },
     {
       "path": "examples/webgl_postprocessing_ssr.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -8487,7 +8782,8 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_postprocessing_taa.html",
@@ -8561,14 +8857,15 @@
     },
     {
       "path": "examples/webgl_random_uv.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 27
     },
     {
       "path": "examples/webgl_raycaster_bvh.html",
@@ -8620,8 +8917,8 @@
     },
     {
       "path": "examples/webgl_rendertarget_texture2darray.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/fflate.module.js",
@@ -8635,18 +8932,20 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_reversed_depth_buffer.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_rtt.html",
@@ -8668,7 +8967,8 @@
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "reason": "Pending deferred GLTFExporter dependency; sculpt addons are ported without a partial replacement page"
     },
     {
       "path": "examples/webgl_shader.html",
@@ -8709,8 +9009,8 @@
     },
     {
       "path": "examples/webgl_shadow_contact.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -8720,89 +9020,97 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_shadowmap.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_shadowmap_csm.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 27
     },
     {
       "path": "examples/webgl_shadowmap_pcss.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_shadowmap_performance.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_shadowmap_pointlight.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_shadowmap_progressive.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 27
     },
     {
       "path": "examples/webgl_shadowmap_viewer.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_shadowmap_vsm.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -8812,17 +9120,20 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_shadowmesh.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_simple_gi.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_sprites.html",
@@ -8831,23 +9142,26 @@
     },
     {
       "path": "examples/webgl_test_memory.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_test_memory2.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_test_wide_gamut.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_texture2darray.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/fflate.module.js",
@@ -8857,51 +9171,56 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_texture2darray_compressed.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_texture2darray_layerupdate.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_texture3d.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_texture3d_partialupdate.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_tonemapping.html",
@@ -8976,13 +9295,14 @@
     },
     {
       "path": "examples/webgl_ubo.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_ubo_arrays.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -8992,66 +9312,74 @@
           "module": "examples/jsm/libs/stats.module.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_video_kinect.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_video_panorama_equirectangular.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 26
     },
     {
       "path": "examples/webgl_volume_cloud.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_volume_instancing.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_volume_perlin.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 25
     },
     {
       "path": "examples/webgl_watch.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
           "category": "excluded-vendor-runtime"
         }
-      ]
+      ],
+      "ported_iteration": 27
     },
     {
       "path": "examples/webgl_worker_offscreencanvas.html",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 27
     },
     {
       "path": "examples/webgpu_animation_retargeting.html",
@@ -12972,5 +13300,5 @@
       "dependency_issue": true
     }
   ],
-  "progress_note": "Through iteration 24: 166 upstream addon modules and 189 upstream pages ported. This batch adds GeometryUtils and fifty-two pages covering textures/materials, custom points/lines, cameras/clipping, multi-view rendering, render targets, shaders and panoramas. Comprehensive browser interactions remain deferred to the combined pass. The project is non-commercial; third-party redistribution restrictions still apply."
+  "progress_note": "Through iteration 28: 238 upstream addon modules and 302 upstream pages ported. This batch adds 19 addons and 11 pages for Ammo physics, WebGL lightprobe grids, USD and FastHDR environments, plus photometric/native HDR loaders and animation, geometry, color and sculpt utilities. USDZLoader is excluded as a deprecated alias; the sculpt page awaits deferred GLTFExporter. Consumer runtimes and licensed assets remain explicit local resources. Comprehensive browser interactions remain deferred to the combined pass; asset-specific publication restrictions still apply."
 }

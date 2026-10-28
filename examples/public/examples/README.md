@@ -155,3 +155,106 @@ snowflake2,snowflake3,snowflake4,snowflake5}.png`, `textures/{sprite0,sprite1,sp
 `models/obj/female02/female02.obj`. The retained model README identifies Reallusion iClone
 and its 3D Warehouse source but does not state a redistribution license.
 `fonts/helvetiker_bold.typeface.json` retains the existing Helvetiker font notices.
+
+## Animation, lighting, geometry and volume batch
+
+All files below are copied unmodified from the pinned three.js examples.
+
+- `models/gltf/{Soldier,Xbot}.glb`: upstream credits Mixamo. Resolve redistribution terms
+  before public hosting. `models/gltf/RobotExpressive/RobotExpressive.glb`: Tomás Laulhé, modified by Don McCurdy,
+  CC0 1.0, as recorded in the upstream model README.
+- `models/gltf/{Flamingo,Stork,Parrot}.glb`: Mirada's _Rome_ models. As with the Horse,
+  the pinned tree does not establish asset-specific redistribution rights.
+- `models/gltf/dungeon_warkarma.glb`, `models/json/{pressure,suzanne_buffergeometry}.json`,
+  `models/obj/tree.obj`, `models/vox/menger.vox`, `textures/{tri_pattern,disturb}.jpg`,
+  `textures/{checker,colors}.png`, hardwood/brick maps, Earth maps, `lobe.hdr` and the
+  checkerboard floor maps retain upstream provenance. No blanket asset license is inferred.
+- `textures/equirectangular/royal_esplanade_2k.hdr.jpg` is the upstream Royal Esplanade
+  environment. Review its original image terms before publication.
+- `textures/cube/pisa/{px,nx,py,ny,pz,nz}.png` is Paul Debevec's Pisa light probe.
+  Credit alone does not establish redistribution rights.
+- `fonts/MPLUSRounded1c/` retains the M PLUS Rounded font's `OFL.txt`.
+  Decal textures retain their adjacent `LICENSE.TXT` and Lee Perry-Smith attribution.
+- `textures/3d/head256x256x109.zip` retains its adjacent head-dataset notice and copyright.
+  `models/nrrd/stent.nrrd` retains its public-domain provenance notice.
+  Upstream lists the provenance of `models/nrrd/I.nrrd` as unknown.
+- `textures/spiritedaway.ktx2` contains Studio Ghibli imagery; no separate
+  redistribution permission was found. `textures/cm_{gray,viridis}.png` retain upstream
+  provenance. These resources must not be publicly distributed without applicable rights.
+
+The existing local fflate and Basis runtimes serve the new archive/volume examples.
+They are injected explicitly and remain outside the package source.
+
+## Lines, materials, simulation and molecular batch
+
+- `models/pdb/*.pdb` are the seventeen pinned molecular samples. Some files credit
+  Chemical Structure Services, A. W. Maverick or Marvin; no asset-specific redistribution
+  license was found. Confirm permission before publication.
+- `textures/{pano.mp4,pano.webm,kinect.mp4,kinect.webm,sintel.mp4,sintel.ogv}` and
+  `models/gltf/{DragonAttenuation,duck}.glb` are unmodified pinned assets.
+  The retained `textures/kinect.nfo` records freenect/ffmpeg provenance, not a content license.
+  Upstream's Sintel example credits the Blender Foundation. Resolve video/model terms
+  before public hosting; the adjacent code license does not establish these rights.
+- `textures/wide_gamut/logo_{srgb,p3}.png` and `textures/equirectangular/spot1Lux.hdr`
+  retain pinned upstream provenance, without identified asset-specific redistribution terms.
+- Bird simulations reuse the local Mirada _Rome_ Parrot and Flamingo models. Lensflare
+  textures retain their `LICENSE.txt` (CC BY-NC-SA 3.0); SwedishRoyalCastle retains its
+  Humus notice. Existing font, Ferrari, Lee Perry-Smith, UV-grid, HDR and Draco resources
+  keep their previously recorded notices and publication caveats.
+
+## Collada, vector scenes, lighting, workers and audio batch
+
+- `models/collada/elf/` is Elf Girl by halloween; `models/collada/stormtrooper/`
+  is Dancing Stormtrooper by StrykerDoesAnimation. The upstream pages identify both as
+  CC BY. Preserve author credit and review the original distribution terms.
+  `models/collada/abb_irb52_7_120.dae` comes from `rdiankov/collada_robots`;
+  repository provenance alone does not establish model-specific redistribution rights.
+- `models/kmz/Box.kmz` retains `Readme.txt`, attributing the Box model to
+  Khronos glTF-Sample-Models. `models/svg/` contains the unmodified pinned SVG samples.
+  No blanket license is inferred for individual artwork.
+- `models/vrml/` contains all sixteen pinned chooser models and `map.gif`.
+  Four model headers cite the Web3D license retained in `WEB3D-LICENSE.txt`;
+  review the remaining models' individual terms before publication.
+- `libs/chevrotain.module.min.js` is Chevrotain 9.0.1, Apache-2.0, including
+  regexp-to-ast 0.5.0, MIT. Both license texts are adjacent.
+  `libs/potpack.module.js` retains its ISC license header.
+  These are example resources injected into addons, not package dependencies.
+- `models/gltf/kira.glb` is identified as CC0 by the upstream IK page.
+  `BoomBox.glb` retains the CC0 Public / Microsoft for Everything notice in
+  `BoomBox-LICENSE.txt`. RobotExpressive retains its CC0 README.
+  DispersionTest embeds CC BY 4.0 attribution to Analytical Graphics, model by Ed Mackey,
+  with a CC0 Adobe cloth backdrop.
+- `models/gltf/{coffeeMug,DiffuseRoughnessParameterSweep,godrays_demo,ShaderBall,
+  ShaderBall2,ShadowmappableMesh,rolex}.glb` and `textures/{jade,shaderball_ds}.jpg`
+  and `textures/noise.png` retain pinned upstream provenance. No separate redistribution
+  terms were established. FPS, worker and priority examples also reuse existing local
+  models, matcap, HDR and Draco resources with their earlier notices.
+- `sounds/readme.txt` and `sounds/analysis-NOTICE.txt` retain audio credits.
+  Skullbeatz's Bad Cat and other Newgrounds tracks use CC BY-NC-SA terms recorded there;
+  Project Utopia and michorvath's ping-pong recording are CC0.
+  SwedishRoyalCastle remains subject to its existing Humus notice.
+
+Non-commercial use does not waive attribution, share-alike or permission requirements.
+
+## USD, probe grids, Ammo and prefiltered environments
+
+- `models/usdz/saeukkang.usdz` is copied from the pinned three.js checkout.
+  No asset-specific attribution or redistribution license was established. Resolve permission
+  before publishing this model.
+- `models/gltf/Sponza/` comes from Khronos glTF-Sample-Assets revision
+  `8f492390ddc7a2ae221a1369ef560589cf8c70fb`, preserving all 71 glTF payload files.
+  The retained README credits Crytek and Frank Meinl. Model files use the
+  CRYENGINE Limited License Agreement; metadata uses CC BY 4.0.
+  Keep `LICENSE.md`, `metadata.json` and the referenced
+  `models/LICENSES/LicenseRef-CRYENGINE-Agreement.txt`. Review the CRYENGINE terms
+  before public hosting; this is not a CC0 model.
+- `libs/ammo.wasm.js`, `libs/ammo.wasm.wasm` and `libs/ammo.LICENSE` come from
+  ammo.js revision `79190a1f03845794b1bba1777f30037349967658`.
+  The retained zlib license applies to the runtime, not the example textures.
+  `textures/{grid,colors}.png` retain pinned three.js provenance without an inferred
+  blanket image license.
+- `textures/pmrem/` contains eight pinned prefiltered HDR environments.
+  Its README records CC0 Poly Haven sources and photographer credits. Existing local
+  Basis, ZSTD, fflate and Venice Sunset resources keep their earlier notices.
+
+The sculpt addon source embeds the complete SculptGL MIT notice for Stéphane Ginier.

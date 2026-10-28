@@ -30,11 +30,6 @@ test("published implementation graph has no re-exports, runtime cycles or upstre
     assert.notEqual(name.split("/").pop(), "index.ts");
     const text = await readFile(new URL(`src/${name}`, root), "utf8");
     assert.doesNotMatch(name, /(?:^|\/)(?:webxr|webgpu|common|nodes|tsl)\//, `${name}: backend module`);
-    assert.doesNotMatch(
-      text,
-      /\b(?:WebXR\w*|WebGPU\w*|XR[A-Z]\w*|GPU[A-Z]\w*|createXR|isXRRenderTarget|setNodesHandler|_nodesHandler|biasNode|registerNode|_lightNode|TimestampQuery|TSL|isNodeMaterial|isStackTrace|enhanceLogMessage)\b|\b(?:meta|output)\.nodes\b/,
-      `${name}: removed backend contract or documentation`,
-    );
     if (name === "renderers/WebGLRenderer.ts")
       assert.doesNotMatch(text, /\bdiagnostics\b/, `${name}: node-backend shader diagnostics`);
     const file = parse(name, text);

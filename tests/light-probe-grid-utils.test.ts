@@ -1,0 +1,53 @@
+import assert from "node:assert/strict";
+import { test } from "vite-plus/test";
+import { replaceSunLights, restoreSunLights } from "../src/addons/lighting/LightProbeGridUtils";
+import { SunLight } from "../src/addons/lights/SunLight";
+import { BoxGeometry } from "../src/geometries/BoxGeometry";
+import { MeshBasicMaterial } from "../src/materials/MeshBasicMaterial";
+import { Mesh } from "../src/objects/Mesh";
+import { Scene } from "../src/scenes/Scene";
+
+test("sun replacements fit casters, restore visibility, and reuse bake lights", () => {
+  const scene = new Scene();
+  const sun = new SunLight(0xffaa44, 3);
+  sun.castShadow = true;
+  sun.position.set(0, 10, 0);
+  sun.shadow.mapSize.set(256, 512);
+  const geometry = new BoxGeometry(2, 2, 2);
+  const material = new MeshBasicMaterial();
+  const caster = new Mesh(geometry, material);
+  caster.position.set(5, 0, 0);
+  caster.castShadow = true;
+  scene.add(sun, caster);
+  scene.updateMatrixWorld(true);
+  const replacements = replaceSunLights(scene);
+  assert.ok(replacements);
+  const light = replacements[0].bakeLight;
+  assert.equal(sun.visible, false);
+  assert.equal(light.intensity, 3);
+  assert.equal(light.shadow.mapSize.y, 512);
+  assert.equal(light.target.position.x, 5);
+  assert.equal(light.shadow.camera.left, -Math.sqrt(3));
+  restoreSunLights(scene, replacements);
+  assert.equal(sun.visible, true);
+  assert.equal(light.parent, null);
+  const next = replaceSunLights(scene);
+  assert.ok(next);
+  assert.equal(next[0].bakeLight, light);
+  restoreSunLights(scene, next);
+  geometry.dispose();
+  material.dispose();
+  sun.dispose();
+  light.dispose();
+});
+
+test("sun replacement ignores invisible and unshadowed lights", () => {
+  const scene = new Scene();
+  const sun = new SunLight();
+  scene.add(sun);
+  assert.equal(replaceSunLights(scene), null);
+  sun.castShadow = true;
+  sun.visible = false;
+  assert.equal(replaceSunLights(scene), null);
+  sun.dispose();
+});

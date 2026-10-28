@@ -1,0 +1,4 @@
+BoomBox model: © 2017 Public; Microsoft for Everything.
+Licensed under Creative Commons Zero 1.0 Universal (CC0 1.0).
+https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/BoomBox
+https://creativecommons.org/publicdomain/zero/1.0/legalcode

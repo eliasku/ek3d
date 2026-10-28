@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — sunlight</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+      }
+      #wrapper,
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        color: white;
+        text-align: center;
+        pointer-events: none;
+        font: 13px sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper"><canvas id="scene"></canvas></div>
+    <div id="info">sunlight<br />WASD to move, mouse to look around</div>
+    <script type="module" src="./webgl_lights_sunlight.ts"></script>
+  </body>
+</html>

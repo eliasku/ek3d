@@ -255,19 +255,18 @@ function onWindowResize(): void {
 }
 
 window.addEventListener("resize", onWindowResize);
-window.addEventListener(
-  "pagehide",
-  () => {
-    window.removeEventListener("resize", onWindowResize);
-    timer.disconnect();
-    gui.destroy();
-    stats.dom.remove();
-    renderer.setAnimationLoop(null);
-    for (const mixer of mixers) mixer.stopAllAction();
-    groundGeo.dispose();
-    skyGeo.dispose();
-    groundMat.dispose();
-    renderer.dispose();
-  },
-  { once: true },
-);
+let disposed = false;
+window.addEventListener("pagehide", (event) => {
+  if (event.persisted || disposed) return;
+  disposed = true;
+  window.removeEventListener("resize", onWindowResize);
+  timer.disconnect();
+  gui.destroy();
+  stats.dom.remove();
+  renderer.setAnimationLoop(null);
+  for (const mixer of mixers) mixer.stopAllAction();
+  groundGeo.dispose();
+  skyGeo.dispose();
+  groundMat.dispose();
+  renderer.dispose();
+});

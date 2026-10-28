@@ -134,6 +134,31 @@ sky and panoramas. `GeometryUtils` provides Hilbert 2D/3D and Gosper curves at i
 Assets remain local with adjacent notices. Runtime coverage is recorded per exercised subset,
 not implied by a successful typecheck or build.
 
+The following bulk batch adds 53 pages for animation blending, convex/teapot/decal geometry,
+splines, lighting and probes, shadow techniques, advanced postprocessing, volume/array textures,
+uniform buffers and performance comparisons. `NRRDLoader` takes an optional `NRRDGzipDecoder`
+as its second constructor argument; inject `{ gunzipSync }` for gzip data. `Volume` and
+`VolumeSlice` retain CPU slicing and repaint controls. `SVGStroke` exposes the extracted SVG
+stroke tessellator without claiming a complete `SVGLoader` port. Geometry, probe, shadow and
+sorting helpers use their defining addon paths. Godrays remains pending because its upstream
+third-party effects need a separate runtime integration. Full-page interactions remain deferred
+to the combined verification pass; `.local/PLAN.md` records the exercised subset.
+
+The next batch adds fat lines and raycasting, curve/edge/tessellation modifiers, PMREM comparisons,
+portals, progressive GI, GPU picking, physical materials, video, molecular geometry, UV previews,
+wide-gamut output, procedural surfaces and GPU simulations. Addons keep their defining import paths,
+including `ek3d/addons/lines/Line2`, `ek3d/addons/modifiers/CurveModifier` and
+`ek3d/addons/misc/GPUComputationRenderer`. `VTKLoader` accepts `{ unzlibSync }` as its second
+constructor argument for compressed XML. `PDBLoader` returns atom/bond geometry and atom metadata;
+its canvas example omits the excluded CSS label renderer. `UVsDebug` draws triangle UV contours,
+face numbers and vertex labels. `WebGL` exposes WebGL 2 and drawing-buffer color-space probes;
+these do not establish display hardware gamut. Video examples surface permission/playback errors
+and release media tracks on disposal. Lensflare disposal also releases its element textures,
+matching upstream; do not reuse those textures after disposal.
+
+The main `webgl_loader_gltf` catalog remains pending: its live Khronos catalog and referenced
+models require a licensed local snapshot. Existing local glTF examples remain available.
+
 Open the URL printed by Vite. `/` is the English project landing page: a fullscreen, animated metallic torus knot with a short introduction, a link to `/examples/examples.html`, and a "Star on GitHub" CTA linking to [eliasku/ek3d](https://github.com/eliasku/ek3d) in a new tab. Its entrypoint is `examples/landing.ts`. A `MeshStandardMaterial` reflects a `RoomEnvironment`, baked once through `PMREMGenerator`; neutral tone mapping preserves highlight detail. The model and room are generated locally, with no external assets or runtime dependencies. The layout adapts to narrow screens. Capture resources are released after baking; navigation releases the model, environment target and DFG lookup texture while preserving back/forward-cache restores.
 
 `/feature-testbed/` is the internal feature self-testing stand. It runs `feature-testbed/main.ts`: a combined scene with camera/hierarchy, a reflective sphere, textured cylinder, normalized interleaved Lambert capsule, and an alternate set with a curved tube, beveled extrusion and flat shape with real holes. **O** replaces those meshes with a line strip, dashed loop, box edges, textured points and a translucent camera-facing sprite. **M** shows three colored instanced boxes. **H** shows a batched sphere/cylinder and a distance-selected sphere/box LOD. These paths include independent transforms, picking and directional/point/spot shadows. Ambient fill and a projected spot cookie can be toggled independently. All sets support fog, environment/background, HDR output and animation. Use the controls shown on the canvas; resizing updates both camera projections and the renderer. Rendering failures remain visible and are rethrown, not replaced with a mock or software scene.
@@ -223,6 +248,39 @@ Import `STLLoader` from `ek3d/addons/loaders/STLLoader` or `PLYLoader` from `ek3
 STL preserves non-indexed facets, normals, groups for multiple ASCII solids and Magics binary vertex colors/alpha. PLY preserves ASCII, little- and big-endian binary input, vertex and face colors/UVs, triangle/quad faces, property-name remapping and custom attributes.
 
 The corresponding `/examples/webgl_loader_stl.html` and `/examples/webgl_loader_ply.html` pages use local upstream models, animated cameras, fog, directional shadows and Stats. Model provenance is recorded in `examples/public/examples/README.md`. Parser regression tests use synthetic data and require no network.
+
+### Collada, SVG, VRML, lighting, workers and audio
+
+`ColladaLoader` exposes parsed libraries, scene animations and kinematics. Its four local
+examples cover static scenes, robot joints, skinning and KMZ archives. Configure KMZ with
+`new KMZLoader(manager).setZipRuntime({ unzipSync })`; the ZIP implementation stays outside
+the package. `SVGLoader` provides paths, styles, gradients, fill/stroke materials and stroke
+tessellation. `VRMLLoader` takes a consumer-supplied Chevrotain-compatible runtime as its
+first constructor argument. Its example loads the licensed runtime locally.
+
+`CCDIKSolver` supports constrained bone-chain solving and a disposable helper.
+`CSM.setupMaterial()` injects cascaded directional shadows into explicitly composed material
+descriptors without a global shader registry. Update CSM before rendering and release its
+lights and material hooks when finished. `new ProgressiveLightMap(renderer, potpack, resolution?)`
+takes an explicit atlas packer; callers retain ownership of scene objects and source materials.
+
+`Capsule`, `Octree` and `OctreeHelper` support the local FPS collision example.
+The OffscreenCanvas comparison uses the same scene on the main thread and a module worker;
+Vite resolves the worker through the installed package. Worker animation requires worker
+`requestAnimationFrame`. Priority loading, random UV shaders and the watch example use
+the existing loader and postprocessing APIs with local resources.
+
+Core audio modules live at `ek3d/audio/{AudioContext,AudioListener,Audio,PositionalAudio,AudioAnalyser}`;
+audio buffers load through `ek3d/loaders/AudioLoader`. The four `webaudio_*` pages start
+playback from a user gesture. `AudioContext.setContext(context)` supplies a caller-owned native
+context; neither sources nor listeners close it automatically. Release source/filter nodes
+and close an owned context explicitly. `PositionalAudioHelper` lives at its canonical addon path.
+AudioLoader copies encoded data before decoding so cached buffers are not detached, and keeps
+the loading manager active until decoding finishes.
+
+Asset notices are in `examples/public/examples/README.md` and adjacent files. Code/package
+checks and a minimal changed-path browser check do not establish the deferred combined
+interaction, lifecycle or device matrix recorded in `.local/PLAN.md`.
 
 ## Development tooling
 
@@ -888,3 +946,35 @@ controls activate once; its WebGL example raycasts pointer UVs without WebXR.
 New pages appear in `/examples/examples.html`. Each uses local resources, resize handling
 and pagehide cleanup. Unexercised codec/device combinations are listed in the coverage
 sections above; the full release browser matrix remains a separate gate.
+
+## USD, photometry, physics and sculpting addons
+
+`USDLoader` supports USDA, USDC and USDZ through its defining addon path.
+Inject `setZipRuntime({ unzipSync })` for USDZ archives; standalone layers need no ZIP runtime.
+The deprecated `USDZLoader` alias is intentionally absent. The local USDZ example uses
+the same external fflate runtime as the other archive examples.
+
+`IESLoader` produces normalized red-channel photometric textures in half-float, float or byte form.
+External tilt files remain unsupported. `JXLLoader` requires native JPEG XL decoding and HDR
+Canvas2D support (`srgb-linear`, float16 storage/readback and `globalHDRHeadroom`); it has no LDR fallback.
+
+`AmmoPhysics` takes an initialized consumer-provided Ammo runtime. Its `dispose()` stops simulation
+and releases owned Bullet objects, not mesh geometry or materials. Six Ammo pages use the local
+licensed JS/WASM runtime. Rapier remains deferred.
+
+`LightProbeGridWebGL` bakes a WebGL spherical-harmonic atlas; `LightProbeGridHelperWebGL`
+visualizes its probes. `LightProbeGridUtils` replaces SunLight captures with equivalent
+directional lights. Import each from its defining lighting/helper module. The three probe
+pages include a complete local Sponza payload; its CRYENGINE license is not CC0.
+
+`Sculptor`, `SculptorMesh`, `SculptorTools` and `SculptorUtils` retain the SculptGL MIT notice
+in their source headers. The sculpt page remains pending because its GLB export requires
+the deferred `GLTFExporter`; no export-free replacement page is provided.
+
+`AnimationClipCreator`, `BoxLineGeometry`, `ColorEnvironment` and `ColorConverter` use their
+canonical defining-module paths. Rotation clips preserve upstream track values (0–360),
+which are interpreted as radians by Object3D rotation tracks.
+
+`webgl_materials_envmaps_fasthdr` loads eight local prefiltered, compressed HDR environments.
+The textures retain the PMREM mip chain and use the existing Basis/ZSTD runtimes.
+The adjacent asset README credits the CC0 Poly Haven photographs.

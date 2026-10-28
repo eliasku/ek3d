@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>ek3d — webgl contact shadows</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #fff;
+      }
+      #wrapper,
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        color: #000;
+        text-align: center;
+        font: 13px sans-serif;
+        pointer-events: none;
+      }
+      #info a {
+        color: #08f;
+        pointer-events: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper">
+      <canvas id="scene"></canvas>
+      <div id="info">
+        <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - contact shadows
+      </div>
+    </div>
+    <script type="module" src="./webgl_shadow_contact.ts"></script>
+  </body>
+</html>

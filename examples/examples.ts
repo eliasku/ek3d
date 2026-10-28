@@ -15,6 +15,190 @@ const list: HTMLDivElement = listSel;
 /** The ported demo pages grouped by upstream section. */
 const DEMOS: Array<{ group: string; items: string[] }> = [
   {
+    group: "Ammo physics",
+    items: [
+      "physics_ammo_break",
+      "physics_ammo_cloth",
+      "physics_ammo_instancing",
+      "physics_ammo_rope",
+      "physics_ammo_terrain",
+      "physics_ammo_volume",
+    ],
+  },
+  {
+    group: "light probe grids",
+    items: ["webgl_lightprobes", "webgl_lightprobes_complex", "webgl_lightprobes_sponza"],
+  },
+  {
+    group: "USD and prefiltered environments",
+    items: ["webgl_loader_usdz", "webgl_materials_envmaps_fasthdr"],
+  },
+  {
+    group: "Collada, KMZ, SVG and VRML loaders",
+    items: [
+      "webgl_loader_collada",
+      "webgl_loader_collada_kinematics",
+      "webgl_loader_collada_skinning",
+      "webgl_loader_kmz",
+      "webgl_loader_svg",
+      "webgl_loader_vrml",
+    ],
+  },
+  {
+    group: "IK, cascaded shadows and lightmaps",
+    items: ["webgl_animation_skinning_ik", "webgl_shadowmap_csm", "webgl_shadowmap_progressive"],
+  },
+  {
+    group: "audio",
+    items: ["webaudio_orientation", "webaudio_sandbox", "webaudio_timing", "webaudio_visualizer"],
+  },
+  {
+    group: "loading and shader techniques",
+    items: ["webgl_loader_priority", "webgl_random_uv", "webgl_watch"],
+  },
+  {
+    group: "FPS and offscreen workers",
+    items: ["games_fps", "webgl_worker_offscreencanvas"],
+  },
+  {
+    group: "fat lines",
+    items: ["webgl_lines_fat", "webgl_lines_fat_raycasting", "webgl_lines_fat_wireframe"],
+  },
+  {
+    group: "curve and geometry modifiers",
+    items: [
+      "webgl_modifier_curve",
+      "webgl_modifier_curve_instanced",
+      "webgl_modifier_edgesplit",
+      "webgl_modifier_tessellation",
+    ],
+  },
+  {
+    group: "environment and render techniques",
+    items: [
+      "webgl_pmrem_cubemap",
+      "webgl_pmrem_equirectangular",
+      "webgl_pmrem_test",
+      "webgl_portal",
+      "webgl_simple_gi",
+      "webgl_interactive_cubes_gpu",
+    ],
+  },
+  {
+    group: "material and video techniques",
+    items: [
+      "webgl_furnace_test",
+      "webgl_materials_car",
+      "webgl_materials_modified",
+      "webgl_materials_physical_transmission",
+      "webgl_materials_physical_transmission_alpha",
+      "webgl_materials_video",
+      "webgl_materials_video_webcam",
+      "webgl_video_kinect",
+      "webgl_video_panorama_equirectangular",
+    ],
+  },
+  {
+    group: "GPU simulations",
+    items: ["webgl_gpgpu_birds", "webgl_gpgpu_birds_gltf", "webgl_gpgpu_protoplanet", "webgl_gpgpu_water"],
+  },
+  {
+    group: "procedural surfaces and flares",
+    items: ["webgl_marchingcubes", "webgl_lensflares"],
+  },
+  {
+    group: "molecules, UVs and gamut",
+    items: ["webgl_loader_pdb", "misc_uv_tests", "webgl_test_wide_gamut"],
+  },
+  {
+    group: "animation blending",
+    items: [
+      "webgl_animation_multiple",
+      "webgl_animation_skinning_additive_blending",
+      "webgl_animation_skinning_blending",
+      "webgl_animation_skinning_morph",
+      "webgl_animation_walk",
+    ],
+  },
+  {
+    group: "geometry tools",
+    items: [
+      "webgl_geometry_colors_lookuptable",
+      "webgl_geometry_convex",
+      "webgl_geometry_extrude_splines",
+      "webgl_geometry_spline_editor",
+      "webgl_geometry_teapot",
+      "webgl_geometry_text_stroke",
+      "webgl_decals",
+      "webgl_math_obb",
+    ],
+  },
+  {
+    group: "lighting and probes",
+    items: [
+      "webgl_lights_physical",
+      "webgl_lights_spotlight",
+      "webgl_lights_spotlights",
+      "webgl_lights_sunlight",
+      "webgl_lights_rectarealight",
+      "webgl_lightprobe",
+      "webgl_lightprobe_cubecamera",
+    ],
+  },
+  {
+    group: "shadow techniques",
+    items: [
+      "webgl_shadowmap",
+      "webgl_shadowmap_performance",
+      "webgl_shadowmap_pointlight",
+      "webgl_shadowmap_viewer",
+      "webgl_shadowmap_vsm",
+      "webgl_shadowmap_pcss",
+      "webgl_shadow_contact",
+      "webgl_shadowmesh",
+    ],
+  },
+  {
+    group: "volume and array textures",
+    items: [
+      "webgl_texture2darray",
+      "webgl_texture2darray_compressed",
+      "webgl_texture2darray_layerupdate",
+      "webgl_texture3d",
+      "webgl_texture3d_partialupdate",
+      "webgl_volume_cloud",
+      "webgl_volume_instancing",
+      "webgl_volume_perlin",
+      "webgl_rendertarget_texture2darray",
+      "webgl_loader_nrrd",
+    ],
+  },
+  {
+    group: "advanced postprocessing",
+    items: [
+      "webgl_postprocessing_advanced",
+      "webgl_postprocessing_backgrounds",
+      "webgl_postprocessing_dof2",
+      "webgl_postprocessing_outline",
+      "webgl_postprocessing_pixel",
+      "webgl_postprocessing_ssr",
+    ],
+  },
+  {
+    group: "performance and renderer diagnostics",
+    items: [
+      "webgl_ubo",
+      "webgl_ubo_arrays",
+      "webgl_test_memory",
+      "webgl_test_memory2",
+      "webgl_clipculldistance",
+      "webgl_instancing_performance",
+      "webgl_mesh_batch",
+      "webgl_performance",
+      "webgl_reversed_depth_buffer",
+    ],
+  },
+  {
     group: "materials and textures",
     items: [
       "webgl_materials_texture_anisotropy",

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Loader priority</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+      }
+      #info {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        color: white;
+        font: 13px sans-serif;
+      }
+      a {
+        color: #9cf;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="info">
+      Keep the main asset at default priority and lower background priority. Reload to repeat.<br />Background:
+      <a href="?background=auto">Default (auto)</a> | <a href="?background=low">Low</a><br /><span id="status"></span>
+    </div>
+    <script type="module" src="./webgl_loader_priority.ts"></script>
+  </body>
+</html>

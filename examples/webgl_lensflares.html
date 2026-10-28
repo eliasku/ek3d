@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — lensflares</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      #wrapper,
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        text-align: center;
+        color: white;
+        font: 13px sans-serif;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper">
+      <canvas id="scene"></canvas>
+      <div id="info">
+        Fly with WASD / RF / QE and mouse<br />Textures from ROME: 3 Dreams of Black (CC BY-NC-SA 3.0)
+      </div>
+    </div>
+    <script type="module" src="./webgl_lensflares.ts"></script>
+  </body>
+</html>
