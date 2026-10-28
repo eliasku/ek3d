@@ -15,6 +15,17 @@ const list: HTMLDivElement = listSel;
 /** The ported demo pages grouped by upstream section. */
 const DEMOS: Array<{ group: string; items: string[] }> = [
   {
+    group: "Rapier physics",
+    items: [
+      "physics_rapier_basic",
+      "physics_rapier_character_controller",
+      "physics_rapier_instancing",
+      "physics_rapier_joints",
+      "physics_rapier_terrain",
+      "physics_rapier_vehicle_controller",
+    ],
+  },
+  {
     group: "CSG and batch LOD",
     items: ["webgl_geometry_csg", "webgl_batch_lod_bvh"],
   },

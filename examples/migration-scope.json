@@ -50,21 +50,21 @@
   "totals": {
     "modules": {
       "total": 500,
-      "candidate": 3,
-      "ported": 283,
+      "candidate": 1,
+      "ported": 285,
       "excluded": 214,
       "lines_total": 222616,
-      "candidate_lines": 850,
-      "ported_lines": 138147,
+      "candidate_lines": 330,
+      "ported_lines": 138667,
       "excluded_lines": 83619,
       "by_category": {
         "excluded-aggregate": 1,
-        "ported": 283,
+        "ported": 285,
         "excluded-backend-capability": 1,
         "excluded-backend": 51,
         "excluded-effect": 4,
         "excluded-directory": 133,
-        "candidate": 3,
+        "candidate": 1,
         "excluded-vendor-runtime": 18,
         "excluded-deprecated": 2,
         "excluded-renderer": 4
@@ -143,12 +143,12 @@
     },
     "pages": {
       "total": 617,
-      "candidate": 9,
-      "ported": 322,
+      "candidate": 3,
+      "ported": 328,
       "excluded": 286,
       "lines_total": 157006,
-      "candidate_lines": 2407,
-      "ported_lines": 76934,
+      "candidate_lines": 824,
+      "ported_lines": 78517,
       "excluded_lines": 77665,
       "excluded_by_category": {
         "page-css2d": 1,
@@ -163,7 +163,6 @@
       "candidates_with_dependency_issues": 0,
       "candidate_dependency_issues": [],
       "candidate_excluded_dependency_counts": {
-        "examples/jsm/libs/stats.module.js": 6,
         "examples/jsm/libs/lil-gui.module.min.js": 1
       },
       "external_runtime_pages": [
@@ -187,7 +186,7 @@
         }
       ]
     },
-    "progress_note": "Through iteration 32: 283 upstream addons and 322 upstream pages ported. User decision: finish all approved WebGL addons, including exporters; RapierPhysics, RapierHelper and six Rapier pages are active, not deferred. Complete catalog and progressive glTF are active work, with code completion and resource-rights review tracked separately. Missing license notices are not CC0. GaussianSplat renderer integration remains a scope/dependency review; 3D tiles needs authorized service credentials. Existing backend exclusions remain. Comprehensive browser/device verification and asset publication review remain pending."
+    "progress_note": "Through iteration 33: 285 upstream addons and 328 upstream pages ported. RapierPhysics, RapierHelper and all six Rapier pages use a local initialized consumer runtime. Complete catalog and progressive glTF remain active work, with code completion and resource-rights review tracked separately. Missing license notices are not CC0. GaussianSplat renderer integration remains a scope/dependency review; 3D tiles needs authorized service credentials. Existing backend exclusions remain. Exporter completeness audit, comprehensive browser/device verification and asset publication review remain pending."
   },
   "module_dependency_review": [
     {
@@ -2017,8 +2016,11 @@
     },
     {
       "path": "examples/jsm/helpers/RapierHelper.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/helpers/RapierHelper.ts",
+      "ported_iteration": 33,
+      "reason": "iteration 33: typed collider debug renderer with caller-owned world"
     },
     {
       "path": "examples/jsm/helpers/RectAreaLightHelper.js",
@@ -4118,8 +4120,11 @@
     },
     {
       "path": "examples/jsm/physics/RapierPhysics.js",
-      "status": "candidate",
-      "category": "candidate"
+      "status": "ported",
+      "category": "ported",
+      "ported_path": "src/addons/physics/RapierPhysics.ts",
+      "ported_iteration": 33,
+      "reason": "iteration 33: initialized consumer runtime, complete shape and body APIs, owned simulation disposal"
     },
     {
       "path": "examples/jsm/postprocessing/AfterimagePass.js",
@@ -6072,8 +6077,10 @@
     },
     {
       "path": "examples/physics_rapier_basic.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 33,
+      "reason": "iteration 33: complete native Rapier scene with local runtime and owned resource cleanup",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6083,8 +6090,10 @@
     },
     {
       "path": "examples/physics_rapier_character_controller.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 33,
+      "reason": "iteration 33: complete native Rapier character controller with local runtime",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6094,8 +6103,10 @@
     },
     {
       "path": "examples/physics_rapier_instancing.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 33,
+      "reason": "iteration 33: native instanced Rapier scene, shake impulses and local runtime",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6105,8 +6116,10 @@
     },
     {
       "path": "examples/physics_rapier_joints.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 33,
+      "reason": "iteration 33: native spherical joint chain with local Rapier runtime",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6116,8 +6129,10 @@
     },
     {
       "path": "examples/physics_rapier_terrain.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 33,
+      "reason": "iteration 33: complete native heightfield scene with local Rapier runtime",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -6127,8 +6142,10 @@
     },
     {
       "path": "examples/physics_rapier_vehicle_controller.html",
-      "status": "candidate",
-      "category": "candidate",
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 33,
+      "reason": "iteration 33: native vehicle controller, suspension, steering, braking and reset with local runtime",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/stats.module.js",
@@ -13459,5 +13476,5 @@
       "dependency_issue": true
     }
   ],
-  "progress_note": "Through iteration 32: 283 upstream addons and 322 upstream pages ported. User decision: finish all approved WebGL addons, including exporters; RapierPhysics, RapierHelper and six Rapier pages are active, not deferred. Complete catalog and progressive glTF are active work, with code completion and resource-rights review tracked separately. Missing license notices are not CC0. GaussianSplat renderer integration remains a scope/dependency review; 3D tiles needs authorized service credentials. Existing backend exclusions remain. Comprehensive browser/device verification and asset publication review remain pending."
+  "progress_note": "Through iteration 33: 285 upstream addons and 328 upstream pages ported. RapierPhysics, RapierHelper and all six Rapier pages use a local initialized consumer runtime. Complete catalog and progressive glTF remain active work, with code completion and resource-rights review tracked separately. Missing license notices are not CC0. GaussianSplat renderer integration remains a scope/dependency review; 3D tiles needs authorized service credentials. Existing backend exclusions remain. Exporter completeness audit, comprehensive browser/device verification and asset publication review remain pending."
 }

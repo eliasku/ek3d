@@ -1007,7 +1007,7 @@ Canvas2D support (`srgb-linear`, float16 storage/readback and `globalHDRHeadroom
 
 `AmmoPhysics` takes an initialized consumer-provided Ammo runtime. Its `dispose()` stops simulation
 and releases owned Bullet objects, not mesh geometry or materials. Six Ammo pages use the local
-licensed JS/WASM runtime. Rapier remains deferred.
+licensed JS/WASM runtime.
 
 `LightProbeGridWebGL` bakes a WebGL spherical-harmonic atlas; `LightProbeGridHelperWebGL`
 visualizes its probes. `LightProbeGridUtils` replaces SunLight captures with equivalent
@@ -1078,4 +1078,20 @@ Positive mass selects a dynamic body, as upstream; the magnitude does not overri
 Jolt's shape-derived mass. Position resets clear velocity and rotation without
 destroying the body. `setMeshVelocity()` is implemented, not the upstream no-op.
 `dispose()` stops the timer and releases owned bodies and the world, not mesh
-geometry, materials or the caller's runtime. Rapier remains deferred.
+geometry, materials or the caller's runtime.
+
+## Rapier physics
+
+`RapierPhysics(initializedRuntime)` lives at `ek3d/addons/physics/RapierPhysics`.
+Supply an initialized Rapier 0.21.0-compatible runtime; the package never downloads it.
+The adapter supports primitive and triangle-mesh colliders, heightfields, instanced meshes,
+scene physics metadata, velocity changes and impulses. Instance synchronization preserves
+rotation and scale. `removeMesh()` removes fixed and dynamic bodies; `dispose()` stops the
+timer and frees the owned world, not caller geometry, materials or the runtime.
+The returned `world` and `RAPIER` expose joint, character and vehicle controller access.
+`step(delta?)` advances and synchronizes the simulation; an internal 60 Hz timer runs by default.
+
+Import `RapierHelper` from `ek3d/addons/helpers/RapierHelper`; call `update()` before rendering
+and `dispose()` when finished. It owns its debug geometry and material, not the physics world.
+Six pages cover basic shapes, instancing, joints, terrain, character and vehicle controllers.
+They share the local Apache-2.0 JS/WASM runtime and the existing grid texture.

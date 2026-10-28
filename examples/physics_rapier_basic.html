@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — Rapier basic</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #bfd1e5;
+      }
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        text-align: center;
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="info">
+      <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics -
+      <a href="https://github.com/dimforge/rapier.js" target="_blank" rel="noopener">rapier</a> basic
+    </div>
+    <script type="module" src="./physics_rapier_basic.ts"></script>
+  </body>
+</html>

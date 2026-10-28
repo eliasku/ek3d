@@ -323,3 +323,14 @@ MaterialX 1.39.5 interface metadata retains its Apache-2.0 license in the root `
   polytree, polygon-clipping, splaytree, robust-predicates, three-subdivide and
   Microsoft's bundled TypeScript helpers. This is an example runtime, not a package
   dependency. Generated G-code is not certified for physical printers.
+
+## Rapier physics
+
+- `libs/rapier/` contains `@dimforge/rapier3d-compat` 0.21.0 from its npm distribution:
+  https://www.npmjs.com/package/@dimforge/rapier3d-compat/v/0.21.0.
+  Source: https://github.com/dimforge/rapier.js.
+  The adjacent `LICENSE` retains the Apache-2.0 terms. The compatibility module embeds
+  its WASM payload; the separate upstream WASM file is retained alongside it.
+  The runtime is injected by the examples, not bundled into package sources.
+- All six Rapier scenes use procedural geometry. Their grid texture reuses the existing
+  pinned three.js resource; no additional model asset license is implied.
