@@ -187,7 +187,7 @@
         }
       ]
     },
-    "progress_note": "Through iteration 32: 283 upstream addons and 322 upstream pages ported. This batch adds JoltPhysics, complete CSG and 500k-instance batch LOD pages, and G-code export using an injected local Polyslice runtime. External algorithm ports are package-owned and outside upstream addon counts. Rapier remains deferred; GaussianSplat renderer integration, 3D tiles and offline progressive/catalog glTF remain pending. Progressive assets and the pinned library need redistribution permission clarification. Comprehensive interactions, browser/device coverage and asset publication review remain deferred."
+    "progress_note": "Through iteration 32: 283 upstream addons and 322 upstream pages ported. User decision: finish all approved WebGL addons, including exporters; RapierPhysics, RapierHelper and six Rapier pages are active, not deferred. Complete catalog and progressive glTF are active work, with code completion and resource-rights review tracked separately. Missing license notices are not CC0. GaussianSplat renderer integration remains a scope/dependency review; 3D tiles needs authorized service credentials. Existing backend exclusions remain. Comprehensive browser/device verification and asset publication review remain pending."
   },
   "module_dependency_review": [
     {
@@ -7385,7 +7385,8 @@
     {
       "path": "examples/webgl_loader_3dtiles.html",
       "status": "candidate",
-      "category": "candidate"
+      "category": "candidate",
+      "reason": "Blocked: needs project-authorized Cesium ion credentials and approval for live Google tiles under the local-resource policy; the upstream token is restricted to threejs.org and offline tile redistribution is not established."
     },
     {
       "path": "examples/webgl_loader_3mf.html",
@@ -7501,6 +7502,7 @@
       "path": "examples/webgl_loader_gltf.html",
       "status": "candidate",
       "category": "candidate",
+      "reason": "Active: implement the complete pinned catalog and resource graph while reviewing individual model rights. Missing notices are not CC0; unresolved publication rights are tracked separately from code work. No reduced catalog.",
       "excluded_dependencies": [
         {
           "module": "examples/jsm/libs/lil-gui.module.min.js",
@@ -13457,5 +13459,5 @@
       "dependency_issue": true
     }
   ],
-  "progress_note": "Through iteration 32: 283 upstream addons and 322 upstream pages ported. This batch adds JoltPhysics, complete CSG and 500k-instance batch LOD pages, and G-code export using an injected local Polyslice runtime. External algorithm ports are package-owned and outside upstream addon counts. Rapier remains deferred; GaussianSplat renderer integration, 3D tiles and offline progressive/catalog glTF remain pending. Progressive assets and the pinned library need redistribution permission clarification. Comprehensive interactions, browser/device coverage and asset publication review remain deferred."
+  "progress_note": "Through iteration 32: 283 upstream addons and 322 upstream pages ported. User decision: finish all approved WebGL addons, including exporters; RapierPhysics, RapierHelper and six Rapier pages are active, not deferred. Complete catalog and progressive glTF are active work, with code completion and resource-rights review tracked separately. Missing license notices are not CC0. GaussianSplat renderer integration remains a scope/dependency review; 3D tiles needs authorized service credentials. Existing backend exclusions remain. Comprehensive browser/device verification and asset publication review remain pending."
 }
