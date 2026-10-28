@@ -11,7 +11,6 @@ interface PvrDatas {
   header: Uint32Array;
   dataPtr?: number;
   bpp?: number;
-  format?: number;
   width?: number;
   height?: number;
   numSurfaces?: number;
@@ -77,7 +76,7 @@ function parseV3(pvrDatas: PvrDatas): CompressedTextureData {
   const numMipmaps = header[11];
 
   let bpp: number;
-  let format: number;
+  let format: PixelFormat;
   switch (pixelFormat) {
     case 0: // PVRTC 2bpp RGB
       bpp = 2;
@@ -101,13 +100,12 @@ function parseV3(pvrDatas: PvrDatas): CompressedTextureData {
 
   pvrDatas.dataPtr = 52 + metaLen;
   pvrDatas.bpp = bpp;
-  pvrDatas.format = format;
   pvrDatas.width = width;
   pvrDatas.height = height;
   pvrDatas.numSurfaces = numFaces;
   pvrDatas.numMipmaps = numMipmaps;
   pvrDatas.isCubemap = numFaces === 6;
-  return extract(pvrDatas);
+  return extract(pvrDatas, format);
 }
 
 function parseV2(pvrDatas: PvrDatas): CompressedTextureData {
@@ -127,7 +125,7 @@ function parseV2(pvrDatas: PvrDatas): CompressedTextureData {
   const formatFlags = flags & TYPE_MASK;
   const hasAlpha = bitmaskAlpha > 0;
   let bpp: number;
-  let format: number;
+  let format: PixelFormat;
 
   if (formatFlags === PVRTC_4) {
     format = hasAlpha ? PixelFormat.RGBA_PVRTC_4BPPV1 : PixelFormat.RGB_PVRTC_4BPPV1;
@@ -141,20 +139,18 @@ function parseV2(pvrDatas: PvrDatas): CompressedTextureData {
 
   pvrDatas.dataPtr = headerLength;
   pvrDatas.bpp = bpp;
-  pvrDatas.format = format;
   pvrDatas.width = width;
   pvrDatas.height = height;
   pvrDatas.numSurfaces = numSurfs;
   pvrDatas.numMipmaps = numMipmaps + 1;
   // v2 has no explicit cubemap flag: six surfaces are treated as a cube.
   pvrDatas.isCubemap = numSurfs === 6;
-  return extract(pvrDatas);
+  return extract(pvrDatas, format);
 }
 
-function extract(pvrDatas: PvrDatas): CompressedTextureData {
+function extract(pvrDatas: PvrDatas, format: PixelFormat): CompressedTextureData {
   const width = pvrDatas.width ?? 0;
   const height = pvrDatas.height ?? 0;
-  const format = pvrDatas.format ?? 0;
   const numMipmaps = pvrDatas.numMipmaps ?? 1;
   const numSurfs = pvrDatas.numSurfaces ?? 1;
   const isCubemap = pvrDatas.isCubemap === true;

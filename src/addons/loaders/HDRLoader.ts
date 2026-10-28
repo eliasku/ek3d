@@ -398,7 +398,7 @@ export class HDRLoader extends DataTextureLoader {
    * @param value - The texture type to set.
    * @return A reference to this loader.
    */
-  setDataType(value: number): this {
+  setDataType(value: TextureType): this {
     this.type = value;
     return this;
   }

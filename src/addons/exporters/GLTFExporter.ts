@@ -77,7 +77,7 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
 
 const KHR_MESH_QUANTIZATION = "KHR_mesh_quantization";
 
-const THREE_TO_WEBGL: Record<number, number> = {};
+const THREE_TO_WEBGL: Record<number, GL> = {};
 
 THREE_TO_WEBGL[TextureFilter.Nearest] = GL.NEAREST;
 THREE_TO_WEBGL[TextureFilter.NearestMipmapNearest] = GL.NEAREST_MIPMAP_NEAREST;
@@ -219,7 +219,7 @@ export interface GLTFDocument {
   bufferViews?: GLTFBufferViewDef[];
   accessors?: GLTFAccessorDef[];
   images?: GLTFImageDef[];
-  samplers?: { magFilter: TextureFilter; minFilter: TextureFilter; wrapS: Wrapping; wrapT: Wrapping }[];
+  samplers?: { magFilter: GL; minFilter: GL; wrapS: GL; wrapT: GL }[];
   textures?: GLTFTextureDef[];
   materials?: GLTFMaterialDef[];
   meshes?: GLTFMeshDef[];

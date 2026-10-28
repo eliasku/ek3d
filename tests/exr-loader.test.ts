@@ -588,6 +588,7 @@ test("EXRLoader rejects invalid output formats for the file's channels", () => {
     data: scanlineRow(1, [[0.1], [0.2], [0.3]]),
   });
 
+  // @ts-expect-error Exercise rejection of an unsupported output format.
   const loader = new EXRLoader().setOutputFormat(0x9999);
 
   assert.throws(() => loader.parse(buffer), /invalid output format/);

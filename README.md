@@ -30,23 +30,4 @@ document.body.append(renderer.domElement);
 renderer.render(scene, camera);
 ```
 
-## Constants
-
-Import typed `const enum` groups from `ek3d/constants`, for example `Side.Double`,
-`ShadowMap.PCF`, `TextureType.HalfFloat`, and `CullFace.Back`. Standalone names such
-as `DoubleSide` and `CullFaceBack` are removed. `MOUSE` and `TOUCH` are const enums,
-not runtime objects; do not enumerate or mutate them.
-
-`ek3d/GL` provides the shared `GL` const enum with WebGL and extension values from
-TypeScript's `lib.dom.d.ts`. Use `GL.FLOAT`, not `gl.FLOAT`.
-
-Production builds must use cross-module TypeScript emit with
-`preserveConstEnums: false` and `isolatedModules: false` before bundling to erase
-enum objects. The repository and installed-package checks use
-`scripts/const-enums.ts`, including worker builds. Isolated transpilers alone can
-retain runtime enum objects. Color-space APIs still accept custom string names.
-
-The internal scene is at `/testbed/`. Static assets live in `public/` and are served
-from `/`, without a `/public/` URL prefix.
-
 Repository setup, scripts, API details and verification: [CONTRIBUTING.md](CONTRIBUTING.md).

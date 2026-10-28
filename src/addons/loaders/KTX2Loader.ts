@@ -420,13 +420,13 @@ export class KTX2Loader extends Loader<
           mipmaps: { data: Uint8Array; width: number; height: number }[];
           width: number;
           height: number;
-          format: number;
-          type: number;
+          format: PixelFormat;
+          type: TextureType;
         }[];
         width: number;
         height: number;
-        format: number;
-        type: number;
+        format: PixelFormat;
+        type: TextureType;
         dfdFlags: number;
       };
     },
@@ -740,8 +740,8 @@ const KTX2Loader_BasisWorker = function (): void {
       mipmaps: { data: Uint8Array | Uint16Array; width: number; height: number }[];
       width: number;
       height: number;
-      format: number;
-      type: number;
+      format: PixelFormat;
+      type: TextureType;
     }[] = [];
     const buffers: ArrayBuffer[] = [];
 
@@ -814,8 +814,8 @@ const KTX2Loader_BasisWorker = function (): void {
     if?: string;
     basisFormat: number[];
     transcoderFormat: number[];
-    engineFormat: number[];
-    engineType: number[];
+    engineFormat: PixelFormat[];
+    engineType: TextureType[];
     priorityETC1S?: number;
     priorityUASTC?: number;
     priorityHDR?: number;
@@ -990,11 +990,11 @@ const KTX2Loader_BasisWorker = function (): void {
 // Parsing for non-Basis textures. These textures may have supercompression
 // like Zstd, but they do not require transcoding.
 
-const UNCOMPRESSED_FORMATS = new Set([PixelFormat.RGBA, PixelFormat.RGB, PixelFormat.RG, PixelFormat.Red]);
+const UNCOMPRESSED_FORMATS = new Set<PixelFormat>([PixelFormat.RGBA, PixelFormat.RGB, PixelFormat.RG, PixelFormat.Red]);
 
 const NORMALIZED_VK_FORMATS = new Set([VK_FORMAT_R16G16B16A16_UNORM]);
 
-const FORMAT_MAP: Record<number, number> = {
+const FORMAT_MAP: Record<number, PixelFormat> = {
   [VK_FORMAT_R32G32B32A32_SFLOAT]: PixelFormat.RGBA,
   [VK_FORMAT_R32G32_SFLOAT]: PixelFormat.RG,
   [VK_FORMAT_R32_SFLOAT]: PixelFormat.Red,

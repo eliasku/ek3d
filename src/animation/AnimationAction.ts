@@ -238,7 +238,7 @@ export class AnimationAction {
    * @param repetitions - The number of repetitions.
    * @return A reference to this animation action.
    */
-  setLoop(mode: number, repetitions: number): AnimationAction {
+  setLoop(mode: Loop, repetitions: number): AnimationAction {
     this.loop = mode;
     this.repetitions = repetitions;
     return this;

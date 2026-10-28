@@ -641,7 +641,7 @@ export function WebGLTextures(
     }
   }
   function uploadTexture(textureProperties?: any, texture?: any, slot?: any) {
-    let textureType = GL.TEXTURE_2D;
+    let textureType: GL = GL.TEXTURE_2D;
     if (texture.isDataArrayTexture || texture.isCompressedArrayTexture) textureType = GL.TEXTURE_2D_ARRAY;
     if (texture.isData3DTexture) textureType = GL.TEXTURE_3D;
     const forceUpload = initTexture(textureProperties, texture);
@@ -1513,7 +1513,7 @@ export function WebGLTextures(
     }
     const webglDepthTexture = textureProperties.__webglTexture;
     const samples = getRenderTargetSamples(renderTarget);
-    const glTextureType = isCube ? GL.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace : GL.TEXTURE_2D;
+    const glTextureType: GL = isCube ? GL.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace : GL.TEXTURE_2D;
     const glAttachmentType =
       renderTarget.depthTexture.format === PixelFormat.DepthStencil ? GL.DEPTH_STENCIL_ATTACHMENT : GL.DEPTH_ATTACHMENT;
     if (renderTarget.depthTexture.format === PixelFormat.Depth) {
@@ -1763,7 +1763,7 @@ export function WebGLTextures(
       for (let i = 0, il = textures.length; i < il; i++) {
         const attachment = textures[i];
         const attachmentProperties = properties.get(attachment);
-        let glTextureType = GL.TEXTURE_2D;
+        let glTextureType: GL = GL.TEXTURE_2D;
         if (renderTarget.isWebGL3DRenderTarget || renderTarget.isWebGLArrayRenderTarget) {
           glTextureType = renderTarget.isWebGL3DRenderTarget ? GL.TEXTURE_3D : GL.TEXTURE_2D_ARRAY;
         }
@@ -1783,7 +1783,7 @@ export function WebGLTextures(
       }
       state.unbindTexture();
     } else {
-      let glTextureType = GL.TEXTURE_2D;
+      let glTextureType: GL = GL.TEXTURE_2D;
       if (renderTarget.isWebGL3DRenderTarget || renderTarget.isWebGLArrayRenderTarget) {
         glTextureType = renderTarget.isWebGL3DRenderTarget ? GL.TEXTURE_3D : GL.TEXTURE_2D_ARRAY;
       }

@@ -1,3 +1,4 @@
+import { Side } from "../../../../../constants";
 import type { MeshBVH } from "../MeshBVH";
 import type { Ray } from "../../../../../math/Ray";
 import type { Material } from "../../../../../materials/Material";
@@ -14,7 +15,7 @@ import { intersectTris_indirect } from "../utils/iterationUtils_indirect.generat
 export function raycast_indirect(
   bvh: MeshBVH,
   root: number,
-  materialOrSide: Material | Material[] | number,
+  materialOrSide: Material | Material[] | Side,
   ray: Ray,
   intersects: Intersection[],
   near: number,
@@ -28,7 +29,7 @@ export function raycast_indirect(
 function _raycast(
   nodeIndex32: number,
   bvh: MeshBVH,
-  materialOrSide: Material | Material[] | number,
+  materialOrSide: Material | Material[] | Side,
   ray: Ray,
   intersects: Intersection[],
   near: number,

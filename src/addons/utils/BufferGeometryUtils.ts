@@ -5,7 +5,7 @@ import { InstancedInterleavedBuffer } from "../../core/InstancedInterleavedBuffe
 import { InterleavedBuffer } from "../../core/InterleavedBuffer";
 import { InterleavedBufferAttribute } from "../../core/InterleavedBufferAttribute";
 import { normalize } from "../../math/MathUtils";
-import { DrawMode } from "../../constants";
+import { DrawMode, type TextureType } from "../../constants";
 import { Vector3 } from "../../math/Vector3";
 import type { Line } from "../../objects/Line";
 import type { Mesh } from "../../objects/Mesh";
@@ -372,7 +372,7 @@ export function mergeAttributes(attributes: Attribute[]): BufferAttribute | null
   let TypedArray: TypedArrayConstructor | undefined;
   let itemSize: number | undefined;
   let normalized: boolean | undefined;
-  let gpuType: number | undefined = -1;
+  let gpuType: TextureType | -1 | undefined = -1;
   let arrayLength = 0;
 
   for (let i = 0; i < attributes.length; ++i) {
@@ -435,7 +435,7 @@ export function mergeAttributes(attributes: Attribute[]): BufferAttribute | null
     offset += attribute.count * itemSize!;
   }
 
-  if (gpuType !== undefined) {
+  if (gpuType !== undefined && gpuType !== -1) {
     result.gpuType = gpuType;
   }
 

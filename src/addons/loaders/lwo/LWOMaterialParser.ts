@@ -37,7 +37,7 @@ type MaterialNode = LWOForm & {
 type ImageMap = LWOForm & { imageIndex: number; wrap?: { w: number; h: number } };
 type MaterialParams = {
   name?: string;
-  side?: number;
+  side?: Side;
   flatShading?: boolean;
   color?: Color;
   map?: Texture;
@@ -119,7 +119,7 @@ export class LWOMaterialParser {
   }
 
   // The handedness conversion switches front and back faces.
-  private getSide(attributes: LWOAttributes): number | undefined {
+  private getSide(attributes: LWOAttributes): Side | undefined {
     if (!attributes.side) return Side.Back;
     switch (attributes.side) {
       case 0:
@@ -356,7 +356,7 @@ export class LWOMaterialParser {
     });
   }
 
-  private getWrappingType(num: number): number | undefined {
+  private getWrappingType(num: number): Wrapping | undefined {
     switch (num) {
       case 0:
         console.warn('LWOLoader: "Reset" texture wrapping type is not supported in three.js');

@@ -1,4 +1,4 @@
-import { Mapping, Wrapping, TextureFilter } from "../constants";
+import { Mapping, Wrapping, TextureFilter, PixelFormat, TextureType } from "../constants";
 import { Texture } from "./Texture";
 /**
  * Creates a texture from a canvas element.
@@ -30,8 +30,8 @@ export class CanvasTexture extends Texture {
     wrapT?: Wrapping,
     magFilter?: TextureFilter,
     minFilter?: TextureFilter,
-    format?: number,
-    type?: number,
+    format?: PixelFormat,
+    type?: TextureType,
     anisotropy?: number,
   ) {
     super(canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy);

@@ -83,7 +83,7 @@ export class HDRCubeTextureLoader extends Loader<CubeTexture, string[]> {
     return texture;
   }
 
-  setDataType(value: number): this {
+  setDataType(value: TextureType): this {
     this.type = value;
     this.hdrLoader.setDataType(value);
     return this;

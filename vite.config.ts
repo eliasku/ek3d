@@ -12,8 +12,11 @@ export default defineConfig({
   publicDir: "public",
   plugins: [constEnums()],
   worker: { plugins: () => [constEnums()] },
+
   // The upstream checkout is a read-only comparison baseline, not a development entry point.
-  optimizeDeps: { entries: ["index.html", "testbed/index.html", ...exampleEntries, "tests/browser*.ts"] },
+  optimizeDeps: {
+    entries: ["index.html", "testbed/index.html", ...exampleEntries, "tests/browser*.ts"],
+  },
   test: {
     include: ["tests/**/*.test.ts"],
     environment: "node",
@@ -45,12 +48,13 @@ export default defineConfig({
     sortPackageJson: false,
   },
   build: {
-    rollupOptions: {
+    rolldownOptions: {
       input: ["index.html", "testbed/index.html", ...exampleEntries],
       external: [
         // exclude transpiling source code from /upstream/ directory
         /^\/upstream\/.*/,
       ],
     },
+    assetsInlineLimit: 0,
   },
 });

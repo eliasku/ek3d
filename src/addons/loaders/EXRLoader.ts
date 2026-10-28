@@ -3086,7 +3086,7 @@ export class EXRLoader extends DataTextureLoader {
    * @param value - The texture type to set.
    * @return A reference to this loader.
    */
-  setDataType(value: number): this {
+  setDataType(value: TextureType): this {
     this.type = value;
     return this;
   }
@@ -3097,7 +3097,7 @@ export class EXRLoader extends DataTextureLoader {
    * @param value - Texture output format.
    * @return A reference to this loader.
    */
-  setOutputFormat(value: number): this {
+  setOutputFormat(value: PixelFormat): this {
     this.outputFormat = value;
     return this;
   }

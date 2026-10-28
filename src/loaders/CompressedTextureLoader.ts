@@ -1,5 +1,5 @@
 import type { LoadingManager } from "./LoadingManager";
-import { TextureFilter } from "../constants";
+import { TextureFilter, PixelFormat } from "../constants";
 import { FileLoader } from "./FileLoader";
 import { CompressedTexture } from "../textures/CompressedTexture";
 import type { CompressedTextureFace } from "../textures/CompressedTexture";
@@ -146,7 +146,7 @@ export interface CompressedTextureData {
   /** Height of the base mip level. */
   height: number;
   /** Texture format. */
-  format: number;
+  format: PixelFormat;
   /** Texture data and dimensions for each mip level. */
   mipmaps: CompressedTexture["mipmaps"];
   /** Number of mip levels per face. */

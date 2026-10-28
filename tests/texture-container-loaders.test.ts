@@ -121,6 +121,7 @@ test("KTX reports the stored internal format and rejects uncompressed, array and
   assert.equal(parsed.mipmaps.length, 1);
   assert.equal(parsed.mipmaps[0].data.byteLength, 8);
   assert.equal(parsed.mipmaps[0].data[0], 0x7e);
+  assert.throws(() => new KTXLoader().parse(ktxContainer(0xdead, 4, 4, 8)), /Unsupported internal format/);
 
   const uncompressed = ktxContainer(0x83f0, 4, 4, 8);
   new DataView(uncompressed).setUint32(16, 0x1401, true);

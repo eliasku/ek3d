@@ -1,6 +1,6 @@
 import type { CompressedTextureMipmap } from "./CompressedTexture";
 
-import { Wrapping } from "../constants";
+import { Wrapping, PixelFormat, TextureType } from "../constants";
 import { CompressedTexture } from "./CompressedTexture";
 /**
  * Creates a texture 2D array based on data in compressed form.
@@ -29,8 +29,8 @@ export class CompressedArrayTexture extends CompressedTexture {
     width: number,
     height: number,
     depth: number,
-    format?: number,
-    type?: number,
+    format?: PixelFormat,
+    type?: TextureType,
   ) {
     super(mipmaps, width, height, format, type);
     /**

@@ -1781,7 +1781,7 @@ export class WebGLRenderer {
       const morphTargets = !!geometry.morphAttributes.position;
       const morphNormals = !!geometry.morphAttributes.normal;
       const morphColors = !!geometry.morphAttributes.color;
-      let toneMapping = ToneMapping.No;
+      let toneMapping: ToneMapping = ToneMapping.No;
       if (material.toneMapped) {
         if (_currentRenderTarget === null) {
           toneMapping = _this.toneMapping;

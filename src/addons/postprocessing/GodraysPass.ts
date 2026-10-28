@@ -23,10 +23,11 @@ import {
 } from "./GodraysShaders";
 
 // Adapted from three-good-godrays 0.12.0; the original license is in GodraysShaders.ts.
-export enum GodraysUpsampleQuality {
+export const enum GodraysUpsampleQuality {
   LOW = 0,
   HIGH = 1,
 }
+
 export interface GodraysBlurParams {
   variance: number;
   kernelSize: number;

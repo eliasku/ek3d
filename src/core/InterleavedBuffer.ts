@@ -135,7 +135,7 @@ export class InterleavedBuffer {
    * @param value - The usage to set.
    * @return A reference to this interleaved buffer.
    */
-  setUsage(value: number): InterleavedBuffer {
+  setUsage(value: BufferUsage): InterleavedBuffer {
     this.usage = value;
     return this;
   }

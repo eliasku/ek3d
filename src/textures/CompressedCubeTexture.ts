@@ -1,6 +1,6 @@
 import type { CompressedTextureFace } from "./CompressedTexture";
 
-import { Mapping } from "../constants";
+import { Mapping, PixelFormat, TextureType } from "../constants";
 import { CompressedTexture } from "./CompressedTexture";
 /**
  * Creates a cube texture based on data in compressed form.
@@ -19,7 +19,7 @@ export class CompressedCubeTexture extends CompressedTexture {
    * @param [format=PixelFormat.RGBA] - The texture format.
    * @param [type=TextureType.UnsignedByte] - The texture type.
    */
-  constructor(images: CompressedTextureFace[], format?: number, type?: number) {
+  constructor(images: CompressedTextureFace[], format?: PixelFormat, type?: TextureType) {
     super(undefined, images[0].width, images[0].height, format, type, Mapping.CubeReflection);
     /**
      * This flag can be used for type testing.

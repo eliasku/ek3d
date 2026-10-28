@@ -29,7 +29,11 @@ const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 const stats = new Stats();
 document.body.appendChild(stats.dom);
-const params = { format: PixelFormat.Depth, type: TextureType.UnsignedShort, samples: 0 };
+const params: { format: PixelFormat; type: TextureType; samples: number } = {
+  format: PixelFormat.Depth,
+  type: TextureType.UnsignedShort,
+  samples: 0,
+};
 let target: WebGLRenderTarget;
 function setupRenderTarget(): void {
   if (target) {
@@ -44,8 +48,8 @@ function setupRenderTarget(): void {
   target.stencilBuffer = Number(params.format) === PixelFormat.DepthStencil;
   target.samples = Number(params.samples);
   target.depthTexture = new DepthTexture(1, 1);
-  target.depthTexture.format = Number(params.format);
-  target.depthTexture.type = Number(params.type);
+  target.depthTexture.format = params.format;
+  target.depthTexture.type = params.type;
 }
 setupRenderTarget();
 const scene = new Scene();

@@ -51,7 +51,7 @@ void main() {
     this.quad = new FullScreenQuad(this.passThruShader);
   }
 
-  setDataType(type: number): this {
+  setDataType(type: TextureType): this {
     this.dataType = type;
     return this;
   }

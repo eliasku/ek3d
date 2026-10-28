@@ -1,3 +1,4 @@
+import { Side } from "../../../../../constants";
 import type { MeshBVH } from "../MeshBVH";
 import type { Ray } from "../../../../../math/Ray";
 import type { Material } from "../../../../../materials/Material";
@@ -16,7 +17,7 @@ const _xyzFields = ["x", "y", "z"] as const;
 export function raycastFirst(
   bvh: MeshBVH,
   root: number,
-  materialOrSide: Material | Material[] | number,
+  materialOrSide: Material | Material[] | Side,
   ray: Ray,
   near: number,
   far: number,
@@ -31,7 +32,7 @@ export function raycastFirst(
 function _raycastFirst(
   nodeIndex32: number,
   bvh: MeshBVH,
-  materialOrSide: Material | Material[] | number,
+  materialOrSide: Material | Material[] | Side,
   ray: Ray,
   near: number,
   far: number,

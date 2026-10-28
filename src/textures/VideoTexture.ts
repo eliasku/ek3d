@@ -1,4 +1,4 @@
-import { TextureFilter, Mapping, Wrapping } from "../constants";
+import { TextureFilter, Mapping, Wrapping, PixelFormat, TextureType } from "../constants";
 import { Texture } from "./Texture";
 /**
  * A texture for use with a video.
@@ -41,8 +41,8 @@ export class VideoTexture extends Texture {
     wrapT?: Wrapping,
     magFilter: TextureFilter = TextureFilter.Linear,
     minFilter: TextureFilter = TextureFilter.Linear,
-    format?: number,
-    type?: number,
+    format?: PixelFormat,
+    type?: TextureType,
     anisotropy?: number,
   ) {
     super(video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy);

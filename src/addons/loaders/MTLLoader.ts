@@ -13,7 +13,7 @@ import { Texture } from "../../textures/Texture";
 
 export interface MaterialOptions {
   side?: Side;
-  wrap?: number;
+  wrap?: Wrapping;
   normalizeRGB?: boolean;
   ignoreZeroRGBs?: boolean;
   invertTrProperty?: boolean;
@@ -104,7 +104,7 @@ export class MaterialCreator {
   priority: "high" | "low" | "auto" = "auto";
   cache: RequestCache = "default";
   side: Side;
-  wrap: number;
+  wrap: Wrapping;
   manager: LoadingManager | undefined;
 
   constructor(baseUrl: string = "", options: MaterialOptions = {}) {

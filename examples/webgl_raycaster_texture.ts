@@ -60,7 +60,7 @@ function draw(): void {
   ctx.stroke();
   for (const texture of textures) texture.needsUpdate = true;
 }
-function makeTexture(wrapping: number): Texture {
+function makeTexture(wrapping: Wrapping): Texture {
   const texture = new Texture(drawing, Mapping.UV, wrapping, wrapping);
   texture.colorSpace = ColorSpace.SRGB;
   textures.push(texture);

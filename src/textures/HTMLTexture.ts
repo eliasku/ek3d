@@ -1,4 +1,4 @@
-import { Mapping, Wrapping, TextureFilter } from "../constants";
+import { Mapping, Wrapping, TextureFilter, PixelFormat, TextureType } from "../constants";
 import { Texture } from "./Texture";
 
 /**
@@ -46,8 +46,8 @@ export class HTMLTexture extends Texture {
     wrapT?: Wrapping,
     magFilter?: TextureFilter,
     minFilter?: TextureFilter,
-    format?: number,
-    type?: number,
+    format?: PixelFormat,
+    type?: TextureType,
     anisotropy?: number,
   ) {
     super(element, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy);

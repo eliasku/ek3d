@@ -135,14 +135,14 @@ function checkBufferGeometryIntersection(
   return intersection as RayIntersection | null;
 }
 
-function getSide(materialOrSide: Material | number) {
+function getSide(materialOrSide: Material | Side) {
   return typeof materialOrSide === "number" ? materialOrSide : materialOrSide.side;
 }
 
 // https://github.com/mrdoob/three.js/blob/0aa87c999fe61e216c1133fba7a95772b503eddf/src/objects/Mesh.js#L258
 export function intersectTri(
   geometry: BufferGeometry,
-  materialOrSide: Material | Material[] | number,
+  materialOrSide: Material | Material[] | Side,
   ray: Ray,
   tri: number,
   intersections: RayIntersection[] | null,

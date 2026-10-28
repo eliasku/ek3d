@@ -92,7 +92,7 @@ export class UniformsGroup extends EventDispatcher {
    * @param value - The usage to set.
    * @return A reference to this uniforms group.
    */
-  setUsage(value: number): UniformsGroup {
+  setUsage(value: BufferUsage): UniformsGroup {
     this.usage = value;
     return this;
   }

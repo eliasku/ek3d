@@ -19,19 +19,20 @@ export function constEnums(): Plugin {
         preserveConstEnums: false,
         isolatedModules: false,
       });
-      const externalSources = program
+      const compiler = program;
+      const externalSources = compiler
         .getSourceFiles()
         .filter(
           (file) =>
-            !file.isDeclarationFile && file.fileName.endsWith(".ts") && program!.isSourceFileFromExternalLibrary(file),
+            !file.isDeclarationFile && file.fileName.endsWith(".ts") && compiler.isSourceFileFromExternalLibrary(file),
         );
       if (externalSources.length) {
         // Source-first packages under node_modules must be emit roots, not external libraries.
         program = ts.createProgram(
           [...parsed.fileNames, ...externalSources.map((file) => file.fileName)],
-          program.getCompilerOptions(),
+          compiler.getCompilerOptions(),
           undefined,
-          program,
+          compiler,
         );
       }
     },

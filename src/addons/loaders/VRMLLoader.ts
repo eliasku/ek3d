@@ -397,8 +397,8 @@ export class VRMLLoader extends Loader<Scene> {
     };
     const imageTexture = (node: VRMLNode): Texture | undefined => {
       let texture: Texture | undefined,
-        wrapS: number = Wrapping.Repeat,
-        wrapT: number = Wrapping.Repeat;
+        wrapS: Wrapping = Wrapping.Repeat,
+        wrapT: Wrapping = Wrapping.Repeat;
       for (const field of node.fields) {
         switch (field.name) {
           case "url":
@@ -423,8 +423,8 @@ export class VRMLLoader extends Loader<Scene> {
     };
     const pixelTexture = (node: VRMLNode): PixelTexture | undefined => {
       let texture: PixelTexture | undefined,
-        wrapS: number = Wrapping.Repeat,
-        wrapT: number = Wrapping.Repeat;
+        wrapS: Wrapping = Wrapping.Repeat,
+        wrapT: Wrapping = Wrapping.Repeat;
       for (const field of node.fields) {
         switch (field.name) {
           case "image": {

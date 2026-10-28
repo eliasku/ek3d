@@ -160,7 +160,7 @@ export class DDSLoader extends CompressedTextureLoader {
     let isRGBAUncompressed = false;
     let isRGBUncompressed = false;
     let dataOffset = header[OFF_SIZE] + 4;
-    let format: number;
+    let format: PixelFormat;
 
     switch (fourCC) {
       case FOURCC_DXT1:

@@ -448,7 +448,7 @@ export class MeshBVH extends GeometryBVH {
    * world space to be consistent with three's results.
    *
    */
-  raycast(ray: Ray, materialOrSide: number | Material | Material[] = Side.Front, near = 0, far = Infinity) {
+  raycast(ray: Ray, materialOrSide: Side | Material | Material[] = Side.Front, near = 0, far = Infinity) {
     const roots = this._roots;
     const intersects: RayIntersection[] = [];
     const raycastFunc = this.indirect ? raycast_indirect : raycast;
@@ -465,7 +465,7 @@ export class MeshBVH extends GeometryBVH {
    * frame of the returned intersections.
    *
    */
-  raycastFirst(ray: Ray, materialOrSide: number | Material | Material[] = Side.Front, near = 0, far = Infinity) {
+  raycastFirst(ray: Ray, materialOrSide: Side | Material | Material[] = Side.Front, near = 0, far = Infinity) {
     const roots = this._roots;
     let closestResult: RayIntersection | null = null;
 

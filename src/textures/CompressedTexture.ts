@@ -1,4 +1,4 @@
-import { Mapping, Wrapping, TextureFilter } from "../constants";
+import { Mapping, Wrapping, TextureFilter, PixelFormat, TextureType } from "../constants";
 import { Texture } from "./Texture";
 export interface CompressedTextureMipmap {
   data:
@@ -49,8 +49,8 @@ export class CompressedTexture extends Texture<CompressedTextureMipmap> {
     mipmaps: CompressedTextureMipmap[] = [],
     width?: number,
     height?: number,
-    format?: number,
-    type?: number,
+    format?: PixelFormat,
+    type?: TextureType,
     mapping?: Mapping,
     wrapS?: Wrapping,
     wrapT?: Wrapping,

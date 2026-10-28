@@ -2,11 +2,63 @@ import { CompressedTextureLoader } from "../../loaders/CompressedTextureLoader";
 import type { CompressedTextureData } from "../../loaders/CompressedTextureLoader";
 import type { CompressedTextureMipmap } from "../../textures/CompressedTexture";
 import type { LoadingManager } from "../../loaders/LoadingManager";
+import { PixelFormat } from "../../constants";
 
 // identifier + header elements (not including key value meta-data pairs)
 const HEADER_LEN = 12 + 13 * 4;
 
 const KTX_IDENTIFIER = [0xab, 0x4b, 0x54, 0x58, 0x20, 0x31, 0x31, 0xbb, 0x0d, 0x0a, 0x1a, 0x0a];
+
+// Const enums cannot be enumerated; keep runtime file-format validation exhaustive.
+const INTERNAL_FORMATS = {
+  [PixelFormat.Alpha]: true,
+  [PixelFormat.RGB]: true,
+  [PixelFormat.RGBA]: true,
+  [PixelFormat.Depth]: true,
+  [PixelFormat.DepthStencil]: true,
+  [PixelFormat.Red]: true,
+  [PixelFormat.RedInteger]: true,
+  [PixelFormat.RG]: true,
+  [PixelFormat.RGInteger]: true,
+  [PixelFormat.RGBInteger]: true,
+  [PixelFormat.RGBAInteger]: true,
+  [PixelFormat.RGB_S3TC_DXT1]: true,
+  [PixelFormat.RGBA_S3TC_DXT1]: true,
+  [PixelFormat.RGBA_S3TC_DXT3]: true,
+  [PixelFormat.RGBA_S3TC_DXT5]: true,
+  [PixelFormat.RGB_PVRTC_4BPPV1]: true,
+  [PixelFormat.RGB_PVRTC_2BPPV1]: true,
+  [PixelFormat.RGBA_PVRTC_4BPPV1]: true,
+  [PixelFormat.RGBA_PVRTC_2BPPV1]: true,
+  [PixelFormat.RGB_ETC1]: true,
+  [PixelFormat.RGB_ETC2]: true,
+  [PixelFormat.RGBA_ETC2_EAC]: true,
+  [PixelFormat.R11_EAC]: true,
+  [PixelFormat.SIGNED_R11_EAC]: true,
+  [PixelFormat.RG11_EAC]: true,
+  [PixelFormat.SIGNED_RG11_EAC]: true,
+  [PixelFormat.RGBA_ASTC_4x4]: true,
+  [PixelFormat.RGBA_ASTC_5x4]: true,
+  [PixelFormat.RGBA_ASTC_5x5]: true,
+  [PixelFormat.RGBA_ASTC_6x5]: true,
+  [PixelFormat.RGBA_ASTC_6x6]: true,
+  [PixelFormat.RGBA_ASTC_8x5]: true,
+  [PixelFormat.RGBA_ASTC_8x6]: true,
+  [PixelFormat.RGBA_ASTC_8x8]: true,
+  [PixelFormat.RGBA_ASTC_10x5]: true,
+  [PixelFormat.RGBA_ASTC_10x6]: true,
+  [PixelFormat.RGBA_ASTC_10x8]: true,
+  [PixelFormat.RGBA_ASTC_10x10]: true,
+  [PixelFormat.RGBA_ASTC_12x10]: true,
+  [PixelFormat.RGBA_ASTC_12x12]: true,
+  [PixelFormat.RGBA_BPTC]: true,
+  [PixelFormat.RGB_BPTC_SIGNED]: true,
+  [PixelFormat.RGB_BPTC_UNSIGNED]: true,
+  [PixelFormat.RED_RGTC1]: true,
+  [PixelFormat.SIGNED_RED_RGTC1]: true,
+  [PixelFormat.RED_GREEN_RGTC2]: true,
+  [PixelFormat.SIGNED_RED_GREEN_RGTC2]: true,
+} satisfies Record<PixelFormat, true>;
 
 /**
  * Reader for the KTX 1.1 container that {@link KTXLoader} parses. Unsupported layouts
@@ -139,11 +191,15 @@ export class KTXLoader extends CompressedTextureLoader {
    */
   parse(buffer: ArrayBuffer, loadMipmaps?: boolean): CompressedTextureData {
     const ktx = new KhronosTextureContainer(buffer, 1);
+    const format = ktx.glInternalFormat;
+    if (!Object.hasOwn(INTERNAL_FORMATS, format)) {
+      throw new Error("THREE.KTXLoader: Unsupported internal format " + format);
+    }
     return {
       mipmaps: ktx.mipmaps(loadMipmaps === true),
       width: ktx.pixelWidth,
       height: ktx.pixelHeight,
-      format: ktx.glInternalFormat,
+      format,
       isCubemap: ktx.numberOfFaces === 6,
       mipmapCount: ktx.numberOfMipmapLevels,
     };

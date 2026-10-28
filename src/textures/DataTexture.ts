@@ -1,5 +1,5 @@
 import { Texture } from "./Texture";
-import { TextureFilter, Mapping, Wrapping } from "../constants";
+import { TextureFilter, Mapping, Wrapping, PixelFormat, TextureType } from "../constants";
 
 export type DataTextureImageData =
   | Int8Array
@@ -51,8 +51,8 @@ export class DataTexture extends Texture {
     data: DataTextureImageData = null,
     width: number = 1,
     height: number = 1,
-    format?: number,
-    type?: number,
+    format?: PixelFormat,
+    type?: TextureType,
     mapping?: Mapping,
     wrapS?: Wrapping,
     wrapT?: Wrapping,

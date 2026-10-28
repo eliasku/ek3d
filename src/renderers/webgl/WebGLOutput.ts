@@ -46,7 +46,7 @@ const toneMappingMap = {
   [ToneMapping.Custom]: "CUSTOM_TONE_MAPPING",
 };
 export function WebGLOutput(
-  type: number,
+  type: TextureType,
   width: number,
   height: number,
   antialias: boolean,

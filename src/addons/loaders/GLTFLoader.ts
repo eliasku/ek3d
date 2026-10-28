@@ -2023,7 +2023,7 @@ const WEBGL_COMPONENT_TYPES: Record<number, TypedArrayConstructor> = {
   5126: Float32Array,
 };
 
-const WEBGL_FILTERS: Record<number, number> = {
+const WEBGL_FILTERS: Record<number, TextureFilter> = {
   9728: TextureFilter.Nearest,
   9729: TextureFilter.Linear,
   9984: TextureFilter.NearestMipmapNearest,
@@ -2032,7 +2032,7 @@ const WEBGL_FILTERS: Record<number, number> = {
   9987: TextureFilter.LinearMipmapLinear,
 };
 
-const WEBGL_WRAPPINGS: Record<number, number> = {
+const WEBGL_WRAPPINGS: Record<number, Wrapping> = {
   33071: Wrapping.ClampToEdge,
   33648: Wrapping.MirroredRepeat,
   10497: Wrapping.Repeat,
@@ -2068,7 +2068,7 @@ const PATH_PROPERTIES: Record<string, string> = {
   weights: "morphTargetInfluences",
 };
 
-const INTERPOLATION: Record<string, number | undefined> = {
+const INTERPOLATION: Record<string, Interpolation | undefined> = {
   CUBICSPLINE: undefined, // We use a custom interpolant (GLTFCubicSplineInterpolation) for CUBICSPLINE tracks. Each
   // keyframe track will be initialized with a default interpolation type, then modified.
   LINEAR: Interpolation.Linear,

@@ -1,4 +1,4 @@
-import { Mapping, Wrapping, TextureFilter } from "../constants";
+import { Mapping, Wrapping, TextureFilter, PixelFormat, TextureType } from "../constants";
 import { VideoTexture } from "./VideoTexture";
 /**
  * This class can be used as an alternative way to define video data. Instead of using
@@ -37,8 +37,8 @@ export class VideoFrameTexture extends VideoTexture {
     wrapT?: Wrapping,
     magFilter?: TextureFilter,
     minFilter?: TextureFilter,
-    format?: number,
-    type?: number,
+    format?: PixelFormat,
+    type?: TextureType,
     anisotropy?: number,
   ) {
     super({} as HTMLVideoElement, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy);

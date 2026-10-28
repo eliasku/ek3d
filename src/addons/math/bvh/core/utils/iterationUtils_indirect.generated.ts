@@ -1,3 +1,4 @@
+import { Side } from "../../../../../constants";
 import type { MeshBVH } from "../MeshBVH";
 import type { Ray } from "../../../../../math/Ray";
 import type { Material } from "../../../../../materials/Material";
@@ -12,7 +13,7 @@ import { setTriangle } from "../../utils/TriangleUtilities";
 
 export function intersectTris_indirect(
   bvh: MeshBVH,
-  materialOrSide: Material | Material[] | number,
+  materialOrSide: Material | Material[] | Side,
   ray: Ray,
   offset: number,
   count: number,
@@ -29,7 +30,7 @@ export function intersectTris_indirect(
 
 export function intersectClosestTri_indirect(
   bvh: MeshBVH,
-  materialOrSide: Material | Material[] | number,
+  materialOrSide: Material | Material[] | Side,
   ray: Ray,
   offset: number,
   count: number,
