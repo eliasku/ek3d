@@ -1,0 +1,76 @@
+import type { Texture } from "../../textures/Texture";
+import { Vector2 } from "../../math/Vector2";
+import chunk_common from "../../renderers/shaders/ShaderChunk/common.glsl";
+/**
+ * @module TriangleBlurShader
+ * @three_import import { TriangleBlurShader } from 'ek3d/addons/shaders/TriangleBlurShader';
+ */
+
+/**
+ * Triangle blur shader based on [glfx.js triangle blur shader](https://github.com/evanw/glfx.js).
+ *
+ * A basic blur filter, which convolves the image with a
+ * pyramid filter. The pyramid filter is separable and is applied as two
+ * perpendicular triangle filters.
+ *
+ * @constant
+ */
+export const TriangleBlurShader = {
+  name: "TriangleBlurShader",
+
+  uniforms: {
+    texture: { value: null as Texture | null },
+    delta: { value: new Vector2(1, 1) },
+  },
+
+  vertexShader: /* glsl */ `
+
+		varying vec2 vUv;
+
+		void main() {
+
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+		}`,
+
+  fragmentShader: /* glsl */ `
+
+${chunk_common}
+
+		#define ITERATIONS 10.0
+
+		// Resolve the builtin before the legacy uniform shadows its GLSL3 name.
+		vec4 sampleTriangleTexture( sampler2D source, vec2 coord ) {
+			return texture2D( source, coord );
+		}
+
+		uniform sampler2D texture;
+		uniform vec2 delta;
+
+		varying vec2 vUv;
+
+		void main() {
+
+			vec4 color = vec4( 0.0 );
+
+			float total = 0.0;
+
+		// randomize the lookup values to hide the fixed number of samples
+
+			float offset = rand( vUv );
+
+			for ( float t = -ITERATIONS; t <= ITERATIONS; t ++ ) {
+
+				float percent = ( t + offset - 0.5 ) / ITERATIONS;
+				float weight = 1.0 - abs( percent );
+
+				color += sampleTriangleTexture( texture, vUv + delta * percent ) * weight;
+				total += weight;
+
+			}
+
+			gl_FragColor = color / total;
+
+		}`,
+};

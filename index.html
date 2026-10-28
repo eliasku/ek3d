@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d · 3D, on your terms</title>
+    <link rel="icon" href="data:," />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        color: #eef4ed;
+        background: #0a1218;
+        font-family: system-ui, sans-serif;
+      }
+      body {
+        background: radial-gradient(ellipse at 73% 45%, #203c40 0%, #101e27 38%, #0a1218 76%);
+      }
+      #scene {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        pointer-events: none;
+      }
+      #landing {
+        position: relative;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        min-height: 100svh;
+        padding: 32px clamp(24px, 6vw, 96px);
+      }
+      .topline,
+      .footline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+      }
+      .brand {
+        font-size: 26px;
+        font-weight: 650;
+        letter-spacing: -1.5px;
+      }
+      .edition,
+      .eyebrow,
+      .footline {
+        font-family: ui-monospace, monospace;
+        font-size: 11px;
+        line-height: 1.6;
+        letter-spacing: 0.06em;
+      }
+      .edition,
+      .footline {
+        color: #829b9f;
+      }
+      .edition::before {
+        content: "";
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        margin-right: 10px;
+        border-radius: 50%;
+        background: #b5edcb;
+      }
+      .copy {
+        align-self: center;
+        max-width: min(560px, 48%);
+        padding: 64px 0;
+      }
+      .eyebrow {
+        color: #b5edcb;
+        text-transform: uppercase;
+      }
+      .title {
+        margin: 22px 0 24px;
+        font-size: clamp(64px, 7.4vw, 112px);
+        font-weight: 500;
+        line-height: 0.98;
+        letter-spacing: -0.065em;
+      }
+      .description,
+      .details {
+        max-width: 390px;
+        font-size: 16px;
+        line-height: 1.75;
+        color: #b3c2c4;
+      }
+      .details {
+        margin-top: 14px;
+        font-size: 14px;
+        color: #829b9f;
+      }
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 32px;
+      }
+      a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        min-height: 48px;
+        padding: 0 22px;
+        border: 1px solid #b5edcb;
+        border-radius: 6px;
+        background: #b5edcb;
+        color: #10251d;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition:
+          background 150ms,
+          border-color 150ms;
+      }
+      a::after {
+        content: "↗";
+        font-size: 18px;
+      }
+      a:hover {
+        background: #d5f8e1;
+        border-color: #d5f8e1;
+      }
+      a + a {
+        background: #0a12184d;
+        border-color: #536b70;
+        color: #eef4ed;
+      }
+      a + a:hover {
+        background: #203c40;
+        border-color: #829b9f;
+      }
+      .footline {
+        border-top: 1px solid #829b9f30;
+        padding-top: 18px;
+        font-size: 10px;
+      }
+      @media (max-width: 760px) {
+        #landing {
+          padding: 24px;
+        }
+        .edition {
+          font-size: 9px;
+        }
+        .copy {
+          max-width: none;
+          margin-top: min(39vh, 330px);
+          padding: 0 0 32px;
+        }
+        .title {
+          font-size: clamp(48px, 12vw, 76px);
+          margin: 16px 0 20px;
+        }
+        .description {
+          font-size: 15px;
+        }
+        .details {
+          font-size: 13px;
+        }
+        .links {
+          margin-top: 24px;
+        }
+        a {
+          padding: 0 14px;
+          gap: 8px;
+          font-size: 13px;
+        }
+        .footline {
+          flex-wrap: wrap;
+          gap: 6px 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="landing">
+      <div class="topline">
+        <div class="brand">ek3d</div>
+        <div class="edition">SOURCE-FIRST / WEBGL 2</div>
+      </div>
+      <div class="copy">
+        <div class="eyebrow">Less implicit. More yours.</div>
+        <div class="title">3D.<br />On your terms.</div>
+        <div class="description">
+          A WebGL-focused TypeScript port of Three.js for canvas games and interactive worlds.
+        </div>
+        <div class="details">
+          Direct imports. Explicit rendering systems. Keep your dependencies visible, without a Three.js runtime
+          dependency.
+        </div>
+        <div class="links">
+          <a href="/examples/examples.html">Explore examples</a>
+          <a href="/demo/">Open demo</a>
+          <a href="https://github.com/eliasku/ek3d" target="_blank" rel="noopener noreferrer">Star on GitHub</a>
+        </div>
+      </div>
+      <div class="footline">
+        <div>BUILT WITH EK3D. RENDERED LIVE.</div>
+        <div>WEBGL ONLY · NO WEBGPU · NO WEBXR</div>
+      </div>
+    </div>
+    <script type="module" src="/examples/landing.ts"></script>
+  </body>
+</html>

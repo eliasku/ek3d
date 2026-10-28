@@ -1,0 +1,38 @@
+{
+  "servers": {
+    "oxlint": {
+      "command": "oxlint",
+      "args": ["--lsp"],
+      "fileTypes": [".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs"],
+      "rootMarkers": ["package.json"],
+      "isLinter": true,
+      "initOptions": {
+        "settings": { "configPath": "./vite.config.ts", "typeAware": true, "fixKind": "safe_fix" }
+      }
+    },
+    "oxfmt": {
+      "command": "oxfmt",
+      "args": ["--lsp"],
+      "fileTypes": [
+        ".ts",
+        ".tsx",
+        ".mts",
+        ".cts",
+        ".js",
+        ".jsx",
+        ".mjs",
+        ".cjs",
+        ".json",
+        ".jsonc",
+        ".html",
+        ".css",
+        ".md"
+      ],
+      "rootMarkers": ["package.json"],
+      "isLinter": true,
+      "initOptions": {
+        "settings": { "fmt.configPath": "./vite.config.ts", "run": "onSave" }
+      }
+    }
+  }
+}

@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>ek3d — ldraw loader</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #deebed;
+      }
+      #wrapper {
+        position: absolute;
+        inset: 0;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #attribution {
+        display: block;
+        position: absolute;
+        bottom: 8px;
+        left: 8px;
+        width: 160px;
+        padding: 10px;
+        background-color: #f3f7f8;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper"><canvas id="scene"></canvas></div>
+    <script type="module" src="./webgl_loader_ldraw.ts"></script>
+    <!-- LDraw.org CC BY 2.0 Parts Library attribution -->
+    <div id="attribution">
+      <center>
+        <a href="https://www.ldraw.org"
+          ><img style="width: 145px" src="/examples/models/ldraw/ldraw_org_logo/Stamp145.png"
+        /></a>
+      </center>
+      <br />
+      <center>
+        <a href="https://www.ldraw.org"
+          >LEGO&reg; and the LEGO logo are trademarks of the LEGO Group. This file is not a LEGO Group product.</a
+        >
+      </center>
+    </div>
+  </body>
+</html>

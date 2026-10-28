@@ -1,20 +1,54 @@
 {
   "name": "ek3d",
-  "version": "0.0.1",
-  "description": "",
+  "version": "0.1.0",
+  "description": "WebGL-focused, source-first TypeScript port of Three.js with explicit composition",
   "license": "MIT",
-  "author": "Elias Ku <eliasku.games@gmail.com>",
+  "files": [
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "author": "Ilya Kuzmichev <eliasku.games@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eliasku/ek3d.git"
+  },
   "type": "module",
   "sideEffects": false,
   "exports": {
     "./*": "./src/*.ts"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "typecheck": "node node_modules/typescript/bin/tsc --noEmit",
+    "test": "vp test",
+    "dev": "vp dev --host 127.0.0.1",
+    "preview": "vp preview --host 127.0.0.1",
+    "build": "vp build",
+    "package:check": "tsx scripts/check-package.ts",
+    "browser:smoke": "tsx scripts/browser-smoke.ts",
+    "lint": "vp lint --deny-warnings",
+    "format": "vp fmt",
+    "format:check": "vp fmt --check",
+    "style:check": "tsx scripts/check-style.ts",
+    "check": "npm run format:check && npm run style:check && npm run lint && npm run typecheck",
+    "verify": "npm run check && npm test && npm run build"
   },
-  "files": [
-    "src",
-    "README.md",
-    "LICENSE"
-  ]
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "playwright": "1.64.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "typescript6": "npm:typescript@6.0.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.4.0",
+    "vite-plus": "1.4.0"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.4.0"
+  },
+  "engines": {
+    "node": "^22.18.0 || ^24.11.0 || >=26.0.0"
+  },
+  "allowScripts": {
+    "esbuild": true
+  }
 }

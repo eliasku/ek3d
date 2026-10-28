@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "ES2025.Float16", "DOM", "DOM.Iterable"],
+    "noEmit": true,
+    "allowJs": true,
+    "checkJs": false,
+    "strict": true,
+    "useDefineForClassFields": true,
+    "skipLibCheck": false,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "demo/**/*.ts", "examples/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts", "vite.config.ts"]
+}

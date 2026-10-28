@@ -1,0 +1,168 @@
+import { BufferGeometry } from "../../core/BufferGeometry";
+import { Float32BufferAttribute } from "../../core/BufferAttribute";
+import { OrthographicCamera } from "../../cameras/OrthographicCamera";
+import { Mesh } from "../../objects/Mesh";
+import type { Material } from "../../materials/Material";
+import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
+import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
+
+/**
+ * Base class for all post processing passes.
+ *
+ * This module is only relevant for post processing with {@link WebGLRenderer}.
+ *
+ * @abstract
+ * @three_import import { Pass } from 'ek3d/addons/postprocessing/Pass';
+ */
+export class Pass {
+  isPass: boolean;
+  enabled: boolean;
+  needsSwap: boolean;
+  clear: boolean;
+  renderToScreen: boolean;
+
+  /**
+   * Constructs a new pass.
+   */
+  constructor() {
+    /**
+     * This flag can be used for type testing.
+     *
+     * @readonly
+     * @default true
+     */
+    this.isPass = true;
+    /**
+     * If set to `true`, the pass is processed by the composer.
+     *
+     * @default true
+     */
+    this.enabled = true;
+    /**
+     * If set to `true`, the pass indicates to swap read and write buffer after rendering.
+     *
+     * @default true
+     */
+    this.needsSwap = true;
+    /**
+     * If set to `true`, the pass clears its buffer before rendering
+     *
+     * @default false
+     */
+    this.clear = false;
+    /**
+     * If set to `true`, the result of the pass is rendered to screen. The last pass in the composers
+     * pass chain gets automatically rendered to screen, no matter how this property is configured.
+     *
+     * @default false
+     */
+    this.renderToScreen = false;
+  }
+
+  /**
+   * Sets the size of the pass.
+   *
+   * @abstract
+   * @param width - The width to set.
+   * @param height - The height to set.
+   */
+  setSize(_width: number, _height: number): void {}
+
+  /**
+   * This method holds the render logic of a pass. It must be implemented in all derived classes.
+   *
+   * @abstract
+   * @param renderer - The renderer.
+   * @param writeBuffer - The write buffer. This buffer is intended as the rendering
+   * destination for the pass.
+   * @param readBuffer - The read buffer. The pass can access the result from the
+   * previous pass from this buffer.
+   * @param deltaTime - The delta time in seconds.
+   * @param maskActive - Whether masking is active or not.
+   */
+  render(
+    _renderer: WebGLRenderer,
+    _writeBuffer: WebGLRenderTarget,
+    _readBuffer: WebGLRenderTarget,
+    _deltaTime: number,
+    _maskActive: boolean,
+  ): void {
+    console.error("THREE.Pass: .render() must be implemented in derived pass.");
+  }
+
+  /**
+   * Frees the GPU-related resources allocated by this instance. Call this
+   * method whenever the pass is no longer used in your app.
+   *
+   * @abstract
+   */
+  dispose(): void {}
+}
+
+// Helper for passes that need to fill the viewport with a single quad.
+
+const _camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+// https://github.com/mrdoob/three.js/pull/21358
+
+class FullscreenTriangleGeometry extends BufferGeometry {
+  constructor() {
+    super();
+    this.setAttribute("position", new Float32BufferAttribute([-1, 3, 0, -1, -1, 0, 3, -1, 0], 3));
+    this.setAttribute("uv", new Float32BufferAttribute([0, 2, 0, 0, 2, 0], 2));
+  }
+}
+
+const _geometry = new FullscreenTriangleGeometry();
+
+/**
+ * A helper for passes which need to render a full
+ * screen effect which is quite common in context of post processing.
+ *
+ * The intended usage is to reuse a single full screen quad for rendering
+ * subsequent passes by just reassigning the `material` reference.
+ *
+ * This module can only be used with {@link WebGLRenderer}.
+ *
+ * @three_import import { FullScreenQuad } from 'ek3d/addons/postprocessing/Pass';
+ */
+export class FullScreenQuad {
+  _mesh: Mesh<Material>;
+
+  /**
+   * Constructs a new full screen quad.
+   *
+   * @param material - The material to render te full screen quad with.
+   */
+  constructor(material: Material | null) {
+    this._mesh = new Mesh<Material>(_geometry, material as Material);
+  }
+
+  /**
+   * Frees the GPU-related resources allocated by this instance. Call this
+   * method whenever the instance is no longer used in your app.
+   */
+  dispose(): void {
+    this._mesh.geometry.dispose();
+  }
+
+  /**
+   * Renders the full screen quad.
+   *
+   * @param renderer - The renderer.
+   */
+  render(renderer: WebGLRenderer): void {
+    renderer.render(this._mesh, _camera);
+  }
+
+  /**
+   * The quad's material.
+   */
+  get material(): Material | null {
+    return this._mesh.material;
+  }
+
+  set material(value: Material | null) {
+    this._mesh.material = value as Material;
+  }
+}

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>ek3d — geometry — text</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        color: #fff;
+        font-family: sans-serif;
+      }
+      #wrapper {
+        position: absolute;
+        inset: 0;
+      }
+      #wrapper::after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 8px 12px;
+        font-size: 13px;
+        line-height: 1.4;
+        white-space: pre;
+        pointer-events: none;
+        content: "type to enter new text, drag to spin the text\A F1 color · F2 font · F3 weight · F4 bevel";
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper"><canvas id="scene"></canvas></div>
+    <script type="module" src="./webgl_geometry_text.ts"></script>
+  </body>
+</html>

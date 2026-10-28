@@ -1,0 +1,1 @@
+export default "\n#ifndef FLAT_SHADED // normal is computed with derivatives when FLAT_SHADED\n\n	vNormal = normalize( transformedNormal );\n\n	#ifdef USE_TANGENT\n\n		vTangent = normalize( transformedTangent );\n		vBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );\n\n		#ifdef FLIP_SIDED\n\n			vBitangent = - vBitangent;\n\n		#endif\n\n	#endif\n\n#endif\n";

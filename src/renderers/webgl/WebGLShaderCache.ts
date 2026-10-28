@@ -1,0 +1,70 @@
+let _id = 0;
+export class WebGLShaderCache {
+  shaderCache: any;
+  materialCache: any;
+
+  constructor() {
+    this.shaderCache = new Map();
+    this.materialCache = new Map();
+  }
+  update(material: any, vertexShaderStage: any, fragmentShaderStage?: any) {
+    const materialShaders = this._getShaderCacheForMaterial(material);
+    if (materialShaders.has(vertexShaderStage) === false) {
+      materialShaders.add(vertexShaderStage);
+      vertexShaderStage.usedTimes++;
+    }
+    if (materialShaders.has(fragmentShaderStage) === false) {
+      materialShaders.add(fragmentShaderStage);
+      fragmentShaderStage.usedTimes++;
+    }
+    return this;
+  }
+  remove(material?: any) {
+    const materialShaders = this.materialCache.get(material);
+    for (const shaderStage of materialShaders) {
+      shaderStage.usedTimes--;
+      if (shaderStage.usedTimes === 0) this.shaderCache.delete(shaderStage.code);
+    }
+    this.materialCache.delete(material);
+    return this;
+  }
+  getVertexShaderStage(material?: any) {
+    return this._getShaderStage(material.vertexShader);
+  }
+  getFragmentShaderStage(material?: any) {
+    return this._getShaderStage(material.fragmentShader);
+  }
+  dispose() {
+    this.shaderCache.clear();
+    this.materialCache.clear();
+  }
+  _getShaderCacheForMaterial(material?: any) {
+    const cache = this.materialCache;
+    let set = cache.get(material);
+    if (set === undefined) {
+      set = new Set();
+      cache.set(material, set);
+    }
+    return set;
+  }
+  _getShaderStage(code?: any) {
+    const cache = this.shaderCache;
+    let stage = cache.get(code);
+    if (stage === undefined) {
+      stage = new WebGLShaderStage(code);
+      cache.set(code, stage);
+    }
+    return stage;
+  }
+}
+class WebGLShaderStage {
+  id: number;
+  code: any;
+  usedTimes: number;
+
+  constructor(code?: any) {
+    this.id = _id++;
+    this.code = code;
+    this.usedTimes = 0;
+  }
+}

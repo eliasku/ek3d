@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>ek3d — box selection</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #f0f0f0;
+      }
+      #wrapper {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .selectBox {
+        position: absolute;
+        border: 1px solid #55aaff;
+        background-color: rgba(75, 160, 255, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="wrapper"><canvas id="scene"></canvas></div>
+    <script type="module" src="./misc_boxselection.ts"></script>
+  </body>
+</html>

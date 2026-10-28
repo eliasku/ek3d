@@ -1,0 +1,1 @@
+export default "\n#if defined( USE_COLOR ) || defined( USE_COLOR_ALPHA )\n\n\tdiffuseColor *= vColor;\n\n#endif\n";
