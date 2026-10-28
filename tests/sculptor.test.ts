@@ -1,6 +1,7 @@
 import { test } from "vite-plus/test";
 import assert from "node:assert/strict";
 import { Sculptor } from "../src/addons/misc/Sculptor";
+import { GLTFExporter } from "../src/addons/exporters/GLTFExporter";
 import { PerspectiveCamera } from "../src/cameras/PerspectiveCamera";
 import { BufferAttribute } from "../src/core/BufferAttribute";
 import { IcosahedronGeometry } from "../src/geometries/IcosahedronGeometry";
@@ -57,5 +58,30 @@ test("tool settings persist per tool and ray picking rejects unsupported inputs"
   assert.equal(sculptor.hasHit(), false);
   sculptor.setTool("drag");
   assert.throws(() => sculptor.strokeFromRay(ray, 0.5));
+  sculptor.dispose();
+});
+
+test("sculpt snapshots export their compact deformed geometry as GLB", async () => {
+  const { mesh, sculptor } = fixture();
+  sculptor.setTool("inflate").setDetail(0).setStrength(0.5);
+  assert.equal(sculptor.strokeFromRay(new Ray(new Vector3(0, 0, 3), new Vector3(0, 0, -1)), 0.7), true);
+  sculptor.endStroke();
+  const snapshot = mesh.clone();
+  snapshot.geometry = sculptor.getGeometry();
+  const result = await new GLTFExporter().parseAsync(snapshot, { binary: true });
+  assert.ok(result instanceof ArrayBuffer);
+  const view = new DataView(result);
+  assert.equal(view.getUint32(0, true), 0x46546c67);
+  const jsonLength = view.getUint32(12, true);
+  const json = JSON.parse(new TextDecoder().decode(new Uint8Array(result, 20, jsonLength))) as {
+    meshes: { primitives: { attributes: { POSITION: number } }[] }[];
+    accessors: { count: number }[];
+  };
+  const position = json.meshes[0].primitives[0].attributes.POSITION;
+  const positions = snapshot.geometry.getAttribute("position");
+  assert.ok(positions);
+  assert.equal(json.accessors[position].count, positions.count);
+  assert.notEqual(snapshot.geometry, mesh.geometry);
+  snapshot.geometry.dispose();
   sculptor.dispose();
 });

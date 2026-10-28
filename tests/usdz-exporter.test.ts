@@ -9,6 +9,7 @@ import { BufferGeometry } from "../src/core/BufferGeometry";
 import { MeshStandardMaterial } from "../src/materials/MeshStandardMaterial";
 import { Mesh } from "../src/objects/Mesh";
 import { Scene } from "../src/scenes/Scene";
+import { CompressedTexture } from "../src/textures/CompressedTexture";
 import { Texture } from "../src/textures/Texture";
 
 test("USDZ exports aligned geometry, textured material and animation through the injected ZIP runtime", async () => {
@@ -94,4 +95,76 @@ test("USDZ exports aligned geometry, textured material and animation through the
   } finally {
     vi.unstubAllGlobals();
   }
+});
+
+test("USDZ preserves compressed texture MIME type in the material and archive", async () => {
+  const encodedTypes: string[] = [];
+  class Canvas {
+    width: number = 2;
+    height: number = 2;
+    getContext() {
+      return { translate() {}, scale() {}, drawImage() {} };
+    }
+    toBlob(callback: (blob: Blob) => void, type: string) {
+      encodedTypes.push(type);
+      callback(new Blob(["image"], { type }));
+    }
+  }
+  vi.stubGlobal("HTMLCanvasElement", Canvas);
+  vi.stubGlobal("document", { createElement: () => new Canvas() });
+  try {
+    const texture = new CompressedTexture([], 2, 2);
+    texture.userData.mimeType = "image/jpeg";
+    const geometry = new BufferGeometry();
+    geometry.setAttribute("position", new Float32BufferAttribute([0, 0, 0, 1, 0, 0, 0, 1, 0], 3));
+    const mesh = new Mesh(geometry, new MeshStandardMaterial({ map: texture }));
+    let files: Parameters<USDZZipRuntime["zipSync"]>[0] = {};
+    const exporter = new USDZExporter({
+      zipSync(input) {
+        files = input;
+        return new Uint8Array();
+      },
+    });
+    await assert.rejects(exporter.parseAsync(mesh), /setTextureUtils/);
+    exporter.setTextureUtils({ decompress: () => new Texture(new Canvas()) });
+    await exporter.parseAsync(mesh);
+    const name = `textures/Texture_${texture.source.id}_${texture.flipY}.jpg`;
+    const modelEntry = files["model.usda"];
+    const model = new TextDecoder().decode(Array.isArray(modelEntry) ? modelEntry[0] : modelEntry);
+    assert.ok(model.includes(`asset inputs:file = @${name}@`));
+    assert.ok(name in files);
+    assert.deepEqual(encodedTypes, ["image/jpeg"]);
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});
+
+test("USDZ onlyVisible controls traversal and reuses shared geometry", async () => {
+  const geometry = new BufferGeometry();
+  geometry.setAttribute("position", new Float32BufferAttribute([0, 0, 0, 1, 0, 0, 0, 1, 0], 3));
+  const material = new MeshStandardMaterial();
+  const visible = new Mesh(geometry, material);
+  visible.name = "visible";
+  const hidden = new Mesh(geometry, material);
+  hidden.name = "hidden";
+  hidden.visible = false;
+  const scene = new Scene();
+  scene.add(visible, hidden);
+  let files: Parameters<USDZZipRuntime["zipSync"]>[0] = {};
+  const exporter = new USDZExporter({
+    zipSync(input) {
+      files = input;
+      return new Uint8Array();
+    },
+  });
+  const model = () => {
+    const entry = files["model.usda"];
+    return new TextDecoder().decode(Array.isArray(entry) ? entry[0] : entry);
+  };
+  await exporter.parseAsync(scene);
+  assert.ok(model().includes('"visible"'));
+  assert.ok(!model().includes('"hidden"'));
+  await exporter.parseAsync(scene, { onlyVisible: false });
+  assert.ok(model().includes('"hidden"'));
+  assert.equal(Object.keys(files).filter((name) => name.startsWith("geometries/")).length, 1);
 });

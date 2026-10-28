@@ -17,6 +17,8 @@ import { read as readKTX2 } from "../src/addons/loaders/KTX2Container";
 import { FloatType, HalfFloatType, RGBAFormat, SRGBColorSpace } from "../src/constants";
 import { DataTexture } from "../src/textures/DataTexture";
 import { Data3DTexture } from "../src/textures/Data3DTexture";
+import type { WebGLRenderer } from "../src/renderers/WebGLRenderer";
+import { WebGLRenderTarget } from "../src/renderers/WebGLRenderTarget";
 
 const zlib = { zlibSync: (data: Uint8Array) => deflateSync(data), unzlibSync: (data: Uint8Array) => inflateSync(data) };
 
@@ -46,6 +48,32 @@ test("EXR compression modes round-trip real scanline data", async () => {
   }
 });
 
+test("EXR accepts false render target kind flags and rejects true ones", async () => {
+  const target = new WebGLRenderTarget(1, 1, { type: FloatType });
+  const flags = Object.assign(target, { isWebGLCubeRenderTarget: false });
+  const renderer = {
+    isWebGLRenderer: true,
+    readRenderTargetPixelsAsync: async (
+      _target: unknown,
+      _x: number,
+      _y: number,
+      _w: number,
+      _h: number,
+      data: Float32Array,
+    ) => {
+      data.set([0.25, 0.5, 0.75, 1]);
+      return data;
+    },
+  } as unknown as WebGLRenderer;
+  const exporter = new EXRExporter(zlib);
+  const bytes = await exporter.parse(renderer, flags, { type: FloatType, compression: NO_COMPRESSION });
+  const decoded = new EXRLoader().setZlibDecoder(zlib).setDataType(FloatType).parse(Uint8Array.from(bytes).buffer);
+  assert.ok(decoded.data);
+  assert.deepEqual(Array.from(decoded.data), [0.25, 0.5, 0.75, 1]);
+  flags.isWebGLCubeRenderTarget = true;
+  await assert.rejects(exporter.parse(renderer, flags), /Unsupported render target type/);
+});
+
 test("KTX2 writer preserves byte offsets, descriptor and 3D dimensions", async () => {
   const source = await readFile(
     new URL("../examples/public/examples/libs/ktx-parse.module.js", import.meta.url),
@@ -73,4 +101,28 @@ test("KTX2 writer preserves byte offsets, descriptor and 3D dimensions", async (
   assert.equal(parsedVolume.pixelDepth, 2);
   assert.equal(parsedVolume.pixelHeight, 2);
   assert.equal(parsedVolume.levels[0].levelData.byteLength, 16);
+  const crossRealmVolume = {
+    isData3DTexture: true,
+    format: volume.format,
+    type: volume.type,
+    colorSpace: volume.colorSpace,
+    image: volume.image,
+  } as unknown as Data3DTexture;
+  assert.equal(readKTX2(await exporter.parse(crossRealmVolume)).pixelDepth, 2);
+  const target = new WebGLRenderTarget(1, 1);
+  const renderer = {
+    isWebGLRenderer: true,
+    readRenderTargetPixelsAsync: async (
+      _target: unknown,
+      _x: number,
+      _y: number,
+      _w: number,
+      _h: number,
+      data: Uint8Array,
+    ) => {
+      data.set([5, 6, 7, 8]);
+      return data;
+    },
+  } as unknown as WebGLRenderer;
+  assert.deepEqual(Array.from(readKTX2(await exporter.parse(renderer, target)).levels[0].levelData), [5, 6, 7, 8]);
 });

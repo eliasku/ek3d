@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — glTF catalog</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #222;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        z-index: 1;
+        top: 1em;
+        left: 1em;
+        color: white;
+        text-shadow: 0 1px 3px black;
+      }
+      #info a {
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="info">
+      glTF sample catalog — <a href="https://polyhaven.com/a/royal_esplanade">Royal Esplanade</a> by Greg Zaal<br />
+      <span id="status" role="status" aria-live="polite">Loading…</span>
+    </div>
+    <script type="module" src="./webgl_loader_gltf.ts"></script>
+  </body>
+</html>

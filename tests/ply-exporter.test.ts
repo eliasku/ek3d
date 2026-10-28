@@ -91,3 +91,29 @@ test("PLY defers the callback and rejects incomplete triangles", () => {
     globalThis.requestAnimationFrame = previous;
   }
 });
+
+test("PLY fills missing normals, UVs, colors and custom properties in ASCII and binary", () => {
+  const first = triangle();
+  first.setAttribute("normal", new Float32BufferAttribute([0, 0, 1, 0, 0, 1, 0, 0, 1], 3));
+  first.setAttribute("uv", new Float32BufferAttribute([0, 0, 1, 0, 0, 1], 2));
+  first.setAttribute("color", new Float32BufferAttribute([1, 0, 0, 0, 1, 0, 0, 0, 1], 3));
+  first.setAttribute("weight", new Float32BufferAttribute([2, 3, 4], 1));
+  const root = new Object3D();
+  const material = new MeshBasicMaterial();
+  root.add(new Mesh(first, material), new Mesh(triangle(), material));
+  const exporter = new PLYExporter();
+  const options = { customPropertyMapping: { weight: ["weight"] } };
+  const ascii = exporter.parse(root, undefined, options);
+  assert.ok(typeof ascii === "string");
+  assert.ok(ascii.includes("0 0 0 0 0 0 0 0 1 1 1 0\n"));
+  const binary = exporter.parse(root, undefined, { ...options, binary: true, littleEndian: true });
+  assert.ok(binary instanceof ArrayBuffer);
+  const bytes = new Uint8Array(binary);
+  const headerEnd = new TextDecoder().decode(bytes).indexOf("end_header\n") + "end_header\n".length;
+  const view = new DataView(binary);
+  const missing = headerEnd + 3 * 48;
+  assert.deepEqual(
+    Array.from({ length: 12 }, (_, i) => view.getFloat32(missing + i * 4, true)),
+    [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0],
+  );
+});

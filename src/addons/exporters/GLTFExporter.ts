@@ -1242,11 +1242,10 @@ export class GLTFWriter {
     };
 
     const originalNormal = geometry.getAttribute("normal") as GLTFAttribute | undefined;
-
+    let exportNormal = originalNormal;
     if (originalNormal !== undefined && !this.isNormalizedNormalAttribute(originalNormal)) {
       console.warn("THREE.GLTFExporter: Creating normalized normal attribute from the non-normalized one.");
-
-      geometry.setAttribute("normal", this.createNormalizedNormalAttribute(originalNormal));
+      exportNormal = this.createNormalizedNormalAttribute(originalNormal);
     }
 
     // @QUESTION Detect if .vertexColors = true?
@@ -1257,7 +1256,8 @@ export class GLTFWriter {
       // Ignore morph target attributes, which are exported later.
       if (attributeName.slice(0, 5) === "morph") continue;
 
-      const attribute = geometry.attributes[attributeName] as GLTFAttribute;
+      const attribute =
+        attributeName === "normal" ? exportNormal! : (geometry.attributes[attributeName] as GLTFAttribute);
       attributeName = nameConversion[attributeName] || attributeName.toUpperCase();
 
       // Prefix all geometry attributes except the ones specifically
@@ -1297,8 +1297,6 @@ export class GLTFWriter {
         cache.attributes.set(this.getUID(attribute), accessor);
       }
     }
-
-    if (originalNormal !== undefined) geometry.setAttribute("normal", originalNormal);
 
     // Skip if no exportable attributes found
     if (Object.keys(attributes).length === 0) return null;
@@ -1402,42 +1400,42 @@ export class GLTFWriter {
       ? geometry.groups
       : [{ materialIndex: 0, start: undefined, count: undefined }];
 
-    for (let i = 0, il = groups.length; i < il; i++) {
-      const primitive: GLTFPrimitiveDef = {
-        mode: mode,
-        attributes: attributes,
-      };
+    try {
+      for (let i = 0, il = groups.length; i < il; i++) {
+        const primitive: GLTFPrimitiveDef = {
+          mode: mode,
+          attributes: attributes,
+        };
 
-      this.serializeUserData(geometry, primitive);
+        this.serializeUserData(geometry, primitive);
 
-      if (targets.length > 0) primitive.targets = targets;
+        if (targets.length > 0) primitive.targets = targets;
 
-      if (geometry.index !== null) {
-        let cacheKey: number | string = this.getUID(geometry.index);
+        if (geometry.index !== null) {
+          let cacheKey: number | string = this.getUID(geometry.index);
 
-        if (groups[i].start !== undefined || groups[i].count !== undefined) {
-          cacheKey = cacheKey + ":" + groups[i].start + ":" + groups[i].count;
+          if (groups[i].start !== undefined || groups[i].count !== undefined) {
+            cacheKey = cacheKey + ":" + groups[i].start + ":" + groups[i].count;
+          }
+
+          if (cache.attributes.has(cacheKey)) {
+            primitive.indices = cache.attributes.get(cacheKey)!;
+          } else {
+            primitive.indices = this.processAccessor(geometry.index, geometry, groups[i].start, groups[i].count);
+            cache.attributes.set(cacheKey, primitive.indices);
+          }
+
+          if (primitive.indices === null) delete primitive.indices;
         }
 
-        if (cache.attributes.has(cacheKey)) {
-          primitive.indices = cache.attributes.get(cacheKey)!;
-        } else {
-          primitive.indices = this.processAccessor(geometry.index, geometry, groups[i].start, groups[i].count);
-          cache.attributes.set(cacheKey, primitive.indices);
-        }
+        const material = await this.processMaterialAsync(materials[groups[i].materialIndex], geometry);
 
-        if (primitive.indices === null) delete primitive.indices;
+        if (material !== null) primitive.material = material;
+
+        primitives.push(primitive);
       }
-
-      const material = await this.processMaterialAsync(materials[groups[i].materialIndex], geometry);
-
-      if (material !== null) primitive.material = material;
-
-      primitives.push(primitive);
-    }
-
-    if (didForceIndices === true) {
-      geometry.setIndex(null as unknown as BufferAttribute);
+    } finally {
+      if (didForceIndices) geometry.index = null;
     }
 
     meshDef.primitives = primitives;
@@ -2840,7 +2838,7 @@ export class GLTFExporter {
   parse(
     input: Object3D | Object3D[],
     onDone: (result: GLTFDocument | ArrayBuffer) => void,
-    onError: (error: unknown) => void,
+    onError?: ((error: unknown) => void) | null,
     options: GLTFWriterOptions = {},
   ): void {
     const run = async (): Promise<void> => {
@@ -2849,7 +2847,7 @@ export class GLTFExporter {
       writer.setTextureUtils(this.textureUtils);
       await writer.writeAsync(input, onDone, options);
     };
-    void run().catch(onError);
+    void run().catch(onError ?? undefined);
   }
 
   parseAsync(input: Object3D | Object3D[], options: GLTFWriterOptions = {}): Promise<GLTFDocument | ArrayBuffer> {

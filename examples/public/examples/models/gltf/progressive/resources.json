@@ -1,0 +1,31 @@
+{
+  "description": "Needle progressive glTF example resource graph. Each model's file is its base GLB; NEEDLE_progressive LOD paths resolve alongside it. The original CDN is provenance only, not a runtime fallback.",
+  "models": [
+    {
+      "name": "Mobile Home",
+      "author": "ConradJustin",
+      "source": "https://sketchfab.com/3d-models/mobile-home-5240b1dbc29c4ea28be7f91b3638951a",
+      "upstreamBase": "https://cloud.needle.tools/-/assets/Z23hmXBZ2sPRdk-world/file",
+      "localBase": "mobile-home/file",
+      "availability": "Not distributed: Free Standard/NoAI terms prohibit standalone-file redistribution. A complete authorized base and all referenced progressive LODs are required."
+    },
+    {
+      "name": "Peachy Balloon",
+      "author": "ConradJustin",
+      "source": "https://sketchfab.com/3d-models/3c8b73ebbb3748d39994fc87bc945474",
+      "upstreamBase": "https://cloud.needle.tools/-/assets/Z23hmXBZnlceI-ZnlceI-world/file",
+      "localBase": "peachy-balloon/file",
+      "availability": "Not distributed: listing and description give conflicting license terms. Clarify permission and provide the complete authorized base and all referenced progressive LODs."
+    },
+    {
+      "name": "The Forgotten Knight",
+      "author": "dark_igorek",
+      "source": "https://sketchfab.com/3d-models/the-forgotten-knight-d14eb14d83bd4e7ba7cbe443d76a10fd",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "upstreamBase": "https://cloud.needle.tools/-/assets/Z23hmXBZ21QnG-Z21QnG-product/file",
+      "localBase": "knight/file",
+      "availability": "Base and all 89 referenced mesh and texture LOD GLBs copied unmodified from Needle Cloud. Generated from the original model by Needle Build Pipeline 2.11.2."
+    }
+  ]
+}

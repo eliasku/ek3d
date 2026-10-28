@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ek3d — progressive glTF</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #192022;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #info {
+        position: absolute;
+        z-index: 1;
+        left: 1em;
+        top: 1em;
+        color: white;
+        font: 14px sans-serif;
+      }
+      a {
+        color: #aee4ff;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="info">
+      Progressive glTF using <a href="https://github.com/needle-tools/gltf-progressive">Needle Progressive</a><br />
+      <a href="https://sketchfab.com/3d-models/mobile-home-5240b1dbc29c4ea28be7f91b3638951a">Mobile Home</a> and
+      <a href="https://sketchfab.com/3d-models/3c8b73ebbb3748d39994fc87bc945474">Peachy Balloon</a> by ConradJustin;
+      <a href="https://sketchfab.com/3d-models/the-forgotten-knight-d14eb14d83bd4e7ba7cbe443d76a10fd"
+        >The Forgotten Knight</a
+      >
+      by dark_igorek, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.<br />
+      <a href="https://polyhaven.com/a/quarry_01">Quarry 01</a> by Sergej Majboroda / Poly Haven, CC0.
+      <div id="status" role="status">Loading models.</div>
+      <a href="/examples/models/gltf/progressive/resources.json">Resource provenance and prerequisites</a>
+    </div>
+    <script type="module" src="./webgl_loader_gltf_progressive_lod.ts"></script>
+  </body>
+</html>

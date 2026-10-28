@@ -1,0 +1,24 @@
+{
+  "catalogSource": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/8f492390ddc7a2ae221a1369ef560589cf8c70fb/Models",
+  "revision": "8f492390ddc7a2ae221a1369ef560589cf8c70fb",
+  "catalogIndex": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/8f492390ddc7a2ae221a1369ef560589cf8c70fb/Models/model-index.json",
+  "inventory": "gltf-catalog.json records 150 indexed models, 338 variant entrypoints and 2,482 blobs in their model directories, with Git blob IDs, byte sizes, local-availability flags, complete pinned README and LICENSE notices, and full model metadata including component-level credits and terms. Ancillary metadata and screenshots are inventoried but not copied as assets. The glTF and GLB JSON URI references were inspected at the pin and all resolve inside the pinned tree; local references in copied variants resolve locally.",
+  "localCopy": "964 variant-directory blobs (974,333,153 bytes) for 112 models were copied only when the pinned Legal section and component metadata list exclusively CC0, CC BY 4.0 or CC BY-NC 4.0. Preserve the per-model notices in gltf-catalog.json. CC BY-NC permits only noncommercial use; project noncommercial status does not authorize commercial redistribution. The other 38 models remain selectable but their files are not supplied until their individual terms and permissions are reviewed. A missing file is not replaced by a different model or remote URL. This classification does not decide trademark rights or constitute legal advice.",
+  "examplesOfUnresolvedTerms": {
+    "Sponza": "Cryengine Limited License Agreement; standalone distribution permission unresolved.",
+    "BrainStem": "Poser EULA.",
+    "EnvironmentTest": "Adobe Stock License.",
+    "Duck": "SCEA Shared Source License.",
+    "VirtualCity": "3DRT license with allowances for glTF testing.",
+    "PlaysetLightTest": "CC BY-NC-SA 4.0 and reserved IKEA design rights.",
+    "trademarks": "Several other model notices identify trademarks in addition to permissive copyright licenses. Their treatment requires individual review."
+  },
+  "environment": {
+    "localPath": "examples/public/examples/textures/equirectangular/royal_esplanade_2k.hdr.jpg",
+    "upstreamPath": "upstream/three.js/examples/textures/equirectangular/royal_esplanade_2k.hdr.jpg at e06d724a29df5b44c6ad878207974eb09ed7e0d9",
+    "source": "https://polyhaven.com/a/royal_esplanade",
+    "author": "Greg Zaal",
+    "sourceLicense": "CC0, https://polyhaven.com/license",
+    "limitation": "Poly Haven's source license does not establish who produced the upstream UltraHDR JPEG conversion or any additional conversion-specific terms. Review that provenance before publication."
+  }
+}

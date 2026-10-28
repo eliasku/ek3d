@@ -334,3 +334,36 @@ MaterialX 1.39.5 interface metadata retains its Apache-2.0 license in the root `
   The runtime is injected by the examples, not bundled into package sources.
 - All six Rapier scenes use procedural geometry. Their grid texture reuses the existing
   pinned three.js resource; no additional model asset license is implied.
+
+## Pinned glTF catalog
+
+- `models/gltf-catalog/` uses Khronos glTF-Sample-Assets revision
+  `8f492390ddc7a2ae221a1369ef560589cf8c70fb`. The complete 150-model, 338-variant
+  inventory and each model's full notices, component credits and terms are retained in
+  `examples/gltf-catalog.json`; provenance is in `examples/gltf-catalog-provenance.json`.
+- Local files cover 112 models and 240 variant entrypoints: 964 blobs, 974,333,153 bytes.
+  Their pinned notices identify CC0, CC BY 4.0 or CC BY-NC 4.0. Preserve attribution;
+  CC BY-NC content is not available for commercial use.
+- The remaining 38 models and 98 variants stay selectable but their files are withheld
+  for individual license, trademark or permission review. There is no remote fallback.
+  Existing copies elsewhere in the examples do not establish permission.
+- `textures/equirectangular/royal_esplanade_2k.hdr.jpg` is the pinned upstream
+  UltraHDR conversion of Greg Zaal's Royal Esplanade photograph. The Poly Haven source
+  is CC0: https://polyhaven.com/a/royal_esplanade and https://polyhaven.com/license.
+  The conversion's author and any additional terms remain unconfirmed.
+
+## Progressive glTF
+
+- `models/gltf/progressive/knight/` contains The Forgotten Knight by dark_igorek,
+  licensed CC BY 4.0. Its adjacent `NOTICE.txt` preserves attribution. The unmodified
+  Needle Cloud base GLB and all 89 referenced mesh and texture LOD GLBs are local.
+- `models/gltf/progressive/resources.json` records exact local paths and upstream provenance
+  for all three original models. Mobile Home is not distributed because its current
+  Free Standard/NoAI terms prohibit standalone-file redistribution. Peachy Balloon
+  is withheld because its listing and description disagree about the license.
+  Both require authorized complete base and LOD graphs; there is no remote fallback.
+- The native progressive loader is adapted from MIT-licensed Needle source commit
+  `4d423859641a275d322318b0164bc6dce48d36a4` (`3.5.0-rc`), not the upstream page's
+  unlicensed `3.2.0`. Source modules retain the license and modified-source notice.
+- The example reuses local Quarry 01 by Sergej Majboroda / Poly Haven, CC0.
+  Optional worker transport is consumer-provided; no vendor worker or second engine is bundled.

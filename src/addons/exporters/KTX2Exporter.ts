@@ -1,8 +1,8 @@
 import { ColorManagement } from "../../math/ColorManagement";
 import { DataTexture } from "../../textures/DataTexture";
-import { Data3DTexture } from "../../textures/Data3DTexture";
-import { WebGLRenderer } from "../../renderers/WebGLRenderer";
-import { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
+import type { Data3DTexture } from "../../textures/Data3DTexture";
+import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
+import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
 import {
   FloatType,
   HalfFloatType,
@@ -57,9 +57,12 @@ export class KTX2Exporter {
 
   async parse(input: DataTexture | Data3DTexture | WebGLRenderer, target?: WebGLRenderTarget): Promise<Uint8Array> {
     let texture: DataTexture | Data3DTexture;
-    if (input instanceof DataTexture || input instanceof Data3DTexture) {
-      texture = input;
-    } else if (input instanceof WebGLRenderer && target instanceof WebGLRenderTarget) {
+    if (
+      input &&
+      (("isDataTexture" in input && input.isDataTexture) || ("isData3DTexture" in input && input.isData3DTexture))
+    ) {
+      texture = input as DataTexture | Data3DTexture;
+    } else if (input && "isWebGLRenderer" in input && input.isWebGLRenderer && target?.isRenderTarget) {
       const count = channelCount(target.texture.format);
       const size = target.width * target.height * count;
       const data =
@@ -142,7 +145,7 @@ export class KTX2Exporter {
     container.typeSize = array.BYTES_PER_ELEMENT;
     container.pixelWidth = image.width;
     container.pixelHeight = image.height;
-    if (texture instanceof Data3DTexture) container.pixelDepth = image.depth ?? 0;
+    if ("isData3DTexture" in texture && texture.isData3DTexture) container.pixelDepth = image.depth ?? 0;
     const desc = container.dataFormatDescriptor[0];
     desc.colorModel = w.KHR_DF_MODEL_RGBSDA;
     desc.colorPrimaries =

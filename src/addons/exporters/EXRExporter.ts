@@ -121,10 +121,10 @@ function supportedRTT(renderTarget: WebGLRenderTarget, options: EXRExporterOptio
   }
 
   if (
-    "isCubeRenderTarget" in renderTarget ||
-    "isWebGLCubeRenderTarget" in renderTarget ||
-    "isWebGL3DRenderTarget" in renderTarget ||
-    "isWebGLArrayRenderTarget" in renderTarget
+    ("isCubeRenderTarget" in renderTarget && renderTarget.isCubeRenderTarget) ||
+    ("isWebGLCubeRenderTarget" in renderTarget && renderTarget.isWebGLCubeRenderTarget) ||
+    ("isWebGL3DRenderTarget" in renderTarget && renderTarget.isWebGL3DRenderTarget) ||
+    ("isWebGLArrayRenderTarget" in renderTarget && renderTarget.isWebGLArrayRenderTarget)
   ) {
     throw Error("EXRExporter.parse: Unsupported render target type, expected instance of WebGLRenderTarget.");
   }

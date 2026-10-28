@@ -269,6 +269,8 @@ export class USDZExporter {
 
     for (const id in textures) {
       let texture = textures[id];
+      const mimeType = texture.userData.mimeType === "image/jpeg" ? "image/jpeg" : "image/png";
+      const extension = getTextureExtension(texture);
 
       if (texture instanceof CompressedTexture) {
         if (this.textureUtils === null) {
@@ -280,8 +282,6 @@ export class USDZExporter {
 
       const canvas = imageToCanvas(texture.image, texture.flipY, options.maxTextureSize);
 
-      const mimeType = texture.userData.mimeType === "image/jpeg" ? "image/jpeg" : "image/png";
-
       const blob = await new Promise<Blob>((resolve, reject) =>
         canvas.toBlob(
           (blob) => (blob ? resolve(blob) : reject(new Error("USDZExporter: Failed to encode texture."))),
@@ -289,7 +289,7 @@ export class USDZExporter {
         ),
       );
 
-      files[`textures/Texture_${id}.${getTextureExtension(texture)}`] = new Uint8Array(await blob.arrayBuffer());
+      files[`textures/Texture_${id}.${extension}`] = new Uint8Array(await blob.arrayBuffer());
     }
 
     // 64 byte alignment

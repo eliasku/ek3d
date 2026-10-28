@@ -60,3 +60,21 @@ test("exports vertex colors and point indices after a mesh", () => {
   assert.match(result, /o points\n/);
   assert.match(result, /p 4 5 6 \n$/);
 });
+
+test("keeps UV and normal offsets independent across meshes", () => {
+  const root = new Object3D();
+  const uvOnly = geometry();
+  uvOnly.setAttribute("uv", new Float32BufferAttribute([0, 0, 1, 0, 0, 1], 2));
+  const normalOnly = geometry();
+  normalOnly.setAttribute("normal", new Float32BufferAttribute([0, 0, 1, 0, 0, 1, 0, 0, 1], 3));
+  const both = geometry();
+  both.setAttribute("uv", new Float32BufferAttribute([0, 0, 1, 0, 0, 1], 2));
+  both.setAttribute("normal", new Float32BufferAttribute([0, 0, 1, 0, 0, 1, 0, 0, 1], 3));
+  const material = new MeshBasicMaterial();
+  root.add(new Mesh(uvOnly, material), new Mesh(normalOnly, material), new Mesh(both, material));
+  assert.deepEqual(new OBJExporter().parse(root).match(/^f .*$/gm), [
+    "f 1/1 2/2 3/3",
+    "f 4//1 5//2 6//3",
+    "f 7/4/4 8/5/5 9/6/6",
+  ]);
+});

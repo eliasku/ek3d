@@ -149,7 +149,7 @@ export interface GLTFLoaderPlugin {
   loadTexture?(textureIndex: number): Promise<Texture | null> | null;
   loadBufferView?(index: number): Promise<ArrayBuffer | null> | null;
   loadNode?(nodeIndex: number): Promise<Object3D>;
-  loadMesh?(meshIndex: number): Promise<Object3D>;
+  loadMesh?(meshIndex: number): Promise<Object3D> | null;
   loadMaterial?(materialIndex: number): Promise<Material>;
   loadAnimation?(animationIndex: number): Promise<AnimationClip>;
 }

@@ -9,6 +9,7 @@
     "checkJs": false,
     "strict": true,
     "useDefineForClassFields": true,
+    "isolatedModules": false,
     "skipLibCheck": false,
     "types": ["node"]
   },

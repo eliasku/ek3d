@@ -1030,7 +1030,10 @@ The adjacent asset README credits the CC0 Poly Haven photographs.
 `SPLATLoader`, `KSPLATLoader`, `GaussianSplatPLYLoader` and `SPZLoader` produce ordinary
 `BufferGeometry` with centers, covariance, colors and optional packed spherical harmonics.
 They do not install a splat renderer. The upstream GaussianSplat renderer and its glTF
-extension require the excluded WebGPU/TSL backend and are not provided.
+extension require the excluded WebGPU/TSL backend and are not provided. Its `forceWebGL`
+fallback still requires `WebGPURenderer`, TSL `NodeMaterial`, storage buffers and counting
+sort; it is not compatible with this package's `WebGLRenderer`. The extension remains an
+explicit scope conflict, not a completed data-only port.
 
 `SPZLoader.setGzipRuntime({ gunzipSync })` supplies decoding for versions 1–3.
 `setZSTDRuntime({ decode, init? })` supplies version 4 decoding. The consumer owns both
@@ -1053,6 +1056,10 @@ half-float or float 2D/3D textures and WebGL render targets.
 animations and registered extension plugins. Both glTF and USDZ exporters accept
 `setTextureUtils({ decompress })` for compressed texture inputs. Examples supply
 `WebGLTextureUtils`; codec implementations remain outside package sources.
+Export keeps caller geometry unchanged when normals need normalization or material export fails.
+Compressed USDZ texture filenames retain the original JPEG/PNG encoding choice through
+decompression. Codec failures remain observable; no fallback codec is installed.
+
 The G-code page loads the local Polyslice 26.4.0 browser runtime and injects native engine
 constructors. It does not set a global Three.js namespace or bundle another engine.
 Printer, filament, infill and geometry controls retain the upstream behavior.
@@ -1095,3 +1102,42 @@ Import `RapierHelper` from `ek3d/addons/helpers/RapierHelper`; call `update()` b
 and `dispose()` when finished. It owns its debug geometry and material, not the physics world.
 Six pages cover basic shapes, instancing, joints, terrain, character and vehicle controllers.
 They share the local Apache-2.0 JS/WASM runtime and the existing grid texture.
+
+## Pinned glTF catalog
+
+`examples/webgl_loader_gltf.html` retains all 150 models and 338 variants from Khronos
+glTF-Sample-Assets revision `8f492390ddc7a2ae221a1369ef560589cf8c70fb`.
+The viewer supports model/variant switching, animation, camera fitting and stale-load cleanup.
+The pinned blob inventory, complete model notices and component metadata are in
+`examples/gltf-catalog.json`; environment provenance is recorded separately in
+`examples/gltf-catalog-provenance.json`.
+
+Local resources cover 112 models and 240 variants whose pinned notices identify CC0,
+CC BY 4.0 or CC BY-NC 4.0. The other 38 models and 98 variants remain selectable but
+require individual license, trademark or permission review before their files can be supplied.
+The page reports missing resources rather than using a remote fallback or substitute.
+It remains pending in the migration scope until its full authorized resource closure is available.
+Keep every attribution and noncommercial restriction when hosting or distributing the assets.
+
+## Progressive glTF
+
+Import `useNeedleProgressive`, `LODsManager` and `NEEDLE_progressive` from
+`ek3d/addons/loaders/GLTFProgressive`. The maintained native implementation adapts
+MIT-licensed Needle commit `4d423859641a275d322318b0164bc6dce48d36a4`
+(`3.5.0-rc`), deliberately replacing the upstream page's unlicensed `3.2.0`.
+This is a source adaptation, not byte-identical vendor API compatibility.
+
+Pass a configured native `GLTFLoader` and renderer to `useNeedleProgressive`.
+Configure local Draco, KTX2 and any Meshopt runtime on that loader first.
+Mesh/texture LOD selection, scheduling, caches and raycast proxies use native resources.
+Optional worker decoding takes `ProgressiveOptions.worker`; the consumer owns worker
+transport and native deserialization. Vendor `getWorker` and its query flag are not installed.
+`disable()` restores rendering without freeing model resources.
+`NEEDLE_progressive.dispose(guid?)` invalidates loads and releases registered original
+resources and cached LODs; do not call the global form while other consumers still use them.
+
+The example preserves all three concurrent models, transforms and animations.
+The Forgotten Knight base and all 89 referenced LODs are local under CC BY 4.0.
+Mobile Home and Peachy Balloon require authorized complete resource graphs and report
+visible load errors until supplied. The page remains a candidate, not a complete resource port.
+Its resource manifest records provenance and the permission requirements.
