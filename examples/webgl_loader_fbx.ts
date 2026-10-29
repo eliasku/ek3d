@@ -172,6 +172,7 @@ function disposeObject(target: Object3D): void {
 function loadAsset(asset: string): void {
   const request = ++assetRequest;
   loader.trimAnimationClips = asset === "ball_anims_asc_2018";
+  loader.setResourcePath("/examples/models/fbx/" + asset.slice(0, asset.lastIndexOf("/") + 1));
 
   loader.load(
     asset + ".fbx",

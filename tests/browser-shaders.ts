@@ -280,7 +280,9 @@ export function verifyCustomShaders() {
           fragmentLog: context.getShaderInfoLog(fragment) ?? "",
         });
       };
-      renderer.render(scene, camera);
+      renderer.compile(scene, camera);
+      // Trigger lazy diagnostics without trying to draw an invalid program.
+      renderer.properties.get(broken).currentProgram.getUniforms();
       check(diagnostics.length === before + 1, `${kind}: missing or repeated diagnostic callback`);
       const diagnostic = diagnostics[before];
       check(diagnostic.vertex && !diagnostic.linked, `${kind}: incorrect shader/program status`);
@@ -290,10 +292,7 @@ export function verifyCustomShaders() {
           : diagnostic.fragment && diagnostic.programLog.length > 0,
         `${kind}: missing real driver error log`,
       );
-      // Invalid programs may produce INVALID_OPERATION when the renderer attempts the draw.
-      for (let error = gl.getError(); error !== GL.NO_ERROR; error = gl.getError()) {
-        check(error === GL.INVALID_OPERATION, `${kind}: unexpected GL error ${error}`);
-      }
+      check(gl.getError() === GL.NO_ERROR, `${kind}: shader diagnostics caused a GL error`);
       broken.vertexShader =
         "precision highp float; in vec3 position; void main() { gl_Position = vec4(position, 1.0); }";
       broken.fragmentShader =

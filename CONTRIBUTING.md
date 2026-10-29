@@ -942,7 +942,7 @@ The maintained browser scenarios exercise the integrated dev/production scene: p
 - Ambient/spot lights: analytical irradiance, cone/penumbra/range/decay, target movement, map-only cookies and RGB/alpha semantics, mixed shadow/map ordering, missing-factory/depth recovery, Basic/PCF/VSM occlusion, shadow camera/resize and one-shot updates, caller-owned cookies, GPU deletion/reallocation and frozen context restoration.
 - Materials/PBR: analytical Normal/Matcap/Toon/probe pixels, Phong specular and Shadow alpha, area direction/size/intensity with float and half LTC, real DFG/IBL, Standard/Physical maps and physical features, same-class/cross-renderer uniform isolation, missing-input recovery, actual program/texture deletion/recreation, caller-owned LUTs and context restoration.
 - Layered targets: independent array layers/volume slices, texture sampling, shared depth, sync/async selected-layer readback, target/face/mip restoration, resize, GPU deletion/reallocation and context restoration.
-- Custom shaders: GLSL 1/3 ShaderMaterial/RawShaderMaterial, nested explicit includes and missing-include allocation safety, structured/array uniforms, sampler rebinding, upload caching, program ownership, actual compile/link logs and repaired rendering.
+- Custom shaders: GLSL 1/3 ShaderMaterial/RawShaderMaterial, nested explicit includes and missing-include allocation safety, structured/array uniforms, sampler rebinding, upload caching, program ownership, actual compile/link logs without drawing invalid programs, and repaired rendering.
 - Core helpers: pixels from all 13 helpers, visibility, bounds/camera/light/skeleton updates and native buffer deletion/recreation.
 
 These are correctness checks, not separate user-facing examples or performance benchmarks. Helpers used only by lifecycle checks live under `tests/`.
@@ -985,6 +985,13 @@ Its parsed `header` is structured metadata; `HDRLoader.parse().header` remains a
 `DataTextureData.header` therefore accepts either a string or a metadata record.
 FBX includes ASCII/binary geometry, skinning, morphs, animation, cameras/lights and NURBS curves;
 `NURBSCurve` and its math utilities are available at their defining addon paths.
+The FBX example sets the texture resource path to each selected model's directory, including
+the nested Archer and Warrior assets.
+`Head_69.fbx` references `ALPHA.png`, which is absent from the pinned upstream assets;
+its unsupported 3ds Max material maps are not replaced with substitute textures.
+
+The scene comparison example supplies its DFG lookup texture and background system explicitly.
+The depth and framebuffer texture examples also select their required basic and sprite shaders.
 
 `SimplifyModifier.modify(geometry, count)` stays asynchronous and requires
 `setSimplifier(runtime)` with a `MeshoptSimplifierLike` runtime. Its local example loads

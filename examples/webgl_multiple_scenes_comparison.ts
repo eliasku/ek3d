@@ -7,6 +7,8 @@ import { Color } from "ek3d/math/Color";
 import { Group } from "ek3d/objects/Group";
 import { Mesh } from "ek3d/objects/Mesh";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
+import { createDFGLUT } from "ek3d/renderers/shaders/DFGLUTData";
+import { WebGLBackground } from "ek3d/renderers/webgl/WebGLBackground";
 import { standardShader } from "ek3d/renderers/shaders/StandardShader";
 import { Scene } from "ek3d/scenes/Scene";
 import { disposeObject } from "./dispose-object";
@@ -29,10 +31,13 @@ sceneR.add(light.clone());
 const geometry = new IcosahedronGeometry(1, 3);
 sceneL.add(new Mesh(geometry, new MeshStandardMaterial()));
 sceneR.add(new Mesh(geometry, new MeshStandardMaterial({ wireframe: true })));
+const dfgLUT = createDFGLUT();
 const renderer = new WebGLRenderer({
   canvas,
   antialias: true,
   preserveDrawingBuffer: true,
+  createBackground: WebGLBackground,
+  getDFGLUT: () => dfgLUT,
   shaders: { MeshStandardMaterial: standardShader },
 });
 renderer.setPixelRatio(devicePixelRatio);
@@ -90,5 +95,6 @@ window.addEventListener("pagehide", (event) => {
   const group = new Group();
   group.add(sceneL, sceneR);
   disposeObject(group);
+  dfgLUT.dispose();
   renderer.dispose();
 });

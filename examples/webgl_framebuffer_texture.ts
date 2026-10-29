@@ -11,6 +11,8 @@ import { Vector2 } from "ek3d/math/Vector2";
 import { Line } from "ek3d/objects/Line";
 import { Sprite } from "ek3d/objects/Sprite";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
+import { basicShader } from "ek3d/renderers/shaders/BasicShader";
+import { spriteShader } from "ek3d/renderers/shaders/SpriteShader";
 import { Scene } from "ek3d/scenes/Scene";
 import { FramebufferTexture } from "ek3d/textures/FramebufferTexture";
 import { disposeObject } from "./dispose-object";
@@ -72,7 +74,11 @@ function updateSpritePosition(): void {
   sprite.position.set(-window.innerWidth / 2 + textureSize / 2, window.innerHeight / 2 - textureSize / 2, 1);
 }
 updateSpritePosition();
-const renderer = new WebGLRenderer({ canvas, antialias: true });
+const renderer = new WebGLRenderer({
+  canvas,
+  antialias: true,
+  shaders: { LineBasicMaterial: basicShader, SpriteMaterial: spriteShader },
+});
 renderer.setPixelRatio(dpr);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.autoClear = false;
