@@ -262,11 +262,11 @@ export function WebGLState(gl?: any, extensions?: any) {
     }
     return texture;
   }
-  const emptyTextures: any = {};
-  (emptyTextures as any)[GL.TEXTURE_2D] = createTexture(GL.TEXTURE_2D, GL.TEXTURE_2D, 1);
-  (emptyTextures as any)[GL.TEXTURE_CUBE_MAP] = createTexture(GL.TEXTURE_CUBE_MAP, GL.TEXTURE_CUBE_MAP_POSITIVE_X, 6);
-  (emptyTextures as any)[GL.TEXTURE_2D_ARRAY] = createTexture(GL.TEXTURE_2D_ARRAY, GL.TEXTURE_2D_ARRAY, 1, 1);
-  (emptyTextures as any)[GL.TEXTURE_3D] = createTexture(GL.TEXTURE_3D, GL.TEXTURE_3D, 1, 1);
+  const emptyTextures: Record<number, WebGLTexture | null> = {};
+  emptyTextures[GL.TEXTURE_2D] = createTexture(GL.TEXTURE_2D, GL.TEXTURE_2D, 1);
+  emptyTextures[GL.TEXTURE_CUBE_MAP] = createTexture(GL.TEXTURE_CUBE_MAP, GL.TEXTURE_CUBE_MAP_POSITIVE_X, 6);
+  emptyTextures[GL.TEXTURE_2D_ARRAY] = createTexture(GL.TEXTURE_2D_ARRAY, GL.TEXTURE_2D_ARRAY, 1, 1);
+  emptyTextures[GL.TEXTURE_3D] = createTexture(GL.TEXTURE_3D, GL.TEXTURE_3D, 1, 1);
   // init
   colorBuffer.setClear(0, 0, 0, 1);
   depthBuffer.setClear(1);
@@ -596,7 +596,7 @@ export function WebGLState(gl?: any, extensions?: any) {
         gl.activeTexture(webglSlot);
         currentTextureSlot = webglSlot;
       }
-      gl.bindTexture(webglType, webglTexture || (emptyTextures as any)[webglType]);
+      gl.bindTexture(webglType, webglTexture || emptyTextures[webglType]);
       boundTexture.type = webglType;
       boundTexture.texture = webglTexture;
     }
@@ -807,6 +807,12 @@ export function WebGLState(gl?: any, extensions?: any) {
     depthBuffer.reset();
     stencilBuffer.reset();
   }
+  function dispose() {
+    for (const target in emptyTextures) {
+      gl.deleteTexture(emptyTextures[target]);
+      delete emptyTextures[target];
+    }
+  }
   return {
     buffers: {
       color: colorBuffer,
@@ -845,5 +851,6 @@ export function WebGLState(gl?: any, extensions?: any) {
     scissor: scissor,
     viewport: viewport,
     reset: reset,
+    dispose: dispose,
   };
 }

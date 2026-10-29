@@ -158,15 +158,7 @@ async function loadModel(model: CatalogModel, variant: string): Promise<void> {
     canvas.dataset.state = "ready";
     status.textContent = `${model.name} (${variant})`;
   } catch (error) {
-    if (!disposed && id === request) {
-      const notice = catalogData.find((entry) => entry.name === model.name);
-      const message = error instanceof Error ? error.message : String(error);
-      reportError(
-        notice?.localCopy === "not-copied-rights-review"
-          ? new Error(`${model.name}: resources are not supplied pending rights review. ${message}`)
-          : error,
-      );
-    }
+    if (!disposed && id === request) reportError(error);
   } finally {
     if (loaded !== null) disposeGLTF(loaded);
   }

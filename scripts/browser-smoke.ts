@@ -22,6 +22,7 @@ export function launchBrowser(name: BrowserName): Promise<Browser> {
 
 const lifecycles = [
   ["browser.ts", "verifyRenderingBoundaries"],
+  ["browser-core.ts", "verifyRendererDisposal"],
   ["browser.ts", "verifyTextureLifecycle"],
   ["browser.ts", "verifyLambertLighting"],
   ["browser.ts", "verifyBackgroundLifecycle"],

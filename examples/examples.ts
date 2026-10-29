@@ -15,7 +15,7 @@ const list: HTMLDivElement = listSel;
 /** The ported demo pages grouped by upstream section. */
 const DEMOS: Array<{ group: string; items: string[] }> = [
   {
-    group: "glTF catalog and progressive loading (resource restrictions apply)",
+    group: "glTF catalog and progressive loading",
     items: ["webgl_loader_gltf", "webgl_loader_gltf_progressive_lod"],
   },
   {

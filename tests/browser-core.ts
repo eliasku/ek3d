@@ -23,6 +23,82 @@ function check(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
+export function verifyRendererDisposal() {
+  const canvas = document.createElement("canvas");
+  const gl = canvas.getContext("webgl2");
+  check(gl !== null, "Renderer disposal requires WebGL 2");
+  const createTexture = gl.createTexture.bind(gl);
+  const createFramebuffer = gl.createFramebuffer.bind(gl);
+  const externalTexture = createTexture();
+  const externalFramebuffer = createFramebuffer();
+  gl.bindTexture(GL.TEXTURE_2D, externalTexture);
+  gl.bindFramebuffer(GL.FRAMEBUFFER, externalFramebuffer);
+  const geometry = new PlaneGeometry(2, 2);
+  const material = new RawShaderMaterial({
+    glslVersion: GLSL.GLSL3,
+    vertexShader: "precision highp float; in vec3 position; void main() { gl_Position = vec4(position, 1.0); }",
+    fragmentShader: "precision highp float; out vec4 result; void main() { result = vec4(1.0, 0.0, 0.0, 1.0); }",
+  });
+  const scene = new Scene();
+  const camera = new PerspectiveCamera();
+  const mesh = new Mesh(geometry, material);
+  mesh.frustumCulled = false;
+  scene.add(mesh);
+  const pixel = new Uint8Array(4);
+  try {
+    for (let cycle = 0; cycle < 3; cycle++) {
+      const textures: WebGLTexture[] = [];
+      const framebuffers: WebGLFramebuffer[] = [];
+      gl.createTexture = () => {
+        const texture = createTexture();
+        if (texture !== null) textures.push(texture);
+        return texture;
+      };
+      gl.createFramebuffer = () => {
+        const framebuffer = createFramebuffer();
+        if (framebuffer !== null) framebuffers.push(framebuffer);
+        return framebuffer;
+      };
+      let renderer: WebGLRenderer;
+      try {
+        renderer = new WebGLRenderer({ canvas, context: gl, preserveDrawingBuffer: true });
+      } finally {
+        gl.createTexture = createTexture;
+        gl.createFramebuffer = createFramebuffer;
+      }
+      try {
+        renderer.setSize(16, 16);
+        for (const framebuffer of framebuffers) gl.bindFramebuffer(GL.FRAMEBUFFER, framebuffer);
+        renderer.resetState();
+        renderer.render(scene, camera);
+        gl.readPixels(8, 8, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
+        check(pixel[0] === 255 && pixel[1] === 0 && pixel[2] === 0, "Recreated renderer did not draw red");
+        check(gl.getError() === GL.NO_ERROR, "Recreated renderer produced a GL error");
+      } finally {
+        renderer.dispose();
+      }
+      check(
+        textures.every((texture) => !gl.isTexture(texture)),
+        "Renderer disposal leaked an internal texture",
+      );
+      check(
+        framebuffers.every((framebuffer) => !gl.isFramebuffer(framebuffer)),
+        "Renderer disposal leaked an internal framebuffer",
+      );
+      check(gl.isTexture(externalTexture), "Renderer disposal destroyed a caller-owned texture");
+      check(gl.isFramebuffer(externalFramebuffer), "Renderer disposal destroyed a caller-owned framebuffer");
+    }
+    return { cycles: 3, internalResourcesReleased: true, externalResourcesPreserved: true, glError: gl.getError() };
+  } finally {
+    gl.createTexture = createTexture;
+    gl.createFramebuffer = createFramebuffer;
+    material.dispose();
+    geometry.dispose();
+    gl.deleteTexture(externalTexture);
+    gl.deleteFramebuffer(externalFramebuffer);
+  }
+}
+
 export function verifyFogRendering() {
   const renderer = new WebGLRenderer({
     preserveDrawingBuffer: true,

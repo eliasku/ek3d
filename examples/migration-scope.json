@@ -21,7 +21,8 @@
       "renderers/CSS2DRenderer.js, CSS3DRenderer.js, SVGRenderer.js, Projector.js",
       "effects/AsciiEffect.js, AnaglyphEffect.js, ParallaxBarrierEffect.js, StereoEffect.js",
       "capabilities/WebGPU.js",
-      "modules importing three/webgpu or three/tsl"
+      "modules importing three/webgpu or three/tsl",
+      "loaders/GLTFGaussianSplatLoaderExtension.js (explicit user exclusion)"
     ],
     "adaptation": {
       "review-before-removal": "excluded module still contains WebGL code; review for extractable WebGL behaviour instead of blind deletion",
@@ -34,7 +35,8 @@
       "CSS/SVG/ASCII renderers and effects (user decision)",
       "DOM inspector (user decision)",
       "WebGPU/TSL backend (user decision)",
-      "WebXR and stereo/parallax cameras (user decision)"
+      "WebXR and stereo/parallax cameras (user decision)",
+      "3D Tiles example (user decision)"
     ],
     "status_values": {
       "ported": "implemented in src/addons/ in this repository, iteration recorded",
@@ -50,21 +52,20 @@
   "totals": {
     "modules": {
       "total": 500,
-      "candidate": 1,
+      "candidate": 0,
       "ported": 285,
-      "excluded": 214,
+      "excluded": 215,
       "lines_total": 222616,
-      "candidate_lines": 330,
+      "candidate_lines": 0,
       "ported_lines": 138667,
-      "excluded_lines": 83619,
+      "excluded_lines": 83949,
       "by_category": {
         "excluded-aggregate": 1,
         "ported": 285,
         "excluded-backend-capability": 1,
-        "excluded-backend": 51,
+        "excluded-backend": 52,
         "excluded-effect": 4,
         "excluded-directory": 133,
-        "candidate": 1,
         "excluded-vendor-runtime": 18,
         "excluded-deprecated": 2,
         "excluded-renderer": 4
@@ -143,13 +144,13 @@
     },
     "pages": {
       "total": 617,
-      "candidate": 3,
-      "ported": 328,
-      "excluded": 286,
+      "candidate": 0,
+      "ported": 330,
+      "excluded": 287,
       "lines_total": 157006,
-      "candidate_lines": 824,
-      "ported_lines": 78517,
-      "excluded_lines": 77665,
+      "candidate_lines": 0,
+      "ported_lines": 78976,
+      "excluded_lines": 78030,
       "excluded_by_category": {
         "page-css2d": 1,
         "page-css3d": 7,
@@ -158,13 +159,12 @@
         "page-svg": 2,
         "page-stereo-ascii": 4,
         "page-webgpu": 238,
-        "page-webxr": 27
+        "page-webxr": 27,
+        "page-user-excluded": 1
       },
       "candidates_with_dependency_issues": 0,
       "candidate_dependency_issues": [],
-      "candidate_excluded_dependency_counts": {
-        "examples/jsm/libs/lil-gui.module.min.js": 1
-      },
+      "candidate_excluded_dependency_counts": {},
       "external_runtime_pages": [
         {
           "path": "examples/misc_exporter_gcode.html",
@@ -186,7 +186,7 @@
         }
       ]
     },
-    "progress_note": "Iteration 34 retains 285 ported upstream addons and 328 ported upstream pages. Both remaining glTF page implementations and the licensed native progressive runtime are added, but pages remain candidates until authorized resource graphs are complete: catalog 112/150 models and 240/338 variants local; progressive Knight base plus 89 LODs local, two model graphs withheld. All eight exporters and nine exporter pages were audited and concrete GLTF/EXR/KTX2/USDZ gaps corrected. Gaussian extension remains an explicit excluded-renderer scope conflict, not a data-only port or silent exclusion. 3D tiles needs authorized credentials/service-policy approval. Minimal installed development/production checks passed; comprehensive browser/device verification and asset publication review remain pending."
+    "progress_note": "Iteration 37 completes the approved scope: 285 ported / 215 excluded addons and 330 ported / 287 excluded upstream pages, with no pending candidates. The user explicitly excludes GLTFGaussianSplatLoaderExtension, 3D Tiles, four catalog models and two progressive resources. The glTF catalog has all 146 approved models / 325 variants local; progressive has Knight and all 89 LODs local. Original excluded resource records remain in provenance, not runtime selection."
   },
   "module_dependency_review": [
     {
@@ -3180,9 +3180,9 @@
     },
     {
       "path": "examples/jsm/loaders/GLTFGaussianSplatLoaderExtension.js",
-      "status": "candidate",
-      "category": "candidate",
-      "reason": "Scope conflict reviewed in iteration 34: loadMesh always constructs the excluded GaussianSplat renderer, whose NodeMaterial, storage buffers, TSL projection/SH shaders and CountingSort closure require WebGPURenderer. Its forceWebGL path is not WebGLRenderer support. Existing GaussianSplatUtils and four data loaders preserve the reusable data path; a data-only plugin would not preserve this rendering contract. Remains pending, not silently excluded or marked ported."
+      "status": "excluded",
+      "category": "excluded-backend",
+      "reason": "Explicit user exclusion in iteration 36. Its GaussianSplat renderer closure requires the excluded WebGPU/TSL backend. GaussianSplatUtils and the four geometry data loaders remain ported; no native WebGL splat renderer is requested."
     },
     {
       "path": "examples/jsm/loaders/GLTFLoader.js",
@@ -7402,9 +7402,9 @@
     },
     {
       "path": "examples/webgl_loader_3dtiles.html",
-      "status": "candidate",
-      "category": "candidate",
-      "reason": "Blocked: needs project-authorized Cesium ion credentials and approval for live Google tiles under the local-resource policy; the upstream token is restricted to threejs.org and offline tile redistribution is not established."
+      "status": "excluded",
+      "category": "page-user-excluded",
+      "reason": "Explicit user exclusion in iteration 36: 3D Tiles is outside the approved migration scope. No Cesium credentials, upstream token or Google tile resources are required or copied."
     },
     {
       "path": "examples/webgl_loader_3mf.html",
@@ -7518,9 +7518,10 @@
     },
     {
       "path": "examples/webgl_loader_gltf.html",
-      "status": "candidate",
-      "category": "candidate",
-      "reason": "Iteration 34 implements the complete pinned catalog viewer and 150-model/338-variant resource inventory. Local resources cover 112 models/240 variants; 38 models/98 variants remain selectable but are withheld for individual license, trademark or permission review. No reduced catalog or remote fallback; remains candidate until the complete authorized resource closure is available.",
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 37,
+      "reason": "Complete approved catalog: all 146 models/325 variants are local. The user explicitly excludes BrainStem, EnvironmentTest, Sponza and VirtualCity (13 variants); their original pinned records, notices and hashes remain in gltf-catalog-provenance.json. Model/variant switching, animations, camera fitting, stale-load cleanup and supported texture-transform animation use native implementations. All approved variants rendered in the standard browser with GL error 0. No runtime remote fallback or substitute.",
       "implementation_path": "examples/webgl_loader_gltf.ts",
       "resource_manifest": "examples/gltf-catalog.json",
       "excluded_dependencies": [
@@ -7586,9 +7587,10 @@
     },
     {
       "path": "examples/webgl_loader_gltf_progressive_lod.html",
-      "status": "candidate",
-      "category": "candidate",
-      "reason": "Iteration 34 implements native progressive mesh/texture LOD loading from licensed Needle commit 4d423859641a275d322318b0164bc6dce48d36a4 (3.5.0-rc), deliberately replacing unlicensed 3.2.0. The default main-thread example preserves all three concurrent models and their transforms/animations. Knight base plus 89 LOD files are local under CC BY 4.0; Mobile Home and Peachy Balloon need authorized complete resource graphs. Optional worker transport is explicitly consumer-injected, not vendor getWorker/query compatibility. Remains candidate until the complete authorized resource closure is available.",
+      "status": "ported",
+      "category": "ported",
+      "ported_iteration": 37,
+      "reason": "Complete user-approved Knight-only scene with native progressive loading, animation, camera fitting, interaction and disposal. Base plus all 89 mesh/texture LOD GLBs are local under CC BY 4.0. The supplied three.js revision 83f6bd095356c68334df7d9b7ec03a0abebff3fc uses the same reachable Needle sources; the user explicitly excludes Mobile Home and Peachy Balloon because redistribution permission remains unresolved. Source records remain in resources.json. The runtime adapts licensed Needle commit 4d423859641a275d322318b0164bc6dce48d36a4 (3.5.0-rc); optional worker transport remains consumer-injected, not vendor getWorker/query compatibility.",
       "implementation_path": "examples/webgl_loader_gltf_progressive_lod.ts",
       "resource_manifest": "public/examples/models/gltf/progressive/resources.json"
     },
@@ -13482,5 +13484,5 @@
       "dependency_issue": true
     }
   ],
-  "progress_note": "Through iteration 33: 285 upstream addons and 328 upstream pages ported. RapierPhysics, RapierHelper and all six Rapier pages use a local initialized consumer runtime. Complete catalog and progressive glTF remain active work, with code completion and resource-rights review tracked separately. Missing license notices are not CC0. GaussianSplat renderer integration remains a scope/dependency review; 3D tiles needs authorized service credentials. Existing backend exclusions remain. Exporter completeness audit, comprehensive browser/device verification and asset publication review remain pending."
+  "progress_note": "Iteration 37 closes all approved migration candidates: 285 ported addons, 215 excluded addons, 330 ported pages and 287 excluded pages. User-approved exclusions cover GLTFGaussianSplatLoaderExtension, 3D Tiles, BrainStem/EnvironmentTest/Sponza/VirtualCity catalog resources and Mobile Home/Peachy Balloon progressive resources. The runtime catalog has 146 local models/325 variants; Knight has its complete 90-GLB progressive graph. Excluded resource provenance is retained, not silently removed. Full browser/device verification and remaining real-file/visual matrices remain release gates, not pending implementation ports."
 }

@@ -2,16 +2,15 @@
   "catalogSource": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/8f492390ddc7a2ae221a1369ef560589cf8c70fb/Models",
   "revision": "8f492390ddc7a2ae221a1369ef560589cf8c70fb",
   "catalogIndex": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/8f492390ddc7a2ae221a1369ef560589cf8c70fb/Models/model-index.json",
-  "inventory": "gltf-catalog.json records 150 indexed models, 338 variant entrypoints and 2,482 blobs in their model directories, with Git blob IDs, byte sizes, local-availability flags, complete pinned README and LICENSE notices, and full model metadata including component-level credits and terms. Ancillary metadata and screenshots are inventoried but not copied as assets. The glTF and GLB JSON URI references were inspected at the pin and all resolve inside the pinned tree; local references in copied variants resolve locally.",
-  "localCopy": "964 variant-directory blobs (974,333,153 bytes) for 112 models were copied only when the pinned Legal section and component metadata list exclusively CC0, CC BY 4.0 or CC BY-NC 4.0. Preserve the per-model notices in gltf-catalog.json. CC BY-NC permits only noncommercial use; project noncommercial status does not authorize commercial redistribution. The other 38 models remain selectable but their files are not supplied until their individual terms and permissions are reviewed. A missing file is not replaced by a different model or remote URL. This classification does not decide trademark rights or constitute legal advice.",
-  "examplesOfUnresolvedTerms": {
-    "Sponza": "Cryengine Limited License Agreement; standalone distribution permission unresolved.",
-    "BrainStem": "Poser EULA.",
-    "EnvironmentTest": "Adobe Stock License.",
-    "Duck": "SCEA Shared Source License.",
-    "VirtualCity": "3DRT license with allowances for glTF testing.",
-    "PlaysetLightTest": "CC BY-NC-SA 4.0 and reserved IKEA design rights.",
-    "trademarks": "Several other model notices identify trademarks in addition to permissive copyright licenses. Their treatment requires individual review."
+  "inventory": "The pinned upstream index has 150 models / 338 variants and 2,482 model-directory blobs. The approved runtime catalog in gltf-catalog.json contains 146 models / 325 variants. The four explicitly user-excluded model records, including original variants, hashes, full notices and component metadata, are preserved in excludedModels below. No remote fallback or model substitution is used.",
+  "localCopy": "All 146 approved models / 325 variants are local: 1,294 variant-directory blobs (1,208,113,979 bytes). Iteration 36 added 330 unmodified variant blobs (233,780,826 bytes) and 68 exact README/LICENSE notices. All runtime model graphs are complete.",
+  "rightsReview": {
+    "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/8f492390ddc7a2ae221a1369ef560589cf8c70fb/LICENSES",
+    "embeddedMarks": "The Khronos, Cesium, UX3D and DGG LegalMark notices explicitly permit the embedded marks and state that this does not change the model license. Models and marks are copied unmodified for glTF demonstration; marks are not extracted, used as project branding or represented as endorsement. The exact notices are retained in public/examples/models/LICENSES. Follow the referenced trademark guidelines for any other use.",
+    "Duck": "SCEA Shared Source License 1.0 section 2 grants reproduction, distribution and public display; section 5 requires the license, copyright notices and accompanying documentation. The model and exact README/LICENSE are unmodified; SCEA.txt is retained locally.",
+    "DragonAttenuationAndDragonDispersion": "The Stanford Graphics notice permits free mirroring/redistribution with source acknowledgment, not commercial use or a product for sale. Exact model notices credit the Stanford Computer Graphics Laboratory, conversions and backdrop contributors. This noncommercial example preserves those notices.",
+    "PlaysetLightTest": "The model notice and LICENSE.md explicitly grant the 3D modelling data under CC BY-NC-SA 4.0, with IKEA product/design rights reserved. The data and notices are unmodified; no commercial use or independent product/design rights are granted.",
+    "CC": "Preserve CC0, CC BY 4.0, CC BY-NC 4.0 and CC BY-NC-SA 4.0 component notices. Noncommercial and share-alike conditions remain attached to their assets; the package license does not replace them."
   },
   "environment": {
     "localPath": "public/examples/textures/equirectangular/royal_esplanade_2k.hdr.jpg",
@@ -19,6 +18,1104 @@
     "source": "https://polyhaven.com/a/royal_esplanade",
     "author": "Greg Zaal",
     "sourceLicense": "CC0, https://polyhaven.com/license",
-    "limitation": "Poly Haven's source license does not establish who produced the upstream UltraHDR JPEG conversion or any additional conversion-specific terms. Review that provenance before publication."
+    "introducingCommit": "https://github.com/mrdoob/three.js/commit/56446ce283fa983634903820ecdc4f99aaa3d829",
+    "introducingPullRequest": "https://github.com/mrdoob/three.js/pull/32380",
+    "upstreamContributor": "mrdoob",
+    "provenance": "The introducing commit and PR identify mrdoob's UltraHDR migration contribution. The photograph remains Greg Zaal's CC0 Royal Esplanade; the upstream three.js MIT notice is retained at public/examples/models/THREE-LICENSE.txt. The PR does not specify the conversion tool or additional conversion-specific terms."
+  },
+  "excludedModels": [
+    {
+      "name": "BrainStem",
+      "label": "BrainStem",
+      "variants": {
+        "glTF": "BrainStem.gltf",
+        "glTF-Binary": "BrainStem.glb",
+        "glTF-Draco": "BrainStem.gltf",
+        "glTF-Embedded": "BrainStem.gltf",
+        "glTF-Meshopt": "BrainStem.gltf",
+        "glTF-Meshopt-EXT": "BrainStem.gltf"
+      },
+      "files": [
+        {
+          "path": "LICENSE.md",
+          "gitBlob": "682080c85342f0b4275befcb276081fede8260a9",
+          "size": 689,
+          "local": false
+        },
+        {
+          "path": "README.body.md",
+          "gitBlob": "a183585b3dac069629b9405660c35f8c9906e79a",
+          "size": 121,
+          "local": false
+        },
+        {
+          "path": "README.md",
+          "gitBlob": "bd9df3fc5d33a0e2ad3a1b33830bdee31c57dca6",
+          "size": 909,
+          "local": false
+        },
+        {
+          "path": "glTF-Binary/BrainStem.glb",
+          "gitBlob": "88fe89569bedb74926a35b460b8b29ff8b609d01",
+          "size": 3194848,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/BrainStem.gltf",
+          "gitBlob": "40347a2feefd43d7b29de3898f80b2ec25e3098a",
+          "size": 187357,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/BrainStem0.bin",
+          "gitBlob": "96c3c805156e57c05b37a10db54a5709f9cf47fd",
+          "size": 1802012,
+          "local": false
+        },
+        {
+          "path": "glTF-Embedded/BrainStem.gltf",
+          "gitBlob": "0a3938f16b2e57f240b86cbc391a3f46643074cc",
+          "size": 4372640,
+          "local": false
+        },
+        {
+          "path": "glTF-Meshopt-EXT/BrainStem.bin",
+          "gitBlob": "5f85d43cc9a5ff51a05650692a22024c9379390c",
+          "size": 347840,
+          "local": false
+        },
+        {
+          "path": "glTF-Meshopt-EXT/BrainStem.gltf",
+          "gitBlob": "6c1130c20b07e160ac8f909a5fb6880448fcc115",
+          "size": 81504,
+          "local": false
+        },
+        {
+          "path": "glTF-Meshopt/BrainStem.bin",
+          "gitBlob": "d65da3b1aaf75c9b581b8a3d68851cd987ae605d",
+          "size": 328492,
+          "local": false
+        },
+        {
+          "path": "glTF-Meshopt/BrainStem.gltf",
+          "gitBlob": "998d4f1d0b5c458d7f7075cd74a51c1fddae2b99",
+          "size": 81499,
+          "local": false
+        },
+        {
+          "path": "glTF/BrainStem.gltf",
+          "gitBlob": "b0a768a2c024e83f4ea88f56341622fe424de29d",
+          "size": 232477,
+          "local": false
+        },
+        {
+          "path": "glTF/BrainStem0.bin",
+          "gitBlob": "a684a8f3ea96953630e64babe15c93c75c3035cf",
+          "size": 3105104,
+          "local": false
+        },
+        {
+          "path": "metadata.json",
+          "gitBlob": "3d4bf3926a85a76028efe6ceae6a59270327209c",
+          "size": 528,
+          "local": false
+        },
+        {
+          "path": "screenshot/screenshot.gif",
+          "gitBlob": "e9249889394c68f157e8c6807ac2beb7f97f0273",
+          "size": 944494,
+          "local": false
+        }
+      ],
+      "notice": "# BrainStem\n\n<!-- This file is auto-generated by modelmetadata. Do not edit by hand. -->\n\n## Tags\n\n[core](../Models-core.md), [testing](../Models-testing.md)\n\n## Summary\n\nAnimations. Skins.\n\n## Operations\n\n* [Display](https://github.khronos.org/glTF-Sample-Viewer-Release/?model=https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/./Models/BrainStem/glTF-Binary/BrainStem.glb) in SampleViewer\n* [Download GLB](https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/./Models/BrainStem/glTF-Binary/BrainStem.glb)\n* [Model Directory](./)\n\n## Screenshot\n\n![screenshot](screenshot/screenshot.gif)\n\n## Description\n\nArticulated robot with animation and hierarchy.\n\n\n## Legal\n\n&copy; 2017, Smith Micro Software, Inc.. [Poser EULA](../../LICENSES/LicenseRef-Poser-EULA.txt)\n\n - Keith Hunter for Everything\n\n<!-- This file is auto-generated by modelmetadata. Do not edit by hand. -->\n",
+      "localCopy": "not-copied-rights-review",
+      "licenseNotice": "# LICENSE file for the model: BrainStem\n\nAll files in this directory tree are licensed as indicated below.\n\n* All files directly associated with the model including all text, image and binary files:\n\n  * [Poser EULA](../../LICENSES/LicenseRef-Poser-EULA.txt)\n\n* This file and all other metadocumentation files including \"metadata.json\":\n\n  * [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/legalcode) [SPDX license identifier: \"CC-BY-4.0\"]\n\nFull license text of these licenses are available at the links above.\n\nThis license excludes logos and associated trademarks.\n\n<!-- This file is auto-generated by modelmetadata. Do not edit by hand. -->\n",
+      "metadata": {
+        "version": 2,
+        "legal": [
+          {
+            "license": "LicenseRef-Poser-EULA",
+            "licenseUrl": "../../LICENSES/LicenseRef-Poser-EULA.txt",
+            "artist": "Keith Hunter",
+            "year": "2017",
+            "owner": "Smith Micro Software, Inc.",
+            "what": "Everything",
+            "text": "Poser EULA",
+            "icon": ""
+          }
+        ],
+        "tags": ["core", "testing"],
+        "screenshot": "screenshot/screenshot.gif",
+        "name": "BrainStem",
+        "path": "./Models/BrainStem",
+        "summary": "Animations. Skins.",
+        "createReadme": true
+      },
+      "exclusion": "Explicit user exclusion in iteration 37: standalone redistribution permission is not established; omitted from runtime selection, retained here for provenance."
+    },
+    {
+      "name": "EnvironmentTest",
+      "label": "Environment Test",
+      "variants": {
+        "glTF": "EnvironmentTest.gltf",
+        "glTF-IBL": "EnvironmentTest.gltf"
+      },
+      "files": [
+        {
+          "path": "LICENSE.md",
+          "gitBlob": "0caa7dc664f06fc1e0a720f86b56468c9eb740dd",
+          "size": 706,
+          "local": false
+        },
+        {
+          "path": "README.body.md",
+          "gitBlob": "042b953638ffa114e60dbc8eabf7c7011e7cb509",
+          "size": 458,
+          "local": false
+        },
+        {
+          "path": "README.md",
+          "gitBlob": "b312e04edbeca084d624485c6dbc76fd55793beb",
+          "size": 1226,
+          "local": false
+        },
+        {
+          "path": "glTF-IBL/EnvironmentTest.gltf",
+          "gitBlob": "1f13aec6608bfc58c2ea3df7e723689bb2d440a5",
+          "size": 19371,
+          "local": false
+        },
+        {
+          "path": "glTF-IBL/EnvironmentTest_binary.bin",
+          "gitBlob": "ebe7df09281813fe633d66fecc9e54a2144699df",
+          "size": 1414042,
+          "local": false
+        },
+        {
+          "path": "glTF-IBL/EnvironmentTest_images/roughness_metallic_0.png",
+          "gitBlob": "c182f9dd3d5e7162d6696fd33f5a386e73e6bb6a",
+          "size": 624,
+          "local": false
+        },
+        {
+          "path": "glTF-IBL/EnvironmentTest_images/roughness_metallic_1.png",
+          "gitBlob": "89da9dbea0db7062dc2ff98ee57e09e7d64e8040",
+          "size": 624,
+          "local": false
+        },
+        {
+          "path": "glTF/EnvironmentTest.gltf",
+          "gitBlob": "0788514a4119a7dadfd856cac97bfbbd008b414a",
+          "size": 8256,
+          "local": false
+        },
+        {
+          "path": "glTF/EnvironmentTest_binary.bin",
+          "gitBlob": "4473a8529e7bc2a55cf2f11e4087eb01bf94c6ce",
+          "size": 340472,
+          "local": false
+        },
+        {
+          "path": "glTF/EnvironmentTest_images/roughness_metallic_0.png",
+          "gitBlob": "c182f9dd3d5e7162d6696fd33f5a386e73e6bb6a",
+          "size": 624,
+          "local": false
+        },
+        {
+          "path": "glTF/EnvironmentTest_images/roughness_metallic_1.png",
+          "gitBlob": "89da9dbea0db7062dc2ff98ee57e09e7d64e8040",
+          "size": 624,
+          "local": false
+        },
+        {
+          "path": "metadata.json",
+          "gitBlob": "0469717f51b90f0c96403ea71b486c9b381356a5",
+          "size": 638,
+          "local": false
+        },
+        {
+          "path": "screenshot/screenshot.jpg",
+          "gitBlob": "5c444aa884062076110ce6d08a609c3db151931c",
+          "size": 14072,
+          "local": false
+        },
+        {
+          "path": "screenshot/screenshot_large.png",
+          "gitBlob": "47454697e61b789e14ae3b32e78f0852338577be",
+          "size": 193011,
+          "local": false
+        }
+      ],
+      "notice": "# Environment Test\n\n<!-- This file is auto-generated by modelmetadata. Do not edit by hand. -->\n\n## Tags\n\n[testing](../Models-testing.md), [extension](../Models-extension.md)\n\n## Summary\n\nA simple scene with metal and dielectric spheres that range between 0 and 1 roughness. Useful for testing environment lighting.\n\n## Operations\n\n* [Display](https://github.khronos.org/glTF-Sample-Viewer-Release/?model=https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/./Models/EnvironmentTest/glTF/EnvironmentTest.gltf) in SampleViewer\n* [Model Directory](./)\n\n## Screenshot\n\n![screenshot](screenshot/screenshot_large.png)\n\n## Description\n\nThree rows of spheres with varying roughness. Top row is white metal, middle row is white dielectric, bottom row is black dielectric.\n\n## Original Asset\n\nhttps://stock.adobe.com/search/3d-assets?filters%5Bcontent_type%3A3d%5D=1&filters%5B3d_type_id%5D%5B%5D=2&order=relevance&safe_search=1&search_page=1&limit=100&acp=&aco=canyon&price%5B%24%5D=1&get_facets=1&asset_id=122687900\n\n\n## Legal\n\n&copy; 2017, Adobe. [Adobe Stock License](../../LICENSES/LicenseRef-Adobe-Stock.txt)\n\n - Adobe for Everything\n\n<!-- This file is auto-generated by modelmetadata. Do not edit by hand. -->\n",
+      "localCopy": "not-copied-rights-review",
+      "licenseNotice": "# LICENSE file for the model: Environment Test\n\nAll files in this directory tree are licensed as indicated below.\n\n* All files directly associated with the model including all text, image and binary files:\n\n  * [Adobe Stock License](../../LICENSES/LicenseRef-Adobe-Stock.txt)\n\n* This file and all other metadocumentation files including \"metadata.json\":\n\n  * [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/legalcode) [SPDX license identifier: \"CC-BY-4.0\"]\n\nFull license text of these licenses are available at the links above.\n\nThis license excludes logos and associated trademarks.\n\n<!-- This file is auto-generated by modelmetadata. Do not edit by hand. -->\n",
+      "metadata": {
+        "version": 2,
+        "legal": [
+          {
+            "license": "LicenseRef-Adobe-Stock",
+            "licenseUrl": "../../LICENSES/LicenseRef-Adobe-Stock.txt",
+            "artist": "Adobe",
+            "year": "2017",
+            "owner": "Adobe",
+            "what": "Everything",
+            "text": "Adobe Stock License",
+            "icon": ""
+          }
+        ],
+        "tags": ["testing", "extension"],
+        "screenshot": "screenshot/screenshot.jpg",
+        "name": "Environment Test",
+        "path": "./Models/EnvironmentTest",
+        "summary": "A simple scene with metal and dielectric spheres that range between 0 and 1 roughness. Useful for testing environment lighting.",
+        "createReadme": true
+      },
+      "exclusion": "Explicit user exclusion in iteration 37: standalone redistribution permission is not established; omitted from runtime selection, retained here for provenance."
+    },
+    {
+      "name": "Sponza",
+      "label": "Sponza",
+      "variants": {
+        "glTF": "Sponza.gltf"
+      },
+      "files": [
+        {
+          "path": "LICENSE.md",
+          "gitBlob": "eb26fd70b92c95f1226e7cb05123e96d29f984ac",
+          "size": 720,
+          "local": false
+        },
+        {
+          "path": "README.body.md",
+          "gitBlob": "9962df4df233acfce79b4540e2ef29e46914a955",
+          "size": 2826,
+          "local": false
+        },
+        {
+          "path": "README.md",
+          "gitBlob": "3fad2e68cd7bcd1de4c6a6a4e73264d7e510fd79",
+          "size": 3469,
+          "local": false
+        },
+        {
+          "path": "glTF/10381718147657362067.jpg",
+          "gitBlob": "e49b8b12468323f8293f9c7e65b2f6f6c5debddd",
+          "size": 881980,
+          "local": false
+        },
+        {
+          "path": "glTF/10388182081421875623.jpg",
+          "gitBlob": "254626b440670950cd9f1f949245490545ff4b67",
+          "size": 917202,
+          "local": false
+        },
+        {
+          "path": "glTF/11474523244911310074.jpg",
+          "gitBlob": "f2cf424e0c27d4c209ee5fabadc10a673763d141",
+          "size": 1079152,
+          "local": false
+        },
+        {
+          "path": "glTF/11490520546946913238.jpg",
+          "gitBlob": "4174770a63aea6e0a86ade5ea0aae6b7b8fcca10",
+          "size": 321375,
+          "local": false
+        },
+        {
+          "path": "glTF/11872827283454512094.jpg",
+          "gitBlob": "fd4136f46878b129b0a2207d79a8b2a7de165cd0",
+          "size": 668962,
+          "local": false
+        },
+        {
+          "path": "glTF/11968150294050148237.jpg",
+          "gitBlob": "db25cc6c67d36037210e96bb1998c3fa9fc0cc1c",
+          "size": 530384,
+          "local": false
+        },
+        {
+          "path": "glTF/1219024358953944284.jpg",
+          "gitBlob": "4f3fe654ee3d576225ff7253c5b8704873d95ac4",
+          "size": 329124,
+          "local": false
+        },
+        {
+          "path": "glTF/12501374198249454378.jpg",
+          "gitBlob": "79276b204b3e251353474952590b6155993011eb",
+          "size": 418235,
+          "local": false
+        },
+        {
+          "path": "glTF/13196865903111448057.jpg",
+          "gitBlob": "cdf1eaee667bafe2408729367784020603be9b9d",
+          "size": 281980,
+          "local": false
+        },
+        {
+          "path": "glTF/13824894030729245199.jpg",
+          "gitBlob": "8410fd7731f9573d653aebd9b07c637a0048f5a3",
+          "size": 313460,
+          "local": false
+        },
+        {
+          "path": "glTF/13982482287905699490.jpg",
+          "gitBlob": "2c938a4ca239ab36f574190f98d6b1fab4aa5311",
+          "size": 347538,
+          "local": false
+        },
+        {
+          "path": "glTF/14118779221266351425.jpg",
+          "gitBlob": "f385e6b40ce7d88eac659b05a853252e77f6cc1c",
+          "size": 1611314,
+          "local": false
+        },
+        {
+          "path": "glTF/14170708867020035030.jpg",
+          "gitBlob": "51f9d064c23fbf7b25c4782262bf7e6bd6ecf542",
+          "size": 140738,
+          "local": false
+        },
+        {
+          "path": "glTF/14267839433702832875.jpg",
+          "gitBlob": "5e7b1c37f820403e6cc13657bb2ecb9542a24ceb",
+          "size": 711217,
+          "local": false
+        },
+        {
+          "path": "glTF/14650633544276105767.jpg",
+          "gitBlob": "64e58dc2c87a53417de0037b4a5814f9addbf2aa",
+          "size": 521947,
+          "local": false
+        },
+        {
+          "path": "glTF/15295713303328085182.jpg",
+          "gitBlob": "80c8b28b48d4a0c2680eeb49942b9f0cc38bca1a",
+          "size": 520162,
+          "local": false
+        },
+        {
+          "path": "glTF/15722799267630235092.jpg",
+          "gitBlob": "079c22c5620950ca00c742b2c7e3ddc6656406d8",
+          "size": 560258,
+          "local": false
+        },
+        {
+          "path": "glTF/16275776544635328252.png",
+          "gitBlob": "987e8d03ad1da1542575108d6bcd8b90307bba03",
+          "size": 1077432,
+          "local": false
+        },
+        {
+          "path": "glTF/16299174074766089871.jpg",
+          "gitBlob": "578484f29ca71f95394e204e06a40c907ae324a1",
+          "size": 322693,
+          "local": false
+        },
+        {
+          "path": "glTF/16885566240357350108.jpg",
+          "gitBlob": "82bd131e1e23feff2424b7895c3f017a61a3b244",
+          "size": 12575,
+          "local": false
+        },
+        {
+          "path": "glTF/17556969131407844942.jpg",
+          "gitBlob": "8b7b6ded422f2c73a70591d0cb50b92b603fdae6",
+          "size": 370061,
+          "local": false
+        },
+        {
+          "path": "glTF/17876391417123941155.jpg",
+          "gitBlob": "662ac2e84cde764c45c1d78aa7f244e8aa78a216",
+          "size": 1151448,
+          "local": false
+        },
+        {
+          "path": "glTF/2051777328469649772.jpg",
+          "gitBlob": "16bdb11d115e26aa5042108f2285b38d2a1e3332",
+          "size": 206618,
+          "local": false
+        },
+        {
+          "path": "glTF/2185409758123873465.jpg",
+          "gitBlob": "6740aee73530d43e22696fcea094be3c4944356a",
+          "size": 780166,
+          "local": false
+        },
+        {
+          "path": "glTF/2299742237651021498.jpg",
+          "gitBlob": "93e4c860c93868c0d7bf21108ba180e910f55fc1",
+          "size": 772672,
+          "local": false
+        },
+        {
+          "path": "glTF/2374361008830720677.jpg",
+          "gitBlob": "393a02897d98ecaa8221e0a6b398c583c670b9eb",
+          "size": 852079,
+          "local": false
+        },
+        {
+          "path": "glTF/2411100444841994089.jpg",
+          "gitBlob": "e0fe74c0480e840a0ee7caf7e8031bf4dd31d770",
+          "size": 399963,
+          "local": false
+        },
+        {
+          "path": "glTF/2775690330959970771.jpg",
+          "gitBlob": "a715d92c478b7ddde38a26e56db7ead4de2b9dd7",
+          "size": 785678,
+          "local": false
+        },
+        {
+          "path": "glTF/2969916736137545357.jpg",
+          "gitBlob": "d4c22138b90fd3f004718b3ad4f52f301442578f",
+          "size": 822373,
+          "local": false
+        },
+        {
+          "path": "glTF/332936164838540657.jpg",
+          "gitBlob": "393a02897d98ecaa8221e0a6b398c583c670b9eb",
+          "size": 852079,
+          "local": false
+        },
+        {
+          "path": "glTF/3371964815757888145.jpg",
+          "gitBlob": "5d7e258890688e6205d37890bb3d5ca92bd44f14",
+          "size": 682743,
+          "local": false
+        },
+        {
+          "path": "glTF/3455394979645218238.jpg",
+          "gitBlob": "c91c7956e866e452f27c121bd7ecc105e4f18da9",
+          "size": 551432,
+          "local": false
+        },
+        {
+          "path": "glTF/3628158980083700836.jpg",
+          "gitBlob": "75884009982c8bbbc94df6076f703a43858147b1",
+          "size": 527788,
+          "local": false
+        },
+        {
+          "path": "glTF/3827035219084910048.jpg",
+          "gitBlob": "0a7b892cf8b2c4ddeae3901c93938a52e4f60a9b",
+          "size": 608394,
+          "local": false
+        },
+        {
+          "path": "glTF/4477655471536070370.jpg",
+          "gitBlob": "3b463b27cd9de857310dbe2e9fbf37659dcb1b14",
+          "size": 211322,
+          "local": false
+        },
+        {
+          "path": "glTF/4601176305987539675.jpg",
+          "gitBlob": "3fca97a404598ea5aa6abc9b9f59433a103fc01d",
+          "size": 1043152,
+          "local": false
+        },
+        {
+          "path": "glTF/466164707995436622.jpg",
+          "gitBlob": "d65b8f3c45068614b30985af6202192c44db8cb4",
+          "size": 486634,
+          "local": false
+        },
+        {
+          "path": "glTF/4675343432951571524.jpg",
+          "gitBlob": "14dd8f9e551dd92a13ffe19e80b202cd385220f4",
+          "size": 764529,
+          "local": false
+        },
+        {
+          "path": "glTF/4871783166746854860.jpg",
+          "gitBlob": "dd777519519b41d00df6bda5b056819522cfd944",
+          "size": 570081,
+          "local": false
+        },
+        {
+          "path": "glTF/4910669866631290573.jpg",
+          "gitBlob": "3fca97a404598ea5aa6abc9b9f59433a103fc01d",
+          "size": 1043152,
+          "local": false
+        },
+        {
+          "path": "glTF/4975155472559461469.jpg",
+          "gitBlob": "43aee7b9b93f214e83b3957caba2b11792348336",
+          "size": 399027,
+          "local": false
+        },
+        {
+          "path": "glTF/5061699253647017043.png",
+          "gitBlob": "8b690c363fa467a6acc232439606c43978150936",
+          "size": 2427921,
+          "local": false
+        },
+        {
+          "path": "glTF/5792855332885324923.jpg",
+          "gitBlob": "c965353acdf76db7d9b51f0a2da0bd5d164884c4",
+          "size": 564801,
+          "local": false
+        },
+        {
+          "path": "glTF/5823059166183034438.jpg",
+          "gitBlob": "1873401fbee770d55436e796a82ac30131cd90d5",
+          "size": 573157,
+          "local": false
+        },
+        {
+          "path": "glTF/6047387724914829168.jpg",
+          "gitBlob": "d9b3ccaa5de3c1947d45a5f4465467a7aa9f4d96",
+          "size": 518310,
+          "local": false
+        },
+        {
+          "path": "glTF/6151467286084645207.jpg",
+          "gitBlob": "1714a852546944fab0d4399efa15c69c78c0c857",
+          "size": 643517,
+          "local": false
+        },
+        {
+          "path": "glTF/6593109234861095314.jpg",
+          "gitBlob": "3fca97a404598ea5aa6abc9b9f59433a103fc01d",
+          "size": 1043152,
+          "local": false
+        },
+        {
+          "path": "glTF/6667038893015345571.jpg",
+          "gitBlob": "2a79121d938c1d7a079551667a5973f2134eaaeb",
+          "size": 703420,
+          "local": false
+        },
+        {
+          "path": "glTF/6772804448157695701.jpg",
+          "gitBlob": "d3619afe0feac0983f8bf6fe717d2a9039cf0325",
+          "size": 599959,
+          "local": false
+        },
+        {
+          "path": "glTF/7056944414013900257.jpg",
+          "gitBlob": "393a02897d98ecaa8221e0a6b398c583c670b9eb",
+          "size": 852079,
+          "local": false
+        },
+        {
+          "path": "glTF/715093869573992647.jpg",
+          "gitBlob": "e56a2822547144c2f68ab42fa9ccad166a46ee49",
+          "size": 280745,
+          "local": false
+        },
+        {
+          "path": "glTF/7268504077753552595.jpg",
+          "gitBlob": "15a6d7dfc6b7254a8951bccf25446fbf5e7897fc",
+          "size": 572245,
+          "local": false
+        },
+        {
+          "path": "glTF/7441062115984513793.jpg",
+          "gitBlob": "e571d401ced3e00ad9fdd77e21492581c695c44e",
+          "size": 665796,
+          "local": false
+        },
+        {
+          "path": "glTF/755318871556304029.jpg",
+          "gitBlob": "f2afed3cd3fd3803a08d32bb0f6ee1421bda708a",
+          "size": 302363,
+          "local": false
+        },
+        {
+          "path": "glTF/759203620573749278.jpg",
+          "gitBlob": "8a2170c960a8e61a28d7575393bdee835b5b96df",
+          "size": 509411,
+          "local": false
+        },
+        {
+          "path": "glTF/7645212358685992005.jpg",
+          "gitBlob": "ee067215721f41b078608d953aa84fc47f766aa9",
+          "size": 656995,
+          "local": false
+        },
+        {
+          "path": "glTF/7815564343179553343.jpg",
+          "gitBlob": "11948eee5834d516f13e8fa981cd871c098d0c96",
+          "size": 623144,
+          "local": false
+        },
+        {
+          "path": "glTF/8006627369776289000.png",
+          "gitBlob": "ba5f65519c18c288c8b58d0572415f3ad1cbf99d",
+          "size": 1225157,
+          "local": false
+        },
+        {
+          "path": "glTF/8051790464816141987.jpg",
+          "gitBlob": "6e0501522007d07d05b28fbaeaf54ff65b6ce308",
+          "size": 260119,
+          "local": false
+        },
+        {
+          "path": "glTF/8114461559286000061.jpg",
+          "gitBlob": "58be9bcee57134c796897a04496c5b8f44e9b970",
+          "size": 193077,
+          "local": false
+        },
+        {
+          "path": "glTF/8481240838833932244.jpg",
+          "gitBlob": "207a7a6cc33e11acd39633c97c87bb05bf5c4714",
+          "size": 531156,
+          "local": false
+        },
+        {
+          "path": "glTF/8503262930880235456.jpg",
+          "gitBlob": "f3423ebee2ace0489f7b7d8a037dcec4336cbc9e",
+          "size": 104626,
+          "local": false
+        },
+        {
+          "path": "glTF/8747919177698443163.jpg",
+          "gitBlob": "3c3d983ff42de98687f436984e1de7244a8ada38",
+          "size": 872255,
+          "local": false
+        },
+        {
+          "path": "glTF/8750083169368950601.jpg",
+          "gitBlob": "48a46dfcb5727a2911304d62ce670801c0ffdb71",
+          "size": 362437,
+          "local": false
+        },
+        {
+          "path": "glTF/8773302468495022225.jpg",
+          "gitBlob": "4647a44e6059fdca58de9fbedccc56b9751ea75e",
+          "size": 413837,
+          "local": false
+        },
+        {
+          "path": "glTF/8783994986360286082.jpg",
+          "gitBlob": "6839be4a8bb6659eb9d15d24fbae7f5a4ca03ec2",
+          "size": 388462,
+          "local": false
+        },
+        {
+          "path": "glTF/9288698199695299068.jpg",
+          "gitBlob": "dba904f11b17f78104c51f2dd8222ef1cf655446",
+          "size": 1044330,
+          "local": false
+        },
+        {
+          "path": "glTF/9916269861720640319.jpg",
+          "gitBlob": "bfe9d287d7cf7fabd1011372870c6598236960f0",
+          "size": 608687,
+          "local": false
+        },
+        {
+          "path": "glTF/Sponza.bin",
+          "gitBlob": "caa2a36d0309aa985adadd879991a4b3399c4ef4",
+          "size": 9528220,
+          "local": false
+        },
+        {
+          "path": "glTF/Sponza.gltf",
+          "gitBlob": "02252eba518f40cce4b36d45000c7f21139e5494",
+          "size": 167176,
+          "local": false
+        },
+        {
+          "path": "glTF/white.png",
+          "gitBlob": "0851a35f7e27a14f7dd415dae9b5b814c6366be2",
+          "size": 951,
+          "local": false
+        },
+        {
+          "path": "metadata.json",
+          "gitBlob": "7a74d0a59255bcd7546f5c9844f127034966a555",
+          "size": 553,
+          "local": false
+        },
+        {
+          "path": "screenshot/large.jpg",
+          "gitBlob": "6e1a627d0622a6e214c4faaf39be9e51acb2fc40",
+          "size": 885111,
+          "local": false
+        },
+        {
+          "path": "screenshot/screenshot.jpg",
+          "gitBlob": "03a0ea8143e6b7ef2ba2d9fb4ca992b199ae6e65",
+          "size": 31768,
+          "local": false
+        }
+      ],
+      "notice": "# Sponza\n\n<!-- This file is auto-generated by modelmetadata. Do not edit by hand. -->\n\n## Tags\n\n[core](../Models-core.md)\n\n## Summary\n\nBuilding interior, often used to test lighting.\n\n## Operations\n\n* [Display](https://github.khronos.org/glTF-Sample-Viewer-Release/?model=https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/./Models/Sponza/glTF/Sponza.gltf) in SampleViewer\n* [Model Directory](./)\n\n## Screenshot\n\nLights are shown here, they are not part of the model.\n\n![screenshot](screenshot/large.jpg)\n\n## Model notes\n\nTangents have been computed using MikkTSpace, as the original OBJ model did not have them.\nI have manually inspected the normals, and it looks correct to me.\n\n\n## Sources\n\n### https://www.cryengine.com/marketplace/\n\n- https://www.cryengine.com/marketplace/product/CEMP-1102\n\n### http://www.alexandre-pestana.com/pbr-textures-sponza/\n\n- www.alexandre-pestana.com/downloads/SponzaPBR_Textures.rar\n\nI needed to resize some of the alpha mask textures to the 1024x1024 resolution used by the new texture pack,\nand merge in diffuse with alpha.\nI also repacked the separate metallic/roughness textures into the glTF layout (G - roughness, B - metallic).\nThe images are also re-encoded as PNG instead of TGA.\nAll the materials also had a constant diffuse factor of about 0.58. I assume it was supposed to be there, so I kept it.\nI also ran the vertices and indices through a mesh optimizer.\n\n## Licensing notes\n\nOn 2023-03-08, the model was confirmed to be [available](https://www.cryengine.com/marketplace/product/crytek/sponza-sample-scene)\n\nTaken from copyright.txt in SponzaPBR\\_Textures.rar\n\n```\nPBR textures for the Sponza model.\nFor more informations: www.alexandre-pestana.com\n\n\nOriginal copyright:\n\nJuly 14, 2011 Morgan McGuire modified the model from Crytek's OBJ\nexport to correct some small errors.  He computed bump maps from the\nnormal maps using <a\nhref=\"http://cs.williams.edu/~morgan/code/\">normal2bump.cpp</a> (since\nMTL files expect height bumps, not normals), put the \"mask\" textures\ninto the alpha channel of the associated diffuse texture, cleaned up\nnoise in the masks, created the missing gi_flag.tga texture, and\nremoved the long untextured banner floating in the middle of the\natrium that appears in the file but in none of the published images of\nthe model.  The banner is in banner.obj.\n\n\n\nhttp://www.crytek.com/cryengine/cryengine3/downloads\n\n\nSponza Model\nAugust 19, 2010\nThe Atrium Sponza Palace, Dubrovnik, is an elegant and improved model created by Frank Meinl. The original Sponza model was created by Marko Dabrovic in early 2002. Over the years, the Sponza Atrium scene has become one of the most popular 3D scenes for testing global illumination and radiosity due to it's specific architectural structure which is particularly complex for global illumination light.\n\nHowever, nowadays it is considered as a simple model, thus it was decided to crate a new model with highly improved appearance and scene complexity. It is donated to the public for  radiosity and is represented in several different formats (3ds, Obj) for use with various commercial 3D applications and renderers.\n\n\nScreenshot from the I3D paper\nhttp://crytek.com/sites/default/files/20100301_lpv.pdf\n```\n\n\n## Legal\n\n&copy; 2016, Crytek. [Cryengine Limited License Agreement](../../LICENSES/LicenseRef-CRYENGINE-Agreement.txt)\n\n - Crytek for Everything\n\n<!-- This file is auto-generated by modelmetadata. Do not edit by hand. -->\n",
+      "localCopy": "not-copied-rights-review",
+      "licenseNotice": "# LICENSE file for the model: Sponza\n\nAll files in this directory tree are licensed as indicated below.\n\n* All files directly associated with the model including all text, image and binary files:\n\n  * [Cryengine Limited License Agreement](../../LICENSES/LicenseRef-CRYENGINE-Agreement.txt)\n\n* This file and all other metadocumentation files including \"metadata.json\":\n\n  * [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/legalcode) [SPDX license identifier: \"CC-BY-4.0\"]\n\nFull license text of these licenses are available at the links above.\n\nThis license excludes logos and associated trademarks.\n\n<!-- This file is auto-generated by modelmetadata. Do not edit by hand. -->\n",
+      "metadata": {
+        "version": 2,
+        "legal": [
+          {
+            "license": "LicenseRef-CRYENGINE-Agreement",
+            "licenseUrl": "../../LICENSES/LicenseRef-CRYENGINE-Agreement.txt",
+            "artist": "Crytek",
+            "year": "2016",
+            "owner": "Crytek",
+            "what": "Everything",
+            "text": "Cryengine Limited License Agreement",
+            "icon": ""
+          }
+        ],
+        "tags": ["core"],
+        "screenshot": "screenshot/screenshot.jpg",
+        "name": "Sponza",
+        "path": "./Models/Sponza",
+        "summary": "Building interior, often used to test lighting.",
+        "createReadme": true
+      },
+      "exclusion": "Explicit user exclusion in iteration 37: standalone redistribution permission is not established; omitted from runtime selection, retained here for provenance."
+    },
+    {
+      "name": "VirtualCity",
+      "label": "Virtual City",
+      "variants": {
+        "glTF": "VirtualCity.gltf",
+        "glTF-Binary": "VirtualCity.glb",
+        "glTF-Draco": "VirtualCity.gltf",
+        "glTF-Embedded": "VirtualCity.gltf"
+      },
+      "files": [
+        {
+          "path": "LICENSE.md",
+          "gitBlob": "c00daa6dfba297c856858cee930499e382b00cf6",
+          "size": 729,
+          "local": false
+        },
+        {
+          "path": "README.body.md",
+          "gitBlob": "1efdf8c19b4bac9c6ff7cb7d382505418a11fd04",
+          "size": 56,
+          "local": false
+        },
+        {
+          "path": "README.md",
+          "gitBlob": "1db074af26fe69d9ca7239c4b7c083b57c45272e",
+          "size": 917,
+          "local": false
+        },
+        {
+          "path": "glTF-Binary/VirtualCity.glb",
+          "gitBlob": "5399ac442c6f14cc48078ff182a83b2acd5a9306",
+          "size": 3085416,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/001.jpg",
+          "gitBlob": "1c0aaa47696c77879357f87f637d32f5187adeaf",
+          "size": 60967,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/002.jpg",
+          "gitBlob": "ef72b25b4429082ff6b3658430675321b924081d",
+          "size": 37442,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/11.jpg",
+          "gitBlob": "8adef09a7509a7014c9c775da0c05371ad22cc01",
+          "size": 32523,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/5.jpg",
+          "gitBlob": "8bbba13655a98750371dc7b27e9ae68a5c9ca354",
+          "size": 31216,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/O21.jpg",
+          "gitBlob": "24ad991a23cb70517105473f885a2e873b94ce8c",
+          "size": 35913,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/VC0.bin",
+          "gitBlob": "6b58f7066cc0c95857696c9c82c5610132047a1b",
+          "size": 1392204,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/VirtualCity.gltf",
+          "gitBlob": "9d5a88eae810dbda76173487bb1dd922ff9d0e7c",
+          "size": 492884,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/cockpit-map.jpg",
+          "gitBlob": "f6e4eb7c3de66b3634df7a047e67546531a75104",
+          "size": 63992,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/f22.jpg",
+          "gitBlob": "8a1b20f82bcf92228a01f591131c7c0a81e6a343",
+          "size": 143381,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/heli.jpg",
+          "gitBlob": "777c2d79821fc7c8f8cb091f85e2e8cdd85a68ee",
+          "size": 206056,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/machine.jpg",
+          "gitBlob": "e917e17384e690829a1d4ca43ab4a27357f03cca",
+          "size": 57559,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/prop128.png",
+          "gitBlob": "7027e7c9aa63f94beff31d64b975b2fce5875fbd",
+          "size": 4213,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/s_01.jpg",
+          "gitBlob": "72a4e9e6b4ebfe9922c7bc21b6ef5b75c5d1c497",
+          "size": 20053,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/s_02.jpg",
+          "gitBlob": "c56fb8f0f4ff85c2d0d04bdd688c5a92d7438dbc",
+          "size": 20323,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/s_03.jpg",
+          "gitBlob": "6e9d5d4e559d9f882ca0a9b37036fe1b01029906",
+          "size": 20182,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/s_04.jpg",
+          "gitBlob": "0a87b26b44176ab49a9ac60bbed979b535aeb2b1",
+          "size": 16998,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/s_05.jpg",
+          "gitBlob": "b8ee0f332d0b71e2f1bd6047965dcd191152ba9b",
+          "size": 22899,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/s_06.jpg",
+          "gitBlob": "89c6d2a3205c6adde03da39c90abcfd5485fc546",
+          "size": 21265,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/s_07.jpg",
+          "gitBlob": "a73d8d14777dfb74b93f534070214cd3e7df3ceb",
+          "size": 21483,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/s_08.jpg",
+          "gitBlob": "4c2bc301f982c204c271b51ecfd4200ec749a0ad",
+          "size": 18950,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/scrapsurf03-red.jpg",
+          "gitBlob": "ab488cde97a08752aac93976ca980f001df12dfb",
+          "size": 24026,
+          "local": false
+        },
+        {
+          "path": "glTF-Draco/surface01.jpg",
+          "gitBlob": "9b5a87d164c677dfc0b470e25897c4626d24f5f6",
+          "size": 22231,
+          "local": false
+        },
+        {
+          "path": "glTF-Embedded/VirtualCity.gltf",
+          "gitBlob": "8714face88238c70c7c06b872c193e98e09f2a53",
+          "size": 4389833,
+          "local": false
+        },
+        {
+          "path": "glTF/001.jpg",
+          "gitBlob": "1c0aaa47696c77879357f87f637d32f5187adeaf",
+          "size": 60967,
+          "local": false
+        },
+        {
+          "path": "glTF/002.jpg",
+          "gitBlob": "ef72b25b4429082ff6b3658430675321b924081d",
+          "size": 37442,
+          "local": false
+        },
+        {
+          "path": "glTF/11.jpg",
+          "gitBlob": "8adef09a7509a7014c9c775da0c05371ad22cc01",
+          "size": 32523,
+          "local": false
+        },
+        {
+          "path": "glTF/5.jpg",
+          "gitBlob": "8bbba13655a98750371dc7b27e9ae68a5c9ca354",
+          "size": 31216,
+          "local": false
+        },
+        {
+          "path": "glTF/O21.jpg",
+          "gitBlob": "24ad991a23cb70517105473f885a2e873b94ce8c",
+          "size": 35913,
+          "local": false
+        },
+        {
+          "path": "glTF/VC0.bin",
+          "gitBlob": "a4b159ddde26c19b4a0f61faa7a7254066968f08",
+          "size": 1967226,
+          "local": false
+        },
+        {
+          "path": "glTF/VirtualCity.gltf",
+          "gitBlob": "f22bcd136646433d8ab49555770c58b9fb6cc2c0",
+          "size": 590960,
+          "local": false
+        },
+        {
+          "path": "glTF/cockpit-map.jpg",
+          "gitBlob": "f6e4eb7c3de66b3634df7a047e67546531a75104",
+          "size": 63992,
+          "local": false
+        },
+        {
+          "path": "glTF/f22.jpg",
+          "gitBlob": "8a1b20f82bcf92228a01f591131c7c0a81e6a343",
+          "size": 143381,
+          "local": false
+        },
+        {
+          "path": "glTF/heli.jpg",
+          "gitBlob": "777c2d79821fc7c8f8cb091f85e2e8cdd85a68ee",
+          "size": 206056,
+          "local": false
+        },
+        {
+          "path": "glTF/machine.jpg",
+          "gitBlob": "e917e17384e690829a1d4ca43ab4a27357f03cca",
+          "size": 57559,
+          "local": false
+        },
+        {
+          "path": "glTF/prop128.png",
+          "gitBlob": "7027e7c9aa63f94beff31d64b975b2fce5875fbd",
+          "size": 4213,
+          "local": false
+        },
+        {
+          "path": "glTF/s_01.jpg",
+          "gitBlob": "72a4e9e6b4ebfe9922c7bc21b6ef5b75c5d1c497",
+          "size": 20053,
+          "local": false
+        },
+        {
+          "path": "glTF/s_02.jpg",
+          "gitBlob": "c56fb8f0f4ff85c2d0d04bdd688c5a92d7438dbc",
+          "size": 20323,
+          "local": false
+        },
+        {
+          "path": "glTF/s_03.jpg",
+          "gitBlob": "6e9d5d4e559d9f882ca0a9b37036fe1b01029906",
+          "size": 20182,
+          "local": false
+        },
+        {
+          "path": "glTF/s_04.jpg",
+          "gitBlob": "0a87b26b44176ab49a9ac60bbed979b535aeb2b1",
+          "size": 16998,
+          "local": false
+        },
+        {
+          "path": "glTF/s_05.jpg",
+          "gitBlob": "b8ee0f332d0b71e2f1bd6047965dcd191152ba9b",
+          "size": 22899,
+          "local": false
+        },
+        {
+          "path": "glTF/s_06.jpg",
+          "gitBlob": "89c6d2a3205c6adde03da39c90abcfd5485fc546",
+          "size": 21265,
+          "local": false
+        },
+        {
+          "path": "glTF/s_07.jpg",
+          "gitBlob": "a73d8d14777dfb74b93f534070214cd3e7df3ceb",
+          "size": 21483,
+          "local": false
+        },
+        {
+          "path": "glTF/s_08.jpg",
+          "gitBlob": "4c2bc301f982c204c271b51ecfd4200ec749a0ad",
+          "size": 18950,
+          "local": false
+        },
+        {
+          "path": "glTF/scrapsurf03-red.jpg",
+          "gitBlob": "ab488cde97a08752aac93976ca980f001df12dfb",
+          "size": 24026,
+          "local": false
+        },
+        {
+          "path": "glTF/surface01.jpg",
+          "gitBlob": "9b5a87d164c677dfc0b470e25897c4626d24f5f6",
+          "size": 22231,
+          "local": false
+        },
+        {
+          "path": "metadata.json",
+          "gitBlob": "e54c1ed26a34c3106c9f67b7f90f27fdd5107d27",
+          "size": 595,
+          "local": false
+        },
+        {
+          "path": "screenshot/screenshot.gif",
+          "gitBlob": "b7db13f535377af85343eb1d483d09e5226ea626",
+          "size": 495094,
+          "local": false
+        }
+      ],
+      "notice": "# Virtual City\n\n<!-- This file is auto-generated by modelmetadata. Do not edit by hand. -->\n\n## Tags\n\n[core](../Models-core.md), [testing](../Models-testing.md)\n\n## Summary\n\nThe 'Virtual City' model was graciously contributed by the folks at 3DRT.\n\n## Operations\n\n* [Display](https://github.khronos.org/glTF-Sample-Viewer-Release/?model=https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/./Models/VirtualCity/glTF-Binary/VirtualCity.glb) in SampleViewer\n* [Download GLB](https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/./Models/VirtualCity/glTF-Binary/VirtualCity.glb)\n* [Model Directory](./)\n\n## Screenshot\n\n![screenshot](screenshot/screenshot.gif)\n\n\n## Legal\n\n&copy; 2017, 3DRT. [3DRT license with allowances for glTF Testing](../../LICENSES/LicenseRef-3DRT-Testing.txt)\n\n - 3DRT for Everything\n\n<!-- This file is auto-generated by modelmetadata. Do not edit by hand. -->\n",
+      "localCopy": "not-copied-rights-review",
+      "licenseNotice": "# LICENSE file for the model: Virtual City\n\nAll files in this directory tree are licensed as indicated below.\n\n* All files directly associated with the model including all text, image and binary files:\n\n  * [3DRT license with allowances for glTF Testing](../../LICENSES/LicenseRef-3DRT-Testing.txt)\n\n* This file and all other metadocumentation files including \"metadata.json\":\n\n  * [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/legalcode) [SPDX license identifier: \"CC-BY-4.0\"]\n\nFull license text of these licenses are available at the links above.\n\nThis license excludes logos and associated trademarks.\n\n<!-- This file is auto-generated by modelmetadata. Do not edit by hand. -->\n",
+      "metadata": {
+        "version": 2,
+        "legal": [
+          {
+            "year": 2017,
+            "owner": "3DRT",
+            "license": "LicenseRef-3DRT-Testing",
+            "licenseUrl": "../../LICENSES/LicenseRef-3DRT-Testing.txt",
+            "artist": "3DRT",
+            "what": "Everything",
+            "text": "3DRT license with allowances for glTF Testing",
+            "icon": ""
+          }
+        ],
+        "tags": ["core", "testing"],
+        "screenshot": "screenshot/screenshot.gif",
+        "name": "Virtual City",
+        "path": "./Models/VirtualCity",
+        "summary": "The 'Virtual City' model was graciously contributed by the folks at 3DRT.",
+        "createReadme": true
+      },
+      "exclusion": "Explicit user exclusion in iteration 37: standalone redistribution permission is not established; omitted from runtime selection, retained here for provenance."
+    }
+  ],
+  "exclusionReasons": {
+    "BrainStem": "Poser EULA identifies restricted geometry; no grant covering standalone distribution of this model was established.",
+    "EnvironmentTest": "Adobe Stock terms require the applicable license entitlement; inclusion in the Khronos repository does not establish this project's redistribution rights.",
+    "Sponza": "CRYENGINE Limited License Agreement does not establish standalone distribution rights for this engine's sample asset.",
+    "VirtualCity": "3DRT permits testing glTF tools but prohibits distributing the model except in a compiled application; permission to publish raw model/texture files is not established."
   }
 }

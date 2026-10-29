@@ -338,30 +338,45 @@ MaterialX 1.39.5 interface metadata retains its Apache-2.0 license in the root `
 ## Pinned glTF catalog
 
 - `models/gltf-catalog/` uses Khronos glTF-Sample-Assets revision
-  `8f492390ddc7a2ae221a1369ef560589cf8c70fb`. The complete 150-model, 338-variant
-  inventory and each model's full notices, component credits and terms are retained in
-  `examples/gltf-catalog.json`; provenance is in `examples/gltf-catalog-provenance.json`.
-- Local files cover 112 models and 240 variant entrypoints: 964 blobs, 974,333,153 bytes.
-  Their pinned notices identify CC0, CC BY 4.0 or CC BY-NC 4.0. Preserve attribution;
-  CC BY-NC content is not available for commercial use.
-- The remaining 38 models and 98 variants stay selectable but their files are withheld
-  for individual license, trademark or permission review. There is no remote fallback.
-  Existing copies elsewhere in the examples do not establish permission.
+  `8f492390ddc7a2ae221a1369ef560589cf8c70fb`. The approved 146-model, 325-variant
+  inventory and full notices are retained in `examples/gltf-catalog.json`.
+  `examples/gltf-catalog-provenance.json` preserves the four excluded model records from
+  the original 150-model / 338-variant index, including their notices, hashes and terms.
+- Local files cover 146 models and 325 variant entrypoints: 1,294 blobs, 1,208,113,979 bytes,
+  plus exact pinned README/LICENSE notices for the 34 models added in iteration 36.
+  Preserve component attribution and noncommercial/share-alike conditions.
+- BrainStem, EnvironmentTest, Sponza and VirtualCity (13 variants) are explicitly user-excluded.
+  Poser EULA, Adobe Stock, CRYENGINE and 3DRT notices do not establish this project's right
+  to publish their standalone files. They are not runtime selections or missing assets.
+- The embedded Khronos, Cesium, UX3D and DGG marks remain unmodified inside the models,
+  as allowed by their pinned LegalMark notices in `models/LICENSES`. They are not used
+  as project branding and imply no endorsement. Khronos and the Khronos Group logo are
+  registered trademarks of the Khronos Group Inc. glTF and the glTF logo, and 3D Commerce
+  and the 3D Commerce logo, are trademarks of the Khronos Group Inc.
+- Duck is unmodified under SCEA Shared Source License 1.0; its source notices and
+  accompanying documentation are retained with `models/LICENSES/SCEA.txt`.
+- DragonAttenuation and DragonDispersion credit the Stanford Computer Graphics Laboratory.
+  `models/LICENSES/LicenseRef-Stanford-Graphics.txt` permits free redistribution, not
+  commercial use or inclusion in a product for sale without permission.
+- PlaysetLightTest's unmodified 3D data retains CC BY-NC-SA 4.0; IKEA product/design rights
+  remain reserved. Its complete README and license are adjacent to the model.
 - `textures/equirectangular/royal_esplanade_2k.hdr.jpg` is the pinned upstream
   UltraHDR conversion of Greg Zaal's Royal Esplanade photograph. The Poly Haven source
   is CC0: https://polyhaven.com/a/royal_esplanade and https://polyhaven.com/license.
-  The conversion's author and any additional terms remain unconfirmed.
+  mrdoob introduced the conversion in three.js commit `56446ce283fa983634903820ecdc4f99aaa3d829`
+  ([PR 32380](https://github.com/mrdoob/three.js/pull/32380)); the upstream MIT notice is retained.
+  The PR does not specify the conversion tool or additional conversion-specific terms.
 
 ## Progressive glTF
 
 - `models/gltf/progressive/knight/` contains The Forgotten Knight by dark_igorek,
   licensed CC BY 4.0. Its adjacent `NOTICE.txt` preserves attribution. The unmodified
   Needle Cloud base GLB and all 89 referenced mesh and texture LOD GLBs are local.
-- `models/gltf/progressive/resources.json` records exact local paths and upstream provenance
-  for all three original models. Mobile Home is not distributed because its current
-  Free Standard/NoAI terms prohibit standalone-file redistribution. Peachy Balloon
-  is withheld because its listing and description disagree about the license.
-  Both require authorized complete base and LOD graphs; there is no remote fallback.
+- `models/gltf/progressive/resources.json` records Knight's complete local graph and the
+  original source records for the user-excluded Mobile Home and Peachy Balloon.
+  The URLs in the supplied three.js revision `83f6bd095356c68334df7d9b7ec03a0abebff3fc`
+  both return HTTP 200, but no redistribution grant is established. Balloon's GLB itself
+  declares SKETCHFAB Standard. Neither excluded model is copied or requested at runtime.
 - The native progressive loader is adapted from MIT-licensed Needle source commit
   `4d423859641a275d322318b0164bc6dce48d36a4` (`3.5.0-rc`), not the upstream page's
   unlicensed `3.2.0`. Source modules retain the license and modified-source notice.

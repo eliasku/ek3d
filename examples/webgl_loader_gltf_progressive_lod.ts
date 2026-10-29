@@ -11,6 +11,8 @@ import { Timer } from "ek3d/core/Timer";
 import type { Object3D } from "ek3d/core/Object3D";
 import { Color } from "ek3d/math/Color";
 import { Group } from "ek3d/objects/Group";
+import { Box3 } from "ek3d/math/Box3";
+import { Vector3 } from "ek3d/math/Vector3";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { WebGLBackground } from "ek3d/renderers/webgl/WebGLBackground";
 import { WebGLEnvironments } from "ek3d/renderers/webgl/WebGLEnvironments";
@@ -80,13 +82,10 @@ const removeLODListener = progressive.addEventListener("changed", (event) => {
   canvas.dataset[key] = String(Number(canvas.dataset[key] ?? 0) + 1);
 });
 let environment: Texture | undefined;
-let airship: Object3D | undefined;
 let disposed = false;
-let time = 0;
-let loaded = 0;
+let loaded = false;
 const failures: string[] = [];
 const modelScenes = new Set<Object3D>();
-const loadedNames: string[] = [];
 
 function disposeScenes(scenes: Iterable<Object3D>): void {
   const root = new Group();
@@ -112,45 +111,42 @@ new HDRLoader().load(
   (error) => reportFailure("Quarry 01 environment", error),
 );
 
-const sources = [
-  { name: "Mobile Home", path: "mobile-home/file", scale: 0.1, position: [0, 0, 0], rotation: 0 },
-  {
-    name: "Peachy Balloon",
-    path: "peachy-balloon/file",
-    scale: 0.0005,
-    position: [1.6, 6, 7],
-    rotation: Math.PI * 1.4,
+loader.load(
+  "/examples/models/gltf/progressive/knight/file",
+  (gltf) => {
+    if (disposed) {
+      NEEDLE_progressive.dispose();
+      disposeScenes(gltf.scenes);
+      return;
+    }
+    const model = gltf.scene;
+    model.scale.multiplyScalar(0.5);
+    model.position.set(2, 5.15, 2.3);
+    model.rotation.set(0, Math.PI, 0);
+    scene.add(model);
+    for (const modelScene of gltf.scenes) modelScenes.add(modelScene);
+    modelScenes.add(model);
+    for (const animation of gltf.animations) mixer.clipAction(animation).play();
+    mixer.update(0);
+    model.updateMatrixWorld(true);
+    const bounds = new Box3().setFromObject(model);
+    const center = bounds.getCenter(new Vector3());
+    const distance = (1.3 * bounds.getSize(new Vector3()).length()) / (2 * Math.tan((Math.PI * camera.fov) / 360));
+    controls.target.copy(center);
+    camera.position.copy(center).addScaledVector(new Vector3(-1, 0.2, -1).normalize(), distance);
+    camera.near = distance / 100;
+    camera.far = distance * 100;
+    camera.updateProjectionMatrix();
+    controls.minDistance = distance / 10;
+    controls.maxDistance = distance * 10;
+    controls.update();
+    canvas.dataset.loaded = JSON.stringify(["The Forgotten Knight"]);
+    loaded = true;
+    updateStatus();
   },
-  { name: "The Forgotten Knight", path: "knight/file", scale: 0.5, position: [2, 5.15, 2.3], rotation: Math.PI },
-] as const;
-
-for (const source of sources) {
-  loader.load(
-    `/examples/models/gltf/progressive/${source.path}`,
-    (gltf) => {
-      if (disposed) {
-        NEEDLE_progressive.dispose();
-        disposeScenes(gltf.scenes);
-        return;
-      }
-      const model = gltf.scene;
-      model.scale.multiplyScalar(source.scale);
-      model.position.set(source.position[0], source.position[1], source.position[2]);
-      model.rotation.set(0, source.rotation, 0);
-      scene.add(model);
-      for (const modelScene of gltf.scenes) modelScenes.add(modelScene);
-      modelScenes.add(model);
-      loadedNames.push(source.name);
-      canvas.dataset.loaded = JSON.stringify(loadedNames);
-      if (source.name === "Peachy Balloon") airship = model;
-      for (const animation of gltf.animations) mixer.clipAction(animation).play();
-      loaded++;
-      updateStatus();
-    },
-    undefined,
-    (error) => reportFailure(source.name, error),
-  );
-}
+  undefined,
+  (error) => reportFailure("The Forgotten Knight", error),
+);
 
 function reportFailure(name: string, error: unknown): void {
   if (disposed) return;
@@ -162,12 +158,12 @@ function reportFailure(name: string, error: unknown): void {
 function updateStatus(): void {
   if (failures.length > 0) {
     canvas!.dataset.state = "error";
-    status!.textContent = `Failed to load: ${failures.join(", ")}. The Mobile Home and Peachy Balloon resource graphs require redistribution permission; see the resource manifest.`;
-  } else if (loaded === sources.length) {
-    status!.textContent = "All models loaded; mesh and texture detail streams as needed.";
+    status.textContent = `Failed to load: ${failures.join(", ")}. See the console for details.`;
+  } else if (loaded) {
+    status.textContent = "Knight loaded; mesh and texture detail streams as needed.";
     canvas!.dataset.state = "rendered";
   } else {
-    status!.textContent = `Loading models (${loaded}/${sources.length}).`;
+    status.textContent = "Loading Knight.";
     canvas!.dataset.state = "loading";
   }
 }
@@ -182,10 +178,7 @@ updateStatus();
 window.addEventListener("resize", resize);
 renderer.setAnimationLoop(() => {
   timer.update();
-  const delta = timer.getDelta();
-  time += delta;
-  mixer.update(delta);
-  if (airship) airship.position.y += Math.sin(time) * 0.002;
+  mixer.update(timer.getDelta());
   renderer.render(scene, camera);
   canvas.dataset.frames = String(Number(canvas.dataset.frames ?? 0) + 1);
 });

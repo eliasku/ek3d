@@ -986,6 +986,10 @@ export class WebGLRenderer {
       bindingStates.dispose();
       uniformsGroups.dispose();
       programCache.dispose();
+      state.dispose();
+      _gl!.deleteFramebuffer(_scratchFramebuffer);
+      _gl!.deleteFramebuffer(_srcFramebuffer);
+      _gl!.deleteFramebuffer(_dstFramebuffer);
       animation.stop();
     };
     // Events

@@ -24,6 +24,26 @@ const ANIMATION_TARGET_TYPE = {
 
 const KHR_ANIMATION_POINTER = "KHR_animation_pointer";
 
+const TEXTURE_TRANSFORM_SLOTS: Record<string, string> = {
+  "pbrMetallicRoughness/baseColorTexture": "map",
+  "pbrMetallicRoughness/metallicRoughnessTexture": "metalnessMap",
+  emissiveTexture: "emissiveMap",
+  normalTexture: "normalMap",
+  occlusionTexture: "aoMap",
+  "extensions/KHR_materials_anisotropy/anisotropyTexture": "anisotropyMap",
+  "extensions/KHR_materials_clearcoat/clearcoatTexture": "clearcoatMap",
+  "extensions/KHR_materials_clearcoat/clearcoatNormalTexture": "clearcoatNormalMap",
+  "extensions/KHR_materials_clearcoat/clearcoatRoughnessTexture": "clearcoatRoughnessMap",
+  "extensions/KHR_materials_iridescence/iridescenceTexture": "iridescenceMap",
+  "extensions/KHR_materials_iridescence/iridescenceThicknessTexture": "iridescenceThicknessMap",
+  "extensions/KHR_materials_sheen/sheenColorTexture": "sheenColorMap",
+  "extensions/KHR_materials_sheen/sheenRoughnessTexture": "sheenRoughnessMap",
+  "extensions/KHR_materials_specular/specularTexture": "specularIntensityMap",
+  "extensions/KHR_materials_specular/specularColorTexture": "specularColorMap",
+  "extensions/KHR_materials_transmission/transmissionTexture": "transmissionMap",
+  "extensions/KHR_materials_volume/thicknessTexture": "thicknessMap",
+};
+
 // Duplicated from GLTFLoader port: cubic spline tracks keep their custom
 // interpolant factory; LINEAR and STEP map to the shared interpolant classes.
 const INTERPOLATION = {
@@ -151,6 +171,12 @@ export class GLTFAnimationPointerExtension {
         const pathIndex = ("/materials/" + targetId.toString() + "/").length;
         const pathStart = path.substring(0, pathIndex);
         targetProperty = path.substring(pathIndex);
+        const transformIndex = targetProperty.indexOf("/extensions/KHR_texture_transform/");
+        if (transformIndex >= 0) {
+          const slot = TEXTURE_TRANSFORM_SLOTS[targetProperty.substring(0, transformIndex)];
+          const property = targetProperty.substring(transformIndex + "/extensions/KHR_texture_transform/".length);
+          if (slot !== undefined) targetProperty = `${slot}/${property === "scale" ? "repeat" : property}`;
+        }
 
         switch (targetProperty) {
           // Core Spec PBR Properties
@@ -174,22 +200,6 @@ export class GLTFAnimationPointerExtension {
             break;
           case "normalTexture/scale":
             targetProperty = "normalScale";
-            break;
-
-          // Core Spec + KHR_texture_transform
-          case "pbrMetallicRoughness/baseColorTexture/extensions/KHR_texture_transform/scale":
-            targetProperty = "map/repeat";
-            break;
-          case "pbrMetallicRoughness/baseColorTexture/extensions/KHR_texture_transform/offset":
-            targetProperty = "map/offset";
-            break;
-
-          // UV transforms for anything but map doesn't seem to currently be supported in three.js
-          case "emissiveTexture/extensions/KHR_texture_transform/scale":
-            targetProperty = "emissiveMap/repeat";
-            break;
-          case "emissiveTexture/extensions/KHR_texture_transform/offset":
-            targetProperty = "emissiveMap/offset";
             break;
 
           // KHR_materials_emissive_strength
@@ -667,50 +677,40 @@ export class GLTFAnimationPointerExtension {
 
 let _havePatchedPropertyBindings = false;
 
-// HACK monkey patching findNode to ensure we can map to other types required by KHR_animation_pointer.
-type FindNodeFn = (root: Object3DLike, nodeName: string | number | undefined) => Object3DLike | null;
-let findNodeFn: FindNodeFn | null = null;
-
+// Extend node lookup for KHR_animation_pointer while preserving ordinary bindings.
 function _ensurePropertyBindingPatch(): void {
   if (_havePatchedPropertyBindings) return;
   _havePatchedPropertyBindings = true;
 
-  const findNode = (findNodeFn ||= ((root: Object3DLike, nodeName: string | number | undefined) =>
-    PropertyBinding.findNode(root as never, nodeName as string)) as unknown as FindNodeFn);
+  const findNode = PropertyBinding.findNode.bind(PropertyBinding) as unknown as (
+    root: Object3DLike,
+    nodeName: string | number | undefined,
+  ) => Object3DLike | null;
 
   // "node" is the Animator component
   // "path" is the animated property path, just with translated material names.
   PropertyBinding.findNode = function (rootNode: Object3DLike, path: string) {
-    // if the binding is empty fallback to original
-    if (!path) return findNode(rootNode, path);
+    // Preserve the original lookup's empty and numeric root sentinels.
+    if (typeof path !== "string" || !path) return findNode(rootNode, path);
 
     if (path.startsWith(".materials.")) {
       if (_animationPointerDebug) console.log("FIND", path);
 
-      // Upstream semantics: substring(11) then substring from the FIRST '.' after that — a
-      // name-only path keeps everything; a name + property path drops the name.
-      const tail = path.substring(".materials.".length);
-      const tailDot = tail.indexOf(".");
-      const remainingPath = tailDot < 0 ? tail : tail.substring(tailDot);
+      const remainingPath = path.substring(".materials.".length);
       const nextIndex = remainingPath.indexOf(".");
       const uuid = nextIndex < 0 ? remainingPath : remainingPath.substring(0, nextIndex);
       let res: Object3DLike | null = null;
       rootNode.traverse((x) => {
         if (res !== null || (x.type !== "Mesh" && x.type !== "SkinnedMesh")) return;
         const mesh = x as unknown as {
-          material?: Object3DLike & { uuid: string; name: string; map?: unknown; emissiveMap?: unknown };
+          material?: Object3DLike;
         };
         const material = mesh.material;
         if (material && (material.uuid === uuid || material.name === uuid)) {
-          res = material as unknown as Object3DLike;
-          if (_animationPointerDebug) console.log(res, remainingPath);
-          if (res !== null) {
-            if (remainingPath.endsWith(".map")) res = material.map as unknown as Object3DLike;
-            else if (remainingPath.endsWith(".emissiveMap")) res = material.emissiveMap as unknown as Object3DLike;
-
-            // TODO other texture slots only make sense if three.js actually supports them
-            // (currently only .map can have repeat/offset)
-          }
+          const property = nextIndex < 0 ? "" : remainingPath.substring(nextIndex + 1);
+          res = property
+            ? (((material as unknown as Record<string, unknown>)[property] as Object3DLike | undefined) ?? null)
+            : material;
         }
       });
 
