@@ -25,6 +25,7 @@ import { WebGLShadowMap } from "ek3d/renderers/webgl/WebGLShadowMap";
 import { WebGLEnvironments } from "ek3d/renderers/webgl/WebGLEnvironments";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { depthShader } from "ek3d/renderers/shaders/DepthShader";
+import { distanceShader } from "ek3d/renderers/shaders/DistanceShader";
 import { standardShader } from "ek3d/renderers/shaders/StandardShader";
 import { createDFGLUT } from "ek3d/renderers/shaders/DFGLUTData";
 import { createLTCTextures } from "ek3d/renderers/shaders/LTCTextures";
@@ -68,6 +69,7 @@ const renderer = new WebGLRenderer({
     MeshBasicMaterial: basicShader,
     LineBasicMaterial: basicShader,
     MeshDepthMaterial: depthShader,
+    MeshDistanceMaterial: distanceShader,
   },
 });
 renderer.setPixelRatio(devicePixelRatio);

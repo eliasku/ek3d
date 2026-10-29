@@ -9,6 +9,9 @@ pointer plugin etc.) are temporary companions of the porting effort. Tests depen
 resources (CDN modules, needle.tools assets) are deleted instead of kept — re-checks happen at
 package release against the remaining browser matrix.
 
+The curve modifier examples bundle `examples/fonts/helvetiker_regular.typeface.json` through
+`new URL(..., import.meta.url)` so the font loads in both development and production preview.
+
 `venice_sunset_1k.hdr` is upstream three.js' example asset: [Venice Sunset by Greg Zaal](https://polyhaven.com/a/venice_sunset), [CC0 / Poly Haven](https://polyhaven.com/license). Copied unmodified from the pinned `upstream/three.js/examples/textures/equirectangular/` checkout.
 
 `textures/minecraft/atlas.png` comes from the Painterly Pack (http://painterlypack.net/), as referenced by upstream's `painterlypack.txt`.

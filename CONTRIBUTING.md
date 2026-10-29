@@ -41,6 +41,10 @@ npm test
 npm run dev
 ```
 
+`/examples/webgl_postprocessing_ssr.html` uses `ReflectorForSSRPass`, which constructs its
+shader material before initializing `Mesh`. `/examples/webgl_animation_walk.html` registers
+both depth and distance shaders for directional-light and point-light shadows.
+
 `/examples/webgl_loader_xyz.html` loads and rotates the local 201-point helix using
 `ek3d/addons/loaders/XYZLoader` and explicit `PointsMaterial` shader composition.
 The loader supports XYZ and XYZRGB rows, converting byte sRGB colors to working-space colors.

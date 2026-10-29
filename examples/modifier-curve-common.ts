@@ -109,7 +109,7 @@ export function modifierCurve(instanced: boolean): void {
   }
   canvas.addEventListener("pointerdown", pointer);
   new FontLoader().load(
-    "/examples/fonts/helvetiker_regular.typeface.json",
+    new URL("./fonts/helvetiker_regular.typeface.json", import.meta.url).href,
     (font) => {
       if (disposed) return;
       const geometry = new TextGeometry("Hello three.js!", {

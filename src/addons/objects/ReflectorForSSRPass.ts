@@ -26,7 +26,7 @@ import type { PerspectiveCamera as CameraOf } from "../../cameras/PerspectiveCam
  *
  * @three_import import { ReflectorForSSRPass } from 'ek3d/addons/objects/ReflectorForSSRPass';
  */
-export class ReflectorForSSRPass extends Mesh {
+export class ReflectorForSSRPass extends Mesh<ShaderMaterial> {
   /** Use this for type testing. */
   isReflectorForSSRPass: boolean = true;
   needsUpdate: boolean = false;
@@ -34,7 +34,6 @@ export class ReflectorForSSRPass extends Mesh {
   opacity: number = 0.5;
   color: Color = new Color(0x7f7f7f);
   resolution: Vector2 = new Vector2(window.innerWidth, window.innerHeight);
-  material: ShaderMaterial;
   /** Internal distance attenuation state. */
   _distanceAttenuation: boolean = true;
   /** Internal fresnel state. */
@@ -150,7 +149,17 @@ ${chunk_packing}
    * @param options - The configuration options.
    */
   constructor(geometry: BufferGeometry, options: ReflectorForSSRPassOptions = {} as ReflectorForSSRPassOptions) {
-    super(geometry, undefined as never);
+    const shader = options.shader || ReflectorForSSRPass.ReflectorShader;
+    const useDepthTexture = options.useDepthTexture === true;
+    const material = new ShaderMaterial({
+      name: shader.name !== undefined ? shader.name : "unspecified",
+      transparent: useDepthTexture,
+      defines: { ...ReflectorForSSRPass.ReflectorShader.defines, useDepthTexture },
+      uniforms: cloneUniforms(shader.uniforms),
+      fragmentShader: shader.fragmentShader,
+      vertexShader: shader.vertexShader,
+    });
+    super(geometry, material);
 
     this.type = "ReflectorForSSRPass";
 
@@ -158,8 +167,6 @@ ${chunk_packing}
     const textureWidth = options.textureWidth || 512;
     const textureHeight = options.textureHeight || 512;
     const clipBias = options.clipBias || 0;
-    const shader = options.shader || ReflectorForSSRPass.ReflectorShader;
-    const useDepthTexture = options.useDepthTexture === true;
     const yAxis = new Vector3(0, 1, 0);
     const vecTemp0 = new Vector3();
     const vecTemp1 = new Vector3();
@@ -232,23 +239,12 @@ ${chunk_packing}
 
     const renderTarget = new WebGLRenderTarget(textureWidth, textureHeight, parameters);
 
-    const material = new ShaderMaterial({
-      name: shader.name !== undefined ? shader.name : "unspecified",
-      transparent: useDepthTexture,
-      defines: { ...(ReflectorForSSRPass.ReflectorShader.defines as Record<string, any>), useDepthTexture },
-      uniforms: cloneUniforms(shader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
-      fragmentShader: shader.fragmentShader,
-      vertexShader: shader.vertexShader,
-    });
-
     material.uniforms["tDiffuse"].value = renderTarget.texture;
     material.uniforms["color"].value = this.color;
     material.uniforms["textureMatrix"].value = textureMatrix;
     if (useDepthTexture) {
       material.uniforms["tDepth"].value = renderTarget.depthTexture;
     }
-
-    this.material = material;
 
     const globalPlane = new Plane(new Vector3(0, 1, 0), clipBias);
     const globalPlanes = [globalPlane];

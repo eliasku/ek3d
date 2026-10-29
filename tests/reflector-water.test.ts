@@ -1,6 +1,7 @@
-import { test } from "vite-plus/test";
+import { test, vi } from "vite-plus/test";
 import assert from "node:assert/strict";
 import { Reflector } from "../src/addons/objects/Reflector";
+import { ReflectorForSSRPass } from "../src/addons/objects/ReflectorForSSRPass";
 import { Refractor } from "../src/addons/objects/Refractor";
 import { Water } from "../src/addons/objects/Water";
 import { Water as Water2 } from "../src/addons/objects/Water2";
@@ -75,6 +76,30 @@ class RendererRecorder {
 function asRenderer(recorder: RendererRecorder): WebGLRenderer {
   return recorder as unknown as WebGLRenderer;
 }
+
+test("SSR reflectors keep independent material uniforms and depth targets", () => {
+  vi.stubGlobal("window", { innerWidth: 800, innerHeight: 600 });
+  const geometry = new PlaneGeometry(10, 10);
+  try {
+    const first = new ReflectorForSSRPass(geometry, { useDepthTexture: true });
+    const second = new ReflectorForSSRPass(geometry);
+    try {
+      assert.equal(first.geometry, geometry);
+      assert.notEqual(first.material, second.material);
+      first.material.uniforms.opacity.value = 0.25;
+      assert.equal(second.material.uniforms.opacity.value, 0.5);
+      assert.equal(first.material.uniforms.tDepth.value, first.getRenderTarget().depthTexture);
+      assert.notEqual(first.getRenderTarget().depthTexture, null);
+      assert.equal(second.getRenderTarget().depthTexture, null);
+    } finally {
+      first.dispose();
+      second.dispose();
+    }
+  } finally {
+    geometry.dispose();
+    vi.unstubAllGlobals();
+  }
+});
 
 test("Reflector keeps an independent cached camera for each source camera", () => {
   const reflector = new Reflector(new PlaneGeometry(10, 10));
