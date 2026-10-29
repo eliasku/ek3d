@@ -50,6 +50,10 @@ npm test
 npm run dev
 ```
 
+Production builds exclude `.ts` files from Vite's per-file Oxc transform so Rolldown can inline
+imported `const enum` values across modules, including workers. Development keeps the default
+per-file transform. No custom enum plugin is needed; the installed-package check uses the same setup.
+
 `/examples/webgl_postprocessing_ssr.html` uses `ReflectorForSSRPass`, which constructs its
 shader material before initializing `Mesh`. `/examples/webgl_animation_walk.html` registers
 both depth and distance shaders for directional-light and point-light shadows.

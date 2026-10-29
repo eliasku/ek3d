@@ -1,6 +1,5 @@
 import { existsSync, readdirSync } from "node:fs";
 import { defineConfig } from "vite-plus";
-import { constEnums } from "./scripts/const-enums";
 
 const exampleEntries = existsSync("examples")
   ? readdirSync("examples", { recursive: true })
@@ -8,11 +7,9 @@ const exampleEntries = existsSync("examples")
       .map((name) => `examples/${name.toString()}`)
   : [];
 
-export default defineConfig({
-  publicDir: "public",
-  plugins: [constEnums()],
-  worker: { plugins: () => [constEnums()] },
-
+export default defineConfig(({ command }) => ({
+  // Let Rolldown inline const enums across modules; keep per-file transforms in development.
+  oxc: command === "build" ? { exclude: /\.ts$/ } : undefined,
   // The upstream checkout is a read-only comparison baseline, not a development entry point.
   optimizeDeps: {
     entries: ["index.html", "testbed/index.html", ...exampleEntries, "tests/browser*.ts"],
@@ -55,6 +52,7 @@ export default defineConfig({
         /^\/upstream\/.*/,
       ],
     },
+    assetsDir: "",
     assetsInlineLimit: 0,
   },
-});
+}));

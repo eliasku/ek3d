@@ -6,7 +6,6 @@ import { existsSync } from "node:fs";
 import ts from "typescript6";
 import { dependencyGraph, cycles, parse } from "../scripts/module-graph";
 import { build } from "vite-plus";
-import { constEnums } from "../scripts/const-enums";
 
 const root = new URL("../", import.meta.url);
 
@@ -142,7 +141,7 @@ test("production compilation inlines imported engine and WebGL const enums", asy
   const result = await build({
     configFile: false,
     logLevel: "silent",
-    plugins: [constEnums()],
+    oxc: { exclude: /\.ts$/ },
     build: {
       write: false,
       minify: false,

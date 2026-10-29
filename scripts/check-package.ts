@@ -79,8 +79,6 @@ try {
 
   await cp(path.join(root, "testbed"), path.join(consumer, "testbed"), { recursive: true });
   await cp(path.join(root, "public"), path.join(consumer, "public"), { recursive: true });
-  await mkdir(path.join(consumer, "scripts"));
-  await cp(path.join(root, "scripts/const-enums.ts"), path.join(consumer, "scripts/const-enums.ts"));
   const directories = ["testbed"];
   if ((await readdir(root)).includes("examples")) {
     await cp(path.join(root, "examples"), path.join(consumer, "examples"), { recursive: true });
@@ -115,15 +113,14 @@ try {
     path.join(consumer, "vite.config.ts"),
     `import { defineConfig } from 'vite-plus';
 import { writeFileSync } from 'node:fs';
-import { constEnums } from './scripts/const-enums';
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   publicDir: 'public',
-  worker: { plugins: () => [constEnums()] },
-  plugins: [constEnums(), { name: 'record-packed-graph', generateBundle(_options, bundle) {
+  oxc: command === 'build' ? { exclude: /\\.ts$/ } : undefined,
+  plugins: [{ name: 'record-packed-graph', generateBundle(_options, bundle) {
     writeFileSync('graph.json', JSON.stringify([...new Set(Object.values(bundle).flatMap(chunk => chunk.type === 'chunk' ? Object.keys(chunk.modules) : []))].sort()));
   } }],
   build: { target: 'es2022', minify: 'oxc', rollupOptions: { input: ${JSON.stringify(entries)} } },
-});\n`,
+}));\n`,
   );
   run("npm", ["exec", "--", "vp", "build"]);
   const graph = JSON.parse(await readFile(path.join(consumer, "graph.json"), "utf8")) as string[];
