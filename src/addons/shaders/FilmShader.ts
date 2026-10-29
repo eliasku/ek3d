@@ -2,7 +2,6 @@ import type { Texture } from "../../textures/Texture";
 import chunk_common from "../../renderers/shaders/ShaderChunk/common.glsl";
 /**
  * @module FilmShader
- * @three_import import { FilmShader } from 'ek3d/addons/shaders/FilmShader';
  */
 
 /**

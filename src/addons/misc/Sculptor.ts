@@ -277,7 +277,7 @@ function compactDirtyVertices(vertices: number[], vertexCount: number) {
 /**
  * Sculpts triangle meshes with adaptive topology.
  *
- * ```typescript
+ * ```ts
  * import { Sculptor } from 'ek3d/addons/misc/Sculptor';
  * // mesh, camera and renderer are supplied by the application.
  * const sculptor = new Sculptor( mesh, camera )

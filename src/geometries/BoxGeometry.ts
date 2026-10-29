@@ -6,7 +6,7 @@ import { Vector3 } from "../math/Vector3";
  * On creation, the cuboid is centred on the origin, with each edge parallel to one
  * of the axes.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { BoxGeometry } from 'ek3d/geometries/BoxGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

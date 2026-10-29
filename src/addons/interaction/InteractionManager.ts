@@ -22,7 +22,7 @@ interface RendererLike {
  * their meshes. Because the elements are children of the canvas, the browser
  * dispatches pointer events to them natively.
  *
- * ```typescript
+ * ```ts
  * const interactions = new InteractionManager();
  * interactions.connect( renderer, camera );
  *
@@ -36,7 +36,6 @@ interface RendererLike {
  * interactions.update();
  * ```
  *
- * @three_import import { InteractionManager } from 'ek3d/addons/interaction/InteractionManager';
  */
 export class InteractionManager {
   /**

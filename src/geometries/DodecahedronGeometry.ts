@@ -2,7 +2,7 @@ import { PolyhedronGeometry } from "./PolyhedronGeometry";
 /**
  * A geometry class for representing a dodecahedron.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { DodecahedronGeometry } from 'ek3d/geometries/DodecahedronGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

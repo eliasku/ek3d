@@ -2,7 +2,6 @@ import type { Texture } from "../../textures/Texture";
 import { Color } from "../../math/Color";
 /**
  * @module ColorifyShader
- * @three_import import { ColorifyShader } from 'ek3d/addons/shaders/ColorifyShader';
  */
 
 /**

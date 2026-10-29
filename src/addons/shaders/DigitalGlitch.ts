@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module DigitalGlitch
- * @three_import import { DigitalGlitch } from 'ek3d/addons/shaders/DigitalGlitch';
  */
 
 /**

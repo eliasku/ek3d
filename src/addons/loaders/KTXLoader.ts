@@ -164,7 +164,7 @@ class KhronosTextureContainer {
  * - [The KTX File Format and Tools](https://www.khronos.org/opengles/sdk/tools/KTX/)
  * - [Babylon.JS khronosTextureContainer.ts](https://github.com/BabylonJS/Babylon.js/blob/master/src/Misc/khronosTextureContainer.ts)
  *
- * ```typescript
+ * ```ts
  * import { KTXLoader } from "ek3d/addons/loaders/KTXLoader";
  * import { ColorSpace } from "ek3d/constants";
  *

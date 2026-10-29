@@ -103,7 +103,7 @@ type BufferAttributeConstructor = new (array: number[], itemSize: number, normal
  * Limitations:
  * - ASCII decoding assumes file is UTF-8.
  *
- * ```typescript
+ * ```ts
  * import { PLYLoader } from "ek3d/addons/loaders/PLYLoader";
  * import { MeshStandardMaterial } from "ek3d/materials/MeshStandardMaterial";
  * import { Mesh } from "ek3d/objects/Mesh";
@@ -188,7 +188,7 @@ export class PLYLoader extends Loader<BufferGeometry, string> {
    * to custom ones. For example, the following maps the properties
    * "diffuse_(red|green|blue)" in the file to standard color names.
    *
-   * ```typescript
+   * ```ts
    * loader.setPropertyNameMapping( {
    *   diffuse_red: "red",
    *   diffuse_green: "green",
@@ -209,7 +209,7 @@ export class PLYLoader extends Loader<BufferGeometry, string> {
    * and "custom_property_b" to an attribute "customAttribute" with an item size of 2.
    * Attribute item sizes are set from the number of element properties in the property array.
    *
-   * ```typescript
+   * ```ts
    * loader.setCustomPropertyNameMapping( {
    *   customAttribute: ["custom_property_a", "custom_property_b"],
    * } );

@@ -32,7 +32,7 @@ const _uvC = /*@__PURE__*/ new Vector2();
  * Sprites do not cast shadows, setting {@link Object3D#castShadow} to `true` will
  * have no effect.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { Sprite } from 'ek3d/objects/Sprite';
  * import { SpriteMaterial } from 'ek3d/materials/SpriteMaterial';

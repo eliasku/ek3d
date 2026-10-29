@@ -65,12 +65,11 @@ export interface LUTPassOptions {
 /**
  * Pass for color grading via lookup tables.
  *
- * ```typescript
+ * ```ts
  * const lutPass = new LUTPass( { lut: lut.texture3D } );
  * composer.addPass( lutPass );
  * ```
  *
- * @three_import import { LUTPass } from 'ek3d/addons/postprocessing/LUTPass';
  */
 export class LUTPass extends ShaderPass {
   /**

@@ -7,7 +7,6 @@ import type { Box3 } from "../../math/Box3";
  *
  * Capsules are often used as bounding volumes (next to AABBs and bounding spheres).
  *
- * @three_import import { Capsule } from 'ek3d/addons/math/Capsule';
  */
 export class Capsule {
   start: Vector3;

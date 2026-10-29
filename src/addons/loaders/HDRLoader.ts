@@ -290,7 +290,7 @@ function RGBEByteToRGBHalf(
 /**
  * A loader for the RGBE HDR texture format.
  *
- * ```typescript
+ * ```ts
  * import { HDRLoader } from 'ek3d/addons/loaders/HDRLoader';
  * import { Mapping } from 'ek3d/constants';
  * import { Scene } from 'ek3d/scenes/Scene';

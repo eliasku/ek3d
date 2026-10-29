@@ -12,12 +12,11 @@ import type { WebGLRenderTarget as RT } from "../../renderers/WebGLRenderTarget"
  * A pass rendering two scenes into separate targets and blending them with
  * an optional transition texture.
  *
- * ```typescript
+ * ```ts
  * const transitionPass = new RenderTransitionPass( sceneA, cameraA, sceneB, cameraB );
  * composer.addPass( transitionPass );
  * ```
  *
- * @three_import import { RenderTransitionPass } from 'ek3d/addons/postprocessing/RenderTransitionPass';
  */
 export class RenderTransitionPass extends Pass {
   sceneA: Scene;

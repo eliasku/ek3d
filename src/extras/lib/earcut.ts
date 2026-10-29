@@ -27,7 +27,7 @@ let filteredOut = false;
  * @param [dim=2] number of coordinates per vertex in `data`
  * @returns triangles as triplets of vertex indices into `data`
  * @example
- * ```typescript
+ * ```ts
  * import { earcut } from "ek3d/extras/lib/earcut";
  *
  * const triangles = earcut([10, 0, 0, 50, 60, 60, 70, 10]);
@@ -898,7 +898,7 @@ function createNode(i: number, x: number, y: number): Node {
  * @param triangles output of {@link earcut}
  * @returns relative area difference
  * @example
- * ```typescript
+ * ```ts
  * import { earcut, deviation } from "ek3d/extras/lib/earcut";
  *
  * const data = [0, 0, 1, 0, 0, 1];
@@ -958,7 +958,7 @@ function signedArea(data: ArrayLike<number>, start: number, end: number, dim: nu
  * @param data array of rings; the first ring is the outer contour, the rest are holes
  * @returns flat coordinates, hole offsets and coordinates per vertex
  * @example
- * ```typescript
+ * ```ts
  * import { flatten } from "ek3d/extras/lib/earcut";
  *
  * const { vertices, holes, dimensions } = flatten([[[0, 0], [1, 0], [0, 1]]]);
@@ -1013,7 +1013,7 @@ let hMask = 0,
  * @param coords the flat vertex coordinates passed to {@link earcut}
  * @param [dim=2] number of coordinates per vertex in `coords`
  * @example
- * ```typescript
+ * ```ts
  * import { earcut, refine } from "ek3d/extras/lib/earcut";
  *
  * const data = [0, 0, 3, 0, 10, 1, 0, 2];

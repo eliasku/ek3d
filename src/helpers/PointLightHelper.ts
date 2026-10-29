@@ -7,7 +7,7 @@ import { SphereGeometry } from "../geometries/SphereGeometry";
  * This displays a helper object consisting of a spherical mesh for
  * visualizing an instance of {@link PointLight}.
  *
- * ```typescript
+ * ```ts
  * import { PointLight } from 'ek3d/lights/PointLight';
  * import { PointLightHelper } from 'ek3d/helpers/PointLightHelper';
  * import { Scene } from 'ek3d/scenes/Scene';

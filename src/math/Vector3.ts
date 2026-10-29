@@ -26,7 +26,7 @@ import { Quaternion } from "./Quaternion";
  *
  * Iterating through a vector instance will yield its components `(x, y, z)` in
  * the corresponding order.
- * ```typescript
+ * ```ts
  * import { Vector3 } from 'ek3d/math/Vector3';
  *
  * const a = new Vector3( 0, 1, 0 );

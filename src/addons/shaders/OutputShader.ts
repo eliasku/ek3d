@@ -3,7 +3,6 @@ import chunk_tonemapping_pars_fragment_chunk from "../../renderers/shaders/Shade
 import chunk_colorspace_pars_fragment from "../../renderers/shaders/ShaderChunk/colorspace_pars_fragment.glsl";
 /**
  * @module OutputShader
- * @three_import import { OutputShader } from 'ek3d/addons/shaders/OutputShader';
  */
 
 /**
@@ -15,7 +14,7 @@ import chunk_colorspace_pars_fragment from "../../renderers/shaders/ShaderChunk/
  * The shader declares its own attributes and matrices, so pair it with
  * `RawShaderMaterial`:
  *
- * ```typescript
+ * ```ts
  * import { OutputShader } from 'ek3d/addons/shaders/OutputShader';
  * import { RawShaderMaterial } from 'ek3d/materials/RawShaderMaterial';
  * import { WebGLRenderTarget } from 'ek3d/renderers/WebGLRenderTarget';

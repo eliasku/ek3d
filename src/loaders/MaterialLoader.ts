@@ -9,7 +9,7 @@ export type MaterialConstructors = Readonly<Record<string, new () => Material>>;
  * Class for loading materials. The files are internally
  * loaded via {@link FileLoader}.
  *
- * ```typescript
+ * ```ts
  * import { MaterialLoader } from 'ek3d/loaders/MaterialLoader';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
  *

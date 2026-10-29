@@ -77,7 +77,7 @@ export interface MeshoptSimplifierLike {
  * The simplifier runtime is supplied by the consumer; this class never bundles or
  * fetches it, matching the other explicit vendor-runtime integrations.
  *
- * ```typescript
+ * ```ts
  * import { SimplifyModifier, type MeshoptSimplifierLike } from 'ek3d/addons/modifiers/SimplifyModifier';
  * import type { BufferGeometry } from 'ek3d/core/BufferGeometry';
  *
@@ -87,7 +87,6 @@ export interface MeshoptSimplifierLike {
  * }
  * ```
  *
- * @three_import import { SimplifyModifier } from 'ek3d/addons/modifiers/SimplifyModifier';
  */
 export class SimplifyModifier {
   simplifier: MeshoptSimplifierLike | null;

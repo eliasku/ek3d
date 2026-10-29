@@ -4,7 +4,7 @@ import { Vector2 } from "../../math/Vector2";
 /**
  * A curve representing an ellipse.
  *
- * ```typescript
+ * ```ts
  * import { EllipseCurve } from 'ek3d/extras/curves/EllipseCurve';
  * import { BufferGeometry } from 'ek3d/core/BufferGeometry';
  * import { LineBasicMaterial } from 'ek3d/materials/LineBasicMaterial';

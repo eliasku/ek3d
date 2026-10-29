@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module KaleidoShader
- * @three_import import { KaleidoShader } from 'ek3d/addons/shaders/KaleidoShader';
  */
 
 /**

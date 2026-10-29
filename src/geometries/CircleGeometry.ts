@@ -10,7 +10,7 @@ import { Vector2 } from "../math/Vector2";
  * regular polygons, where the number of segments determines the number of
  * sides.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { CircleGeometry } from 'ek3d/geometries/CircleGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

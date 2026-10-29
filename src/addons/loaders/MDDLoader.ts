@@ -18,7 +18,7 @@ export interface MDDLoaderResult {
  * in big endian binary layout: frame count (uint32), vertex count (uint32), one
  * float32 time per frame, then vertex positions for each frame.
  *
- * ```typescript
+ * ```ts
  * import { MDDLoader } from "ek3d/addons/loaders/MDDLoader";
  * import { AnimationMixer } from "ek3d/animation/AnimationMixer";
  * import { BoxGeometry } from "ek3d/geometries/BoxGeometry";

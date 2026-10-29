@@ -7,7 +7,7 @@ import { Object3D } from "../core/Object3D";
  *
  * This light cannot be used to cast shadows.
  *
- * ```typescript
+ * ```ts
  * import { HemisphereLight } from 'ek3d/lights/HemisphereLight';
  * import { Scene } from 'ek3d/scenes/Scene';
  *

@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module HueSaturationShader
- * @three_import import { HueSaturationShader } from 'ek3d/addons/shaders/HueSaturationShader';
  */
 
 /**

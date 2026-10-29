@@ -21,12 +21,11 @@ import type { WebGLRenderTarget as RT } from "../../renderers/WebGLRenderTarget"
  *
  * `SAOPass` provides better quality than {@link SSAOPass} but is also more expensive.
  *
- * ```typescript
+ * ```ts
  * const saoPass = new SAOPass( scene, camera );
  * composer.addPass( saoPass );
  * ```
  *
- * @three_import import { SAOPass } from 'ek3d/addons/postprocessing/SAOPass';
  */
 export class SAOPass extends Pass {
   scene: Scene;

@@ -238,7 +238,7 @@ type EXRDecoder = EXRDecoderState & { decode: () => void };
  * ZIP(S), PXR24, DWA and deep data need a zlib runtime; pass one with {@link EXRLoader#setZlibDecoder}
  * before parsing compressed files. Uncompressed, RLE, PIZ and B44 streams work without it.
  *
- * ```typescript
+ * ```ts
  * import { EXRLoader, type EXRZlibDecoder } from "ek3d/addons/loaders/EXRLoader";
  *
  * async function loadEXR( url: string, runtime: EXRZlibDecoder ) {

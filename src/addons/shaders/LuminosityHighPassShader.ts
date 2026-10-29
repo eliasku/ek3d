@@ -3,7 +3,6 @@ import { Color } from "../../math/Color";
 import chunk_common from "../../renderers/shaders/ShaderChunk/common.glsl";
 /**
  * @module LuminosityHighPassShader
- * @three_import import { LuminosityHighPassShader } from 'ek3d/addons/shaders/LuminosityHighPassShader';
  */
 
 /**

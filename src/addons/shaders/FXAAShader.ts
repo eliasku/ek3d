@@ -2,7 +2,6 @@ import type { Texture } from "../../textures/Texture";
 import { Vector2 } from "../../math/Vector2";
 /**
  * @module FXAAShader
- * @three_import import { FXAAShader } from 'ek3d/addons/shaders/FXAAShader';
  */
 
 /**

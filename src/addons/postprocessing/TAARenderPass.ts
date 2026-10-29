@@ -12,13 +12,12 @@ import type { WebGLRenderTarget as RT } from "../../renderers/WebGLRenderTarget"
  * When there is no motion in the scene, this pass produces
  * an accumulated anti-aliasing result over multiple frames.
  *
- * ```typescript
+ * ```ts
  * const taaRenderPass = new TAARenderPass( scene, camera );
  * taaRenderPass.sampleLevel = 2;
  * composer.addPass( taaRenderPass );
  * ```
  *
- * @three_import import { TAARenderPass } from 'ek3d/addons/postprocessing/TAARenderPass';
  */
 export class TAARenderPass extends SSAARenderPass {
   accumulate: boolean;

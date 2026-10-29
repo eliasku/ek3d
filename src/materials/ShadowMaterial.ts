@@ -64,7 +64,7 @@ export type ShadowMaterialParameters = Omit<
 /**
  * This material can receive shadows, but otherwise is completely transparent.
  *
- * ```typescript
+ * ```ts
  * import { PlaneGeometry } from 'ek3d/geometries/PlaneGeometry';
  * import { ShadowMaterial } from 'ek3d/materials/ShadowMaterial';
  * import { Mesh } from 'ek3d/objects/Mesh';

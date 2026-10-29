@@ -6,7 +6,7 @@ import { clamp } from "../math/MathUtils";
 /**
  * Creates meshes with axial symmetry like vases. The lathe rotates around the Y axis.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { Vector2 } from 'ek3d/math/Vector2';
  * import { LatheGeometry } from 'ek3d/geometries/LatheGeometry';

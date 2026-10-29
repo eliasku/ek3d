@@ -9,7 +9,7 @@ import { Object3D } from "../core/Object3D";
  *
  * This light can cast shadows - see the {@link SpotLightShadow} for details.
  *
- * ```typescript
+ * ```ts
  * import { SpotLight } from 'ek3d/lights/SpotLight';
  * import { TextureLoader } from 'ek3d/loaders/TextureLoader';
  *

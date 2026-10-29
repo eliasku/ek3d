@@ -11,7 +11,7 @@ export interface ShapeGeometryJSON {
 /**
  * Creates an one-sided polygonal geometry from one or more path shapes.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { Shape } from 'ek3d/extras/core/Shape';
  * import { ShapeGeometry } from 'ek3d/geometries/ShapeGeometry';

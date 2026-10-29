@@ -2,7 +2,6 @@ import { Vector2 } from "../../math/Vector2";
 
 /**
  * @module SobelOperatorShader
- * @three_import import { SobelOperatorShader } from 'ek3d/addons/shaders/SobelOperatorShader';
  */
 
 /**

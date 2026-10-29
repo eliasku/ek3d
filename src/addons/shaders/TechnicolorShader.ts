@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module TriangleBlurShader
- * @three_import import { TriangleBlurShader } from 'ek3d/addons/shaders/TriangleBlurShader';
  */
 
 /**

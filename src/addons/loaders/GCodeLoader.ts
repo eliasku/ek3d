@@ -28,7 +28,7 @@ interface Layer {
  * Loads linear GCode toolpaths for 3D printing and CNC applications.
  * Arc commands and other unsupported commands are ignored, matching upstream.
  *
- * ```typescript
+ * ```ts
  * import { GCodeLoader } from "ek3d/addons/loaders/GCodeLoader";
  * const object = await new GCodeLoader().loadAsync("models/gcode/benchy.gcode");
  * ```

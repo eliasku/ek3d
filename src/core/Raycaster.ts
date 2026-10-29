@@ -97,7 +97,7 @@ export class Raycaster {
      * Allows to selectively ignore 3D objects when performing intersection tests.
      * The following code example ensures that only 3D objects on layer `1` will be
      * honored by raycaster.
-     * ```typescript
+     * ```ts
      * import { Raycaster } from 'ek3d/core/Raycaster';
      * import { Object3D } from 'ek3d/core/Object3D';
      *
@@ -112,7 +112,7 @@ export class Raycaster {
     /**
      * A parameter object that configures the raycasting. It has the structure:
      *
-     * ```typescript
+     * ```ts
      * const params = {
      * 	Mesh: {},
      * 	Line: { threshold: 1 },

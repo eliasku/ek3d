@@ -29,7 +29,7 @@ const _vector = /*@__PURE__*/ new Vector3();
  * positions, face indices, normals, colors, UVs, and custom attributes
  * within buffers, reducing the cost of passing all this data to the GPU.
  *
- * ```typescript
+ * ```ts
  * import { BufferGeometry } from 'ek3d/core/BufferGeometry';
  * import { BufferAttribute } from 'ek3d/core/BufferAttribute';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

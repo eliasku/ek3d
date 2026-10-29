@@ -64,14 +64,13 @@ void main() {
 /**
  * This pass can be used to render a cube texture over the entire screen.
  *
- * ```typescript
+ * ```ts
  * const cubeMap = new CubeTextureLoader().load( urls );
  *
  * const cubeTexturePass = new CubeTexturePass( camera, cubemap );
  * composer.addPass( cubeTexturePass );
  * ```
  *
- * @three_import import { CubeTexturePass } from 'ek3d/addons/postprocessing/CubeTexturePass';
  */
 export class CubeTexturePass extends Pass {
   camera: PerspectiveCamera;

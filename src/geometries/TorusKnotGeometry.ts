@@ -6,7 +6,7 @@ import { Vector3 } from "../math/Vector3";
  * of coprime integers, p and q. If p and q are not coprime, the result will
  * be a torus link.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { TorusKnotGeometry } from 'ek3d/geometries/TorusKnotGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

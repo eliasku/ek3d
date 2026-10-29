@@ -67,7 +67,7 @@ export interface FontData {
 /**
  * A loader for typeface JSON fonts.
  *
- * ```typescript
+ * ```ts
  * import { FontLoader } from 'ek3d/addons/loaders/FontLoader';
  *
  * const loader = new FontLoader();
@@ -135,7 +135,7 @@ export class FontLoader extends Loader<Font> {
 /**
  * Represents a typeface JSON font.
  *
- * ```typescript
+ * ```ts
  * import { FontLoader } from 'ek3d/addons/loaders/FontLoader';
  *
  * const font = await new FontLoader().loadAsync( './optimer_bold.typeface.json' );

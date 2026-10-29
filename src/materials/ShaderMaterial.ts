@@ -30,7 +30,7 @@ export type ShaderMaterialParameters = Partial<ShaderMaterial>;
  * value of *i* for the given iteration and can be used in preprocessor
  * statements.
  *
- * ```typescript
+ * ```ts
  * import { ShaderMaterial } from 'ek3d/materials/ShaderMaterial';
  * import { Vector2 } from 'ek3d/math/Vector2';
  *
@@ -88,7 +88,7 @@ export class ShaderMaterial extends Material {
      * Defines custom constants using `#define` directives within the GLSL code
      * for both the vertex shader and the fragment shader; each key/value pair
      * yields another directive.
-     * ```typescript
+     * ```ts
      * const defines = {
      *   FOO: 15,
      *   BAR: true
@@ -104,7 +104,7 @@ export class ShaderMaterial extends Material {
     this.defines = {};
     /**
      * An object of the form:
-     * ```typescript
+     * ```ts
      * const uniforms = {
      *   uniform1: { value: 1.0 },
      *   uniform2: { value: 2 }
@@ -112,7 +112,7 @@ export class ShaderMaterial extends Material {
      * ```
      * specifying the uniforms to be passed to the shader code; keys are uniform
      * names, values are definitions of the form
-     * ```typescript
+     * ```ts
      * const uniform = { value: 1.0 };
      * ```
      * where `value` is the value of the uniform. Names must match the name of

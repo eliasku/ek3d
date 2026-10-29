@@ -8,12 +8,11 @@ import { fog } from "../../renderers/shaders/UniformsLib";
  *
  * @augments ShaderMaterial
  *
- * ```typescript
+ * ```ts
  * loader.setConditionalLineMaterial( LDrawConditionalLineMaterial );
  * ```
  *
  * @demo examples/webgl_loader_ldraw.html
- * @three_import import { LDrawConditionalLineMaterial } from 'ek3d/addons/materials/LDrawConditionalLineMaterial';
  */
 export class LDrawConditionalLineMaterial extends ShaderMaterial {
   static get type(): string {

@@ -9,7 +9,7 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
 /**
  * This pass can be used to render a texture over the entire screen.
  *
- * ```typescript
+ * ```ts
  * const texture = new TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' );
  * texture.colorSpace = ColorSpace.SRGB;
  *
@@ -17,7 +17,6 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  * composer.addPass( texturePass );
  * ```
  *
- * @three_import import { TexturePass } from 'ek3d/addons/postprocessing/TexturePass';
  */
 export class TexturePass extends Pass {
   map: Texture;

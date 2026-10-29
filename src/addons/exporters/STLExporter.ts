@@ -13,7 +13,7 @@ export interface STLExporterOptions {
  * Exports the surface geometry of an object and its descendants as ASCII or binary STL.
  * STL contains no color, texture, scale, or index information.
  *
- * ```typescript
+ * ```ts
  * import { STLExporter } from 'ek3d/addons/exporters/STLExporter';
  * import { BoxGeometry } from 'ek3d/geometries/BoxGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

@@ -12,7 +12,7 @@ const _triangle = /*@__PURE__*/ new Triangle();
 /**
  * Can be used as a helper object to view the edges of a geometry.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { BoxGeometry } from 'ek3d/geometries/BoxGeometry';
  * import { EdgesGeometry } from 'ek3d/geometries/EdgesGeometry';

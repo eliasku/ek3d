@@ -9,12 +9,11 @@ import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
 /**
  * A pass that saves the contents of the current read buffer in a render target.
  *
- * ```typescript
+ * ```ts
  * const savePass = new SavePass( customRenderTarget );
  * composer.addPass( savePass );
  * ```
  *
- * @three_import import { SavePass } from 'ek3d/addons/postprocessing/SavePass';
  */
 export class SavePass extends Pass {
   uniforms: Record<string, { value: any; needsUpdate?: boolean }>;

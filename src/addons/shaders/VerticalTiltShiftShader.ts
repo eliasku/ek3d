@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module VerticalTiltShiftShader
- * @three_import import { VerticalTiltShiftShader } from 'ek3d/addons/shaders/VerticalTiltShiftShader';
  */
 
 /**

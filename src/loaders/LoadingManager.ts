@@ -8,7 +8,7 @@ import { Cache } from "./Cache";
  * be useful to have separate loaders - for example if you want to show
  * separate loading bars for objects and textures.
  *
- * ```typescript
+ * ```ts
  * import { FileLoader } from 'ek3d/loaders/FileLoader';
  * import { LoadingManager } from 'ek3d/loaders/LoadingManager';
  * import { TextureLoader } from 'ek3d/loaders/TextureLoader';
@@ -169,7 +169,7 @@ export class LoadingManager {
      * override loading behavior. This behavior can be used to load assets from
      * .ZIP files, drag-and-drop APIs, and Data URIs.
      *
-     * ```typescript
+     * ```ts
      * import { FileLoader } from 'ek3d/loaders/FileLoader';
      * import { LoadingManager } from 'ek3d/loaders/LoadingManager';
      *
@@ -206,7 +206,7 @@ export class LoadingManager {
      * define what loader should be used in order to load specific files. A
      * typical use case is to overwrite the default loader for textures.
      *
-     * ```typescript
+     * ```ts
      * import { LoadingManager } from 'ek3d/loaders/LoadingManager';
      * import { TextureLoader } from 'ek3d/loaders/TextureLoader';
      *

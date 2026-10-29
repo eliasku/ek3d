@@ -107,7 +107,7 @@ export interface ZSTDDecoderLike {
  * - [DFD](https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor)
  * - [BasisU HDR](https://github.com/BinomialLLC/basis_universal/wiki/UASTC-HDR-Texture-Specification-v1.0)
  *
- * ```typescript
+ * ```ts
  * import { KTX2Loader } from 'ek3d/addons/loaders/KTX2Loader';
  * import { WebGLRenderer } from 'ek3d/renderers/WebGLRenderer';
  *
@@ -116,7 +116,6 @@ export interface ZSTDDecoderLike {
  * const texture = ktx2Loader.loadAsync( 'textures/2d_rgba8.ktx2' );
  * ```
  *
- * @three_import import { KTX2Loader } from 'ek3d/addons/loaders/KTX2Loader';
  */
 /** Detection contract shared by {@link KTX2Loader#detectSupport} and {@link KTX2Loader#detectSupportAsync}. */
 export interface KTX2RendererLike {
@@ -635,10 +634,10 @@ const KTX2Loader_BasisWorker = function (): void {
     initializeBasis(): void;
   } | null;
 
-  const EngineFormat = _EngineFormat; // eslint-disable-line no-undef
-  const EngineType = _EngineType; // eslint-disable-line no-undef
-  const TranscoderFormat = _TranscoderFormat; // eslint-disable-line no-undef
-  const BasisFormat = _BasisFormat; // eslint-disable-line no-undef
+  const EngineFormat = _EngineFormat;
+  const EngineType = _EngineType;
+  const TranscoderFormat = _TranscoderFormat;
+  const BasisFormat = _BasisFormat;
 
   self.addEventListener("message", function (e: MessageEvent) {
     const message = e.data as {
@@ -681,7 +680,7 @@ const KTX2Loader_BasisWorker = function (): void {
   function init(wasmBinary: ArrayBuffer) {
     transcoderPending = new Promise((resolve) => {
       BasisModule = { wasmBinary, onRuntimeInitialized: resolve } as never;
-      BASIS(BasisModule as unknown as Record<string, unknown>); // eslint-disable-line no-undef
+      BASIS(BasisModule as unknown as Record<string, unknown>);
     }).then(() => {
       BasisModule!.initializeBasis();
 

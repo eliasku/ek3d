@@ -5,7 +5,7 @@ import { Vector2 } from "../../math/Vector2";
 /**
  * A curve representing a 2D spline curve.
  *
- * ```typescript
+ * ```ts
  * import { SplineCurve } from 'ek3d/extras/curves/SplineCurve';
  * import { Vector2 } from 'ek3d/math/Vector2';
  * import { BufferGeometry } from 'ek3d/core/BufferGeometry';

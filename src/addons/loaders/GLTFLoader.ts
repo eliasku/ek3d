@@ -231,7 +231,7 @@ export interface GLTF {
  * - [KHR_animation_pointer](https://github.com/needle-tools/three-animation-pointer)
  * - [NEEDLE_progressive](https://github.com/needle-tools/gltf-progressive)
  *
- * ```typescript
+ * ```ts
  * const loader = new GLTFLoader();
  *
  * // Optional: Provide a DRACOLoader instance to decode compressed mesh data
@@ -243,7 +243,6 @@ export interface GLTF {
  * scene.add( gltf.scene );
  * ```
  *
- * @three_import import { GLTFLoader } from 'ek3d/addons/loaders/GLTFLoader';
  */
 export class GLTFLoader extends Loader<GLTF, string> {
   dracoLoader: DRACOLoaderLike | null;

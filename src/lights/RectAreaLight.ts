@@ -12,7 +12,7 @@ import { Light } from "./Light";
  * - Pass caller-owned textures from `createLTCTextures()` as the renderer `ltcTextures` option.
  * Dispose all four textures when they are no longer used.
  *
- * ```typescript
+ * ```ts
  * import { RectAreaLight } from 'ek3d/lights/RectAreaLight';
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { WebGLRenderer } from 'ek3d/renderers/WebGLRenderer';

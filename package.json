@@ -3,16 +3,16 @@
   "version": "0.1.0",
   "description": "WebGL-focused, source-first TypeScript port of Three.js with explicit composition",
   "license": "MIT",
-  "files": [
-    "src",
-    "LICENSE",
-    "README.md"
-  ],
   "author": "Ilya Kuzmichev <eliasku.games@gmail.com>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eliasku/ek3d.git"
   },
+  "files": [
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
   "type": "module",
   "sideEffects": false,
   "exports": {
@@ -24,6 +24,7 @@
     "dev": "vp dev --host 127.0.0.1",
     "preview": "vp preview --host 127.0.0.1",
     "build": "vp build",
+    "docs:llms": "tsx scripts/build-llms.ts",
     "package:check": "tsx scripts/check-package.ts",
     "browser:smoke": "tsx scripts/browser-smoke.ts",
     "lint": "vp lint --deny-warnings",

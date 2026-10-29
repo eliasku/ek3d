@@ -6,7 +6,7 @@ export type SpriteMaterialParameters = Omit<Partial<SpriteMaterial>, "color"> & 
 /**
  * A material for rendering instances of {@link Sprite}.
  *
- * ```typescript
+ * ```ts
  * import { TextureLoader } from 'ek3d/loaders/TextureLoader';
  * import { SpriteMaterial } from 'ek3d/materials/SpriteMaterial';
  * import { Sprite } from 'ek3d/objects/Sprite';

@@ -40,7 +40,7 @@ export interface SSRPassOptions {
 /**
  * A pass for a basic SSR effect.
  *
- * ```typescript
+ * ```ts
  * const ssrPass = new SSRPass( {
  * 	renderer,
  * 	scene,
@@ -51,7 +51,6 @@ export interface SSRPassOptions {
  * composer.addPass( ssrPass );
  * ```
  *
- * @three_import import { SSRPass } from 'ek3d/addons/postprocessing/SSRPass';
  */
 export class SSRPass extends Pass {
   scene: Scene;

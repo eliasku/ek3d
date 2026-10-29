@@ -40,7 +40,7 @@ const _vz = /*@__PURE__*/ new Vector3(0, 0, 1);
  * Imports BVH files and outputs a single {@link Skeleton} and {@link AnimationClip}.
  * Only files with a single root joint are supported.
  *
- * ```typescript
+ * ```ts
  * import { BVHLoader } from "ek3d/addons/loaders/BVHLoader";
  * import { AnimationMixer } from "ek3d/animation/AnimationMixer";
  *

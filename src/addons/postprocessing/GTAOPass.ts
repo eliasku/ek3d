@@ -55,13 +55,12 @@ export interface GTAOPassParameters {
  *
  * `GTAOPass` provides better quality than {@link SSAOPass} but is also more expensive.
  *
- * ```typescript
+ * ```ts
  * const gtaoPass = new GTAOPass( scene, camera, width, height );
  * gtaoPass.output = GTAOPass.OUTPUT.Denoise;
  * composer.addPass( gtaoPass );
  * ```
  *
- * @three_import import { GTAOPass } from 'ek3d/addons/postprocessing/GTAOPass';
  */
 export class GTAOPass extends Pass {
   scene: Scene;

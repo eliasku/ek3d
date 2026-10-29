@@ -42,7 +42,7 @@ function isPoints(object: Object3D): object is Points {
  * supported. PLY can store vertex positions, colors, normals and uv coordinates. No textures
  * or texture references are saved. Quantized attributes must be normalized.
  *
- * ```typescript
+ * ```ts
  * import { PLYExporter } from "ek3d/addons/exporters/PLYExporter";
  * import { Scene } from "ek3d/scenes/Scene";
  *

@@ -20,11 +20,10 @@ import type { PerspectiveCamera as CameraOf } from "../../cameras/PerspectiveCam
 /**
  * A special version of {@link Reflector} for usage with {@link SSRPass}.
  *
- * ```typescript
+ * ```ts
  * const groundReflector = new ReflectorForSSRPass( geometry, { useDepthTexture: true } );
  * ```
  *
- * @three_import import { ReflectorForSSRPass } from 'ek3d/addons/objects/ReflectorForSSRPass';
  */
 export class ReflectorForSSRPass extends Mesh<ShaderMaterial> {
   /** Use this for type testing. */

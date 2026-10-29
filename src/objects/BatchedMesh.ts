@@ -167,7 +167,7 @@ function copyArrayContents(
  * `BatchedMesh` will help you to reduce the number of draw calls and thus improve the overall
  * rendering performance in your application.
  *
- * ```typescript
+ * ```ts
  * import { BatchedMesh } from 'ek3d/objects/BatchedMesh';
  * import { BoxGeometry } from 'ek3d/geometries/BoxGeometry';
  * import { Matrix4 } from 'ek3d/math/Matrix4';

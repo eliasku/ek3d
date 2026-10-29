@@ -2,7 +2,7 @@ import { PolyhedronGeometry } from "./PolyhedronGeometry";
 /**
  * A geometry class for representing an icosahedron.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { IcosahedronGeometry } from 'ek3d/geometries/IcosahedronGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

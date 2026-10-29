@@ -5,7 +5,7 @@ import { Vector2 } from "../math/Vector2";
 /**
  * A geometry class for representing a cylinder.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { CylinderGeometry } from 'ek3d/geometries/CylinderGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

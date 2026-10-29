@@ -118,7 +118,7 @@ function loadRGBMip(buffer: ArrayBuffer, dataOffset: number, width: number, heig
  * Unsupported headers are reported by throwing instead of returning an empty texture, so a
  * caller cannot mistake a format the GPU cannot decode for a valid black texture.
  *
- * ```typescript
+ * ```ts
  * import { DDSLoader } from "ek3d/addons/loaders/DDSLoader";
  * import { ColorSpace } from "ek3d/constants";
  *

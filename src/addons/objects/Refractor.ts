@@ -47,7 +47,7 @@ export interface RefractorOptions {
  *
  * Note that this class can only be used with {@link WebGLRenderer}.
  *
- * ```typescript
+ * ```ts
  * import { PlaneGeometry } from 'ek3d/geometries/PlaneGeometry';
  * import { Refractor } from 'ek3d/addons/objects/Refractor';
  * import { Scene } from 'ek3d/scenes/Scene';
@@ -64,7 +64,6 @@ export interface RefractorOptions {
  * scene.add( refractor );
  * ```
  *
- * @three_import import { Refractor } from 'ek3d/addons/objects/Refractor';
  */
 export class Refractor extends Mesh<ShaderMaterial> {
   /** Use this for type testing. */

@@ -1,6 +1,5 @@
 /**
  * @module BasicShader
- * @three_import import { BasicShader } from 'ek3d/addons/shaders/BasicShader';
  */
 
 /**

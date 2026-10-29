@@ -2,7 +2,6 @@ import type { Texture } from "../../textures/Texture";
 import { Vector2 } from "../../math/Vector2";
 /**
  * @module ConvolutionShader
- * @three_import import { ConvolutionShader } from 'ek3d/addons/shaders/ConvolutionShader';
  */
 
 /**

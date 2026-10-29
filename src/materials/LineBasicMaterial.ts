@@ -10,7 +10,7 @@ export type LineBasicMaterialParameters = Omit<Partial<LineBasicMaterial>, "colo
  *
  * Materials define the appearance of renderable 3D objects.
  *
- * ```typescript
+ * ```ts
  * import { LineBasicMaterial } from 'ek3d/materials/LineBasicMaterial';
  *
  * const material = new LineBasicMaterial( { color: 0xffffff } );

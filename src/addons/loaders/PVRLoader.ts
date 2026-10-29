@@ -24,7 +24,7 @@ interface PvrDatas {
  * Unsupported containers and format codes throw during parsing, so a driver without PVRTC
  * support reports a failure through the loading manager instead of rendering blank geometry.
  *
- * ```typescript
+ * ```ts
  * import { PVRLoader } from "ek3d/addons/loaders/PVRLoader";
  * import { ColorSpace } from "ek3d/constants";
  *

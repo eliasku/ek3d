@@ -17,7 +17,7 @@ class HttpError extends Error {
  * This loader supports caching. If you want to use it, set `manager.cache.enabled = true;`
  * once to your application.
  *
- * ```typescript
+ * ```ts
  * import { FileLoader } from 'ek3d/loaders/FileLoader';
  *
  * const loader = new FileLoader();

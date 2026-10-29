@@ -13,7 +13,7 @@ const _v2 = new Vector3();
 /**
  * Visualizes an object's vertex tangents. The geometry must have a tangent attribute.
  *
- * ```typescript
+ * ```ts
  * import { VertexTangentsHelper } from 'ek3d/addons/helpers/VertexTangentsHelper';
  * import { BoxGeometry } from 'ek3d/geometries/BoxGeometry';
  * import { MeshStandardMaterial } from 'ek3d/materials/MeshStandardMaterial';

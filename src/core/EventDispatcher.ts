@@ -4,7 +4,7 @@
  * Main repository: [eventdispatcher.js](https://github.com/mrdoob/eventdispatcher.js/)
  *
  * Code Example:
- * ```typescript
+ * ```ts
  * import { EventDispatcher } from 'ek3d/core/EventDispatcher';
  *
  * class Car extends EventDispatcher {

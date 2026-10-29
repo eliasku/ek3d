@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module ExposureShader
- * @three_import import { ExposureShader } from 'ek3d/addons/shaders/ExposureShader';
  */
 
 /**

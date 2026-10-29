@@ -562,7 +562,7 @@ class HTMLCanvasTexture extends CanvasTexture {
  * is compatible for VR. Pointer events dispatched on the mesh by an interactive group are
  * replayed on the DOM element, so the rendered GUI stays editable in 3D.
  *
- * ```typescript
+ * ```ts
  * import { GUI } from 'ek3d/addons/libs/lil-gui/GUI';
  * import { HTMLMesh } from 'ek3d/addons/interactive/HTMLMesh';
  * import { Scene } from 'ek3d/scenes/Scene';
@@ -579,7 +579,6 @@ class HTMLCanvasTexture extends CanvasTexture {
  * ```
  *
  * @augments Mesh
- * @three_import import { HTMLMesh } from 'ek3d/addons/interactive/HTMLMesh';
  * @demo examples/webgl_interactive_htmlmesh.html
  */
 export class HTMLMesh extends Mesh<MeshBasicMaterial> {

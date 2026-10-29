@@ -10,7 +10,7 @@ const ROW_SIZE_BYTES = 32;
 /**
  * Loads fixed-width Gaussian splat data as a BufferGeometry.
  *
- * ```typescript
+ * ```ts
  * import { SPLATLoader } from "ek3d/addons/loaders/SPLATLoader";
  * const geometry = await new SPLATLoader().loadAsync("model.splat");
  * ```

@@ -15,7 +15,16 @@ The ported Three.js snapshot is pinned to:
 
 Use this immutable commit as the baseline for future upstream diffs and ek3d updates, not the moving `dev` tip.
 
-The library is distributed as uncompiled TypeScript source: `exports` maps package subpaths to `src/**/*.ts`, so consumers compile it with their own bundler and no generated output is checked in. LLM documentation generation through `upstream/three.js/utils/llms/build.js` is deferred.
+The library is distributed as uncompiled TypeScript source: `exports` maps package subpaths to `src/**/*.ts`, so consumers compile it with their own bundler. No compiled library output is checked in.
+
+Run `npm run docs:llms` after changing the README or maintained source. The TypeScript generator
+in `scripts/build-llms.ts` writes `public/llms.txt` and `public/llms-full.txt`. Vite serves these
+as `/llms.txt` and `/llms-full.txt` and copies them into the production site.
+The index links every maintained TypeScript module to its repository source and gives its
+canonical import path. The full file includes the README and all `src/**/*.ts` files with
+types, JSDoc and implementation. Internal declarations are included as source, not as public API.
+Generation uses only local package metadata, the README and maintained source. It does not
+read the upstream checkout, generated HTML docs or TSL guides, and makes no network requests.
 
 This is a non-commercial project. Its MIT code license does not replace third-party asset
 licenses. Keep attribution and asset-specific terms; resolve missing redistribution permissions

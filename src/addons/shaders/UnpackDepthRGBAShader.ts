@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module UnpackDepthRGBAShader
- * @three_import import { UnpackDepthRGBAShader } from 'ek3d/addons/shaders/UnpackDepthRGBAShader';
  */
 
 /**

@@ -7,7 +7,7 @@ import { Color } from "../math/Color";
  * An axis object to visualize the 3 axes in a simple way.
  * The X axis is red. The Y axis is green. The Z axis is blue.
  *
- * ```typescript
+ * ```ts
  * import { AxesHelper } from 'ek3d/helpers/AxesHelper';
  * import { Scene } from 'ek3d/scenes/Scene';
  *

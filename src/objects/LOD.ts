@@ -19,7 +19,7 @@ const _v2 = /*@__PURE__*/ new Vector3();
  * three meshes, one for far away (low detail), one for mid range (medium
  * detail) and one for close up (high detail).
  *
- * ```typescript
+ * ```ts
  * import { IcosahedronGeometry } from 'ek3d/geometries/IcosahedronGeometry';
  * import { LOD } from 'ek3d/objects/LOD';
  * import { Mesh } from 'ek3d/objects/Mesh';

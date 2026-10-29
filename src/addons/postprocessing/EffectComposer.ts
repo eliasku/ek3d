@@ -17,7 +17,7 @@ import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
  *
  * This module can only be used with {@link WebGLRenderer}.
  *
- * ```typescript
+ * ```ts
  * const composer = new EffectComposer( renderer );
  *
  * // adding some passes
@@ -37,7 +37,6 @@ import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
  * }
  * ```
  *
- * @three_import import { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
  */
 export class EffectComposer {
   renderer: WebGLRenderer;

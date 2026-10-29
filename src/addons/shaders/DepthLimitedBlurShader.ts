@@ -4,7 +4,6 @@ import chunk_packing from "../../renderers/shaders/ShaderChunk/packing.glsl";
 
 /**
  * @module DepthLimitedBlurShader
- * @three_import import { DepthLimitedBlurShader, BlurShaderUtils } from 'ek3d/addons/shaders/DepthLimitedBlurShader';
  */
 
 /**

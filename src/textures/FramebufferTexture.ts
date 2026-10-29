@@ -6,7 +6,7 @@ import { TextureFilter } from "../constants";
  * of renderers. It extracts the contents of the current bound framebuffer and provides it
  * as a texture for further usage.
  *
- * ```typescript
+ * ```ts
  * import type { Camera } from 'ek3d/cameras/Camera';
  * import { Vector2 } from 'ek3d/math/Vector2';
  * import type { WebGLRenderer } from 'ek3d/renderers/WebGLRenderer';

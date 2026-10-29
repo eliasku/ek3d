@@ -5,7 +5,6 @@ import chunk_colorspace_fragment from "../../renderers/shaders/ShaderChunk/color
  * Collection of toon shaders.
  *
  * @module TriangleBlurShader
- * @three_import import * as ToonShader from 'ek3d/addons/shaders/ToonShader';
  */
 
 /**

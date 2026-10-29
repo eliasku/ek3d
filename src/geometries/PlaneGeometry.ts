@@ -3,7 +3,7 @@ import { Float32BufferAttribute } from "../core/BufferAttribute";
 /**
  * A geometry class for representing a plane.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { PlaneGeometry } from 'ek3d/geometries/PlaneGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

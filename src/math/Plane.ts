@@ -231,7 +231,7 @@ export class Plane {
    * Apply a 4x4 matrix to the plane. The matrix must be an affine, homogeneous transform.
    *
    * The optional normal matrix can be pre-computed like so:
-   * ```typescript
+   * ```ts
    * import { Matrix4 } from 'ek3d/math/Matrix4';
    * import { Matrix3 } from 'ek3d/math/Matrix3';
    *

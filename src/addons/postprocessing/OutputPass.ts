@@ -15,12 +15,11 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  *
  * The tone mapping and color space settings are extracted from the renderer.
  *
- * ```typescript
+ * ```ts
  * const outputPass = new OutputPass();
  * composer.addPass( outputPass );
  * ```
  *
- * @three_import import { OutputPass } from 'ek3d/addons/postprocessing/OutputPass';
  */
 export class OutputPass extends Pass {
   isOutputPass: boolean;

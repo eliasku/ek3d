@@ -2,7 +2,6 @@ import type { Texture } from "../../textures/Texture";
 import { Vector2 } from "../../math/Vector2";
 /**
  * @module NormalMapShader
- * @three_import import { NormalMapShader } from 'ek3d/addons/shaders/NormalMapShader';
  */
 
 /**

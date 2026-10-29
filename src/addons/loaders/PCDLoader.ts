@@ -166,7 +166,7 @@ function parseHeader(binaryData: ArrayBuffer): PCDHeader {
  * - intensity
  * - label
  *
- * ```typescript
+ * ```ts
  * import { PCDLoader } from "ek3d/addons/loaders/PCDLoader";
  *
  * const loader = new PCDLoader();

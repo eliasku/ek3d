@@ -7,7 +7,7 @@
  * [row-major](https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order)
  * order, while internally they are stored in the {@link Matrix2#elements} array in column-major order.
  * This means that calling:
- * ```typescript
+ * ```ts
  * import { Matrix2 } from 'ek3d/math/Matrix2';
  *
  * const m = new Matrix2();
@@ -15,7 +15,7 @@
  *        21, 22 );
  * ```
  * will result in the elements array containing:
- * ```typescript
+ * ```ts
  * import { Matrix2 } from 'ek3d/math/Matrix2';
  *
  * const m = new Matrix2();

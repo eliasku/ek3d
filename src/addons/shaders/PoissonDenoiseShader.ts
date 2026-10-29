@@ -7,7 +7,6 @@ import type { Texture } from "../../textures/Texture";
 
 /**
  * @module PoissonDenoiseShader
- * @three_import import { PoissonDenoiseShader } from 'ek3d/addons/shaders/PoissonDenoiseShader';
  */
 
 /**

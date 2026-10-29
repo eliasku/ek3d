@@ -9,7 +9,6 @@ import chunk_packing from "../../renderers/shaders/ShaderChunk/packing.glsl";
  * - [3D Game Shaders For Beginners, Screen Space Reflection (SSR)](https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html).
  *
  * @module SSRShader
- * @three_import import * as SSRShader from 'ek3d/addons/shaders/SSRShader';
  */
 
 /**

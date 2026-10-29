@@ -138,7 +138,7 @@ class USDNode {
 /**
  * An exporter for USDZ.
  *
- * ```typescript
+ * ```ts
  * import { USDZExporter, type USDZZipRuntime } from 'ek3d/addons/exporters/USDZExporter';
  * import type { Object3D } from 'ek3d/core/Object3D';
  *

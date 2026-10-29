@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module ACESFilmicToneMappingShader
- * @three_import import { ACESFilmicToneMappingShader } from 'ek3d/addons/shaders/ACESFilmicToneMappingShader';
  */
 
 /**

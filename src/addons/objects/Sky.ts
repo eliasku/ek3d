@@ -29,7 +29,7 @@ export interface SkyShader {
  * - {@link http://simonwallner.at/project/atmospheric-scattering/}
  * - {@link http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR}
  *
- * ```typescript
+ * ```ts
  * const sky = new Sky();
  * sky.scale.setScalar( 10000 );
  * scene.add( sky );
@@ -37,7 +37,7 @@ export interface SkyShader {
  *
  * It can be useful to hide the sun disc when generating an environment map to avoid artifacts
  *
- * ```typescript
+ * ```ts
  * // disable before rendering environment map
  * sky.material.uniforms["showSunDisc"].value = false;
  * // ...

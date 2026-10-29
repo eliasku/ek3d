@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module RGBShiftShader
- * @three_import import { RGBShiftShader } from 'ek3d/addons/shaders/RGBShiftShader';
  */
 
 /**

@@ -14,7 +14,7 @@ const _box = /*@__PURE__*/ new Box3();
  * is transformed. Note that the object must have a geometry for this to work,
  * so it won't work with sprites.
  *
- * ```typescript
+ * ```ts
  * import { BoxHelper } from 'ek3d/helpers/BoxHelper';
  * import { Mesh } from 'ek3d/objects/Mesh';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

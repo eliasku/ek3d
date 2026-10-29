@@ -7,7 +7,7 @@ import { Color } from "../math/Color";
  * This helper is an object to define polar grids. Grids are
  * two-dimensional arrays of lines.
  *
- * ```typescript
+ * ```ts
  * import { PolarGridHelper } from 'ek3d/helpers/PolarGridHelper';
  * import { Scene } from 'ek3d/scenes/Scene';
  *

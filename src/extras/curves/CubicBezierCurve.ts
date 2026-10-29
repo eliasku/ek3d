@@ -5,7 +5,7 @@ import { Vector2 } from "../../math/Vector2";
 /**
  * A curve representing a 2D Cubic Bezier curve.
  *
- * ```typescript
+ * ```ts
  * import { CubicBezierCurve } from 'ek3d/extras/curves/CubicBezierCurve';
  * import { Vector2 } from 'ek3d/math/Vector2';
  * import { BufferGeometry } from 'ek3d/core/BufferGeometry';

@@ -14,7 +14,6 @@ import type { SkinnedMesh } from "../../objects/SkinnedMesh";
 
 /**
  * @module BufferGeometryUtils
- * @three_import import * as BufferGeometryUtils from 'ek3d/addons/utils/BufferGeometryUtils';
  */
 
 type TypedArray =

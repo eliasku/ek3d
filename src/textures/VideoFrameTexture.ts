@@ -6,7 +6,7 @@ import { VideoTexture } from "./VideoTexture";
  * defined manually via {@link VideoFrameTexture#setFrame}. A typical use case for this module is when
  * video frames are decoded with the WebCodecs API.
  *
- * ```typescript
+ * ```ts
  * import { VideoFrameTexture } from 'ek3d/textures/VideoFrameTexture';
  *
  * const texture = new VideoFrameTexture();

@@ -8,7 +8,7 @@ export type PointsMaterialParameters = Omit<Partial<PointsMaterial>, "color"> & 
  *
  * Materials define the appearance of renderable 3D objects.
  *
- * ```typescript
+ * ```ts
  * import { BufferGeometry } from 'ek3d/core/BufferGeometry';
  * import { Float32BufferAttribute } from 'ek3d/core/BufferAttribute';
  * import { PointsMaterial } from 'ek3d/materials/PointsMaterial';

@@ -8,7 +8,7 @@ import { generateUUID } from "../../math/MathUtils";
  * can be used with {@link ExtrudeGeometry}, {@link ShapeGeometry}, to get
  * points, or to get triangulated faces.
  *
- * ```typescript
+ * ```ts
  * import { Shape } from 'ek3d/extras/core/Shape';
  * import { ExtrudeGeometry } from 'ek3d/geometries/ExtrudeGeometry';
  * import { Mesh } from 'ek3d/objects/Mesh';

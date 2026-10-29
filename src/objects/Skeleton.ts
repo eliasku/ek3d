@@ -10,7 +10,7 @@ const _identityMatrix = /*@__PURE__*/ new Matrix4();
  * Class for representing the armatures in `three.js`. The skeleton
  * is defined by a hierarchy of bones.
  *
- * ```typescript
+ * ```ts
  * import { Bone } from 'ek3d/objects/Bone';
  * import { Skeleton } from 'ek3d/objects/Skeleton';
  *

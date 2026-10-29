@@ -11,12 +11,11 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  * which lie in the masking area of this pass. Internally, the masking
  * is implemented with the stencil buffer.
  *
- * ```typescript
+ * ```ts
  * const maskPass = new MaskPass( scene, camera );
  * composer.addPass( maskPass );
  * ```
  *
- * @three_import import { MaskPass } from 'ek3d/addons/postprocessing/MaskPass';
  */
 export class MaskPass extends Pass {
   scene: Scene;
@@ -139,12 +138,11 @@ export class MaskPass extends Pass {
 /**
  * This pass can be used to clear a mask previously defined with {@link MaskPass}.
  *
- * ```typescript
+ * ```ts
  * const clearPass = new ClearMaskPass();
  * composer.addPass( clearPass );
  * ```
  *
- * @three_import import { ClearMaskPass } from 'ek3d/addons/postprocessing/MaskPass';
  */
 export class ClearMaskPass extends Pass {
   needsSwap: boolean;

@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module SepiaShader
- * @three_import import { SepiaShader } from 'ek3d/addons/shaders/SepiaShader';
  */
 
 /**

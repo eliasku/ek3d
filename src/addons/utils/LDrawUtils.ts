@@ -11,11 +11,10 @@ import { Group as GroupImpl } from "../../objects/Group";
 /**
  * Utility class for LDraw models.
  *
- * ```typescript
+ * ```ts
  * model = LDrawUtils.mergeObject( model );
  * ```
  *
- * @three_import import { LDrawUtils } from 'ek3d/addons/utils/LDrawUtils';
  */
 export class LDrawUtils {
   /**

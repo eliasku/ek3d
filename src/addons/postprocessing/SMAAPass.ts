@@ -12,12 +12,11 @@ import type { WebGLRenderTarget as RT } from "../../renderers/WebGLRenderTarget"
  * A pass for applying SMAA. Unlike {@link FXAAPass}, `SMAAPass` operates in
  * `linear-srgb` so this pass must be executed before {@link OutputPass}.
  *
- * ```typescript
+ * ```ts
  * const smaaPass = new SMAAPass();
  * composer.addPass( smaaPass );
  * ```
  *
- * @three_import import { SMAAPass } from 'ek3d/addons/postprocessing/SMAAPass';
  */
 export class SMAAPass extends Pass {
   _edgesRT: WebGLRenderTarget;

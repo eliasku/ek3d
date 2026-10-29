@@ -121,7 +121,7 @@ export interface WebGLRendererOptions {
  *
  * Install only the material shaders and rendering features the application uses:
  *
- * ```typescript
+ * ```ts
  * import { WebGLRenderer } from 'ek3d/renderers/WebGLRenderer';
  * import { basicShader } from 'ek3d/renderers/shaders/BasicShader';
  *
@@ -313,7 +313,7 @@ export class WebGLRenderer {
     /**
      * A canvas where the renderer draws its output. This is automatically created by the renderer
      * in the constructor (if not provided already); you just need to add it to your page like so:
-     * ```typescript
+     * ```ts
      * import { WebGLRenderer } from 'ek3d/renderers/WebGLRenderer';
      *
      * const renderer = new WebGLRenderer();
@@ -598,7 +598,7 @@ export class WebGLRenderer {
        * multiple render passes per frame (e.g. when using post processing) it can
        * be preferred to reset with a custom pattern. First, set `autoReset` to
        * `false`.
-       * ```typescript
+       * ```ts
        * import { WebGLRenderer } from 'ek3d/renderers/WebGLRenderer';
        *
        * const renderer = new WebGLRenderer();
@@ -716,7 +716,7 @@ export class WebGLRenderer {
      * This method allows to define the drawing buffer size by specifying
      * width, height and pixel ratio all at once. The size of the drawing
      * buffer is computed with this formula:
-     * ```typescript
+     * ```ts
      * import { Vector2 } from 'ek3d/math/Vector2';
      *
      * const width = 800;

@@ -7,7 +7,6 @@ import chunk_begin_vertex from "../../renderers/shaders/ShaderChunk/begin_vertex
 import chunk_project_vertex from "../../renderers/shaders/ShaderChunk/project_vertex.glsl";
 /**
  * @module BokehShader2
- * @three_import import { BokehShader, BokehDepthShader } from 'ek3d/addons/shaders/BokehShader2';
  */
 
 /**
@@ -17,7 +16,7 @@ import chunk_project_vertex from "../../renderers/shaders/ShaderChunk/project_ve
  * Requires #define RINGS and SAMPLES integers, supplied through
  * `ShaderMaterial.defines`:
  *
- * ```typescript
+ * ```ts
  * import { BokehShader } from 'ek3d/addons/shaders/BokehShader2';
  * import { ShaderMaterial } from 'ek3d/materials/ShaderMaterial';
  *

@@ -77,7 +77,7 @@ type WheelPosition = Pick<WheelEvent, "clientX" | "clientY" | "deltaY">;
  * - Zoom: Middle mouse, or mousewheel / touch: two-finger spread or squish.
  * - Pan: Right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move.
  *
- * ```typescript
+ * ```ts
  * import { OrbitControls } from 'ek3d/addons/controls/OrbitControls';
  * import { PerspectiveCamera } from 'ek3d/cameras/PerspectiveCamera';
  *

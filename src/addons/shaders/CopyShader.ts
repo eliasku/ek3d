@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module CopyShader
- * @three_import import { CopyShader } from 'ek3d/addons/shaders/CopyShader';
  */
 
 /**

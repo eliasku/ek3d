@@ -11,7 +11,7 @@ import type { Texture } from "../../textures/Texture";
  * By default the object is centered at the camera, so it is often helpful to set
  * `skybox.position.y = height` to put the ground at the origin.
  *
- * ```typescript
+ * ```ts
  * const height = 15, radius = 100;
  *
  * const skybox = new GroundedSkybox( envMap, height, radius );

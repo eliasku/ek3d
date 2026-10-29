@@ -13,7 +13,7 @@ let _lineGeometry: any, _coneGeometry: any;
 /**
  * An 3D arrow object for visualizing directions.
  *
- * ```typescript
+ * ```ts
  * import { ArrowHelper } from 'ek3d/helpers/ArrowHelper';
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { Vector3 } from 'ek3d/math/Vector3';

@@ -49,7 +49,7 @@ export interface ReflectorOptions {
  *
  * Note that this class can only be used with {@link WebGLRenderer}.
  *
- * ```typescript
+ * ```ts
  * import { PlaneGeometry } from 'ek3d/geometries/PlaneGeometry';
  * import { Reflector } from 'ek3d/addons/objects/Reflector';
  * import { Scene } from 'ek3d/scenes/Scene';
@@ -67,7 +67,6 @@ export interface ReflectorOptions {
  * scene.add( reflector );
  * ```
  *
- * @three_import import { Reflector } from 'ek3d/addons/objects/Reflector';
  */
 export class Reflector extends Mesh<ShaderMaterial> {
   /** Use this for type testing. */

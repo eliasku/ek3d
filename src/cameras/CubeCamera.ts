@@ -10,7 +10,7 @@ const aspect = 1;
  * cube render target. The render target can then be used as an environment map for rendering
  * realtime reflections in your scene.
  *
- * ```typescript
+ * ```ts
  * import { BoxGeometry } from 'ek3d/geometries/BoxGeometry';
  * import { CubeCamera } from 'ek3d/cameras/CubeCamera';
  * import { TextureFilter } from 'ek3d/constants';

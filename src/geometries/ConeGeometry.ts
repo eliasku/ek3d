@@ -2,7 +2,7 @@ import { CylinderGeometry } from "./CylinderGeometry";
 /**
  * A geometry class for representing a cone.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { ConeGeometry } from 'ek3d/geometries/ConeGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

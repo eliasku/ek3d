@@ -10,12 +10,11 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  * Used to render a scene with the composer's render target setup. This is
  * usually the first pass of a post processing chain.
  *
- * ```typescript
+ * ```ts
  * const renderPass = new RenderPass( scene, camera );
  * composer.addPass( renderPass );
  * ```
  *
- * @three_import import { RenderPass } from 'ek3d/addons/postprocessing/RenderPass';
  */
 export class RenderPass extends Pass {
   scene: Scene;

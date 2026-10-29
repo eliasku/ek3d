@@ -3,7 +3,7 @@ import { Mapping, Wrapping, TextureFilter, PixelFormat, TextureType } from "../c
 /**
  * Creates a cube texture made up of six images.
  *
- * ```typescript
+ * ```ts
  * import { CubeTextureLoader } from 'ek3d/loaders/CubeTextureLoader';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
  *

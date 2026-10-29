@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module DOFMipMapShader
- * @three_import import { DOFMipMapShader } from 'ek3d/addons/shaders/DOFMipMapShader';
  */
 
 /**

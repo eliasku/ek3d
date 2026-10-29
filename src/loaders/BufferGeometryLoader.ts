@@ -14,7 +14,7 @@ import { getTypedArray, error } from "../utils";
  * Class for loading geometries. The files are internally
  * loaded via {@link FileLoader}.
  *
- * ```typescript
+ * ```ts
  * import { BufferGeometryLoader } from 'ek3d/loaders/BufferGeometryLoader';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
  * import { Mesh } from 'ek3d/objects/Mesh';

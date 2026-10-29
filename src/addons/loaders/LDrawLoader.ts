@@ -1484,7 +1484,7 @@ function createObject(
  * - !CATEGORY: Model/part category declarations.
  * - !KEYWORDS: Model/part keywords declarations.
  *
- * ```typescript
+ * ```ts
  * const loader = new LDrawLoader();
  * loader.setConditionalLineMaterial( LDrawConditionalLineMaterial ); // the type of line material depends on the used renderer
  * const object = await loader.loadAsync( 'models/ldraw/officialLibrary/models/car.ldr_Packed.mpd' );
@@ -1493,7 +1493,6 @@ function createObject(
  *
  * @augments Loader
  * @demo examples/webgl_loader_ldraw.html
- * @three_import import { LDrawLoader } from 'ek3d/addons/loaders/LDrawLoader';
  */
 /** Material surface the LDraw material library relies on. */
 interface LDrawMaterialLike {

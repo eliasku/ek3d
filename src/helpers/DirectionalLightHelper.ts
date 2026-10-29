@@ -17,7 +17,7 @@ const _v3 = /*@__PURE__*/ new Vector3();
  * When the directional light or its target are transformed or light properties
  * are changed, it's necessary to call the `update()` method of the respective helper.
  *
- * ```typescript
+ * ```ts
  * import { DirectionalLight } from 'ek3d/lights/DirectionalLight';
  * import { DirectionalLightHelper } from 'ek3d/helpers/DirectionalLightHelper';
  * import { Scene } from 'ek3d/scenes/Scene';

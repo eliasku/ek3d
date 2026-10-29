@@ -6,7 +6,7 @@ import { Loader } from "./Loader";
  * Class for loading textures. Images are internally
  * loaded via {@link ImageLoader}.
  *
- * ```typescript
+ * ```ts
  * import { TextureLoader } from 'ek3d/loaders/TextureLoader';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
  *

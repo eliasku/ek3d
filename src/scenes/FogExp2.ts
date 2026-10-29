@@ -4,7 +4,7 @@ import { Color } from "../math/Color";
  * which gives a clear view near the camera and a faster than exponentially
  * densening fog farther from the camera.
  *
- * ```typescript
+ * ```ts
  * import { FogExp2 } from 'ek3d/scenes/FogExp2';
  * import { Scene } from 'ek3d/scenes/Scene';
  *

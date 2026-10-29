@@ -4,7 +4,7 @@ import { Vector3 } from "../math/Vector3";
 /**
  * A geometry class for representing an torus.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { TorusGeometry } from 'ek3d/geometries/TorusGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

@@ -20,7 +20,7 @@ type TDSMesh = Mesh<MeshPhongMaterial | MeshPhongMaterial[]>;
  *
  * Loads geometry with uv and materials basic properties with texture support.
  *
- * ```typescript
+ * ```ts
  * import { TDSLoader } from "ek3d/addons/loaders/TDSLoader";
  *
  * const loader = new TDSLoader();

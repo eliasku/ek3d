@@ -5,7 +5,6 @@ import type { Vector3 } from "../../math/Vector3";
 import chunk_packing from "../../renderers/shaders/ShaderChunk/packing.glsl";
 /**
  * @module SSAOShader
- * @three_import import { SSAOShader } from 'ek3d/addons/shaders/SSAOShader';
  */
 
 /**

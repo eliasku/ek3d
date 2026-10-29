@@ -4,7 +4,7 @@ import { Vector3 } from "../math/Vector3";
 /**
  * A geometry class for representing a capsule.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { CapsuleGeometry } from 'ek3d/geometries/CapsuleGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

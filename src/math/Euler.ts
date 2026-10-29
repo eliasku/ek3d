@@ -15,7 +15,7 @@ const _quaternion = /*@__PURE__*/ new Quaternion();
  * Iterating through an instance will yield its components (x, y, z,
  * order) in the corresponding order.
  *
- * ```typescript
+ * ```ts
  * import { Euler } from 'ek3d/math/Euler';
  * import { Vector3 } from 'ek3d/math/Vector3';
  *

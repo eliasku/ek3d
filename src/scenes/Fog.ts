@@ -3,7 +3,7 @@ import { Color } from "../math/Color";
  * This class can be used to define a linear fog that grows linearly denser
  * with the distance.
  *
- * ```typescript
+ * ```ts
  * import { Fog } from 'ek3d/scenes/Fog';
  * import { Scene } from 'ek3d/scenes/Scene';
  *

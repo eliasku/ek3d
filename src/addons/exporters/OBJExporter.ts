@@ -17,7 +17,7 @@ import type { Points } from "../../objects/Points";
  *
  * `OBJExporter` is not able to export material data into MTL files so only geometry data are supported.
  *
- * ```typescript
+ * ```ts
  * import { OBJExporter } from 'ek3d/addons/exporters/OBJExporter';
  * import { Scene } from 'ek3d/scenes/Scene';
  * const scene = new Scene();

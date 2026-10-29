@@ -13,7 +13,7 @@ const inverseProjectionMatrix = new Matrix4();
 /**
  * Represents the frustum of a CSM instance.
  *
- * ```typescript
+ * ```ts
  * import { CSMFrustum } from "ek3d/addons/csm/CSMFrustum";
  * ```
  */

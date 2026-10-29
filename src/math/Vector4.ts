@@ -19,7 +19,7 @@ import { clamp } from "./MathUtils";
  *
  * Iterating through a vector instance will yield its components `(x, y, z, w)` in
  * the corresponding order.
- * ```typescript
+ * ```ts
  * import { Vector4 } from 'ek3d/math/Vector4';
  *
  * const a = new Vector4( 0, 1, 0, 0 );

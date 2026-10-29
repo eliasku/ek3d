@@ -2,7 +2,7 @@
  * Represents a uniform which is a global shader variable. They are passed to shader programs.
  *
  * When declaring a uniform of a {@link ShaderMaterial}, it is declared by value or by object.
- * ```typescript
+ * ```ts
  * import { Uniform } from 'ek3d/core/Uniform';
  * import { Vector2 } from 'ek3d/math/Vector2';
  *

@@ -79,7 +79,7 @@ export interface GUIChangeEvent {
  * A lightweight graphical user interface. Changes made with GUI are automatically applied to
  * the controlled object.
  *
- * ```typescript
+ * ```ts
  * import { GUI } from 'ek3d/addons/libs/lil-gui';
  *
  * const gui = new GUI();
@@ -244,7 +244,7 @@ export class GUI {
   /**
    * Adds a controller to the GUI, inferring controller type using the `typeof` operator.
    *
-   * ```typescript
+   * ```ts
    * gui.add( object, 'property' );
    * gui.add( object, 'number', 0, 100, 1 );
    * gui.add( object, 'options', [ 1, 2, 3 ] );
@@ -301,7 +301,7 @@ export class GUI {
   /**
    * Adds a color controller to the GUI.
    *
-   * ```typescript
+   * ```ts
    * const params = {
    * 	cssColor: '#ff00ff',
    * 	rgbColor: { r: 0, g: 0.2, b: 0.4 },

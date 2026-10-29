@@ -5,7 +5,7 @@ import { Vector3 } from "../math/Vector3";
 /**
  * A class for generating a two-dimensional ring geometry.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { RingGeometry } from 'ek3d/geometries/RingGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

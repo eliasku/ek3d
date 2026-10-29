@@ -9,7 +9,7 @@ import { BufferGeometry } from "../core/BufferGeometry";
 /**
  * A helper object to visualize an instance of {@link Plane}.
  *
- * ```typescript
+ * ```ts
  * import { Plane } from 'ek3d/math/Plane';
  * import { PlaneHelper } from 'ek3d/helpers/PlaneHelper';
  * import { Scene } from 'ek3d/scenes/Scene';

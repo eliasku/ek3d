@@ -12,13 +12,13 @@ import { warn } from "../utils";
  *
  * To match the default behaviour of {@link Texture}, the following options are needed:
  *
- * ```typescript
+ * ```ts
  * const options: ImageBitmapOptions = { imageOrientation: 'flipY', premultiplyAlpha: 'none' };
  * ```
  *
  * Also note that unlike {@link FileLoader}, this loader will only avoid multiple concurrent requests to the same URL if {@link Cache} is enabled.
  *
- * ```typescript
+ * ```ts
  * import { ImageBitmapLoader } from 'ek3d/loaders/ImageBitmapLoader';
  * import { Texture } from 'ek3d/textures/Texture';
  *

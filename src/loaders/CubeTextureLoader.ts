@@ -19,7 +19,7 @@ import { ColorSpace } from "../constants";
  * The loaded cube texture is in sRGB color space. Meaning {@link Texture#colorSpace}
  * is set to `ColorSpace.SRGB` by default.
  *
- * ```typescript
+ * ```ts
  * import { CubeTextureLoader } from 'ek3d/loaders/CubeTextureLoader';
  * import { Scene } from 'ek3d/scenes/Scene';
  *

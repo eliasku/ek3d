@@ -12,7 +12,7 @@ const _maxTarget = /*@__PURE__*/ new Vector2();
  * This projection mode is designed to mimic the way the human eye sees. It
  * is the most common projection mode used for rendering a 3D scene.
  *
- * ```typescript
+ * ```ts
  * import { PerspectiveCamera } from 'ek3d/cameras/PerspectiveCamera';
  * import { Scene } from 'ek3d/scenes/Scene';
  *
@@ -235,7 +235,7 @@ export class PerspectiveCamera extends Camera {
    *   +---+---+---+
    *```
    * then for each monitor you would call it like this:
-   *```typescript
+   *```ts
    * import { PerspectiveCamera } from 'ek3d/cameras/PerspectiveCamera';
    *
    * const camera = new PerspectiveCamera();

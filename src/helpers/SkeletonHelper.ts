@@ -14,7 +14,7 @@ const _matrixWorldInv = /*@__PURE__*/ new Matrix4();
 /**
  * A helper object to assist with visualizing a {@link Skeleton}.
  *
- * ```typescript
+ * ```ts
  * import { Bone } from 'ek3d/objects/Bone';
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { SkeletonHelper } from 'ek3d/helpers/SkeletonHelper';

@@ -12,7 +12,6 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  * This module is only relevant for post processing with {@link WebGLRenderer}.
  *
  * @abstract
- * @three_import import { Pass } from 'ek3d/addons/postprocessing/Pass';
  */
 export class Pass {
   isPass: boolean;
@@ -124,7 +123,6 @@ const _geometry = new FullscreenTriangleGeometry();
  *
  * This module can only be used with {@link WebGLRenderer}.
  *
- * @three_import import { FullScreenQuad } from 'ek3d/addons/postprocessing/Pass';
  */
 export class FullScreenQuad {
   _mesh: Mesh<Material>;

@@ -470,7 +470,7 @@ export class OBJGroup extends Group {
  * each texture coordinate vertex, vertex normals, and the faces that make each polygon defined as a list
  * of vertices, and texture vertices.
  *
- * ```typescript
+ * ```ts
  * import { OBJLoader } from 'ek3d/addons/loaders/OBJLoader';
  * import { Scene } from 'ek3d/scenes/Scene';
  *

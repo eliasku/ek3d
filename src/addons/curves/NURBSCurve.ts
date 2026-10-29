@@ -18,7 +18,7 @@ export interface NURBSCurveJSON extends CurveJSON {
  *
  * Implementation is based on `(x, y [, z=0 [, w=1]])` control points with `w=weight`.
  *
- * ```typescript
+ * ```ts
  * import { NURBSCurve } from 'ek3d/addons/curves/NURBSCurve';
  * import { Vector4 } from 'ek3d/math/Vector4';
  *

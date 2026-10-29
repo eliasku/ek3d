@@ -27,12 +27,11 @@ import type { Material } from "../../materials/Material";
  * {@link SAOPass} and {@link GTAOPass} produce a more advanced AO but are also
  * more expensive.
  *
- * ```typescript
+ * ```ts
  * const ssaoPass = new SSAOPass( scene, camera, width, height );
  * composer.addPass( ssaoPass );
  * ```
  *
- * @three_import import { SSAOPass } from 'ek3d/addons/postprocessing/SSAOPass';
  */
 export class SSAOPass extends Pass {
   scene: Scene;

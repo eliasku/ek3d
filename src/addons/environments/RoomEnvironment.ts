@@ -17,7 +17,7 @@ import { Scene } from "../../scenes/Scene";
  * The implementation is based on the [EnvironmentScene](https://github.com/google/model-viewer/blob/master/packages/model-viewer/src/three-components/EnvironmentScene.ts)
  * component from the `model-viewer` project.
  *
- * ```typescript
+ * ```ts
  * const environment = new RoomEnvironment();
  * const pmremGenerator = new PMREMGenerator( renderer );
  *

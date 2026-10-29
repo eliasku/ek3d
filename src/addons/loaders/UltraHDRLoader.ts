@@ -58,7 +58,7 @@ interface JPEGSection {
  * - Non-JPEG image formats (not implemented)
  * - Primary image as an HDR image (not implemented)
  *
- * ```typescript
+ * ```ts
  * const loader = new UltraHDRLoader();
  * const texture = await loader.loadAsync( 'textures/equirectangular/ice_planet_close.jpg' );
  * texture.mapping = Mapping.EquirectangularReflection;

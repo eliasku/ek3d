@@ -2,7 +2,6 @@ import type { Texture } from "../../textures/Texture";
 import { Vector2 } from "../../math/Vector2";
 /**
  * @module DotScreenShader
- * @three_import import { DotScreenShader } from 'ek3d/addons/shaders/DotScreenShader';
  */
 
 /**

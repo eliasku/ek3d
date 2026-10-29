@@ -9,7 +9,7 @@ export type LineDashedMaterialParameters = Omit<Partial<LineDashedMaterial>, "co
  *
  * Materials define the appearance of renderable 3D objects.
  *
- * ```typescript
+ * ```ts
  * import { LineDashedMaterial } from 'ek3d/materials/LineDashedMaterial';
  *
  * const material = new LineDashedMaterial( {

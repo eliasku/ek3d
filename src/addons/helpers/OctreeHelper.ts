@@ -8,7 +8,7 @@ import type { Octree } from "../math/Octree";
 /**
  * A helper for visualizing an Octree.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { Octree } from 'ek3d/addons/math/Octree';
  * import { OctreeHelper } from 'ek3d/addons/helpers/OctreeHelper';
@@ -20,7 +20,6 @@ import type { Octree } from "../math/Octree";
  * ```
  *
  * @augments LineSegments
- * @three_import import { OctreeHelper } from 'ek3d/addons/helpers/OctreeHelper';
  */
 export class OctreeHelper extends LineSegments<LineBasicMaterial> {
   octree: Octree;

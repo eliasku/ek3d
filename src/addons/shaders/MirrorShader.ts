@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module MirrorShader
- * @three_import import { MirrorShader } from 'ek3d/addons/shaders/MirrorShader';
  */
 
 /**

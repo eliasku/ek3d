@@ -7,12 +7,11 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  * This pass can be used to force a clear operation for the current read or
  * default framebuffer (when rendering to screen).
  *
- * ```typescript
+ * ```ts
  * const clearPass = new ClearPass();
  * composer.addPass( clearPass );
  * ```
  *
- * @three_import import { ClearPass } from 'ek3d/addons/postprocessing/ClearPass';
  */
 export class ClearPass extends Pass {
   needsSwap: boolean;

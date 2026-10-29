@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module AfterimageShader
- * @three_import import { AfterimageShader } from 'ek3d/addons/shaders/AfterimageShader';
  */
 
 /**

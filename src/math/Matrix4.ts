@@ -20,7 +20,7 @@ import { Vector3 } from "./Vector3";
  * [row-major](https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order)
  * order, while internally they are stored in the {@link Matrix3#elements} array in column-major order.
  * This means that calling:
- * ```typescript
+ * ```ts
  * import { Matrix4 } from 'ek3d/math/Matrix4';
  *
  * const m = new Matrix4();
@@ -30,7 +30,7 @@ import { Vector3 } from "./Vector3";
  *        41, 42, 43, 44 );
  * ```
  * will result in the elements array containing:
- * ```typescript
+ * ```ts
  * import { Matrix4 } from 'ek3d/math/Matrix4';
  *
  * const m = new Matrix4();

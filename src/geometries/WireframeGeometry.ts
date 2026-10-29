@@ -4,7 +4,7 @@ import { Vector3 } from "../math/Vector3";
 /**
  * Can be used as a helper object to visualize a geometry as a wireframe.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { SphereGeometry } from 'ek3d/geometries/SphereGeometry';
  * import { WireframeGeometry } from 'ek3d/geometries/WireframeGeometry';

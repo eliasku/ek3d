@@ -25,7 +25,6 @@ void RE_Direct_Scattering(const in IncidentLight directLight, const in vec2 uv, 
 
 /** Fast translucency approximation from Colin Barre-Brisebois' GDC 2011 presentation.
  * Composes the maintained Phong descriptor rather than an implicit ShaderLib registry.
- * @three_import import { SubsurfaceScatteringShader } from 'ek3d/addons/shaders/SubsurfaceScatteringShader';
  */
 export const SubsurfaceScatteringShader = {
   name: "SubsurfaceScatteringShader",

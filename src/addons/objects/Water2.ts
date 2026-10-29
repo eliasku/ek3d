@@ -81,7 +81,7 @@ export interface Water2Options {
  * - {@link https://alex.vlachos.com/graphics/Vlachos-SIGGRAPH10-WaterFlow.pdf}
  * - {@link http://graphicsrunner.blogspot.de/2010/08/water-using-flow-maps.html}
  *
- * ```typescript
+ * ```ts
  * import { PlaneGeometry } from 'ek3d/geometries/PlaneGeometry';
  * import { Water } from 'ek3d/addons/objects/Water2';
  * import { Scene } from 'ek3d/scenes/Scene';
@@ -92,7 +92,6 @@ export interface Water2Options {
  * scene.add( water );
  * ```
  *
- * @three_import import { Water } from 'ek3d/addons/objects/Water2';
  */
 export class Water extends Mesh<ShaderMaterial> {
   /** Use this for type testing. */

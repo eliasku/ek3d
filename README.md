@@ -1,15 +1,16 @@
 # ek3d
 
-[Live Examples](https://ek3d.netlify.app/examples/examples.html)
+[Live examples](https://ek3d.netlify.app/examples/examples.html)
 
-- **What:** a lightweight, WebGL-focused TypeScript port of Three.js for canvas games and interactive 3D. Lightweight in scope, not a guaranteed bundle-size reduction.
-- **Removed:** WebGPU/TSL, WebXR, StereoCamera, barrel exports and implicit subsystem registration. Audio remains outside scope. Addons include WebGL postprocessing, controls, loaders (including EXR/FBX and RGBE via HDRLoader), sampling/simplification, reflection/refraction, water, HTMLMesh, fonts and selected utilities—not the full upstream catalog.
-- **Why:** direct module imports and explicit shaders/subsystems keep dependencies visible and avoid pulling unrelated features into your application. No runtime dependency on Three.js.
-- **Usage:** raw TypeScript for a TS-capable bundler; import from defining modules, not `ek3d`. This implementation is not yet published—the npm `0.0.1` release is empty.
+ek3d is a TypeScript port of Three.js for canvas games and interactive 3D.
+It uses WebGL and has no runtime dependency on Three.js.
 
-This is a non-commercial project. Third-party example assets retain their own licenses;
-non-commercial use does not grant redistribution rights. See the
-[asset notices](public/examples/README.md) before publishing examples or assets.
+Import each class or function from its own module. There is no root `ek3d` import.
+The package contains TypeScript source, so use a bundler that supports TypeScript.
+Pass shaders and other required subsystems to the renderer explicitly.
+This keeps dependencies visible. It does not guarantee a smaller bundle.
+
+## Basic example
 
 ```typescript
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
@@ -30,4 +31,19 @@ document.body.append(renderer.domElement);
 renderer.render(scene, camera);
 ```
 
-Repository setup, scripts, API details and verification: [CONTRIBUTING.md](CONTRIBUTING.md).
+## Development and documentation
+
+The port includes controls, loaders, exporters, audio and WebGL postprocessing.
+It also includes tools for geometry, animation, water and reflections.
+It does not include the full Three.js addon catalog.
+WebGPU, TSL, WebXR and StereoCamera are not included.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, commands, API details and checks.
+
+Run `npm run docs:llms` to generate [llms.txt](public/llms.txt) and
+[llms-full.txt](public/llms-full.txt) from this README and the maintained source.
+The first file lists the modules. The second includes their full TypeScript source and comments.
+
+This is a non-commercial project. Example assets have their own licenses.
+Non-commercial use does not give you permission to share those assets.
+Read the [asset notices](public/examples/README.md) before publishing them.

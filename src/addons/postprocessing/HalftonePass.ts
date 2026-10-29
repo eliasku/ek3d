@@ -8,7 +8,7 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
 /**
  * Pass for creating a RGB halftone effect.
  *
- * ```typescript
+ * ```ts
  * const params = {
  * 	shape: 1,
  * 	radius: 4,
@@ -25,7 +25,6 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  * composer.addPass( halftonePass );
  * ```
  *
- * @three_import import { HalftonePass } from 'ek3d/addons/postprocessing/HalftonePass';
  */
 export class HalftonePass extends Pass {
   uniforms: Record<string, { value: any; needsUpdate?: boolean }>;

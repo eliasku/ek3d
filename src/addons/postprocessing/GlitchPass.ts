@@ -11,12 +11,11 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
 /**
  * Pass for a glitch effect, based on the DigitalGlitch shader.
  *
- * ```typescript
+ * ```ts
  * const glitchPass = new GlitchPass();
  * composer.addPass( glitchPass );
  * ```
  *
- * @three_import import { GlitchPass } from 'ek3d/addons/postprocessing/GlitchPass';
  */
 export class GlitchPass extends Pass {
   uniforms: Record<string, { value: any; needsUpdate?: boolean }>;

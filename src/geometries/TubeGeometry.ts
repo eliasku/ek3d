@@ -11,7 +11,7 @@ export type TubeGeometryJSON = Omit<Partial<TubeGeometry["parameters"]>, "path">
 /**
  * Creates a tube that extrudes along a 3D curve.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { Curve } from 'ek3d/extras/core/Curve';
  * import { Vector3 } from 'ek3d/math/Vector3';

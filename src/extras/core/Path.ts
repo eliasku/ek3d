@@ -11,7 +11,7 @@ import { LineCurve } from "../curves/LineCurve";
  * A 2D path representation. The class provides methods for creating paths
  * and contours of 2D shapes similar to the 2D Canvas API.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { Path } from 'ek3d/extras/core/Path';
  * import { BufferGeometry } from 'ek3d/core/BufferGeometry';

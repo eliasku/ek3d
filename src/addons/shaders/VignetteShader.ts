@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module VignetteShader
- * @three_import import { VignetteShader } from 'ek3d/addons/shaders/VignetteShader';
  */
 
 /**

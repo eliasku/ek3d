@@ -57,7 +57,7 @@ export interface ExtrudeGeometryJSON {
 /**
  * Creates extruded geometry from a path shape.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { Shape } from 'ek3d/extras/core/Shape';
  * import { ExtrudeGeometry } from 'ek3d/geometries/ExtrudeGeometry';

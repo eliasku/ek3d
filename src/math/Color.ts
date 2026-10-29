@@ -172,7 +172,7 @@ function hue2rgb(p?: any, q?: any, t?: any) {
  * conventionally using `ColorSpace.SRGB` (such as hexadecimals and CSS
  * strings) are converted to the working color space automatically.
  *
- * ```typescript
+ * ```ts
  * import { Color } from 'ek3d/math/Color';
  * import { ColorSpace } from 'ek3d/constants';
  *
@@ -180,7 +180,7 @@ function hue2rgb(p?: any, q?: any, t?: any) {
  * const color = new Color().setHex( 0x112233 );
  * ```
  * Source color spaces may be specified explicitly, to ensure correct conversions.
- * ```typescript
+ * ```ts
  * import { Color } from 'ek3d/math/Color';
  * import { ColorSpace } from 'ek3d/constants';
  *
@@ -194,7 +194,7 @@ function hue2rgb(p?: any, q?: any, t?: any) {
  * see <i>Color management</i>. Iterating through a Color instance will yield
  * its components (r, g, b) in the corresponding order. A Color can be initialised
  * in any of the following ways:
- * ```typescript
+ * ```ts
  * import { Color } from 'ek3d/math/Color';
  *
  * //empty constructor - will default white
@@ -459,7 +459,7 @@ export class Color {
    * you don't need the other CSS-style formats.
    *
    * For convenience, the list of names is exposed in `Color.NAMES` as a hash.
-   * ```typescript
+   * ```ts
    * import { Color } from 'ek3d/math/Color';
    *
    * Color.NAMES.aliceblue // returns 0xF0F8FF

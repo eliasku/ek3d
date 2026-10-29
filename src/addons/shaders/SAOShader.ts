@@ -5,7 +5,6 @@ import chunk_common from "../../renderers/shaders/ShaderChunk/common.glsl";
 import chunk_packing from "../../renderers/shaders/ShaderChunk/packing.glsl";
 /**
  * @module SAOShader
- * @three_import import { SAOShader } from 'ek3d/addons/shaders/SAOShader';
  */
 
 /**
@@ -173,7 +172,7 @@ ${chunk_packing}
 
 		void main() {
 			float centerDepth = getDepth( vUv );
-			
+
 			#ifdef USE_REVERSED_DEPTH_BUFFER
 				if( centerDepth <= 0.0 + EPSILON ) {
 					discard;

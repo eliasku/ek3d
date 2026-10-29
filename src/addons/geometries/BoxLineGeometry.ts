@@ -4,7 +4,7 @@ import { BufferGeometry } from "../../core/BufferGeometry";
 /**
  * A subdivided box outline for LineSegments.
  *
- * ```typescript
+ * ```ts
  * import { BoxLineGeometry } from "ek3d/addons/geometries/BoxLineGeometry";
  * import { LineBasicMaterial } from "ek3d/materials/LineBasicMaterial";
  * import { LineSegments } from "ek3d/objects/LineSegments";

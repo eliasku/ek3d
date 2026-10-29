@@ -13,7 +13,7 @@ import { warn } from "../utils";
  * the corresponding order.
  *
  * Note that three.js expects Quaternions to be normalized.
- * ```typescript
+ * ```ts
  * import { Quaternion } from 'ek3d/math/Quaternion';
  * import { Vector3 } from 'ek3d/math/Vector3';
  *

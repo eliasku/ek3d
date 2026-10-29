@@ -20,7 +20,7 @@ const _camera = /*@__PURE__*/ new Camera();
  * When the camera is transformed or its projection matrix is changed, it's necessary
  * to call the `update()` method of the respective helper.
  *
- * ```typescript
+ * ```ts
  * import { CameraHelper } from 'ek3d/helpers/CameraHelper';
  * import { PerspectiveCamera } from 'ek3d/cameras/PerspectiveCamera';
  * import { Scene } from 'ek3d/scenes/Scene';

@@ -13,7 +13,7 @@ const _vector = /*@__PURE__*/ new Vector3();
  * When the spot light or its target are transformed or light properties are
  * changed, it's necessary to call the `update()` method of the respective helper.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { SpotLight } from 'ek3d/lights/SpotLight';
  * import { SpotLightHelper } from 'ek3d/helpers/SpotLightHelper';

@@ -9,7 +9,6 @@ import type { Texture } from "../../textures/Texture";
 
 /**
  * @module GTAOShader
- * @three_import import { generateMagicSquareNoise, GTAOShader, GTAODepthShader, GTAOBlendShader } from 'ek3d/addons/shaders/GTAOShader';
  */
 
 /**

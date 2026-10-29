@@ -4,7 +4,7 @@ import { Vector3 } from "../math/Vector3";
 /**
  * A class for generating a sphere geometry.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { SphereGeometry } from 'ek3d/geometries/SphereGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

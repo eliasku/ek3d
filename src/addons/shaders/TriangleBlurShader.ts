@@ -3,7 +3,6 @@ import { Vector2 } from "../../math/Vector2";
 import chunk_common from "../../renderers/shaders/ShaderChunk/common.glsl";
 /**
  * @module TriangleBlurShader
- * @three_import import { TriangleBlurShader } from 'ek3d/addons/shaders/TriangleBlurShader';
  */
 
 /**

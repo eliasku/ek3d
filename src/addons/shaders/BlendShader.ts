@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module BlendShader
- * @three_import import { BlendShader } from 'ek3d/addons/shaders/BlendShader';
  */
 
 /**

@@ -488,7 +488,7 @@ let sceneGraph: Group = new Group();
  * Compressed binary array properties need an explicitly supplied zlib runtime, so the package
  * never bundles one. Supply any object exposing an fflate-compatible `unzlibSync`:
  *
- * ```typescript
+ * ```ts
  * import { FBXLoader, type FBXZlibRuntime } from 'ek3d/addons/loaders/FBXLoader';
  *
  * async function loadFBX( url: string, runtime: FBXZlibRuntime ) {

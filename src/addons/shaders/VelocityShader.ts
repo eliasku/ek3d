@@ -35,7 +35,6 @@ import chunk_displacementmap_pars_vertex from "../../renderers/shaders/ShaderChu
 import chunk_displacementmap_vertex from "../../renderers/shaders/ShaderChunk/displacementmap_vertex.glsl";
 /**
  * @module VelocityShader
- * @three_import import { VelocityShader } from 'ek3d/addons/shaders/VelocityShader';
  */
 
 /**

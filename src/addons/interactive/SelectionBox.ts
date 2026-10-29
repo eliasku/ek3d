@@ -41,7 +41,7 @@ type SelectionCamera = PerspectiveCamera | OrthographicCamera;
  * This class can be used to select 3D objects in a scene with a selection box.
  * It is recommended to visualize the selected area with the help of {@link SelectionHelper}.
  *
- * ```typescript
+ * ```ts
  * const selectionBox = new SelectionBox( camera, scene );
  * const selectedObjects = selectionBox.select( startPoint, endPoint );
  * ```

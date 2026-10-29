@@ -15,7 +15,7 @@ const _normalMatrix = new Matrix3();
 /**
  * Visualizes an object's vertex normals. The geometry must have a normal attribute.
  *
- * ```typescript
+ * ```ts
  * import { VertexNormalsHelper } from 'ek3d/addons/helpers/VertexNormalsHelper';
  * import { BoxGeometry } from 'ek3d/geometries/BoxGeometry';
  * import { MeshStandardMaterial } from 'ek3d/materials/MeshStandardMaterial';

@@ -49,7 +49,7 @@ interface Attributes {
 
 /** Loads compressed SPZ Gaussian splat data into geometry.
  *
- * ```typescript
+ * ```ts
  * import { SPZLoader, type SPZGzipRuntime, type SPZZSTDRuntime } from "ek3d/addons/loaders/SPZLoader";
  * async function loadSplat(gzip: SPZGzipRuntime, zstd: SPZZSTDRuntime) {
  *   const loader = new SPZLoader().setGzipRuntime(gzip).setZSTDRuntime(zstd);

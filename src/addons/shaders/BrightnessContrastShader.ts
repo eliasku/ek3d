@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module BrightnessContrastShader
- * @three_import import { BrightnessContrastShader } from 'ek3d/addons/shaders/BrightnessContrastShader';
  */
 
 /**

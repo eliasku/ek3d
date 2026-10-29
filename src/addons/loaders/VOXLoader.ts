@@ -425,7 +425,7 @@ export function buildData3DTexture(chunk: VOXChunk): Data3DTexture {
 /**
  * A loader for the VOX format.
  *
- * ```typescript
+ * ```ts
  * import { VOXLoader } from "ek3d/addons/loaders/VOXLoader";
  *
  * const loader = new VOXLoader();

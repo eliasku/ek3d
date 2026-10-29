@@ -292,7 +292,7 @@ function ensureBinary(buffer: ArrayBufferLike | string): ArrayBufferLike {
  * - ASCII decoding assumes file is UTF-8.
  *
  * For binary STLs geometry might contain colors for vertices. To use it:
- * ```typescript
+ * ```ts
  * import { STLLoader } from "ek3d/addons/loaders/STLLoader";
  * import { MeshPhongMaterial } from "ek3d/materials/MeshPhongMaterial";
  * import { Mesh } from "ek3d/objects/Mesh";
@@ -309,7 +309,7 @@ function ensureBinary(buffer: ArrayBufferLike | string): ArrayBufferLike {
  * Groups can be used to assign a different color by defining an array of materials with the same length of
  * geometry.groups and passing it to the Mesh constructor:
  *
- * ```typescript
+ * ```ts
  * import { STLLoader } from "ek3d/addons/loaders/STLLoader";
  * import { MeshPhongMaterial } from "ek3d/materials/MeshPhongMaterial";
  * import { Mesh } from "ek3d/objects/Mesh";

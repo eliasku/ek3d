@@ -89,7 +89,7 @@ function lineToLineClosestPoints(
  * the player or other dynamic 3D objects.
  *
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { Capsule } from 'ek3d/addons/math/Capsule';
  * import { Octree } from 'ek3d/addons/math/Octree';
@@ -100,7 +100,6 @@ function lineToLineClosestPoints(
  * const result = octree.capsuleIntersect(playerCollider); // collision detection
  * ```
  *
- * @three_import import { Octree } from 'ek3d/addons/math/Octree';
  */
 export class Octree {
   box: Box3 | null | undefined;

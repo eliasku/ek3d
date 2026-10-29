@@ -37,7 +37,7 @@ export interface TextGeometryJSON extends ExtrudeGeometryJSON {
  *
  * `TextGeometry` uses [typeface.json](https://gero3.github.io/facetype.js/) generated fonts.
  *
- * ```typescript
+ * ```ts
  * import { FontLoader } from 'ek3d/addons/loaders/FontLoader';
  * import { TextGeometry } from 'ek3d/addons/geometries/TextGeometry';
  *

@@ -21,7 +21,7 @@ import { Object3D } from "../core/Object3D";
  *
  * This light can cast shadows - see the {@link DirectionalLightShadow} for details.
  *
- * ```typescript
+ * ```ts
  * import { DirectionalLight } from 'ek3d/lights/DirectionalLight';
  * import { Scene } from 'ek3d/scenes/Scene';
  *

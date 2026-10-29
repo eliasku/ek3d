@@ -24,7 +24,7 @@ const _intersectPointOnSegment = /*@__PURE__*/ new Vector3();
  * A continuous line. The line are rendered by connecting consecutive
  * vertices with straight lines.
  *
- * ```typescript
+ * ```ts
  * import { BufferGeometry } from 'ek3d/core/BufferGeometry';
  * import { Line } from 'ek3d/objects/Line';
  * import { LineBasicMaterial } from 'ek3d/materials/LineBasicMaterial';

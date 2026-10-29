@@ -3,7 +3,6 @@ import chunk_common from "../../renderers/shaders/ShaderChunk/common.glsl";
 import chunk_packing from "../../renderers/shaders/ShaderChunk/packing.glsl";
 /**
  * @module BokehShader
- * @three_import import { BokehShader } from 'ek3d/addons/shaders/BokehShader';
  */
 
 /**

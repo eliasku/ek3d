@@ -10,12 +10,11 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  * with a raw GLSL shader object. Useful for implementing custom
  * effects.
  *
- * ```typescript
+ * ```ts
  * const fxaaPass = new ShaderPass( FXAAShader );
  * composer.addPass( fxaaPass );
  * ```
  *
- * @three_import import { ShaderPass } from 'ek3d/addons/postprocessing/ShaderPass';
  */
 export class ShaderPass extends Pass {
   textureID: string;

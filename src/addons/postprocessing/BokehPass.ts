@@ -24,7 +24,7 @@ export interface BokehPassOptions {
 /**
  * Pass for creating depth of field (DOF) effect.
  *
- * ```typescript
+ * ```ts
  * const bokehPass = new BokehPass( scene, camera, {
  * 	focus: 500
  * 	aperture: 5,
@@ -33,7 +33,6 @@ export interface BokehPassOptions {
  * composer.addPass( bokehPass );
  * ```
  *
- * @three_import import { BokehPass } from 'ek3d/addons/postprocessing/BokehPass';
  */
 export class BokehPass extends Pass {
   scene: Scene;
@@ -112,7 +111,7 @@ export class BokehPass extends Pass {
      * The pass uniforms. Use this object if you want to update the
      * `focus`, `aperture` or `maxblur` values at runtime.
      *
-     * ```typescript
+     * ```ts
      * pass.uniforms.focus.value = focus;
      * pass.uniforms.aperture.value = aperture;
      * pass.uniforms.maxblur.value = maxblur;

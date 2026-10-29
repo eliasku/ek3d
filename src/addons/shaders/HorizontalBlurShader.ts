@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module HorizontalBlurShader
- * @three_import import { HorizontalBlurShader } from 'ek3d/addons/shaders/HorizontalBlurShader';
  */
 
 /**

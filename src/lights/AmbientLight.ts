@@ -5,7 +5,7 @@ import { Light } from "./Light";
  *
  * It cannot be used to cast shadows as it does not have a direction.
  *
- * ```typescript
+ * ```ts
  * import { AmbientLight } from 'ek3d/lights/AmbientLight';
  * import { Scene } from 'ek3d/scenes/Scene';
  *

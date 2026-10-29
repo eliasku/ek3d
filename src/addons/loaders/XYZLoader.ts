@@ -8,7 +8,7 @@ import { Color } from "../../math/Color";
 /**
  * Loads XYZ point clouds, with optional RGB colors in the sRGB 0–255 range.
  *
- * ```typescript
+ * ```ts
  * import { XYZLoader } from "ek3d/addons/loaders/XYZLoader";
  * import { PointsMaterial } from "ek3d/materials/PointsMaterial";
  * import { Points } from "ek3d/objects/Points";

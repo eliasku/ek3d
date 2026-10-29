@@ -2,7 +2,7 @@ import { PolyhedronGeometry } from "./PolyhedronGeometry";
 /**
  * A geometry class for representing an octahedron.
  *
- * ```typescript
+ * ```ts
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { OctahedronGeometry } from 'ek3d/geometries/OctahedronGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

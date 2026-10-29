@@ -36,7 +36,7 @@ const STATE = {
 /**
  * This class can be used to provide a drag'n'drop interaction.
  *
- * ```typescript
+ * ```ts
  * const controls = new DragControls( objects, camera, renderer.domElement );
  *
  * // add event listener to highlight dragged objects

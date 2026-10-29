@@ -7,7 +7,7 @@ import { Color } from "../math/Color";
  * The helper is an object to define grids. Grids are two-dimensional
  * arrays of lines.
  *
- * ```typescript
+ * ```ts
  * import { GridHelper } from 'ek3d/helpers/GridHelper';
  * import { Scene } from 'ek3d/scenes/Scene';
  *

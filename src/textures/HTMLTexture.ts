@@ -9,13 +9,12 @@ import { Texture } from "./Texture";
  *
  * @augments Texture
  *
- * ```typescript
+ * ```ts
  * const element = new HTMLDivElement();
  * const texture = new HTMLTexture( element );
  * ```
  *
  * @demo examples/webgl_materials_texture_html.html
- * @three_import import { HTMLTexture } from 'ek3d/textures/HTMLTexture';
  */
 export class HTMLTexture extends Texture {
   /**

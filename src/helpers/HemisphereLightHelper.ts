@@ -16,7 +16,7 @@ const _color2 = /*@__PURE__*/ new Color();
  * When the hemisphere light is transformed or its light properties are changed,
  * it's necessary to call the `update()` method of the respective helper.
  *
- * ```typescript
+ * ```ts
  * import { HemisphereLight } from 'ek3d/lights/HemisphereLight';
  * import { HemisphereLightHelper } from 'ek3d/helpers/HemisphereLightHelper';
  * import { Scene } from 'ek3d/scenes/Scene';

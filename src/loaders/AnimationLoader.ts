@@ -7,7 +7,7 @@ import { error } from "../utils";
  * Class for loading animation clips in the JSON format. The files are internally
  * loaded via {@link FileLoader}.
  *
- * ```typescript
+ * ```ts
  * import { AnimationLoader } from 'ek3d/loaders/AnimationLoader';
  *
  * const loader = new AnimationLoader();

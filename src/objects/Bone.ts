@@ -3,7 +3,7 @@ import { Object3D } from "../core/Object3D";
  * A bone which is part of a {@link Skeleton}. The skeleton in turn is used by
  * the {@link SkinnedMesh}.
  *
- * ```typescript
+ * ```ts
  * import { Bone } from 'ek3d/objects/Bone';
  *
  * const root = new Bone();

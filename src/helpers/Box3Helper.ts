@@ -7,7 +7,7 @@ import { BufferGeometry } from "../core/BufferGeometry";
 /**
  * A helper object to visualize an instance of {@link Box3}.
  *
- * ```typescript
+ * ```ts
  * import { Box3 } from 'ek3d/math/Box3';
  * import { Box3Helper } from 'ek3d/helpers/Box3Helper';
  * import { Scene } from 'ek3d/scenes/Scene';

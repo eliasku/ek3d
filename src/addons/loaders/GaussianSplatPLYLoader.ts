@@ -30,7 +30,7 @@ const REST_PROPERTY_PATTERN = /^f_rest_\d+$/;
  * Loads GraphDECO/INRIA Gaussian splat PLY files, detecting spherical harmonics
  * degree from the header and converting the properties to splat geometry.
  *
- * ```typescript
+ * ```ts
  * import { GaussianSplatPLYLoader } from "ek3d/addons/loaders/GaussianSplatPLYLoader";
  * const geometry = await new GaussianSplatPLYLoader().loadAsync("./point_cloud.ply");
  * console.log(geometry.getAttribute("position"));

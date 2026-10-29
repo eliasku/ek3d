@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module BleachBypassShader
- * @three_import import { BleachBypassShader } from 'ek3d/addons/shaders/BleachBypassShader';
  */
 
 /**

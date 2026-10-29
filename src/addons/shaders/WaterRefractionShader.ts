@@ -5,7 +5,6 @@ import chunk_tonemapping_fragment from "../../renderers/shaders/ShaderChunk/tone
 import chunk_colorspace_fragment from "../../renderers/shaders/ShaderChunk/colorspace_fragment.glsl";
 /**
  * @module WaterRefractionShader
- * @three_import import { WaterRefractionShader } from 'ek3d/addons/shaders/WaterRefractionShader';
  */
 
 /**

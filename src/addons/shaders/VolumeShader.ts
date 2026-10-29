@@ -3,7 +3,6 @@ import { Vector2 } from "../../math/Vector2";
 import { Vector3 } from "../../math/Vector3";
 /**
  * @module VolumeShader
- * @three_import import { VolumeRenderShader1 } from 'ek3d/addons/shaders/VolumeShader';
  */
 
 /**

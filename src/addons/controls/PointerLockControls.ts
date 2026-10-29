@@ -28,7 +28,7 @@ const _PI_2 = Math.PI / 2;
  * The implementation of this class is based on the [Pointer Lock API](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API).
  * `PointerLockControls` is a perfect choice for first person 3D games.
  *
- * ```typescript
+ * ```ts
  * const controls = new PointerLockControls( camera, document.body );
  *
  * // add event listener to show/hide a UI (e.g. the game's menu)

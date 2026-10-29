@@ -3,7 +3,7 @@ import { Object3D } from "../core/Object3D";
  * This is almost identical to an {@link Object3D}. Its purpose is to
  * make working with groups of objects syntactically clearer.
  *
- * ```typescript
+ * ```ts
  * import { BoxGeometry } from 'ek3d/geometries/BoxGeometry';
  * import { Group } from 'ek3d/objects/Group';
  * import { Mesh } from 'ek3d/objects/Mesh';

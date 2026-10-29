@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module FocusShader
- * @three_import import { FocusShader } from 'ek3d/addons/shaders/FocusShader';
  */
 
 /**

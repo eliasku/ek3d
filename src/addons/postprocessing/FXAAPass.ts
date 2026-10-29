@@ -4,12 +4,11 @@ import { ShaderPass } from "./ShaderPass";
 /**
  * A pass for applying FXAA.
  *
- * ```typescript
+ * ```ts
  * const fxaaPass = new FXAAPass();
  * composer.addPass( fxaaPass );
  * ```
  *
- * @three_import import { FXAAPass } from 'ek3d/addons/postprocessing/FXAAPass';
  */
 export class FXAAPass extends ShaderPass {
   /**

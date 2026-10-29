@@ -28,7 +28,7 @@ const _intersectionPointWorld = /*@__PURE__*/ new Vector3();
 /**
  * Class representing triangular polygon mesh based objects.
  *
- * ```typescript
+ * ```ts
  * import { BoxGeometry } from 'ek3d/geometries/BoxGeometry';
  * import { Mesh } from 'ek3d/objects/Mesh';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

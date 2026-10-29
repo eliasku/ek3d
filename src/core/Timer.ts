@@ -7,7 +7,7 @@
  * - The class can make use of the Page Visibility API to avoid large time delta values when the app
  * is inactive (e.g. tab switched or browser hidden).
  *
- * ```typescript
+ * ```ts
  * import { Timer } from 'ek3d/core/Timer';
  *
  * const timer = new Timer();

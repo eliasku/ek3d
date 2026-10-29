@@ -29,7 +29,7 @@ interface WorkerPoolQueueEntry {
 /**
  * A simple pool for managing Web Workers.
  *
- * ```typescript
+ * ```ts
  * import { WorkerPool } from 'ek3d/addons/utils/WorkerPool';
  *
  * const pool = new WorkerPool();
@@ -38,7 +38,6 @@ interface WorkerPoolQueueEntry {
  * pool.dispose();
  * ```
  *
- * @three_import import { WorkerPool } from 'ek3d/addons/utils/WorkerPool';
  */
 export class WorkerPool {
   /** The size of the pool. */

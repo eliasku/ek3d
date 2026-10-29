@@ -12,7 +12,6 @@ import { Mesh } from "../../objects/Mesh";
  *
  * Port of: {@link http://webglsamples.org/blob/blob.html}
  *
- * @three_import import { MarchingCubes } from 'ek3d/addons/objects/MarchingCubes';
  */
 export class MarchingCubes extends Mesh<Material> {
   isMarchingCubes: boolean = true;

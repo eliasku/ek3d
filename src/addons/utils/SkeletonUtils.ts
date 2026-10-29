@@ -15,7 +15,6 @@ import type { NumericAnimationBuffer } from "../../math/Interpolant";
 
 /**
  * @module SkeletonUtils
- * @three_import import * as SkeletonUtils from 'ek3d/addons/utils/SkeletonUtils';
  */
 
 /** An object holding a skeleton, i.e. a skinned mesh or SkeletonHelper. */

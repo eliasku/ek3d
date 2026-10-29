@@ -132,7 +132,7 @@ export type DRACOOnProgress = (event: ProgressEvent) => void;
  * will need to be attached to {@link GLTFLoader} so that the loader decoder can be reused, using
  * the {@link GLTFLoader#setDRACOLoader} method.
  *
- * ```typescript
+ * ```ts
  * const loader = new DRACOLoader();
  * const geometry = await loader.loadAsync( 'models/draco/bunny.drc' );
  * geometry.computeVertexNormals(); // optional

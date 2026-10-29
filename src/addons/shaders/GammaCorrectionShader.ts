@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module GammaCorrectionShader
- * @three_import import { GammaCorrectionShader } from 'ek3d/addons/shaders/GammaCorrectionShader';
  */
 
 /**

@@ -8,7 +8,7 @@ import { PointLightShadow } from "./PointLightShadow";
  *
  * This light can cast shadows - see the {@link PointLightShadow} for details.
  *
- * ```typescript
+ * ```ts
  * import { PointLight } from 'ek3d/lights/PointLight';
  * import { Scene } from 'ek3d/scenes/Scene';
  *

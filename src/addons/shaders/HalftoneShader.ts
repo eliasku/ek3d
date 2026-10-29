@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module HalftoneShader
- * @three_import import { HalftoneShader } from 'ek3d/addons/shaders/HalftoneShader';
  */
 
 /**

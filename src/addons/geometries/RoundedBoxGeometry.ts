@@ -41,7 +41,7 @@ function getUv(
 /**
  * A special type of box geometry with rounded corners and edges.
  *
- * ```typescript
+ * ```ts
  * import { RoundedBoxGeometry } from 'ek3d/addons/geometries/RoundedBoxGeometry';
  * import { MeshStandardMaterial } from 'ek3d/materials/MeshStandardMaterial';
  * import { Mesh } from 'ek3d/objects/Mesh';

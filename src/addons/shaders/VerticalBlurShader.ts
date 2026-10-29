@@ -1,7 +1,6 @@
 import type { Texture } from "../../textures/Texture";
 /**
  * @module VerticalBlurShader
- * @three_import import { VerticalBlurShader } from 'ek3d/addons/shaders/VerticalBlurShader';
  */
 
 /**

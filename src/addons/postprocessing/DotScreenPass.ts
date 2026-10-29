@@ -9,12 +9,11 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
 /**
  * Pass for creating a dot-screen effect.
  *
- * ```typescript
+ * ```ts
  * const pass = new DotScreenPass( new Vector2( 0, 0 ), 0.5, 0.8 );
  * composer.addPass( pass );
  * ```
  *
- * @three_import import { DotScreenPass } from 'ek3d/addons/postprocessing/DotScreenPass';
  */
 export class DotScreenPass extends Pass {
   uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
@@ -33,7 +32,7 @@ export class DotScreenPass extends Pass {
     /**
      * The pass uniforms. Use this object if you want to update the
      * `center`, `angle` or `scale` value at runtime.
-     * ```typescript
+     * ```ts
      * pass.uniforms.center.value.set( 0.25, 0.25 );
      * ```
      */
