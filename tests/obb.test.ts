@@ -62,3 +62,22 @@ test("OBB world transforms preserve dimensions and collision behavior", () => {
   assert.ok(box.containsPoint(new Vector3(0, 6, 7)));
   assert.ok(!box.containsPoint(new Vector3(5, 9, 7)));
 });
+
+test("OBB composes world rotation before its local rotation", () => {
+  const local = new Matrix4().makeRotationX(0.7);
+  const world = new Matrix4().makeRotationZ(0.4);
+  const box = new OBB(new Vector3(), new Vector3(1, 2, 3), new Matrix3().setFromMatrix4(local));
+  box.applyMatrix4(world);
+  const point = new Vector3(0, 1.9, 0).applyMatrix4(local).applyMatrix4(world);
+  assert.ok(box.containsPoint(point));
+  const expected = new Matrix3().setFromMatrix4(world.clone().multiply(local));
+  for (let i = 0; i < 9; i++) assert.ok(Math.abs(box.rotation.elements[i] - expected.elements[i]) < 1e-10);
+});
+
+test("OBB mirrored transforms keep nonnegative extents and valid containment", () => {
+  const box = new OBB(new Vector3(), new Vector3(1, 2, 3));
+  box.applyMatrix4(new Matrix4().makeScale(-2, 3, 4));
+  near(box.halfSize, new Vector3(2, 6, 12));
+  assert.ok(box.containsPoint(new Vector3(1.9, 5.9, 11.9)));
+  assert.ok(!box.containsPoint(new Vector3(2.1, 0, 0)));
+});

@@ -49,6 +49,8 @@ import { Frustum } from "../src/math/Frustum";
 import { Frustum as UpstreamFrustum } from "../upstream/three.js/src/math/Frustum.js";
 import { OrthographicCamera } from "../src/cameras/OrthographicCamera";
 import { OrthographicCamera as UpstreamOrthographicCamera } from "../upstream/three.js/src/cameras/OrthographicCamera.js";
+import { DepthFunc } from "../src/constants";
+import { ReversedDepthFuncs } from "../src/utils";
 
 // Differential checks guard against migration changing the numerical algorithms.
 test("compose/invert/transform agrees exactly with upstream, including negative scale", () => {
@@ -567,4 +569,27 @@ test("scene serialization preserves shared WebGL assets without a node-material 
   assert.equal(serialized.object.children[0].geometry, geometry.uuid);
   assert.equal(serialized.object.children[1].material, material.uuid);
   assert.deepEqual(serialized.object.children[1].matrix, second.matrix.toArray());
+});
+
+test("reversing depth preserves comparison truth for every depth function", () => {
+  const comparisons = [
+    [DepthFunc.Never, () => false],
+    [DepthFunc.Always, () => true],
+    [DepthFunc.Equal, (a: number, b: number) => a === b],
+    [DepthFunc.NotEqual, (a: number, b: number) => a !== b],
+    [DepthFunc.Less, (a: number, b: number) => a < b],
+    [DepthFunc.LessEqual, (a: number, b: number) => a <= b],
+    [DepthFunc.Greater, (a: number, b: number) => a > b],
+    [DepthFunc.GreaterEqual, (a: number, b: number) => a >= b],
+  ] as const;
+  for (const [depthFunc, compare] of comparisons) {
+    const reversed = comparisons.find(([value]) => value === ReversedDepthFuncs[depthFunc])![1];
+    for (const [a, b] of [
+      [0.25, 0.75],
+      [0.5, 0.5],
+      [0.75, 0.25],
+    ]) {
+      assert.equal(reversed(1 - a, 1 - b), compare(a, b), `depth function ${depthFunc}: ${a}, ${b}`);
+    }
+  }
 });

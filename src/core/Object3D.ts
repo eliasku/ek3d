@@ -367,7 +367,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    * A callback that is executed immediately before a 3D object is rendered.
    *
    * @param renderer - The renderer.
-   * @param object - The 3D object.
+   * @param scene - The scene.
    * @param camera - The camera that is used to render the scene.
    * @param geometry - The 3D object's geometry.
    * @param material - The 3D object's material.
@@ -379,7 +379,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    * A callback that is executed immediately after a 3D object is rendered.
    *
    * @param renderer - The renderer.
-   * @param object - The 3D object.
+   * @param scene - The scene.
    * @param camera - The camera that is used to render the scene.
    * @param geometry - The 3D object's geometry.
    * @param material - The 3D object's material.

@@ -1084,6 +1084,8 @@ export function mergeGroups(geometry: BufferGeometry): BufferGeometry {
   for (let i = 0; i < groups.length; i++) {
     const group = groups[i];
 
+    if (group.count === Infinity) group.count = index.count - group.start;
+
     const groupStart = group.start;
     const groupLength = groupStart + group.count;
 

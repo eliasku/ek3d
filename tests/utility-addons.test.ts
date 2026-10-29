@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "vite-plus/test";
 import { RectAreaLightTexturesLib } from "../src/addons/lights/RectAreaLightTexturesLib";
 import { RectAreaLightUniformsLib } from "../src/addons/lights/RectAreaLightUniformsLib";
+import { mergeGroups } from "../src/addons/utils/BufferGeometryUtils";
 import { compressNormals, compressPositions, compressUvs } from "../src/addons/utils/GeometryCompressionUtils";
 import {
   reduceVertices,
@@ -154,4 +155,25 @@ test("rectangular light libraries expose the existing LTC data for explicit comp
   library.LTC_FLOAT_2?.dispose();
   library.LTC_HALF_1?.dispose();
   library.LTC_HALF_2?.dispose();
+});
+
+test("mergeGroups resolves infinite tails before sorting and merging material groups", () => {
+  for (const indexed of [false, true]) {
+    const geometry = new BufferGeometry();
+    geometry.setAttribute("position", new Float32BufferAttribute(new Float32Array(27), 3));
+    if (indexed) geometry.setIndex([8, 7, 6, 5, 4, 3, 2, 1, 0]);
+    geometry.addGroup(0, 3, 1);
+    geometry.addGroup(3, 3, 0);
+    geometry.addGroup(6, Infinity, 0);
+    mergeGroups(geometry);
+    assert.deepEqual(
+      Array.from(geometry.getIndex()!.array),
+      indexed ? [5, 4, 3, 2, 1, 0, 8, 7, 6] : [3, 4, 5, 6, 7, 8, 0, 1, 2],
+    );
+    assert.deepEqual(geometry.groups, [
+      { start: 0, count: 6, materialIndex: 0 },
+      { start: 6, count: 3, materialIndex: 1 },
+    ]);
+    geometry.dispose();
+  }
 });

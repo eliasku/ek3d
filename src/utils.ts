@@ -343,12 +343,12 @@ export function toReversedProjectionMatrix(projectionMatrix: Matrix4) {
  * @private
  */
 export const ReversedDepthFuncs: any = {
-  [DepthFunc.Never]: DepthFunc.Always,
+  [DepthFunc.Never]: DepthFunc.Never,
   [DepthFunc.Less]: DepthFunc.Greater,
-  [DepthFunc.Equal]: DepthFunc.NotEqual,
+  [DepthFunc.Equal]: DepthFunc.Equal,
   [DepthFunc.LessEqual]: DepthFunc.GreaterEqual,
-  [DepthFunc.Always]: DepthFunc.Never,
+  [DepthFunc.Always]: DepthFunc.Always,
   [DepthFunc.Greater]: DepthFunc.Less,
-  [DepthFunc.NotEqual]: DepthFunc.Equal,
+  [DepthFunc.NotEqual]: DepthFunc.NotEqual,
   [DepthFunc.GreaterEqual]: DepthFunc.LessEqual,
 };

@@ -10,8 +10,8 @@ The ported Three.js snapshot is pinned to:
 
 - Repository: [https://github.com/mrdoob/three.js/](https://github.com/mrdoob/three.js/)
 - Branch at the snapshot: `dev`
-- Commit: [`e06d724a29df5b44c6ad878207974eb09ed7e0d9`](https://github.com/mrdoob/three.js/commit/e06d724a29df5b44c6ad878207974eb09ed7e0d9)
-- Commit date: `Mon Oct 26 23:41:02 2026 +0100`
+- Commit: [`56344393df8f47e725c4e706b61e248b23d3496d`](https://github.com/mrdoob/three.js/commit/56344393df8f47e725c4e706b61e248b23d3496d)
+- Commit date: `Thu Oct 29 10:00:57 2026 +0100`
 
 Use this immutable commit as the baseline for future upstream diffs and ek3d updates, not the moving `dev` tip.
 
