@@ -16,7 +16,7 @@ import chunk_project_vertex from "../../renderers/shaders/ShaderChunk/project_ve
  * Requires #define RINGS and SAMPLES integers, supplied through
  * `ShaderMaterial.defines`:
  *
- * ```ts
+ * ```typescript
  * import { BokehShader } from 'ek3d/addons/shaders/BokehShader2';
  * import { ShaderMaterial } from 'ek3d/materials/ShaderMaterial';
  *
@@ -47,10 +47,10 @@ export const BokehShader = {
 
     maxblur: { value: 1.0 },
 
-    showFocus: { value: 0 },
-    manualdof: { value: 0 },
-    vignetting: { value: 0 },
-    depthblur: { value: 0 },
+    showFocus: { value: 0 as number | boolean },
+    manualdof: { value: 0 as number | boolean },
+    vignetting: { value: 0 as number | boolean },
+    depthblur: { value: 0 as number | boolean },
 
     threshold: { value: 0.5 },
     gain: { value: 2.0 },
@@ -60,11 +60,11 @@ export const BokehShader = {
     znear: { value: 0.1 },
     zfar: { value: 100 },
 
-    noise: { value: 1 },
+    noise: { value: 1 as number | boolean },
     dithering: { value: 0.0001 },
-    pentagon: { value: 0 },
+    pentagon: { value: 0 as number | boolean },
 
-    shaderFocus: { value: 1 },
+    shaderFocus: { value: 1 as number | boolean },
     focusCoords: { value: new Vector2() },
   },
 

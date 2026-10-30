@@ -298,7 +298,7 @@ export function mergeGeometries(geometries: BufferGeometry[], useGroups: boolean
 
   if (isIndexed) {
     let indexOffset = 0;
-    const mergedIndex = [];
+    const mergedIndex: number[] = [];
 
     for (let i = 0; i < geometries.length; ++i) {
       const index = geometries[i].index!;
@@ -708,7 +708,7 @@ export function toTrianglesDrawMode(geometry: BufferGeometry, drawMode: number):
     // generate index if not present
 
     if (index === null) {
-      const indices = [];
+      const indices: number[] = [];
 
       const position = geometry.getAttribute("position");
 
@@ -730,7 +730,7 @@ export function toTrianglesDrawMode(geometry: BufferGeometry, drawMode: number):
     //
 
     const numberOfTriangles = index.count - 2;
-    const newIndices = [];
+    const newIndices: number[] = [];
 
     if (drawMode === DrawMode.TriangleFan) {
       // gl.TRIANGLE_FAN
@@ -1065,7 +1065,7 @@ export function mergeGroups(geometry: BufferGeometry): BufferGeometry {
 
   if (geometry.getIndex() === null) {
     const positionAttribute = geometry.getAttribute("position")!;
-    const indices = [];
+    const indices: number[] = [];
 
     for (let i = 0; i < positionAttribute.count; i += 3) {
       indices.push(i, i + 1, i + 2);
@@ -1078,7 +1078,7 @@ export function mergeGroups(geometry: BufferGeometry): BufferGeometry {
 
   const index = geometry.getIndex()!;
 
-  const newIndices = [];
+  const newIndices: number[] = [];
 
   for (let i = 0; i < groups.length; i++) {
     const group = groups[i];

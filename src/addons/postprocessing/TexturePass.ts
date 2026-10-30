@@ -9,7 +9,7 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
 /**
  * This pass can be used to render a texture over the entire screen.
  *
- * ```ts
+ * ```typescript
  * const texture = new TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' );
  * texture.colorSpace = ColorSpace.SRGB;
  *
@@ -22,7 +22,7 @@ export class TexturePass extends Pass {
   map: Texture;
   opacity: number;
   needsSwap: boolean;
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+  uniforms: typeof CopyShader.uniforms;
   material: ShaderMaterial;
   _fsQuad: FullScreenQuad;
 

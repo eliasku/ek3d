@@ -59,8 +59,7 @@ export class UniformsGroup extends EventDispatcher {
    * @param uniform - The uniform to add.
    * @return A reference to this uniforms group.
    */
-  add(uniform: Uniform | Uniform[]): UniformsGroup;
-  add(uniform?: any): UniformsGroup {
+  add(uniform: Uniform | Uniform[]): UniformsGroup {
     this.uniforms.push(uniform);
     return this;
   }
@@ -70,8 +69,7 @@ export class UniformsGroup extends EventDispatcher {
    * @param uniform - The uniform to remove.
    * @return A reference to this uniforms group.
    */
-  remove(uniform: Uniform | Uniform[]): UniformsGroup;
-  remove(uniform?: any): UniformsGroup {
+  remove(uniform: Uniform | Uniform[]): UniformsGroup {
     const index = this.uniforms.indexOf(uniform);
     if (index !== -1) this.uniforms.splice(index, 1);
     return this;
@@ -119,7 +117,7 @@ export class UniformsGroup extends EventDispatcher {
     for (let i = 0, l = uniformsSource.length; i < l; i++) {
       const uniform = uniformsSource[i];
       if (Array.isArray(uniform)) {
-        this.uniforms.push(uniform.map((u?: any) => u.clone()));
+        this.uniforms.push(uniform.map((u) => u.clone()));
       } else {
         this.uniforms.push(uniform.clone());
       }

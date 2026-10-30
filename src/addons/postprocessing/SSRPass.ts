@@ -17,6 +17,11 @@ import type { WebGLRenderTarget as RT } from "../../renderers/WebGLRenderTarget"
 import type { Material } from "../../materials/Material";
 import type { ReflectorForSSRPass } from "../objects/ReflectorForSSRPass";
 
+type SSRMaterialObject = Object3D & {
+  material?: Material | Material[];
+  _SSRPassBackupMaterial?: Material | Material[];
+};
+
 /** SSR pass constructor options. */
 export interface SSRPassOptions {
   /** The renderer. */
@@ -40,15 +45,15 @@ export interface SSRPassOptions {
 /**
  * A pass for a basic SSR effect.
  *
- * ```ts
- * const ssrPass = new SSRPass( {
- * 	renderer,
- * 	scene,
- * 	camera,
- * 	width: innerWidth,
- * 	height: innerHeight
- * } );
- * composer.addPass( ssrPass );
+ * ```typescript
+ * import { SSRPass, type SSRPassOptions } from 'ek3d/addons/postprocessing/SSRPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ *
+ * function addReflections(composer: EffectComposer, options: SSRPassOptions): SSRPass {
+ *   const pass = new SSRPass(options);
+ *   composer.addPass(pass);
+ *   return pass;
+ * }
  * ```
  *
  */
@@ -738,16 +743,18 @@ export class SSRPass extends Pass {
     }
 
     this.scene.traverseVisible((child) => {
-      (child as any)._SSRPassBackupMaterial = child.material;
+      const object = child as SSRMaterialObject;
+      object._SSRPassBackupMaterial = object.material;
       if (this._selects!.includes(child)) {
-        (child as any).material = this.metalnessOnMaterial;
+        object.material = this.metalnessOnMaterial;
       } else {
-        (child as any).material = this.metalnessOffMaterial;
+        object.material = this.metalnessOffMaterial;
       }
     });
     renderer.render(this.scene, this.camera);
     this.scene.traverseVisible((child) => {
-      (child as any).material = (child as any)._SSRPassBackupMaterial;
+      const object = child as SSRMaterialObject;
+      object.material = object._SSRPassBackupMaterial;
     });
 
     // restore original state

@@ -218,6 +218,12 @@ import { Bone } from "ek3d/objects/Bone";
 import { Skeleton } from "ek3d/objects/Skeleton";
 import { SkinnedMesh } from "ek3d/objects/SkinnedMesh";
 import { Interpolation, Loop } from "ek3d/constants";
+import { cloneUniforms } from "ek3d/renderers/shaders/UniformsUtils";
+import { FilmPass } from "ek3d/addons/postprocessing/FilmPass";
+import { DotScreenPass } from "ek3d/addons/postprocessing/DotScreenPass";
+import { OutputPass } from "ek3d/addons/postprocessing/OutputPass";
+import { TexturePass } from "ek3d/addons/postprocessing/TexturePass";
+import { SavePass } from "ek3d/addons/postprocessing/SavePass";
 
 void [WebGPUCoordinateSystem, TimestampQuery];
 
@@ -2010,3 +2016,60 @@ cameraChildren.add(new Object3D());
 cameraChildren.attach(new Object3D());
 // @ts-expect-error Recursive copying cannot introduce incompatible child objects.
 cameraChildren.copy(new Object3D<Mesh>());
+
+const traversalRoot = new Object3D();
+traversalRoot.traverse((object) => {
+  const position: Vector3 = object.position;
+  // @ts-expect-error Traversal includes objects without a material.
+  void object.material;
+  void position;
+});
+traversalRoot.traverseVisible((object) => {
+  // @ts-expect-error Traversal callbacks receive scene objects, not arbitrary values.
+  const value: number = object;
+  void value;
+});
+traversalRoot.traverseAncestors((object) => {
+  // @ts-expect-error Ancestors are not necessarily meshes.
+  const mesh: Mesh = object;
+  void mesh;
+});
+// @ts-expect-error A traversal callback must also accept non-mesh objects.
+traversalRoot.traverse((mesh: Mesh) => mesh.material);
+AnimationClip.CreateFromMorphTargetSequence("walk", [{ name: "walk_001" }], 30, false);
+// @ts-expect-error Morph targets require string names.
+AnimationClip.CreateClipsFromMorphTargetSequences([{ name: 1 }], 30, false);
+
+const clonedUniforms = cloneUniforms({
+  amount: { value: 1 },
+  map: { value: new Texture() },
+  maps: { value: [new Texture()] },
+  mixed: { value: new Texture() as Texture | number },
+});
+const clonedTexture: Texture | null = clonedUniforms.map.value;
+const clonedArrayTexture: Texture = clonedUniforms.maps.value[0];
+const clonedMixed: Texture | number | null = clonedUniforms.mixed.value;
+// @ts-expect-error Cloned render-target textures can become null.
+const requiredTexture: Texture = clonedUniforms.map.value;
+// @ts-expect-error Cloning preserves numeric uniform values.
+clonedUniforms.amount.value = "wrong";
+// @ts-expect-error Cloning preserves uniform names.
+void clonedUniforms.missing;
+// @ts-expect-error Film intensity is numeric.
+new FilmPass().uniforms.intensity.value = "wrong";
+// @ts-expect-error Dot-screen center is a Vector2.
+new DotScreenPass().uniforms.center.value = 1;
+// @ts-expect-error Output tone-mapping exposure is numeric.
+new OutputPass().uniforms.toneMappingExposure.value = false;
+// @ts-expect-error Texture-pass opacity is numeric.
+new TexturePass(new Texture()).uniforms.opacity.value = false;
+// @ts-expect-error Save-pass input is a texture or null.
+new SavePass().uniforms.tDiffuse.value = 1;
+const typedGeometry = new BufferGeometry();
+typedGeometry.groups.push({ start: 0, count: 3, materialIndex: 0 });
+typedGeometry.morphAttributes.position = [new BufferAttribute(new Float32Array(3), 3)];
+// @ts-expect-error Groups require a material index, as supplied by addGroup().
+typedGeometry.groups.push({ start: 0, count: 3 });
+// @ts-expect-error Morph targets are attributes, not vectors.
+typedGeometry.morphAttributes.position = [new Vector3()];
+void [clonedTexture, clonedArrayTexture, clonedMixed, requiredTexture];

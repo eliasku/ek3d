@@ -166,8 +166,8 @@ try {
   skinned.bind(skeleton);
   const morphGeometry = new SphereGeometry(0.85, 32, 20);
   const morphTarget = morphGeometry.clone().scale(1.65, 0.6, 1);
-  morphGeometry.morphAttributes.position = [morphTarget.getAttribute("position")!];
-  morphGeometry.morphAttributes.normal = [morphTarget.getAttribute("normal")!];
+  morphGeometry.morphAttributes.position = [morphTarget.getAttribute("position") as Float32BufferAttribute];
+  morphGeometry.morphAttributes.normal = [morphTarget.getAttribute("normal") as Float32BufferAttribute];
   const morphMaterial = new MeshPhongMaterial({ color: 0xff9955, shininess: 60 });
   const morph = new Mesh(morphGeometry, morphMaterial);
   morph.name = "Morph sphere";

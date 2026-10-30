@@ -1,4 +1,4 @@
-import { test } from "vite-plus/test";
+import { test, vi } from "vite-plus/test";
 import assert from "node:assert/strict";
 import { ShaderMaterial } from "../src/materials/ShaderMaterial";
 import { RawShaderMaterial } from "../src/materials/RawShaderMaterial";
@@ -6,6 +6,8 @@ import { Vector3 } from "../src/math/Vector3";
 import { Matrix4 } from "../src/math/Matrix4";
 import { DataTexture } from "../src/textures/DataTexture";
 import { GLSL } from "../src/constants";
+import { cloneUniforms } from "../src/renderers/shaders/UniformsUtils";
+import { WebGLRenderTarget } from "../src/renderers/WebGLRenderTarget";
 
 test("custom material clone preserves upload flags and upstream value ownership boundaries", () => {
   for (const Material of [ShaderMaterial, RawShaderMaterial]) {
@@ -57,5 +59,37 @@ test("custom material clone preserves upload flags and upstream value ownership 
     assert.equal(textureDisposals, 0, "Uniform textures remain caller-owned");
     texture.dispose();
     clonedTexture.dispose();
+  }
+});
+
+test("uniform cloning nulls direct render-target textures but clones textures inside arrays", () => {
+  const target = new WebGLRenderTarget(2, 2);
+  const texture = new DataTexture(new Uint8Array([255, 0, 0, 255]), 1, 1);
+  const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
+  try {
+    const source = {
+      target: { value: target.texture, needsUpdate: false },
+      map: { value: texture, label: "albedo" },
+      maps: { value: [target.texture] },
+      vectors: { value: [new Vector3(1, 2, 3)] },
+    };
+    const clone = cloneUniforms(source);
+    assert.equal(clone.target.value, null);
+    assert.equal(clone.target.needsUpdate, false);
+    assert.equal(source.target.value, target.texture);
+    assert.ok(clone.map.value);
+    assert.notEqual(clone.map.value, texture);
+    assert.equal(clone.map.value.source, texture.source);
+    assert.equal(clone.map.label, "albedo");
+    assert.notEqual(clone.maps.value[0], target.texture);
+    assert.equal(clone.maps.value[0].source, target.texture.source);
+    clone.vectors.value[0].x = 9;
+    assert.deepEqual(source.vectors.value[0].toArray(), [1, 2, 3]);
+    clone.map.value.dispose();
+    clone.maps.value[0].dispose();
+  } finally {
+    warning.mockRestore();
+    texture.dispose();
+    target.dispose();
   }
 });

@@ -85,7 +85,7 @@ class USDNode {
       const value = item.value;
 
       if (Array.isArray(value)) {
-        const lines = [];
+        const lines: string[] = [];
         lines.push(`${key} = {`);
         value.forEach((line) => {
           lines.push(`${pad}\t\t${line}`);
@@ -108,7 +108,7 @@ class USDNode {
     });
     const children = this.children.map((c) => c.toString(indent + 1));
 
-    const bodyLines = [];
+    const bodyLines: string[] = [];
 
     if (properties.length > 0) {
       bodyLines.push(...properties);
@@ -138,7 +138,7 @@ class USDNode {
 /**
  * An exporter for USDZ.
  *
- * ```ts
+ * ```typescript
  * import { USDZExporter, type USDZZipRuntime } from 'ek3d/addons/exporters/USDZExporter';
  * import type { Object3D } from 'ek3d/core/Object3D';
  *
@@ -447,7 +447,7 @@ function getMaxClipDuration(clips: AnimationClip[]) {
 function buildVector3TimeSamples(opName: string, opType: string, track: KeyframeTrack, fps: number) {
   const times = track.times;
   const values = track.values as ArrayLike<number>;
-  const samples = [];
+  const samples: string[] = [];
 
   for (let i = 0; i < times.length; i++) {
     const o = i * 3;
@@ -462,7 +462,7 @@ function buildVector3TimeSamples(opName: string, opType: string, track: Keyframe
 function buildQuaternionTimeSamples(track: KeyframeTrack, fps: number) {
   const times = track.times;
   const values = track.values as ArrayLike<number>;
-  const samples = [];
+  const samples: string[] = [];
 
   // three.js quaternion order: (x, y, z, w); USD quatf order: (w, x, y, z)
   for (let i = 0; i < times.length; i++) {

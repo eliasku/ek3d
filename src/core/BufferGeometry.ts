@@ -29,7 +29,7 @@ const _vector = /*@__PURE__*/ new Vector3();
  * positions, face indices, normals, colors, UVs, and custom attributes
  * within buffers, reducing the cost of passing all this data to the GPU.
  *
- * ```ts
+ * ```typescript
  * import { BufferGeometry } from 'ek3d/core/BufferGeometry';
  * import { BufferAttribute } from 'ek3d/core/BufferAttribute';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
@@ -61,9 +61,9 @@ export class BufferGeometry extends EventDispatcher {
   type: string;
   index: BufferAttribute | null;
   attributes: Record<string, BufferAttribute | InterleavedBufferAttribute | GLBufferAttribute>;
-  morphAttributes: any;
+  morphAttributes: Record<string, (BufferAttribute | InterleavedBufferAttribute)[]>;
   morphTargetsRelative: boolean;
-  groups: any[];
+  groups: { start: number; count: number; materialIndex: number }[];
   boundingBox: Box3 | null;
   boundingSphere: Sphere | null;
   drawRange: { start: number; count: number };
@@ -598,8 +598,8 @@ export class BufferGeometry extends EventDispatcher {
       tangentAttribute = new BufferAttribute(new Float32Array(4 * positionAttribute.count), 4);
       this.setAttribute("tangent", tangentAttribute);
     }
-    const tan1: any[] = [],
-      tan2: any[] = [];
+    const tan1: Vector3[] = [],
+      tan2: Vector3[] = [];
     const used = new Uint8Array(positionAttribute.count);
     for (let i = 0; i < positionAttribute.count; i++) {
       tan1[i] = new Vector3();
@@ -613,8 +613,8 @@ export class BufferGeometry extends EventDispatcher {
       uvC = new Vector2(),
       sdir = new Vector3(),
       tdir = new Vector3();
-    function handleTriangle(a: any, b: any, c?: any) {
-      (used as any)[a] = (used as any)[b] = (used as any)[c] = 1;
+    function handleTriangle(a: number, b: number, c: number) {
+      used[a] = used[b] = used[c] = 1;
       vA.fromBufferAttribute(positionAttribute, a);
       vB.fromBufferAttribute(positionAttribute, b);
       vC.fromBufferAttribute(positionAttribute, c);
@@ -637,7 +637,7 @@ export class BufferGeometry extends EventDispatcher {
       tan2[b].add(tdir);
       tan2[c].add(tdir);
     }
-    let groups = this.groups;
+    let groups: { start: number; count: number }[] = this.groups;
     if (groups.length === 0) {
       groups = [
         {
@@ -658,7 +658,7 @@ export class BufferGeometry extends EventDispatcher {
       tmp2 = new Vector3();
     const n = new Vector3(),
       n2 = new Vector3();
-    function handleVertex(v?: any) {
+    function handleVertex(v: number) {
       n.fromBufferAttribute(normalAttribute, v);
       n2.copy(n);
       const t = tan1[v];
@@ -672,7 +672,7 @@ export class BufferGeometry extends EventDispatcher {
       tangentAttribute!.setXYZW(v, tmp.x, tmp.y, tmp.z, w);
     }
     for (let i = 0, il = positionAttribute.count; i < il; ++i) {
-      if ((used as any)[i]) handleVertex(i);
+      if (used[i]) handleVertex(i);
     }
     this._transformed = true;
   }
@@ -927,7 +927,7 @@ export class BufferGeometry extends EventDispatcher {
     // morph attributes
     const morphAttributes = source.morphAttributes;
     for (const name in morphAttributes) {
-      const array: any[] = [];
+      const array: (BufferAttribute | InterleavedBufferAttribute)[] = [];
       const morphAttribute = morphAttributes[name]; // morphAttribute: array of Float32BufferAttributes
       for (let i = 0, l = morphAttribute.length; i < l; i++) {
         array.push(morphAttribute[i].clone(data));

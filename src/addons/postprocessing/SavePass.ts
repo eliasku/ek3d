@@ -9,14 +9,14 @@ import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
 /**
  * A pass that saves the contents of the current read buffer in a render target.
  *
- * ```ts
+ * ```typescript
  * const savePass = new SavePass( customRenderTarget );
  * composer.addPass( savePass );
  * ```
  *
  */
 export class SavePass extends Pass {
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+  uniforms: typeof CopyShader.uniforms;
   material: ShaderMaterial;
   renderTarget: WebGLRenderTarget;
   needsSwap: boolean;

@@ -26,6 +26,20 @@ types, JSDoc and implementation. Internal declarations are included as source, n
 Generation uses only local package metadata, the README and maintained source. It does not
 read the upstream checkout, generated HTML docs or TSL guides, and makes no network requests.
 
+Scene traversal callbacks receive `Object3D`, including non-renderable groups. Narrow to a
+renderable type before accessing its material or geometry. Morph animation sequence inputs
+require string names. Buffer usage accepts `BufferUsage`; half-float attribute indices and
+components are numeric. These contracts preserve the existing runtime behavior.
+
+Geometry groups contain numeric `start`, `count` and `materialIndex`; `addGroup()` defaults
+the material index to zero. Morph attributes are arrays of CPU-backed buffer attributes,
+including interleaved attributes.
+
+`cloneUniforms()` preserves uniform names and property types. Direct texture properties are
+nullable because render-target textures become null. Arrays of textures are cloned without
+that replacement. Unrecognized nested objects and typed arrays remain shared. Film, dot-screen,
+output, texture and save passes expose their concrete shader uniform types.
+
 This is a non-commercial project. Its MIT code license does not replace third-party asset
 licenses. Keep attribution and asset-specific terms; resolve missing redistribution permissions
 before publishing assets, including on a free public website.
@@ -221,9 +235,25 @@ closure and the existing local bunny model. Import `MeshBVH` from
 prototype patch or second runtime. Optional extension methods and local structural types
 live in `ek3d/addons/math/bvh/utils/ExtensionUtilities`.
 
-Open the URL printed by Vite. `/` describes the open-source TypeScript fork, its WebGL-only scope and direct module imports. The page has a text-only ek3d wordmark, an examples link and a GitHub star CTA. Its unpainted-polymer background and satin-metal sculpture use one RAL 2004 screen approximation for the CTA. `examples/landing.ts` lights a connected metaball drop with a locally baked `RoomEnvironment`; SSAO adds soft occlusion without direct lights or bloom. Holding the primary pointer separates the drop quickly; release merges it more slowly. Pointer movement shifts the camera. The narrow layout supports touch. No external assets or second Three.js runtime are used. Hidden pages pause rendering; navigation releases GPU resources and preserves back/forward-cache restores.
+Open the URL printed by Vite. `/` describes the TypeScript fork, WebGL-only scope and direct
+module imports. The text-only wordmark sits above two CTAs: cobalt Examples, then RAL 2004
+GitHub. Icons and the local cube favicon use SVG, not emoji. `examples/landing.ts` lights a
+connected metaball drop with a locally baked `RoomEnvironment`, also shown as a softly
+blurred background. SSAO adds soft occlusion without direct lights or bloom. A seeded
+320-grain dust field surrounds the sculpture at different depths, with 2-3 CSS-pixel
+grains and brief warm cross-shaped glints. No sprite textures, bloom or particle blur are used.
+An idle double heartbeat stretches and contracts the drop every 1.2 seconds; holding
+suppresses that pulse while separating the lobes. Release merges them more slowly.
+Pointer movement shifts the camera.
+The narrow layout supports touch. No external assets or second runtime are used. Hidden
+pages pause rendering; navigation releases GPU resources and preserves back/forward-cache restores.
 
-For repeatable landing inspection, use `/?still=8` and optional `&separation=0.5` (0–1). `&view=noao` renders without post-processing; `ao`, `depth`, `normals`, `clay` and `wireframe` isolate the corresponding surface or pass. SSAO uses fixed samples and noise, a scene-scaled radius and one final ACES/output conversion. `tests/landing-sculpture.test.ts` checks connected idle and separated states, field bounds, buffer capacity, usable normals, stable-state winding, transition volume and deterministic reset.
+For repeatable landing inspection, use `/?still=8` and optional `&separation=0.5` (0–1).
+`&view=noao` renders without post-processing; `dust`, `ao`, `depth`, `normals`, `clay` and
+`wireframe` isolate particles or the corresponding surface/pass. SSAO uses fixed samples
+and noise, a scene-scaled radius and one final ACES/output conversion.
+`tests/landing-sculpture.test.ts` checks connected idle and separated states, field bounds,
+buffer capacity, usable normals, stable-state winding, transition volume and deterministic reset.
 
 `/testbed/` is the internal feature self-testing stand. It runs `testbed/main.ts`: a combined scene with camera/hierarchy, a reflective sphere, textured cylinder, normalized interleaved Lambert capsule, and an alternate set with a curved tube, beveled extrusion and flat shape with real holes. **O** replaces those meshes with a line strip, dashed loop, box edges, textured points and a translucent camera-facing sprite. **M** shows three colored instanced boxes. **H** shows a batched sphere/cylinder and a distance-selected sphere/box LOD. These paths include independent transforms, picking and directional/point/spot shadows. Ambient fill and a projected spot cookie can be toggled independently. All sets support fog, environment/background, HDR output and animation. Use the controls shown on the canvas; resizing updates both camera projections and the renderer. Rendering failures remain visible and are rethrown, not replaced with a mock or software scene.
 

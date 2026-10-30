@@ -1,3 +1,4 @@
+import type { Material } from "../../materials/Material";
 import { Side } from "../../constants";
 import { BoxGeometry } from "../../geometries/BoxGeometry";
 import { PointLight } from "../../lights/PointLight";
@@ -41,8 +42,8 @@ export class DebugEnvironment extends Scene {
     this.traverse((object) => {
       if (object instanceof Mesh) {
         resources.add(object.geometry);
-        for (const material of Array.isArray(object.material) ? object.material : [object.material])
-          resources.add(material);
+        const materials: Material[] = Array.isArray(object.material) ? object.material : [object.material];
+        for (const material of materials) resources.add(material);
       }
       if (object instanceof PointLight) resources.add(object);
     });

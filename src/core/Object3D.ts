@@ -843,7 +843,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    *
    * @param callback - A callback function that allows to process the current 3D object.
    */
-  traverse(callback: (...args: any[]) => any) {
+  traverse(callback: (object: Object3D) => void) {
     callback(this);
     const children = this.children;
     for (let i = 0, l = children.length; i < l; i++) {
@@ -858,7 +858,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    *
    * @param callback - A callback function that allows to process the current 3D object.
    */
-  traverseVisible(callback: (...args: any[]) => any) {
+  traverseVisible(callback: (object: Object3D) => void) {
     if (this.visible === false) return;
     callback(this);
     const children = this.children;
@@ -873,7 +873,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    *
    * @param callback - A callback function that allows to process the current 3D object.
    */
-  traverseAncestors(callback: (...args: any[]) => any) {
+  traverseAncestors(callback: (object: Object3D) => void) {
     const parent = this.parent;
     if (parent !== null) {
       callback(parent);

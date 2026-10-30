@@ -12,13 +12,16 @@ const balls: ReadonlyArray<readonly [number, number, number, number]> = [
 
 export function createLandingSculpture(material: Material): MarchingCubes {
   const surface = new MarchingCubes(80, material, false, false, 24000);
-  surface.scale.setScalar(2.8);
   updateLandingSculpture(surface, 0, 0);
   return surface;
 }
 
 /** Bounded motion keeps the entire isosurface inside the sampled volume. */
 export function updateLandingSculpture(surface: MarchingCubes, seconds: number, energy: number): void {
+  const phase = (seconds * Math.PI * 2) / 1.2;
+  const heartbeat =
+    (Math.pow(Math.max(0, Math.sin(phase)), 18) + 0.55 * Math.pow(Math.max(0, Math.sin(phase - 1)), 24)) * (1 - energy);
+  surface.scale.set(2.8 * (1 - heartbeat * 0.035), 2.8 * (1 + heartbeat * 0.12), 2.8 * (1 + heartbeat * 0.025));
   surface.reset();
   const spread = 0.55 + energy * 0.67;
   const motion = 0.012 + energy * 0.016;

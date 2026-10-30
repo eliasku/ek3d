@@ -65,7 +65,7 @@ export class Camera extends Object3D {
   get reversedDepth() {
     return this._reversedDepth;
   }
-  copy(source: any, recursive?: any): this {
+  copy(source: Camera, recursive?: boolean): this {
     super.copy(source, recursive);
     this.matrixWorldInverse.copy(source.matrixWorldInverse);
     this.projectionMatrix.copy(source.projectionMatrix);
@@ -85,7 +85,7 @@ export class Camera extends Object3D {
   getWorldDirection(target: Vector3): Vector3 {
     return super.getWorldDirection(target).negate();
   }
-  updateMatrixWorld(force?: any) {
+  updateMatrixWorld(force?: boolean) {
     super.updateMatrixWorld(force);
     // exclude scale from view matrix to be glTF conform
     this.matrixWorld.decompose(_position, _quaternion, _scale);
@@ -95,7 +95,7 @@ export class Camera extends Object3D {
       this.matrixWorldInverse.compose(_position, _quaternion, _scale.set(1, 1, 1)).invert();
     }
   }
-  updateWorldMatrix(updateParents: any, updateChildren?: any, force: boolean = false) {
+  updateWorldMatrix(updateParents?: boolean, updateChildren?: boolean, force: boolean = false) {
     super.updateWorldMatrix(updateParents, updateChildren, force);
     // exclude scale from view matrix to be glTF conform
     this.matrixWorld.decompose(_position, _quaternion, _scale);

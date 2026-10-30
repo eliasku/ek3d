@@ -163,7 +163,8 @@ const params = {
   dithering: 0.0001,
 };
 function updateMaterial(): void {
-  for (const [key, value] of Object.entries(params)) if (key in uniforms) uniforms[key].value = value;
+  for (const [key, value] of Object.entries(params))
+    if (key in uniforms) uniforms[key as keyof typeof uniforms].value = value;
   uniforms["znear"].value = camera.near;
   uniforms["zfar"].value = camera.far;
   camera.setFocalLength(params.focalLength);

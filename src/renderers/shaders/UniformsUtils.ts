@@ -1,48 +1,73 @@
 import type { UniformsGroup } from "../../core/UniformsGroup";
+import type { Texture } from "../../textures/Texture";
+import type { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { ColorManagement } from "../../math/ColorManagement";
 import { warn } from "../../utils";
+
+type ClonedUniformProperty<T> = T extends Texture ? T | null : T;
+
+/** Cloned uniform properties retain their types; render-target textures become null. */
+export type ClonedUniforms<T> = {
+  [U in keyof T]: { [P in keyof T[U]]: ClonedUniformProperty<T[U][P]> };
+};
+
+type CloneableUniformValue = {
+  clone(): unknown;
+  isRenderTargetTexture?: boolean;
+  isColor?: boolean;
+  isMatrix3?: boolean;
+  isMatrix4?: boolean;
+  isVector2?: boolean;
+  isVector3?: boolean;
+  isVector4?: boolean;
+  isTexture?: boolean;
+  isQuaternion?: boolean;
+};
 /**
  * Provides utility functions for managing uniforms.
  *
  * @module UniformsUtils
  */
 /**
- * Clones the given uniform definitions by performing a deep-copy. That means
- * if the value of a uniform refers to an object like a Vector3 or Texture,
- * the cloned uniform will refer to a new object reference.
+ * Clones recognized math values and textures, and copies arrays.
+ * Direct render-target texture properties become null; texture arrays are cloned normally.
+ * Other nested objects and typed arrays remain shared.
  *
  * @param src - An object representing uniform definitions.
  * @return The cloned uniforms.
  */
-export function cloneUniforms(src?: any) {
-  const dst: any = {};
+export function cloneUniforms<T extends Record<string, object> = Record<string, never>>(src?: T): ClonedUniforms<T> {
+  const dst: Record<string, Record<string, unknown>> = {};
   for (const u in src) {
-    (dst as any)[u] = {};
-    for (const p in src[u]) {
-      const property = src[u][p];
+    const target: Record<string, unknown> = {};
+    dst[u] = target;
+    const source = src[u] as Record<string, unknown>;
+    for (const p in source) {
+      const property = source[p];
       if (isThreeObject(property)) {
         if (property.isRenderTargetTexture) {
           warn("UniformsUtils: Textures of render targets cannot be cloned via cloneUniforms() or mergeUniforms().");
-          (dst as any)[u][p] = null;
+          target[p] = null;
         } else {
-          (dst as any)[u][p] = property.clone();
+          target[p] = property.clone();
         }
       } else if (Array.isArray(property)) {
         if (isThreeObject(property[0])) {
-          const clonedProperty: any[] = [];
-          for (let i = 0, l = property.length; i < l; i++) {
-            clonedProperty[i] = property[i].clone();
+          const values = property as CloneableUniformValue[];
+          const clonedProperty: unknown[] = [];
+          for (let i = 0, l = values.length; i < l; i++) {
+            clonedProperty[i] = values[i].clone();
           }
-          (dst as any)[u][p] = clonedProperty;
+          target[p] = clonedProperty;
         } else {
-          (dst as any)[u][p] = property.slice();
+          target[p] = property.slice();
         }
       } else {
-        (dst as any)[u][p] = property;
+        target[p] = property;
       }
     }
   }
-  return dst;
+  return dst as ClonedUniforms<T>;
 }
 /**
  * Merges the given uniform definitions into a single object. Since the
@@ -52,27 +77,28 @@ export function cloneUniforms(src?: any) {
  * @param uniforms - An array of objects containing uniform definitions.
  * @return The merged uniforms.
  */
-export function mergeUniforms(uniforms: any[]) {
-  const merged: any = {};
+export function mergeUniforms(uniforms: ShaderMaterial["uniforms"][]): ShaderMaterial["uniforms"] {
+  const merged: ShaderMaterial["uniforms"] = {};
   for (let u = 0; u < uniforms.length; u++) {
     const tmp = cloneUniforms(uniforms[u]);
     for (const p in tmp) {
-      (merged as any)[p] = tmp[p];
+      merged[p] = tmp[p];
     }
   }
   return merged;
 }
-function isThreeObject(property?: any) {
-  return (
-    property &&
-    (property.isColor ||
-      property.isMatrix3 ||
-      property.isMatrix4 ||
-      property.isVector2 ||
-      property.isVector3 ||
-      property.isVector4 ||
-      property.isTexture ||
-      property.isQuaternion)
+function isThreeObject(property: unknown): property is CloneableUniformValue {
+  const value = property as CloneableUniformValue | null | undefined;
+  return !!(
+    value &&
+    (value.isColor ||
+      value.isMatrix3 ||
+      value.isMatrix4 ||
+      value.isVector2 ||
+      value.isVector3 ||
+      value.isVector4 ||
+      value.isTexture ||
+      value.isQuaternion)
   );
 }
 export function cloneUniformsGroups(src: UniformsGroup[]): UniformsGroup[] {

@@ -12776,6 +12776,7 @@ export class ColorEnvironment extends Scene {
 ## ek3d/addons/environments/DebugEnvironment
 
 ```typescript
+import type { Material } from "../../materials/Material";
 import { Side } from "../../constants";
 import { BoxGeometry } from "../../geometries/BoxGeometry";
 import { PointLight } from "../../lights/PointLight";
@@ -12819,8 +12820,8 @@ export class DebugEnvironment extends Scene {
     this.traverse((object) => {
       if (object instanceof Mesh) {
         resources.add(object.geometry);
-        for (const material of Array.isArray(object.material) ? object.material : [object.material])
-          resources.add(material);
+        const materials: Material[] = Array.isArray(object.material) ? object.material : [object.material];
+        for (const material of materials) resources.add(material);
       }
       if (object instanceof PointLight) resources.add(object);
     });
@@ -18400,7 +18401,7 @@ class USDNode {
       const value = item.value;
 
       if (Array.isArray(value)) {
-        const lines = [];
+        const lines: string[] = [];
         lines.push(`${key} = {`);
         value.forEach((line) => {
           lines.push(`${pad}\t\t${line}`);
@@ -18423,7 +18424,7 @@ class USDNode {
     });
     const children = this.children.map((c) => c.toString(indent + 1));
 
-    const bodyLines = [];
+    const bodyLines: string[] = [];
 
     if (properties.length > 0) {
       bodyLines.push(...properties);
@@ -18453,7 +18454,7 @@ class USDNode {
 /**
  * An exporter for USDZ.
  *
- * ```ts
+ * ```typescript
  * import { USDZExporter, type USDZZipRuntime } from 'ek3d/addons/exporters/USDZExporter';
  * import type { Object3D } from 'ek3d/core/Object3D';
  *
@@ -18762,7 +18763,7 @@ function getMaxClipDuration(clips: AnimationClip[]) {
 function buildVector3TimeSamples(opName: string, opType: string, track: KeyframeTrack, fps: number) {
   const times = track.times;
   const values = track.values as ArrayLike<number>;
-  const samples = [];
+  const samples: string[] = [];
 
   for (let i = 0; i < times.length; i++) {
     const o = i * 3;
@@ -18777,7 +18778,7 @@ function buildVector3TimeSamples(opName: string, opType: string, track: Keyframe
 function buildQuaternionTimeSamples(track: KeyframeTrack, fps: number) {
   const times = track.times;
   const values = track.values as ArrayLike<number>;
-  const samples = [];
+  const samples: string[] = [];
 
   // three.js quaternion order: (x, y, z, w); USD quatf order: (w, x, y, z)
   for (let i = 0; i < times.length; i++) {
@@ -114780,14 +114781,14 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
 /**
  * Pass for creating a dot-screen effect.
  *
- * ```ts
+ * ```typescript
  * const pass = new DotScreenPass( new Vector2( 0, 0 ), 0.5, 0.8 );
  * composer.addPass( pass );
  * ```
  *
  */
 export class DotScreenPass extends Pass {
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+  uniforms: typeof DotScreenShader.uniforms;
   material: ShaderMaterial;
   _fsQuad: FullScreenQuad;
 
@@ -114803,7 +114804,7 @@ export class DotScreenPass extends Pass {
     /**
      * The pass uniforms. Use this object if you want to update the
      * `center`, `angle` or `scale` value at runtime.
-     * ```ts
+     * ```typescript
      * pass.uniforms.center.value.set( 0.25, 0.25 );
      * ```
      */
@@ -115232,14 +115233,14 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
 /**
  * This pass can be used to create a film grain effect.
  *
- * ```ts
+ * ```typescript
  * const filmPass = new FilmPass();
  * composer.addPass( filmPass );
  * ```
  *
  */
 export class FilmPass extends Pass {
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+  uniforms: typeof FilmShader.uniforms;
   material: ShaderMaterial;
   _fsQuad: FullScreenQuad;
 
@@ -115256,7 +115257,7 @@ export class FilmPass extends Pass {
     /**
      * The pass uniforms. Use this object if you want to update the
      * `intensity` or `grayscale` value at runtime.
-     * ```ts
+     * ```typescript
      * pass.uniforms.intensity.value = 0.25;
      * pass.uniforms.grayscale.value = true;
      * ```
@@ -117909,7 +117910,7 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  *
  * The tone mapping and color space settings are extracted from the renderer.
  *
- * ```ts
+ * ```typescript
  * const outputPass = new OutputPass();
  * composer.addPass( outputPass );
  * ```
@@ -117917,7 +117918,7 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  */
 export class OutputPass extends Pass {
   isOutputPass: boolean;
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+  uniforms: typeof OutputShader.uniforms;
   material: RawShaderMaterial;
   _fsQuad: FullScreenQuad;
   _outputColorSpace: ColorSpace | null;
@@ -120462,6 +120463,11 @@ import type { WebGLRenderTarget as RT } from "../../renderers/WebGLRenderTarget"
 import type { Material } from "../../materials/Material";
 import type { ReflectorForSSRPass } from "../objects/ReflectorForSSRPass";
 
+type SSRMaterialObject = Object3D & {
+  material?: Material | Material[];
+  _SSRPassBackupMaterial?: Material | Material[];
+};
+
 /** SSR pass constructor options. */
 export interface SSRPassOptions {
   /** The renderer. */
@@ -120485,15 +120491,15 @@ export interface SSRPassOptions {
 /**
  * A pass for a basic SSR effect.
  *
- * ```ts
- * const ssrPass = new SSRPass( {
- * 	renderer,
- * 	scene,
- * 	camera,
- * 	width: innerWidth,
- * 	height: innerHeight
- * } );
- * composer.addPass( ssrPass );
+ * ```typescript
+ * import { SSRPass, type SSRPassOptions } from 'ek3d/addons/postprocessing/SSRPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ *
+ * function addReflections(composer: EffectComposer, options: SSRPassOptions): SSRPass {
+ *   const pass = new SSRPass(options);
+ *   composer.addPass(pass);
+ *   return pass;
+ * }
  * ```
  *
  */
@@ -121183,16 +121189,18 @@ export class SSRPass extends Pass {
     }
 
     this.scene.traverseVisible((child) => {
-      (child as any)._SSRPassBackupMaterial = child.material;
+      const object = child as SSRMaterialObject;
+      object._SSRPassBackupMaterial = object.material;
       if (this._selects!.includes(child)) {
-        (child as any).material = this.metalnessOnMaterial;
+        object.material = this.metalnessOnMaterial;
       } else {
-        (child as any).material = this.metalnessOffMaterial;
+        object.material = this.metalnessOffMaterial;
       }
     });
     renderer.render(this.scene, this.camera);
     this.scene.traverseVisible((child) => {
-      (child as any).material = (child as any)._SSRPassBackupMaterial;
+      const object = child as SSRMaterialObject;
+      object.material = object._SSRPassBackupMaterial;
     });
 
     // restore original state
@@ -121220,14 +121228,14 @@ import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
 /**
  * A pass that saves the contents of the current read buffer in a render target.
  *
- * ```ts
+ * ```typescript
  * const savePass = new SavePass( customRenderTarget );
  * composer.addPass( savePass );
  * ```
  *
  */
 export class SavePass extends Pass {
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+  uniforms: typeof CopyShader.uniforms;
   material: ShaderMaterial;
   renderTarget: WebGLRenderTarget;
   needsSwap: boolean;
@@ -121660,7 +121668,7 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
 /**
  * This pass can be used to render a texture over the entire screen.
  *
- * ```ts
+ * ```typescript
  * const texture = new TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' );
  * texture.colorSpace = ColorSpace.SRGB;
  *
@@ -121673,7 +121681,7 @@ export class TexturePass extends Pass {
   map: Texture;
   opacity: number;
   needsSwap: boolean;
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+  uniforms: typeof CopyShader.uniforms;
   material: ShaderMaterial;
   _fsQuad: FullScreenQuad;
 
@@ -122774,7 +122782,7 @@ import chunk_project_vertex from "../../renderers/shaders/ShaderChunk/project_ve
  * Requires #define RINGS and SAMPLES integers, supplied through
  * `ShaderMaterial.defines`:
  *
- * ```ts
+ * ```typescript
  * import { BokehShader } from 'ek3d/addons/shaders/BokehShader2';
  * import { ShaderMaterial } from 'ek3d/materials/ShaderMaterial';
  *
@@ -122805,10 +122813,10 @@ export const BokehShader = {
 
     maxblur: { value: 1.0 },
 
-    showFocus: { value: 0 },
-    manualdof: { value: 0 },
-    vignetting: { value: 0 },
-    depthblur: { value: 0 },
+    showFocus: { value: 0 as number | boolean },
+    manualdof: { value: 0 as number | boolean },
+    vignetting: { value: 0 as number | boolean },
+    depthblur: { value: 0 as number | boolean },
 
     threshold: { value: 0.5 },
     gain: { value: 2.0 },
@@ -122818,11 +122826,11 @@ export const BokehShader = {
     znear: { value: 0.1 },
     zfar: { value: 100 },
 
-    noise: { value: 1 },
+    noise: { value: 1 as number | boolean },
     dithering: { value: 0.0001 },
-    pentagon: { value: 0 },
+    pentagon: { value: 0 as number | boolean },
 
-    shaderFocus: { value: 1 },
+    shaderFocus: { value: 1 as number | boolean },
     focusCoords: { value: new Vector2() },
   },
 
@@ -129346,7 +129354,7 @@ export function mergeGeometries(geometries: BufferGeometry[], useGroups: boolean
 
   if (isIndexed) {
     let indexOffset = 0;
-    const mergedIndex = [];
+    const mergedIndex: number[] = [];
 
     for (let i = 0; i < geometries.length; ++i) {
       const index = geometries[i].index!;
@@ -129756,7 +129764,7 @@ export function toTrianglesDrawMode(geometry: BufferGeometry, drawMode: number):
     // generate index if not present
 
     if (index === null) {
-      const indices = [];
+      const indices: number[] = [];
 
       const position = geometry.getAttribute("position");
 
@@ -129778,7 +129786,7 @@ export function toTrianglesDrawMode(geometry: BufferGeometry, drawMode: number):
     //
 
     const numberOfTriangles = index.count - 2;
-    const newIndices = [];
+    const newIndices: number[] = [];
 
     if (drawMode === DrawMode.TriangleFan) {
       // gl.TRIANGLE_FAN
@@ -130113,7 +130121,7 @@ export function mergeGroups(geometry: BufferGeometry): BufferGeometry {
 
   if (geometry.getIndex() === null) {
     const positionAttribute = geometry.getAttribute("position")!;
-    const indices = [];
+    const indices: number[] = [];
 
     for (let i = 0; i < positionAttribute.count; i += 3) {
       indices.push(i, i + 1, i + 2);
@@ -130126,7 +130134,7 @@ export function mergeGroups(geometry: BufferGeometry): BufferGeometry {
 
   const index = geometry.getIndex()!;
 
-  const newIndices = [];
+  const newIndices: number[] = [];
 
   for (let i = 0; i < groups.length; i++) {
     const group = groups[i];
@@ -135111,15 +135119,15 @@ export class AnimationClip {
    */
   static CreateFromMorphTargetSequence(
     name: string,
-    morphTargetSequence: any[],
+    morphTargetSequence: { name: string }[],
     fps: number,
     noLoop: boolean,
   ): AnimationClip {
     const numMorphTargets = morphTargetSequence.length;
-    const tracks: any[] = [];
+    const tracks: KeyframeTrack[] = [];
     for (let i = 0; i < numMorphTargets; i++) {
-      let times: any[] = [];
-      let values: any[] = [];
+      let times: number[] = [];
+      let values: number[] = [];
       times.push((i + numMorphTargets - 1) % numMorphTargets, i, (i + 1) % numMorphTargets);
       values.push(0, 1, 0);
       const order = getKeyframeOrder(times);
@@ -135176,8 +135184,12 @@ export class AnimationClip {
    * @param noLoop - Whether the clip should be no loop or not.
    * @return An array of new animation clips.
    */
-  static CreateClipsFromMorphTargetSequences(morphTargets: any[], fps: number, noLoop: boolean): AnimationClip[] {
-    const animationToMorphTargets: any = {};
+  static CreateClipsFromMorphTargetSequences(
+    morphTargets: { name: string }[],
+    fps: number,
+    noLoop: boolean,
+  ): AnimationClip[] {
+    const animationToMorphTargets: Record<string, { name: string }[]> = {};
     // tested with https://regex101.com/ on trick sequences
     // such flamingo_flyA_003, flamingo_run1_003, crdeath0059
     const pattern = /^([\w-]*?)([\d]+)$/;
@@ -135188,16 +135200,16 @@ export class AnimationClip {
       const parts = morphTarget.name.match(pattern);
       if (parts && parts.length > 1) {
         const name = parts[1];
-        let animationMorphTargets = (animationToMorphTargets as any)[name];
+        let animationMorphTargets = animationToMorphTargets[name];
         if (!animationMorphTargets) {
-          (animationToMorphTargets as any)[name] = animationMorphTargets = [];
+          animationToMorphTargets[name] = animationMorphTargets = [];
         }
         animationMorphTargets.push(morphTarget);
       }
     }
-    const clips: any[] = [];
+    const clips: AnimationClip[] = [];
     for (const name in animationToMorphTargets) {
-      clips.push(this.CreateFromMorphTargetSequence(name, (animationToMorphTargets as any)[name], fps, noLoop));
+      clips.push(this.CreateFromMorphTargetSequence(name, animationToMorphTargets[name], fps, noLoop));
     }
     return clips;
   }
@@ -135211,7 +135223,7 @@ export class AnimationClip {
     let duration = 0;
     for (let i = 0, n = tracks.length; i !== n; ++i) {
       const track = this.tracks[i];
-      duration = Math.max(duration, (track.times as any)[track.times.length - 1]);
+      duration = Math.max(duration, track.times[track.times.length - 1]);
     }
     this.duration = duration;
     return this;
@@ -135258,7 +135270,7 @@ export class AnimationClip {
    * @return A clone of this instance.
    */
   clone(): AnimationClip {
-    const tracks: any[] = [];
+    const tracks: KeyframeTrack[] = [];
     for (let i = 0; i < this.tracks.length; i++) {
       tracks.push(this.tracks[i].clone());
     }
@@ -138794,7 +138806,7 @@ export class Camera extends Object3D {
   get reversedDepth() {
     return this._reversedDepth;
   }
-  copy(source: any, recursive?: any): this {
+  copy(source: Camera, recursive?: boolean): this {
     super.copy(source, recursive);
     this.matrixWorldInverse.copy(source.matrixWorldInverse);
     this.projectionMatrix.copy(source.projectionMatrix);
@@ -138814,7 +138826,7 @@ export class Camera extends Object3D {
   getWorldDirection(target: Vector3): Vector3 {
     return super.getWorldDirection(target).negate();
   }
-  updateMatrixWorld(force?: any) {
+  updateMatrixWorld(force?: boolean) {
     super.updateMatrixWorld(force);
     // exclude scale from view matrix to be glTF conform
     this.matrixWorld.decompose(_position, _quaternion, _scale);
@@ -138824,7 +138836,7 @@ export class Camera extends Object3D {
       this.matrixWorldInverse.compose(_position, _quaternion, _scale.set(1, 1, 1)).invert();
     }
   }
-  updateWorldMatrix(updateParents: any, updateChildren?: any, force: boolean = false) {
+  updateWorldMatrix(updateParents?: boolean, updateChildren?: boolean, force: boolean = false) {
     super.updateWorldMatrix(updateParents, updateChildren, force);
     // exclude scale from view matrix to be glTF conform
     this.matrixWorld.decompose(_position, _quaternion, _scale);
@@ -141166,7 +141178,7 @@ export class BufferAttribute extends EventDispatcher {
    * @param value - The usage to set.
    * @return A reference to this buffer attribute.
    */
-  setUsage(value?: any): BufferAttribute {
+  setUsage(value: BufferUsage): BufferAttribute {
     this.usage = value;
     return this;
   }
@@ -141559,7 +141571,7 @@ export class BufferAttribute extends EventDispatcher {
    *
    * @private
    */
-  _denormalize(value?: any) {
+  _denormalize(value: number) {
     const scale = this._normalizationScale;
     return scale !== undefined ? Math.max(value / scale, -1.0) : denormalize(value, this.array);
   }
@@ -141568,7 +141580,7 @@ export class BufferAttribute extends EventDispatcher {
    *
    * @private
    */
-  _normalize(value?: any) {
+  _normalize(value: number) {
     const scale = this._normalizationScale;
     return scale !== undefined ? Math.round(value * scale) : normalize(value, this.array);
   }
@@ -141721,47 +141733,47 @@ export class Float16BufferAttribute extends BufferAttribute {
     super(new Uint16Array(array), itemSize, normalized);
     this.isFloat16BufferAttribute = true;
   }
-  getX(index?: any) {
+  getX(index: number) {
     let x = fromHalfFloat(this.array[index * this.itemSize]);
     if (this.normalized) x = denormalize(x, this.array);
     return x;
   }
-  setX(index: any, x?: any) {
+  setX(index: number, x: number) {
     if (this.normalized) x = normalize(x, this.array);
     this.array[index * this.itemSize] = toHalfFloat(x);
     return this;
   }
-  getY(index?: any) {
+  getY(index: number) {
     let y = fromHalfFloat(this.array[index * this.itemSize + 1]);
     if (this.normalized) y = denormalize(y, this.array);
     return y;
   }
-  setY(index: any, y?: any) {
+  setY(index: number, y: number) {
     if (this.normalized) y = normalize(y, this.array);
     this.array[index * this.itemSize + 1] = toHalfFloat(y);
     return this;
   }
-  getZ(index?: any) {
+  getZ(index: number) {
     let z = fromHalfFloat(this.array[index * this.itemSize + 2]);
     if (this.normalized) z = denormalize(z, this.array);
     return z;
   }
-  setZ(index: any, z?: any) {
+  setZ(index: number, z: number) {
     if (this.normalized) z = normalize(z, this.array);
     this.array[index * this.itemSize + 2] = toHalfFloat(z);
     return this;
   }
-  getW(index?: any) {
+  getW(index: number) {
     let w = fromHalfFloat(this.array[index * this.itemSize + 3]);
     if (this.normalized) w = denormalize(w, this.array);
     return w;
   }
-  setW(index: any, w?: any) {
+  setW(index: number, w: number) {
     if (this.normalized) w = normalize(w, this.array);
     this.array[index * this.itemSize + 3] = toHalfFloat(w);
     return this;
   }
-  setXY(index: any, x: any, y?: any) {
+  setXY(index: number, x: number, y: number) {
     index *= this.itemSize;
     if (this.normalized) {
       x = normalize(x, this.array);
@@ -141771,7 +141783,7 @@ export class Float16BufferAttribute extends BufferAttribute {
     this.array[index + 1] = toHalfFloat(y);
     return this;
   }
-  setXYZ(index: any, x: any, y: any, z?: any) {
+  setXYZ(index: number, x: number, y: number, z: number) {
     index *= this.itemSize;
     if (this.normalized) {
       x = normalize(x, this.array);
@@ -141783,7 +141795,7 @@ export class Float16BufferAttribute extends BufferAttribute {
     this.array[index + 2] = toHalfFloat(z);
     return this;
   }
-  setXYZW(index: any, x: any, y: any, z: any, w?: any) {
+  setXYZW(index: number, x: number, y: number, z: number, w: number) {
     index *= this.itemSize;
     if (this.normalized) {
       x = normalize(x, this.array);
@@ -141853,7 +141865,7 @@ const _vector = /*@__PURE__*/ new Vector3();
  * positions, face indices, normals, colors, UVs, and custom attributes
  * within buffers, reducing the cost of passing all this data to the GPU.
  *
- * ```ts
+ * ```typescript
  * import { BufferGeometry } from 'ek3d/core/BufferGeometry';
  * import { BufferAttribute } from 'ek3d/core/BufferAttribute';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
@@ -141885,9 +141897,9 @@ export class BufferGeometry extends EventDispatcher {
   type: string;
   index: BufferAttribute | null;
   attributes: Record<string, BufferAttribute | InterleavedBufferAttribute | GLBufferAttribute>;
-  morphAttributes: any;
+  morphAttributes: Record<string, (BufferAttribute | InterleavedBufferAttribute)[]>;
   morphTargetsRelative: boolean;
-  groups: any[];
+  groups: { start: number; count: number; materialIndex: number }[];
   boundingBox: Box3 | null;
   boundingSphere: Sphere | null;
   drawRange: { start: number; count: number };
@@ -142422,8 +142434,8 @@ export class BufferGeometry extends EventDispatcher {
       tangentAttribute = new BufferAttribute(new Float32Array(4 * positionAttribute.count), 4);
       this.setAttribute("tangent", tangentAttribute);
     }
-    const tan1: any[] = [],
-      tan2: any[] = [];
+    const tan1: Vector3[] = [],
+      tan2: Vector3[] = [];
     const used = new Uint8Array(positionAttribute.count);
     for (let i = 0; i < positionAttribute.count; i++) {
       tan1[i] = new Vector3();
@@ -142437,8 +142449,8 @@ export class BufferGeometry extends EventDispatcher {
       uvC = new Vector2(),
       sdir = new Vector3(),
       tdir = new Vector3();
-    function handleTriangle(a: any, b: any, c?: any) {
-      (used as any)[a] = (used as any)[b] = (used as any)[c] = 1;
+    function handleTriangle(a: number, b: number, c: number) {
+      used[a] = used[b] = used[c] = 1;
       vA.fromBufferAttribute(positionAttribute, a);
       vB.fromBufferAttribute(positionAttribute, b);
       vC.fromBufferAttribute(positionAttribute, c);
@@ -142461,7 +142473,7 @@ export class BufferGeometry extends EventDispatcher {
       tan2[b].add(tdir);
       tan2[c].add(tdir);
     }
-    let groups = this.groups;
+    let groups: { start: number; count: number }[] = this.groups;
     if (groups.length === 0) {
       groups = [
         {
@@ -142482,7 +142494,7 @@ export class BufferGeometry extends EventDispatcher {
       tmp2 = new Vector3();
     const n = new Vector3(),
       n2 = new Vector3();
-    function handleVertex(v?: any) {
+    function handleVertex(v: number) {
       n.fromBufferAttribute(normalAttribute, v);
       n2.copy(n);
       const t = tan1[v];
@@ -142496,7 +142508,7 @@ export class BufferGeometry extends EventDispatcher {
       tangentAttribute!.setXYZW(v, tmp.x, tmp.y, tmp.z, w);
     }
     for (let i = 0, il = positionAttribute.count; i < il; ++i) {
-      if ((used as any)[i]) handleVertex(i);
+      if (used[i]) handleVertex(i);
     }
     this._transformed = true;
   }
@@ -142751,7 +142763,7 @@ export class BufferGeometry extends EventDispatcher {
     // morph attributes
     const morphAttributes = source.morphAttributes;
     for (const name in morphAttributes) {
-      const array: any[] = [];
+      const array: (BufferAttribute | InterleavedBufferAttribute)[] = [];
       const morphAttribute = morphAttributes[name]; // morphAttribute: array of Float32BufferAttributes
       for (let i = 0, l = morphAttribute.length; i < l; i++) {
         array.push(morphAttribute[i].clone(data));
@@ -144976,7 +144988,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    *
    * @param callback - A callback function that allows to process the current 3D object.
    */
-  traverse(callback: (...args: any[]) => any) {
+  traverse(callback: (object: Object3D) => void) {
     callback(this);
     const children = this.children;
     for (let i = 0, l = children.length; i < l; i++) {
@@ -144991,7 +145003,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    *
    * @param callback - A callback function that allows to process the current 3D object.
    */
-  traverseVisible(callback: (...args: any[]) => any) {
+  traverseVisible(callback: (object: Object3D) => void) {
     if (this.visible === false) return;
     callback(this);
     const children = this.children;
@@ -145006,7 +145018,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    *
    * @param callback - A callback function that allows to process the current 3D object.
    */
-  traverseAncestors(callback: (...args: any[]) => any) {
+  traverseAncestors(callback: (object: Object3D) => void) {
     const parent = this.parent;
     if (parent !== null) {
       callback(parent);
@@ -146354,8 +146366,7 @@ export class UniformsGroup extends EventDispatcher {
    * @param uniform - The uniform to add.
    * @return A reference to this uniforms group.
    */
-  add(uniform: Uniform | Uniform[]): UniformsGroup;
-  add(uniform?: any): UniformsGroup {
+  add(uniform: Uniform | Uniform[]): UniformsGroup {
     this.uniforms.push(uniform);
     return this;
   }
@@ -146365,8 +146376,7 @@ export class UniformsGroup extends EventDispatcher {
    * @param uniform - The uniform to remove.
    * @return A reference to this uniforms group.
    */
-  remove(uniform: Uniform | Uniform[]): UniformsGroup;
-  remove(uniform?: any): UniformsGroup {
+  remove(uniform: Uniform | Uniform[]): UniformsGroup {
     const index = this.uniforms.indexOf(uniform);
     if (index !== -1) this.uniforms.splice(index, 1);
     return this;
@@ -146414,7 +146424,7 @@ export class UniformsGroup extends EventDispatcher {
     for (let i = 0, l = uniformsSource.length; i < l; i++) {
       const uniform = uniformsSource[i];
       if (Array.isArray(uniform)) {
-        this.uniforms.push(uniform.map((u?: any) => u.clone()));
+        this.uniforms.push(uniform.map((u) => u.clone()));
       } else {
         this.uniforms.push(uniform.clone());
       }
@@ -181751,9 +181761,9 @@ export class WebGLCubeRenderTarget extends WebGLRenderTarget {
     this.texture.generateMipmaps = texture.generateMipmaps;
     this.texture.minFilter = texture.minFilter;
     this.texture.magFilter = texture.magFilter;
-    const shader: any = {
+    const shader = {
       uniforms: {
-        tEquirect: { value: null },
+        tEquirect: { value: null as Texture | null },
       },
       vertexShader:
         /* glsl */ "\n\n\t\t\t\tvarying vec3 vWorldDirection;\n\n\t\t\t\tvec3 transformDirection( in vec3 dir, in mat4 matrix ) {\n\n\t\t\t\t\treturn normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );\n\n\t\t\t\t}\n\n\t\t\t\tvoid main() {\n\n\t\t\t\t\tvWorldDirection = transformDirection( position, modelMatrix );\n\n" +
@@ -192103,50 +192113,75 @@ export const sprite = {
 
 ```typescript
 import type { UniformsGroup } from "../../core/UniformsGroup";
+import type { Texture } from "../../textures/Texture";
+import type { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { ColorManagement } from "../../math/ColorManagement";
 import { warn } from "../../utils";
+
+type ClonedUniformProperty<T> = T extends Texture ? T | null : T;
+
+/** Cloned uniform properties retain their types; render-target textures become null. */
+export type ClonedUniforms<T> = {
+  [U in keyof T]: { [P in keyof T[U]]: ClonedUniformProperty<T[U][P]> };
+};
+
+type CloneableUniformValue = {
+  clone(): unknown;
+  isRenderTargetTexture?: boolean;
+  isColor?: boolean;
+  isMatrix3?: boolean;
+  isMatrix4?: boolean;
+  isVector2?: boolean;
+  isVector3?: boolean;
+  isVector4?: boolean;
+  isTexture?: boolean;
+  isQuaternion?: boolean;
+};
 /**
  * Provides utility functions for managing uniforms.
  *
  * @module UniformsUtils
  */
 /**
- * Clones the given uniform definitions by performing a deep-copy. That means
- * if the value of a uniform refers to an object like a Vector3 or Texture,
- * the cloned uniform will refer to a new object reference.
+ * Clones recognized math values and textures, and copies arrays.
+ * Direct render-target texture properties become null; texture arrays are cloned normally.
+ * Other nested objects and typed arrays remain shared.
  *
  * @param src - An object representing uniform definitions.
  * @return The cloned uniforms.
  */
-export function cloneUniforms(src?: any) {
-  const dst: any = {};
+export function cloneUniforms<T extends Record<string, object> = Record<string, never>>(src?: T): ClonedUniforms<T> {
+  const dst: Record<string, Record<string, unknown>> = {};
   for (const u in src) {
-    (dst as any)[u] = {};
-    for (const p in src[u]) {
-      const property = src[u][p];
+    const target: Record<string, unknown> = {};
+    dst[u] = target;
+    const source = src[u] as Record<string, unknown>;
+    for (const p in source) {
+      const property = source[p];
       if (isThreeObject(property)) {
         if (property.isRenderTargetTexture) {
           warn("UniformsUtils: Textures of render targets cannot be cloned via cloneUniforms() or mergeUniforms().");
-          (dst as any)[u][p] = null;
+          target[p] = null;
         } else {
-          (dst as any)[u][p] = property.clone();
+          target[p] = property.clone();
         }
       } else if (Array.isArray(property)) {
         if (isThreeObject(property[0])) {
-          const clonedProperty: any[] = [];
-          for (let i = 0, l = property.length; i < l; i++) {
-            clonedProperty[i] = property[i].clone();
+          const values = property as CloneableUniformValue[];
+          const clonedProperty: unknown[] = [];
+          for (let i = 0, l = values.length; i < l; i++) {
+            clonedProperty[i] = values[i].clone();
           }
-          (dst as any)[u][p] = clonedProperty;
+          target[p] = clonedProperty;
         } else {
-          (dst as any)[u][p] = property.slice();
+          target[p] = property.slice();
         }
       } else {
-        (dst as any)[u][p] = property;
+        target[p] = property;
       }
     }
   }
-  return dst;
+  return dst as ClonedUniforms<T>;
 }
 /**
  * Merges the given uniform definitions into a single object. Since the
@@ -192156,27 +192191,28 @@ export function cloneUniforms(src?: any) {
  * @param uniforms - An array of objects containing uniform definitions.
  * @return The merged uniforms.
  */
-export function mergeUniforms(uniforms: any[]) {
-  const merged: any = {};
+export function mergeUniforms(uniforms: ShaderMaterial["uniforms"][]): ShaderMaterial["uniforms"] {
+  const merged: ShaderMaterial["uniforms"] = {};
   for (let u = 0; u < uniforms.length; u++) {
     const tmp = cloneUniforms(uniforms[u]);
     for (const p in tmp) {
-      (merged as any)[p] = tmp[p];
+      merged[p] = tmp[p];
     }
   }
   return merged;
 }
-function isThreeObject(property?: any) {
-  return (
-    property &&
-    (property.isColor ||
-      property.isMatrix3 ||
-      property.isMatrix4 ||
-      property.isVector2 ||
-      property.isVector3 ||
-      property.isVector4 ||
-      property.isTexture ||
-      property.isQuaternion)
+function isThreeObject(property: unknown): property is CloneableUniformValue {
+  const value = property as CloneableUniformValue | null | undefined;
+  return !!(
+    value &&
+    (value.isColor ||
+      value.isMatrix3 ||
+      value.isMatrix4 ||
+      value.isVector2 ||
+      value.isVector3 ||
+      value.isVector4 ||
+      value.isTexture ||
+      value.isQuaternion)
   );
 }
 export function cloneUniformsGroups(src: UniformsGroup[]): UniformsGroup[] {

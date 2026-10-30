@@ -4,12 +4,16 @@ import { OutputPass } from "ek3d/addons/postprocessing/OutputPass";
 import { RenderPass } from "ek3d/addons/postprocessing/RenderPass";
 import { SSAOPass } from "ek3d/addons/postprocessing/SSAOPass";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
+import { BufferGeometry } from "ek3d/core/BufferGeometry";
+import { BufferAttribute } from "ek3d/core/BufferAttribute";
 import { ToneMapping } from "ek3d/constants";
 import { PMREMGenerator } from "ek3d/extras/PMREMGenerator";
 import { MeshNormalMaterial } from "ek3d/materials/MeshNormalMaterial";
 import { MeshPhysicalMaterial } from "ek3d/materials/MeshPhysicalMaterial";
+import { ShaderMaterial } from "ek3d/materials/ShaderMaterial";
 import { Vector2 } from "ek3d/math/Vector2";
 import { Group } from "ek3d/objects/Group";
+import { Points } from "ek3d/objects/Points";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { createDFGLUT } from "ek3d/renderers/shaders/DFGLUTData";
 import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
@@ -56,6 +60,9 @@ const room = new RoomEnvironment();
 const pmrem = new PMREMGenerator(renderer);
 const environment = pmrem.fromScene(room, 0.12, 0.1, 100, { size: 256 });
 scene.environment = environment.texture;
+scene.background = environment.texture;
+scene.backgroundBlurriness = 0.42;
+scene.backgroundIntensity = 0.65;
 pmrem.dispose();
 room.dispose();
 
@@ -73,6 +80,70 @@ const metal = new MeshPhysicalMaterial({
 });
 const metaballs = createLandingSculpture(metal);
 form.add(metaballs);
+
+const dustPositions = new Float32Array(320 * 3);
+let dustSeed = 0x3d1234;
+for (let i = 0; i < dustPositions.length; i++) {
+  dustSeed = (Math.imul(dustSeed, 1664525) + 1013904223) >>> 0;
+  dustPositions[i] = dustSeed / 4294967296;
+}
+const dustGeometry = new BufferGeometry();
+dustGeometry.setAttribute("position", new BufferAttribute(dustPositions, 3));
+const dustUniforms = {
+  time: { value: 0 },
+  span: { value: new Vector2() },
+  resolution: { value: new Vector2() },
+  pixelRatio: { value: 1 },
+};
+const dustMaterial = new ShaderMaterial({
+  name: "LandingDust",
+  uniforms: dustUniforms,
+  vertexShader: `
+    uniform float time;
+    uniform vec2 span;
+    uniform vec2 resolution;
+    uniform float pixelRatio;
+    varying float opacity;
+    varying float glint;
+    varying float pointSize;
+    void main() {
+      float phase = position.x * 83.0 + position.y * 47.0;
+      vec3 p = vec3(
+        (fract(position.x + time * 0.007 + sin(time * 0.1 + phase) * 0.012) - 0.5) * span.x,
+        (fract(position.y + time * 0.012) - 0.5) * span.y,
+        (position.z - 0.5) * 9.0
+      );
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+      vec2 pixel = floor((gl_Position.xy / gl_Position.w * 0.5 + 0.5) * resolution) + 0.5;
+      gl_Position.xy = (pixel / resolution * 2.0 - 1.0) * gl_Position.w;
+      gl_PointSize = 2.0 * floor(3.5 * pixelRatio) + 1.0;
+      pointSize = gl_PointSize;
+      glint = pow(max(0.0, sin(time * 1.7 + phase)), 24.0);
+      opacity = 0.35 + position.z * 0.2;
+    }
+  `,
+  fragmentShader: `
+    uniform float pixelRatio;
+    varying float opacity;
+    varying float glint;
+    varying float pointSize;
+    void main() {
+      vec2 p = abs(gl_PointCoord - 0.5) * pointSize;
+      float grain = step(max(p.x, p.y), 1.1 * pixelRatio);
+      float spark = max(step(p.x, 0.55 * pixelRatio), step(p.y, 0.55 * pixelRatio));
+      float alpha = max(grain * opacity, spark * glint);
+      if (alpha < 0.02) discard;
+      vec3 color = mix(vec3(0.17, 0.145, 0.1), vec3(3.0, 2.1, 1.2), glint);
+      gl_FragColor = vec4(color, alpha);
+    }
+  `,
+  transparent: true,
+  depthWrite: false,
+});
+// Hard-edged grains catch brief warm glints without sprite textures or blur.
+const dust = new Points(dustGeometry, dustMaterial);
+dust.frustumCulled = false;
+scene.add(dust);
 
 // Only environment lighting reaches the sculpture, so SSAO attenuates indirect light.
 const composer = new EffectComposer(renderer);
@@ -112,6 +183,7 @@ if (view === "normals") {
 } else if (view === "wireframe") {
   metal.wireframe = true;
 }
+if (view === "dust") sculpture.visible = false;
 ssao.enabled = view !== "noao" && view !== "normals" && view !== "wireframe";
 if (view === "ao") ssao.output = SSAOPass.OUTPUT.Blur;
 if (view === "depth") ssao.output = SSAOPass.OUTPUT.Depth;
@@ -136,11 +208,15 @@ function resize(): void {
   const scale = Math.min(viewHeight * (portrait ? 0.38 : 0.76), viewWidth * (portrait ? 0.86 : 0.46)) / 4.5;
   sculpture.scale.setScalar(scale);
   sculpture.position.set(viewWidth * (portrait ? 0 : 0.235), viewHeight * (portrait ? 0.19 : 0), 0);
+  dust.position.copy(sculpture.position);
+  dustUniforms.span.value.set(viewWidth * (portrait ? 1.15 : 0.7), viewHeight * (portrait ? 0.55 : 1.4));
   const dpr = Math.min(window.devicePixelRatio, 1.5);
+  dustUniforms.pixelRatio.value = dpr;
   renderer.setPixelRatio(dpr);
   renderer.setSize(width, height);
   composer.setPixelRatio(dpr);
   composer.setSize(width, height);
+  renderer.getDrawingBufferSize(dustUniforms.resolution.value);
   ssao.kernelRadius = 0.55 * scale;
   ssao.minDistance = (0.006 * scale) / (camera.far - camera.near);
   ssao.maxDistance = (0.8 * scale) / (camera.far - camera.near);
@@ -176,6 +252,7 @@ function animate(time: number): void {
   );
   form.position.y = Math.sin(seconds * 0.4) * 0.06;
   updateLandingSculpture(metaballs, seconds, energy);
+  dustUniforms.time.value = seconds;
   camera.position.x = pointer.x * 0.35 * sculpture.scale.x;
   camera.position.y = pointer.y * 0.22 * sculpture.scale.x;
   camera.position.z = 10;

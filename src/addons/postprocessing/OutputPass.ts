@@ -15,7 +15,7 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  *
  * The tone mapping and color space settings are extracted from the renderer.
  *
- * ```ts
+ * ```typescript
  * const outputPass = new OutputPass();
  * composer.addPass( outputPass );
  * ```
@@ -23,7 +23,7 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  */
 export class OutputPass extends Pass {
   isOutputPass: boolean;
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+  uniforms: typeof OutputShader.uniforms;
   material: RawShaderMaterial;
   _fsQuad: FullScreenQuad;
   _outputColorSpace: ColorSpace | null;

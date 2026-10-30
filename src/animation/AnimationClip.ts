@@ -136,15 +136,15 @@ export class AnimationClip {
    */
   static CreateFromMorphTargetSequence(
     name: string,
-    morphTargetSequence: any[],
+    morphTargetSequence: { name: string }[],
     fps: number,
     noLoop: boolean,
   ): AnimationClip {
     const numMorphTargets = morphTargetSequence.length;
-    const tracks: any[] = [];
+    const tracks: KeyframeTrack[] = [];
     for (let i = 0; i < numMorphTargets; i++) {
-      let times: any[] = [];
-      let values: any[] = [];
+      let times: number[] = [];
+      let values: number[] = [];
       times.push((i + numMorphTargets - 1) % numMorphTargets, i, (i + 1) % numMorphTargets);
       values.push(0, 1, 0);
       const order = getKeyframeOrder(times);
@@ -201,8 +201,12 @@ export class AnimationClip {
    * @param noLoop - Whether the clip should be no loop or not.
    * @return An array of new animation clips.
    */
-  static CreateClipsFromMorphTargetSequences(morphTargets: any[], fps: number, noLoop: boolean): AnimationClip[] {
-    const animationToMorphTargets: any = {};
+  static CreateClipsFromMorphTargetSequences(
+    morphTargets: { name: string }[],
+    fps: number,
+    noLoop: boolean,
+  ): AnimationClip[] {
+    const animationToMorphTargets: Record<string, { name: string }[]> = {};
     // tested with https://regex101.com/ on trick sequences
     // such flamingo_flyA_003, flamingo_run1_003, crdeath0059
     const pattern = /^([\w-]*?)([\d]+)$/;
@@ -213,16 +217,16 @@ export class AnimationClip {
       const parts = morphTarget.name.match(pattern);
       if (parts && parts.length > 1) {
         const name = parts[1];
-        let animationMorphTargets = (animationToMorphTargets as any)[name];
+        let animationMorphTargets = animationToMorphTargets[name];
         if (!animationMorphTargets) {
-          (animationToMorphTargets as any)[name] = animationMorphTargets = [];
+          animationToMorphTargets[name] = animationMorphTargets = [];
         }
         animationMorphTargets.push(morphTarget);
       }
     }
-    const clips: any[] = [];
+    const clips: AnimationClip[] = [];
     for (const name in animationToMorphTargets) {
-      clips.push(this.CreateFromMorphTargetSequence(name, (animationToMorphTargets as any)[name], fps, noLoop));
+      clips.push(this.CreateFromMorphTargetSequence(name, animationToMorphTargets[name], fps, noLoop));
     }
     return clips;
   }
@@ -236,7 +240,7 @@ export class AnimationClip {
     let duration = 0;
     for (let i = 0, n = tracks.length; i !== n; ++i) {
       const track = this.tracks[i];
-      duration = Math.max(duration, (track.times as any)[track.times.length - 1]);
+      duration = Math.max(duration, track.times[track.times.length - 1]);
     }
     this.duration = duration;
     return this;
@@ -283,7 +287,7 @@ export class AnimationClip {
    * @return A clone of this instance.
    */
   clone(): AnimationClip {
-    const tracks: any[] = [];
+    const tracks: KeyframeTrack[] = [];
     for (let i = 0; i < this.tracks.length; i++) {
       tracks.push(this.tracks[i].clone());
     }

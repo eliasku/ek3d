@@ -170,7 +170,7 @@ export class BufferAttribute extends EventDispatcher {
    * @param value - The usage to set.
    * @return A reference to this buffer attribute.
    */
-  setUsage(value?: any): BufferAttribute {
+  setUsage(value: BufferUsage): BufferAttribute {
     this.usage = value;
     return this;
   }
@@ -563,7 +563,7 @@ export class BufferAttribute extends EventDispatcher {
    *
    * @private
    */
-  _denormalize(value?: any) {
+  _denormalize(value: number) {
     const scale = this._normalizationScale;
     return scale !== undefined ? Math.max(value / scale, -1.0) : denormalize(value, this.array);
   }
@@ -572,7 +572,7 @@ export class BufferAttribute extends EventDispatcher {
    *
    * @private
    */
-  _normalize(value?: any) {
+  _normalize(value: number) {
     const scale = this._normalizationScale;
     return scale !== undefined ? Math.round(value * scale) : normalize(value, this.array);
   }
@@ -725,47 +725,47 @@ export class Float16BufferAttribute extends BufferAttribute {
     super(new Uint16Array(array), itemSize, normalized);
     this.isFloat16BufferAttribute = true;
   }
-  getX(index?: any) {
+  getX(index: number) {
     let x = fromHalfFloat(this.array[index * this.itemSize]);
     if (this.normalized) x = denormalize(x, this.array);
     return x;
   }
-  setX(index: any, x?: any) {
+  setX(index: number, x: number) {
     if (this.normalized) x = normalize(x, this.array);
     this.array[index * this.itemSize] = toHalfFloat(x);
     return this;
   }
-  getY(index?: any) {
+  getY(index: number) {
     let y = fromHalfFloat(this.array[index * this.itemSize + 1]);
     if (this.normalized) y = denormalize(y, this.array);
     return y;
   }
-  setY(index: any, y?: any) {
+  setY(index: number, y: number) {
     if (this.normalized) y = normalize(y, this.array);
     this.array[index * this.itemSize + 1] = toHalfFloat(y);
     return this;
   }
-  getZ(index?: any) {
+  getZ(index: number) {
     let z = fromHalfFloat(this.array[index * this.itemSize + 2]);
     if (this.normalized) z = denormalize(z, this.array);
     return z;
   }
-  setZ(index: any, z?: any) {
+  setZ(index: number, z: number) {
     if (this.normalized) z = normalize(z, this.array);
     this.array[index * this.itemSize + 2] = toHalfFloat(z);
     return this;
   }
-  getW(index?: any) {
+  getW(index: number) {
     let w = fromHalfFloat(this.array[index * this.itemSize + 3]);
     if (this.normalized) w = denormalize(w, this.array);
     return w;
   }
-  setW(index: any, w?: any) {
+  setW(index: number, w: number) {
     if (this.normalized) w = normalize(w, this.array);
     this.array[index * this.itemSize + 3] = toHalfFloat(w);
     return this;
   }
-  setXY(index: any, x: any, y?: any) {
+  setXY(index: number, x: number, y: number) {
     index *= this.itemSize;
     if (this.normalized) {
       x = normalize(x, this.array);
@@ -775,7 +775,7 @@ export class Float16BufferAttribute extends BufferAttribute {
     this.array[index + 1] = toHalfFloat(y);
     return this;
   }
-  setXYZ(index: any, x: any, y: any, z?: any) {
+  setXYZ(index: number, x: number, y: number, z: number) {
     index *= this.itemSize;
     if (this.normalized) {
       x = normalize(x, this.array);
@@ -787,7 +787,7 @@ export class Float16BufferAttribute extends BufferAttribute {
     this.array[index + 2] = toHalfFloat(z);
     return this;
   }
-  setXYZW(index: any, x: any, y: any, z: any, w?: any) {
+  setXYZW(index: number, x: number, y: number, z: number, w: number) {
     index *= this.itemSize;
     if (this.normalized) {
       x = normalize(x, this.array);

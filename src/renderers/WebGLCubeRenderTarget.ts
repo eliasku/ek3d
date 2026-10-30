@@ -72,9 +72,9 @@ export class WebGLCubeRenderTarget extends WebGLRenderTarget {
     this.texture.generateMipmaps = texture.generateMipmaps;
     this.texture.minFilter = texture.minFilter;
     this.texture.magFilter = texture.magFilter;
-    const shader: any = {
+    const shader = {
       uniforms: {
-        tEquirect: { value: null },
+        tEquirect: { value: null as Texture | null },
       },
       vertexShader:
         /* glsl */ "\n\n\t\t\t\tvarying vec3 vWorldDirection;\n\n\t\t\t\tvec3 transformDirection( in vec3 dir, in mat4 matrix ) {\n\n\t\t\t\t\treturn normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );\n\n\t\t\t\t}\n\n\t\t\t\tvoid main() {\n\n\t\t\t\t\tvWorldDirection = transformDirection( position, modelMatrix );\n\n" +

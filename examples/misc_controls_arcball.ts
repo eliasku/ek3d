@@ -128,8 +128,8 @@ new OBJLoader().setPath("/examples/models/obj/cerberus/").load("Cerberus.obj", f
   material.metalnessMap!.wrapS = Wrapping.Repeat;
   material.normalMap!.wrapS = Wrapping.Repeat;
 
-  group.traverse(function (child: Mesh) {
-    if (child.isMesh) {
+  group.traverse(function (child) {
+    if (child instanceof Mesh) {
       child.material = material;
     }
   });
