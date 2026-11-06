@@ -1,6 +1,11 @@
 {
   "schema": "addon-inventory/v1",
   "generated_at": "2026-10-27T22:32:18.000Z",
+  "synchronization": {
+    "commit": "2c916de7ad5a7995e345509fbcf8ee5ae161c05c",
+    "report": "../UPSTREAM_SYNC.md",
+    "note": "Extracted records and counts retain the original upstream snapshot below."
+  },
   "upstream": {
     "repo": "three.js",
     "commit": "e06d724a29df5b44c6ad878207974eb09ed7e0d9",

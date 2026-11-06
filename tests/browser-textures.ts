@@ -393,3 +393,70 @@ export async function runTextureChecks() {
     glError: canvasAndFramebuffer.glError | compressed.glError | videoFrame.glError | video.glError,
   };
 }
+
+export async function verifyTextureCopyDimensions() {
+  const fixture = renderFixture();
+  const source = canvasSource();
+  source.fill("#00ff00");
+  const frame = new VideoFrame(source.canvas, { timestamp: 0 });
+  const texture = new VideoFrameTexture();
+  texture.setFrame(frame);
+  const destination = new FramebufferTexture(4, 4);
+  const compressedSource = new CompressedArrayTexture(
+    [
+      { width: 4, height: 4, data: red.slice() },
+      { width: 2, height: 2, data: green.slice() },
+      { width: 1, height: 1, data: blue.slice() },
+    ],
+    4,
+    4,
+    1,
+    PixelFormat.RGBA_S3TC_DXT1,
+  );
+  const compressedDestination = new CompressedArrayTexture(
+    [
+      { width: 4, height: 4, data: red.slice() },
+      { width: 2, height: 2, data: red.slice() },
+      { width: 1, height: 1, data: red.slice() },
+    ],
+    4,
+    4,
+    1,
+    PixelFormat.RGBA_S3TC_DXT1,
+  );
+  compressedDestination.minFilter = TextureFilter.NearestMipmapNearest;
+  compressedDestination.magFilter = TextureFilter.Nearest;
+  compressedDestination.needsUpdate = true;
+  const material = new RawShaderMaterial({
+    glslVersion: GLSL.GLSL3,
+    uniforms: { map: { value: compressedDestination } },
+    vertexShader: "precision highp float; in vec3 position; void main() { gl_Position = vec4(position, 1.0); }",
+    fragmentShader:
+      "precision highp float; precision highp sampler2DArray; uniform sampler2DArray map; out vec4 color; void main() { color = textureLod(map, vec3(0.5, 0.5, 0.0), 1.0); }",
+  });
+  try {
+    fixture.map(texture);
+    fixture.sample([0, 255, 0, 255], "VideoFrame display-size upload");
+    fixture.renderer.initTexture(destination);
+    fixture.renderer.copyTextureToTexture(texture, destination);
+    fixture.map(destination);
+    fixture.sample([0, 255, 0, 255], "non-region copy uses VideoFrame display dimensions");
+    check(
+      fixture.gl.getExtension("WEBGL_compressed_texture_s3tc") !== null,
+      "Compressed copy fixture requires WEBGL_compressed_texture_s3tc",
+    );
+    fixture.renderer.initTexture(compressedDestination);
+    fixture.renderer.copyTextureToTexture(compressedSource, compressedDestination, null, null, 0, 1);
+    fixture.mesh.material = material;
+    fixture.sample([0, 255, 0, 255], "compressed array copy uses selected mip dimensions");
+    return { videoFrameDimensions: true, compressedMipDimensions: true, glError: fixture.gl.getError() };
+  } finally {
+    texture.dispose();
+    frame.close();
+    destination.dispose();
+    compressedSource.dispose();
+    compressedDestination.dispose();
+    material.dispose();
+    fixture.dispose();
+  }
+}

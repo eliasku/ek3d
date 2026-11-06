@@ -19,6 +19,11 @@ test("custom maps and copy preserve upstream lookup behavior", () => {
     .setColorMap("test-linear", 4);
   assert.equal(lut.getColor(0.5).r, 0.5);
   const copied = new Lut().copy(lut);
-  assert.equal(copied.getColor(0.5), lut.getColor(0.5));
+  assert.notEqual(copied.getColor(0.5), lut.getColor(0.5));
+  assert.deepEqual(copied.getColor(0.5), lut.getColor(0.5));
+  copied.getColor(0.5).setRGB(0, 1, 0);
+  assert.deepEqual(lut.getColor(0.5).toArray(), [0.5, 0, 0]);
+  lut.getColor(0).setRGB(1, 1, 1);
+  assert.deepEqual(copied.getColor(0).toArray(), [0, 0, 0]);
   assert.equal(new Lut("missing").map, new Lut("rainbow").map);
 });

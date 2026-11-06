@@ -197,8 +197,8 @@ export class LDrawUtils {
       mergedObject.add(condLines);
     }
 
-    (mergedObject.userData as { constructionStep: number; numConstructionSteps: number }).constructionStep = 0;
-    (mergedObject.userData as { constructionStep: number; numConstructionSteps: number }).numConstructionSteps = 1;
+    mergedObject.userData.buildingStep = 0;
+    mergedObject.userData.numBuildingSteps = 1;
 
     return mergedObject;
   }

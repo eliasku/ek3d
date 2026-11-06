@@ -1,6 +1,18 @@
 {
   "schema": "addon-scope/v2",
   "generated_at": "2026-10-28T21:09:08.988Z",
+  "synchronization": {
+    "commit": "2c916de7ad5a7995e345509fbcf8ee5ae161c05c",
+    "report": "../UPSTREAM_SYNC.md",
+    "upstream_modules": 501,
+    "upstream_pages": 622,
+    "ported_modules": 285,
+    "excluded_modules": 216,
+    "ported_upstream_pages": 329,
+    "excluded_upstream_pages": 293,
+    "retained_native_pages": ["examples/webgl_loader_vdb.html"],
+    "note": "Original entries and totals remain pinned to source.scope_snapshot; the report records the current delta."
+  },
   "source": {
     "artifact": "local://addon-files.json -> .work/addon-inventory.json",
     "schema": "addon-inventory/v1",

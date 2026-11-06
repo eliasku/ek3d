@@ -303,8 +303,8 @@ export class Texture<TMipmap = any> extends EventDispatcher {
      */
     this.userData = {};
     /**
-     * This can be used to only update a subregion or specific rows of the texture (for example, just the
-     * first 3 rows). Use the `addUpdateRange()` function to add ranges to this array.
+     * This can be used to only update parts of a data texture (for example, just a few rows).
+     * Use the `addUpdateRange()` function to add ranges to this array.
      *
      */
     this.updateRanges = [];
@@ -412,8 +412,12 @@ export class Texture<TMipmap = any> extends EventDispatcher {
   /**
    * Adds a range of data in the data texture to be updated on the GPU.
    *
-   * @param start - Position at which to start update.
-   * @param count - The number of components to update.
+   * Update ranges assume four components per texel, so they currently only work with `PixelFormat.RGBA`.
+   * Each range must stay within a single row. Add one range per row to update several rows.
+   * Update ranges are only supported in `WebGLRenderer`.
+   *
+   * @param start - Index of the first array element to update.
+   * @param count - The number of array elements to update.
    */
   addUpdateRange(start: number, count: number) {
     this.updateRanges.push({ start, count });

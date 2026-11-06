@@ -43,8 +43,8 @@ export class LightProbe extends Light {
      */
     this.sh = sh;
   }
-  copy(source: LightProbe): this {
-    super.copy(source);
+  copy(source: LightProbe, recursive?: boolean): this {
+    super.copy(source, recursive);
     this.sh.copy(source.sh);
     return this;
   }

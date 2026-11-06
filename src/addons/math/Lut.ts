@@ -83,7 +83,7 @@ export class Lut {
   }
 
   copy(lut: Lut): this {
-    this.lut = lut.lut;
+    this.lut = lut.lut.map((color) => color.clone());
     this.map = lut.map;
     this.n = lut.n;
     this.minV = lut.minV;

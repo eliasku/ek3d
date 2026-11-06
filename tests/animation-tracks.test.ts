@@ -18,6 +18,8 @@ import {
   makeClipAdditive,
 } from "../src/animation/AnimationUtils";
 import { Interpolant } from "../src/math/Interpolant";
+import { Quaternion } from "../src/math/Quaternion";
+import { GLTFParser } from "../src/addons/loaders/GLTFLoader";
 import { Interpolation, AnimationBlendMode } from "../src/constants";
 import { AnimationClip as UpstreamClip } from "../upstream/three.js/src/animation/AnimationClip.js";
 import { NumberKeyframeTrack as UpstreamNumber } from "../upstream/three.js/src/animation/tracks/NumberKeyframeTrack.js";
@@ -311,4 +313,38 @@ test("subclip, additive conversion and morph sequence creation match upstream wi
       UpstreamClip.CreateClipsFromMorphTargetSequences(sequence, 30, noLoop).map(data),
     );
   }
+});
+
+test("additive cubic quaternion tracks rotate tangents and preserve interpolated rotations", () => {
+  const rotation = new QuaternionKeyframeTrack(
+    ".quaternion",
+    [0, 1],
+    [1, 2, 3, 4, 0, 0, 1, 0, 2, -1, 3, 1, -2, 1, 4, 3, 0, 1, 0, 0, 3, 2, -1, 4],
+  );
+  const numeric = new NumberKeyframeTrack(".position[x]", [0, 1], [2, 10, 4, 6, 20, 8]);
+  const parser = new GLTFParser({});
+  parser._createCubicSplineTrackInterpolant(rotation);
+  parser._createCubicSplineTrackInterpolant(numeric);
+  const originalValues = Array.from(rotation.values);
+  const times = [0, 0.25, 0.75, 1];
+  const originalSamples = times.map((time) => Array.from(rotation.createInterpolant().evaluate(time), Number));
+  const inverseReference = new Quaternion(0, 0, -1, 0);
+  const clip = new AnimationClip("cubic", 1, [rotation, numeric]);
+  makeClipAdditive(clip);
+
+  for (let offset = 0; offset < originalValues.length; offset += 4) {
+    const expected = new Quaternion().fromArray(originalValues, offset).premultiply(inverseReference).toArray();
+    for (let component = 0; component < 4; component++) {
+      assert.ok(Math.abs(rotation.values[offset + component] - expected[component]) < 1e-6);
+    }
+  }
+  for (let i = 0; i < times.length; i++) {
+    const expected = new Quaternion().fromArray(originalSamples[i]).premultiply(inverseReference).toArray();
+    const actual = rotation.createInterpolant().evaluate(times[i]);
+    for (let component = 0; component < 4; component++) {
+      assert.ok(Math.abs(Number(actual[component]) - expected[component]) < 1e-6);
+    }
+  }
+  assert.deepEqual(Array.from(numeric.values), [2, 0, 4, 6, 10, 8]);
+  assert.equal(clip.blendMode, AnimationBlendMode.Additive);
 });

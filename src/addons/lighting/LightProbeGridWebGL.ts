@@ -62,6 +62,7 @@ let _emptyAtlas: Data3DTexture;
 // Number of padding texels added at each boundary of every sub-volume in the atlas.
 const ATLAS_PADDING = 1;
 
+/** An irradiance volume with one probe at each cell center, half a cell inside its bounds. */
 export class LightProbeGridWebGL extends Light {
   isLightProbeGrid: boolean;
   width: number;
@@ -69,6 +70,8 @@ export class LightProbeGridWebGL extends Light {
   depth: number;
   resolution: Vector3;
   boundingBox: Box3;
+  /** Higher priority wins overlaps; creation order breaks ties. */
+  priority: number;
   texture: Data3DTexture | null;
   _renderTarget: WebGL3DRenderTarget | null;
   _bounceTarget: WebGL3DRenderTarget | null;
@@ -88,12 +91,13 @@ export class LightProbeGridWebGL extends Light {
     this.depth = depth;
 
     this.resolution = new Vector3(
-      widthProbes !== undefined ? widthProbes : Math.max(2, Math.round(width) + 1),
-      heightProbes !== undefined ? heightProbes : Math.max(2, Math.round(height) + 1),
-      depthProbes !== undefined ? depthProbes : Math.max(2, Math.round(depth) + 1),
+      widthProbes !== undefined ? widthProbes : Math.max(1, Math.round(width)),
+      heightProbes !== undefined ? heightProbes : Math.max(1, Math.round(height)),
+      depthProbes !== undefined ? depthProbes : Math.max(1, Math.round(depth)),
     );
 
     this.boundingBox = new Box3();
+    this.priority = 0;
 
     this.texture = null;
 
@@ -114,9 +118,9 @@ export class LightProbeGridWebGL extends Light {
       d = this.depth;
 
     target.set(
-      res.x > 1 ? pos.x - w / 2 + (ix * w) / (res.x - 1) : pos.x,
-      res.y > 1 ? pos.y - h / 2 + (iy * h) / (res.y - 1) : pos.y,
-      res.z > 1 ? pos.z - d / 2 + (iz * d) / (res.z - 1) : pos.z,
+      pos.x - w / 2 + ((ix + 0.5) * w) / res.x,
+      pos.y - h / 2 + ((iy + 0.5) * h) / res.y,
+      pos.z - d / 2 + ((iz + 0.5) * d) / res.z,
     );
 
     return target;

@@ -1,8 +1,8 @@
 {
   "servers": {
     "oxlint": {
-      "command": "oxlint",
-      "args": ["--lsp"],
+      "command": "node_modules/.bin/vp",
+      "args": ["lint", "--lsp"],
       "fileTypes": [".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs"],
       "rootMarkers": ["package.json"],
       "isLinter": true,
@@ -11,8 +11,8 @@
       }
     },
     "oxfmt": {
-      "command": "oxfmt",
-      "args": ["--lsp"],
+      "command": "node_modules/.bin/vp",
+      "args": ["fmt", "--lsp"],
       "fileTypes": [
         ".ts",
         ".tsx",

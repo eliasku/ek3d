@@ -35,8 +35,10 @@ export function WebGLPrograms(
     shadows?: any,
     scene?: any,
     object?: any,
-    lightProbeGrids?: any,
+    lightProbeGrids: readonly { texture: Texture | null }[] = [],
   ) {
+    let numLightProbeGrids = 0;
+    for (const grid of lightProbeGrids) if (grid.texture !== null) numLightProbeGrids++;
     const fog = scene.fog;
     const geometry = object.geometry;
     const environment =
@@ -274,7 +276,7 @@ export function WebGLPrograms(
       numSpotLightShadows: lights.spotShadowMap.length,
       numSpotLightShadowsWithMaps: lights.numSpotLightShadowsWithMaps,
       numLightProbes: lights.numLightProbes,
-      numLightProbeGrids: lightProbeGrids.length,
+      numLightProbeGrids: numLightProbeGrids,
       numClippingPlanes: clipping.numPlanes,
       numClipIntersection: clipping.numIntersection,
       dithering: material.dithering,
@@ -380,6 +382,7 @@ export function WebGLPrograms(
     array.push(parameters.numSpotLightShadows);
     array.push(parameters.numSpotLightShadowsWithMaps);
     array.push(parameters.numLightProbes);
+    array.push(parameters.numLightProbeGrids);
     array.push(parameters.shadowMapType);
     array.push(parameters.toneMapping);
     array.push(parameters.numClippingPlanes);

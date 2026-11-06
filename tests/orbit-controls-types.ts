@@ -41,7 +41,7 @@ const changed: boolean = controls.update(1);
 controls.listenToKeyEvents(window);
 controls.stopListenToKeyEvents();
 controls.cursorStyle = "grab";
-const style: "auto" | "grab" = controls.cursorStyle;
+const style: "" | "grab" = controls.cursorStyle;
 controls.target.copy(new Vector3(1, 2, 3));
 controls.cursor.set(0, 1, 0);
 controls.minDistance = 1;

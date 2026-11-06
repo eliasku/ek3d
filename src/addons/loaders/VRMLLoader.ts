@@ -517,7 +517,7 @@ export class VRMLLoader extends Loader<Scene> {
         const v = field.values as number[];
         switch (field.name) {
           case "position":
-            result.position.set(v[0], v[1], v[0]);
+            result.position.set(v[0], v[1], v[2]);
             break;
           case "orientation":
             result.quaternion.setFromAxisAngle(new Vector3(v[0], v[1], v[2]).normalize(), v[3]);

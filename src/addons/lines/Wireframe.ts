@@ -30,9 +30,15 @@ export class Wireframe extends Mesh<LineMaterial> {
       distances[j] = j === 0 ? 0 : distances[j - 1];
       distances[j + 1] = distances[j] + start.distanceTo(end);
     }
-    const data = new InstancedInterleavedBuffer(distances, 2, 1);
-    geometry.setAttribute("instanceDistanceStart", new InterleavedBufferAttribute(data, 1, 0));
-    geometry.setAttribute("instanceDistanceEnd", new InterleavedBufferAttribute(data, 1, 1));
+    const instanceDistanceStart = geometry.attributes.instanceDistanceStart as InterleavedBufferAttribute | undefined;
+    if (instanceDistanceStart !== undefined && instanceDistanceStart.count === instanceStart.count) {
+      instanceDistanceStart.data.array = distances;
+      instanceDistanceStart.data.needsUpdate = true;
+    } else {
+      const data = new InstancedInterleavedBuffer(distances, 2, 1);
+      geometry.setAttribute("instanceDistanceStart", new InterleavedBufferAttribute(data, 1, 0));
+      geometry.setAttribute("instanceDistanceEnd", new InterleavedBufferAttribute(data, 1, 1));
+    }
     return this;
   }
 

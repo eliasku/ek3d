@@ -3,10 +3,13 @@ import { LoadingManager } from "ek3d/loaders/LoadingManager";
 import { Mesh } from "ek3d/objects/Mesh";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
-import { Float32BufferAttribute } from "ek3d/core/BufferAttribute";
+import { BufferAttribute, Float32BufferAttribute } from "ek3d/core/BufferAttribute";
 import { Texture } from "ek3d/textures/Texture";
 import { CubeTexture } from "ek3d/textures/CubeTexture";
 import type { Object3D } from "ek3d/core/Object3D";
+import { ColladaLoader } from "ek3d/addons/loaders/ColladaLoader";
+import { GLTFExporter } from "ek3d/addons/exporters/GLTFExporter";
+import { MeshPhysicalMaterial } from "ek3d/materials/MeshPhysicalMaterial";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -141,4 +144,107 @@ export async function objectLoaderBrowserChecks(): Promise<{ checks: string[] }>
   checks.push("malformed JSON callback and manager error");
   geometry.dispose();
   return { checks };
+}
+
+export async function verifyAddonAssetContracts(): Promise<{ checks: string[] }> {
+  const collada = new ColladaLoader().parse(`
+    <COLLADA version="1.4.1">
+      <asset><unit meter="1"/><up_axis>Y_UP</up_axis></asset>
+      <library_geometries><geometry id="geometry"><mesh>
+        <source id="positions"><float_array id="positions-array" count="15">0 0 0 1 0 0 1 1 0 0 1 0 -1 0 0</float_array>
+          <technique_common><accessor source="#positions-array" count="5" stride="3">
+            <param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/>
+          </accessor></technique_common>
+        </source>
+        <vertices id="vertices"><input semantic="POSITION" source="#positions"/></vertices>
+        <polygons count="2"><input semantic="VERTEX" source="#vertices" offset="0"/>
+          <p>0 1 2</p><p>0 2 3 4</p>
+        </polygons>
+      </mesh></geometry></library_geometries>
+      <library_visual_scenes><visual_scene id="scene">
+        <node id="node"><instance_geometry url="#geometry"/></node>
+      </visual_scene></library_visual_scenes>
+      <scene><instance_visual_scene url="#scene"/></scene>
+    </COLLADA>`);
+  assert(collada !== null, "Collada XML must parse");
+  const meshes: Mesh[] = [];
+  collada.scene.traverse((object) => {
+    if (object instanceof Mesh) meshes.push(object);
+  });
+  assert(meshes.length === 1, "Collada polygons must create one mesh");
+  try {
+    const positions = meshes[0].geometry.getAttribute("position");
+    assert(positions instanceof BufferAttribute, "Collada must produce CPU position data");
+    assert(positions.count === 9, "Collada must retain the triangle and triangulate the quad");
+    assert(positions.getX(1) === 1 && positions.getY(1) === 0, "Collada must retain the first polygon");
+    assert(positions.getX(8) === -1, "Collada must retain the last polygon");
+  } finally {
+    for (const mesh of meshes) {
+      mesh.geometry.dispose();
+      for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) material.dispose();
+    }
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 1;
+  const context = canvas.getContext("2d");
+  assert(context !== null, "Anisotropy export requires a real image");
+  context.fillStyle = "#ff8000";
+  context.fillRect(0, 0, 1, 1);
+  const texture = new Texture(canvas);
+  texture.channel = 2;
+  texture.offset.set(0.25, 0.5);
+  const material = new MeshPhysicalMaterial({
+    sheen: 0.25,
+    sheenRoughness: 0.4,
+    anisotropy: 0.75,
+    anisotropyMap: texture,
+  });
+  material.sheenColor.setRGB(0.8, 0.4, 0.2);
+  const geometry = new BufferGeometry().setAttribute(
+    "position",
+    new Float32BufferAttribute([0, 0, 0, 1, 0, 0, 0, 1, 0], 3),
+  );
+  try {
+    const result = await new GLTFExporter().parseAsync(new Mesh(geometry, material));
+    assert(!(result instanceof ArrayBuffer), "Expected glTF JSON");
+    const sheen = result.materials?.[0].extensions?.KHR_materials_sheen;
+    assert(typeof sheen === "object" && sheen !== null && "sheenColorFactor" in sheen, "Missing sheen extension");
+    assert(
+      JSON.stringify(sheen.sheenColorFactor) === JSON.stringify([0.2, 0.1, 0.05]),
+      "Sheen intensity must scale exported color",
+    );
+    assert(
+      material.sheenColor.r === 0.8 && material.sheenColor.g === 0.4 && material.sheenColor.b === 0.2,
+      "Export must not mutate sheen color",
+    );
+    const anisotropy = result.materials?.[0].extensions?.KHR_materials_anisotropy;
+    assert(
+      typeof anisotropy === "object" && anisotropy !== null && "anisotropyTexture" in anisotropy,
+      "Missing anisotropy extension",
+    );
+    const info = anisotropy.anisotropyTexture;
+    assert(
+      typeof info === "object" && info !== null && "texCoord" in info && info.texCoord === 2,
+      "Anisotropy must retain the UV channel",
+    );
+    assert(
+      "extensions" in info &&
+        typeof info.extensions === "object" &&
+        info.extensions !== null &&
+        "KHR_texture_transform" in info.extensions,
+      "Anisotropy must retain its texture transform",
+    );
+  } finally {
+    geometry.dispose();
+    material.dispose();
+    texture.dispose();
+  }
+  return {
+    checks: [
+      "Collada multiple polygons",
+      "glTF sheen intensity and color ownership",
+      "anisotropy UV channel and transform",
+    ],
+  };
 }

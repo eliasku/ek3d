@@ -665,6 +665,15 @@ export class BufferGeometry extends EventDispatcher {
       // Gram-Schmidt orthogonalize
       tmp.copy(t);
       tmp.sub(n.multiplyScalar(n.dot(t))).normalize();
+      // Degenerate UVs give no tangent direction, so choose one perpendicular to the normal.
+      if (tmp.lengthSq() === 0) {
+        if (Math.abs(n2.x) < 0.9) {
+          tmp.set(1, 0, 0);
+        } else {
+          tmp.set(0, 1, 0);
+        }
+        tmp.crossVectors(n2, tmp).normalize();
+      }
       // Calculate handedness
       tmp2.crossVectors(n2, t);
       const test = tmp2.dot(tan2[v]);

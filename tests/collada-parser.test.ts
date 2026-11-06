@@ -67,3 +67,25 @@ test("Collada parser retains direct-child and whitespace semantics", () => {
   assert.equal(parseId("#target"), "target");
   assert.equal(new ColladaParser().parse(""), null);
 });
+
+test("Collada polygons retain each index list and use the full input stride", () => {
+  const parser = new ColladaParser();
+  const inputs = [
+    element("input", { semantic: "VERTEX", source: "#positions", offset: "0" }),
+    element("input", { semantic: "NORMAL", source: "#normals", offset: "1" }),
+  ];
+  const primitive = parser.parseGeometryPrimitive(
+    element("polygons", { count: "2" }, "", [
+      ...inputs,
+      element("p", {}, "0 0 1 0 2 0"),
+      element("p", {}, "3 1 4 1 5 1 6 1"),
+    ]),
+  );
+  assert.deepEqual(primitive.vcount, [3, 4]);
+  assert.deepEqual(primitive.p, [0, 0, 1, 0, 2, 0, 3, 1, 4, 1, 5, 1, 6, 1]);
+  const triangles = parser.parseGeometryPrimitive(
+    element("triangles", { count: "1" }, "", [...inputs, element("p", {}, "0 0 1 0 2 0")]),
+  );
+  assert.deepEqual(triangles.p, [0, 0, 1, 0, 2, 0]);
+  assert.equal(triangles.vcount, undefined);
+});

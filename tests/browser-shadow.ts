@@ -18,6 +18,60 @@ import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
 import { depthShader } from "ek3d/renderers/shaders/DepthShader";
 import { distanceShader } from "ek3d/renderers/shaders/DistanceShader";
 import { configureShadowScene } from "./browser-fixtures";
+import { Sky } from "ek3d/addons/objects/Sky";
+import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
+import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
+import { basicShader } from "ek3d/renderers/shaders/BasicShader";
+import tonemapping_fragment from "ek3d/renderers/shaders/ShaderChunk/tonemapping_fragment.glsl";
+import colorspace_fragment from "ek3d/renderers/shaders/ShaderChunk/colorspace_fragment.glsl";
+
+export function verifySkyDepthModes() {
+  const results = [];
+  for (const reversedDepthBuffer of [false, true]) {
+    const renderer = new WebGLRenderer({
+      reversedDepthBuffer,
+      logarithmicDepthBuffer: true,
+      preserveDrawingBuffer: true,
+      shaders: { MeshBasicMaterial: basicShader },
+      shaderChunks: { tonemapping_fragment, colorspace_fragment },
+    });
+    renderer.setSize(32, 32, false);
+    const scene = new Scene();
+    const camera = new PerspectiveCamera(60, 1, 0.1, 2000);
+    const sky = new Sky();
+    sky.scale.setScalar(1000);
+    sky.material.uniforms.sunPosition.value.set(0, 1, 0);
+    sky.renderOrder = 1;
+    const geometry = new PlaneGeometry(1, 1);
+    const material = new MeshBasicMaterial({ color: 0xff0000 });
+    const mesh = new Mesh(geometry, material);
+    mesh.position.z = -2;
+    scene.add(sky, mesh);
+    try {
+      renderer.render(scene, camera);
+      const gl = renderer.getContext();
+      const pixel = new Uint8Array(4);
+      gl.readPixels(16, 16, 1, 1, GL.RGBA, GL.UNSIGNED_BYTE, pixel);
+      if (pixel[0] !== 255 || pixel[1] !== 0 || pixel[2] !== 0 || pixel[3] !== 255)
+        throw new Error(`Sky occluded foreground: ${pixel.join(",")}, reversed=${reversedDepthBuffer}`);
+      if (renderer.capabilities.logarithmicDepthBuffer === renderer.capabilities.reversedDepthBuffer)
+        throw new Error("Logarithmic depth did not yield to active reversed depth");
+      if (gl.getError() !== GL.NO_ERROR) throw new Error("Sky depth rendering produced a GL error");
+      results.push({
+        reversed: renderer.capabilities.reversedDepthBuffer,
+        logarithmic: renderer.capabilities.logarithmicDepthBuffer,
+        pixel: Array.from(pixel),
+      });
+    } finally {
+      sky.geometry.dispose();
+      sky.material.dispose();
+      geometry.dispose();
+      material.dispose();
+      renderer.dispose();
+    }
+  }
+  return results;
+}
 
 // Run in a real browser served by Vite: (await import('/tests/browser-shadow.ts')).verifyShadowLifecycle().
 export async function verifyShadowLifecycle() {
@@ -445,6 +499,7 @@ export async function verifyShadowLifecycle() {
     );
     check(gl.getError() === GL.NO_ERROR, "Shadow cleanup produced a WebGL error");
     return {
+      skyDepthModes: verifySkyDepthModes(),
       initialOcclusion,
       pointOcclusion,
       modes,

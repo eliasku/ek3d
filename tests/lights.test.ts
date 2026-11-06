@@ -6,6 +6,8 @@ import { SpotLightShadow } from "../src/lights/SpotLightShadow";
 import { DirectionalLight } from "../src/lights/DirectionalLight";
 import { PointLight } from "../src/lights/PointLight";
 import { RectAreaLight } from "../src/lights/RectAreaLight";
+import { LightProbe } from "../src/lights/LightProbe";
+import { SunLight } from "../src/addons/lights/SunLight";
 import { DirectionalLightShadow } from "../src/lights/DirectionalLightShadow";
 import { PointLightShadow } from "../src/lights/PointLightShadow";
 import { OrthographicCamera } from "../src/cameras/OrthographicCamera";
@@ -316,4 +318,32 @@ test("light and shadow specializations preserve inherited intensity and camera i
   assert.ok(clone.camera instanceof OrthographicCamera);
   assert.notEqual(clone.camera, shadow.camera);
   assert.deepEqual(clone.camera.projectionMatrix.elements, shadow.camera.projectionMatrix.elements);
+});
+
+test("directional lights, probes, area and sun lights honor shallow copy and clone", () => {
+  const directional = new DirectionalLight(0x123456, 2);
+  const probe = new LightProbe();
+  const area = new RectAreaLight(0x654321, 3, 4, 5);
+  const sun = new SunLight(0xabcdef, 4);
+  for (const source of [directional, probe, area, sun]) source.add(new Object3D());
+  const copies = [
+    new DirectionalLight().copy(directional, false),
+    new LightProbe().copy(probe, false),
+    new RectAreaLight().copy(area, false),
+    new SunLight().copy(sun, false),
+  ] as const;
+  for (const [i, source] of [directional, probe, area, sun].entries()) {
+    for (const copy of [copies[i], source.clone(false)]) {
+      assert.equal(copy.children.length, 0);
+      assert.equal(copy.intensity, source.intensity);
+    }
+    const recursive = source.clone();
+    assert.equal(recursive.children.length, 1);
+    assert.notEqual(recursive.children[0], source.children[0]);
+  }
+  assert.notEqual(copies[0].target, directional.target);
+  assert.notEqual(copies[0].shadow, directional.shadow);
+  assert.notEqual(copies[1].sh, probe.sh);
+  assert.equal(copies[2].power, area.power);
+  assert.notEqual(copies[3].shadow, sun.shadow);
 });

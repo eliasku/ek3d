@@ -1,3 +1,5 @@
+import type { Texture } from "../../textures/Texture";
+import type { Vector3 } from "../../math/Vector3";
 import type { LTCTextures } from "../shaders/LTCTextures";
 import { WebGLLights } from "./WebGLLights";
 function WebGLRenderState(extensions?: any, ltcTextures: LTCTextures | null = null) {
@@ -5,6 +7,12 @@ function WebGLRenderState(extensions?: any, ltcTextures: LTCTextures | null = nu
   const lightsArray: any[] = [];
   const shadowsArray: any[] = [];
   const lightProbeGridArray: any[] = [];
+  const lightProbeGridUniforms = {
+    textures: [] as Texture[],
+    min: [] as Vector3[],
+    max: [] as Vector3[],
+    resolution: [] as Vector3[],
+  };
   function init(camera?: any) {
     state.camera = camera;
     lightsArray.length = 0;
@@ -23,6 +31,7 @@ function WebGLRenderState(extensions?: any, ltcTextures: LTCTextures | null = nu
   }
   function setupLights() {
     lights.setup(lightsArray);
+    lightProbeGridArray.sort((a, b) => a.priority - b.priority || a.id - b.id);
   }
   function setupLightsView(camera?: any) {
     lights.setupView(lightsArray, camera);
@@ -31,6 +40,7 @@ function WebGLRenderState(extensions?: any, ltcTextures: LTCTextures | null = nu
     lightsArray: lightsArray,
     shadowsArray: shadowsArray,
     lightProbeGridArray: lightProbeGridArray,
+    lightProbeGridUniforms: lightProbeGridUniforms,
     camera: null,
     lights: lights,
     transmissionRenderTarget: {},

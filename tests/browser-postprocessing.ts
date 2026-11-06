@@ -13,6 +13,12 @@ import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { Vector2 } from "ek3d/math/Vector2";
 import { Scene } from "ek3d/scenes/Scene";
+import { GTAOPass } from "ek3d/addons/postprocessing/GTAOPass";
+import { SSAOPass } from "ek3d/addons/postprocessing/SSAOPass";
+import { SSRPass } from "ek3d/addons/postprocessing/SSRPass";
+import { UnrealBloomPass } from "ek3d/addons/postprocessing/UnrealBloomPass";
+import { DepthTexture } from "ek3d/textures/DepthTexture";
+import { Texture } from "ek3d/textures/Texture";
 
 function check(condition: boolean, message: string): void {
   if (!condition) throw new Error(message);
@@ -116,5 +122,49 @@ export function verifyPostprocessing() {
     material.dispose();
     renderer.dispose();
     canvas.remove();
+  }
+}
+
+export function verifyPassResourceDisposal() {
+  const renderer = new WebGLRenderer();
+  const scene = new Scene();
+  const camera = new PerspectiveCamera();
+  const depth = new DepthTexture(4, 4);
+  const normal = new Texture();
+  const gtao = new GTAOPass(scene, camera, 4, 4, { depthTexture: depth, normalTexture: normal });
+  const ssao = new SSAOPass(scene, camera, 4, 4);
+  const ssr = new SSRPass({ renderer, scene, camera, width: 4, height: 4 });
+  const bloom = new UnrealBloomPass(new Vector2(4, 4));
+  const resources = [
+    gtao.gtaoMaterial,
+    gtao.blendMaterial,
+    ssao.ssaoMaterial,
+    ssao.noiseTexture,
+    ssr.ssrMaterial,
+    bloom.materialHighPassFilter,
+  ];
+  const disposed = resources.map(() => 0);
+  let callerDisposals = 0;
+  depth.addEventListener("dispose", () => callerDisposals++);
+  normal.addEventListener("dispose", () => callerDisposals++);
+  resources.forEach((resource, i) => {
+    if (resource === null) throw new Error("Pass must create its owned resource");
+    resource.addEventListener("dispose", () => disposed[i]++);
+  });
+  try {
+    gtao.dispose();
+    ssao.dispose();
+    ssr.dispose();
+    bloom.dispose();
+    check(
+      disposed.every((count) => count === 1),
+      "Pass disposal must release every owned effect material and noise texture",
+    );
+    check(callerDisposals === 0, "GTAO disposal must preserve caller-owned G-buffer textures");
+    return { checks: ["GTAO, SSAO, SSR and bloom resource disposal", "external G-buffer ownership"] };
+  } finally {
+    depth.dispose();
+    normal.dispose();
+    renderer.dispose();
   }
 }

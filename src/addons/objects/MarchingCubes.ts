@@ -26,7 +26,6 @@ export class MarchingCubes extends Mesh<Material> {
   delta: number = 0;
   yd: number = 0;
   zd: number = 0;
-  count: number = 0;
   field: Float32Array = new Float32Array(0);
   normal_cache: Float32Array = new Float32Array(0);
   palette: Float32Array = new Float32Array(0);
@@ -73,6 +72,8 @@ export class MarchingCubes extends Mesh<Material> {
      * @default true
      */
     this.isMarchingCubes = true;
+
+    let vertexCount = 0;
 
     // temp buffers used in polygonize
 
@@ -126,7 +127,7 @@ export class MarchingCubes extends Mesh<Material> {
 
       //
 
-      this.count = 0;
+      vertexCount = 0;
 
       const maxVertexCount = maxPolyCount * 3;
 
@@ -414,7 +415,7 @@ export class MarchingCubes extends Mesh<Material> {
       o2: number,
       o3: number,
     ) => {
-      const c = this.count * 3;
+      const c = vertexCount * 3;
 
       // positions
 
@@ -465,7 +466,7 @@ export class MarchingCubes extends Mesh<Material> {
       // uvs
 
       if (this.enableUvs) {
-        const d = this.count * 2;
+        const d = vertexCount * 2;
 
         this.uvArray[d + 0] = pos[o1 + 0];
         this.uvArray[d + 1] = pos[o1 + 2];
@@ -493,7 +494,7 @@ export class MarchingCubes extends Mesh<Material> {
         this.colorArray[c + 8] = colors[o3 + 2];
       }
 
-      this.count += 3;
+      vertexCount += 3;
     };
 
     /////////////////////////////////////
@@ -825,7 +826,7 @@ export class MarchingCubes extends Mesh<Material> {
         geometry.setAttribute("color", new BufferAttribute(this.colorArray, 3).setUsage(BufferUsage.DynamicDraw));
       }
 
-      this.count = 0;
+      vertexCount = 0;
 
       // Triangulate. Yeah, this is slow.
 
@@ -850,7 +851,7 @@ export class MarchingCubes extends Mesh<Material> {
 
       // set the draw range to only the processed triangles
 
-      this.geometry.setDrawRange(0, this.count);
+      this.geometry.setDrawRange(0, vertexCount);
 
       // update geometry data
 
@@ -862,7 +863,7 @@ export class MarchingCubes extends Mesh<Material> {
 
       // safety check
 
-      if (this.count / 3 > maxPolyCount)
+      if (vertexCount / 3 > maxPolyCount)
         console.warn(
           "THREE.MarchingCubes: Geometry buffers too small for rendering. Please create an instance with a higher poly count.",
         );

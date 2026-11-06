@@ -219,6 +219,7 @@ export function makeClipAdditive(
     let targetOffset = 0;
     const targetValueSize = targetTrack.getValueSize();
     if (targetTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline) {
+      // Removing a quaternion rotation must also rotate the cubic spline tangents.
       targetOffset = targetValueSize / 3;
     }
     const lastIndex = referenceTrack.times.length - 1;
@@ -248,18 +249,20 @@ export function makeClipAdditive(
     // Subtract the reference value from all of the track values
     const numTimes = targetTrack.times.length;
     for (let j = 0; j < numTimes; ++j) {
-      const valueStart = j * targetValueSize + targetOffset;
       if (referenceTrackType === "quaternion") {
-        // Multiply the conjugate for quaternion track types
-        Quaternion.multiplyQuaternionsFlat(
-          targetTrack.values as NumericAnimationBuffer,
-          valueStart,
-          referenceValue,
-          0,
-          targetTrack.values as NumericAnimationBuffer,
-          valueStart,
-        );
+        for (let k = 0; k < targetValueSize; k += 4) {
+          const offset = j * targetValueSize + k;
+          Quaternion.multiplyQuaternionsFlat(
+            targetTrack.values as NumericAnimationBuffer,
+            offset,
+            referenceValue,
+            0,
+            targetTrack.values as NumericAnimationBuffer,
+            offset,
+          );
+        }
       } else {
+        const valueStart = j * targetValueSize + targetOffset;
         const valueEnd = targetValueSize - targetOffset * 2;
         // Subtract each value for all other numeric track types
         for (let k = 0; k < valueEnd; ++k) {

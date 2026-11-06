@@ -10,7 +10,6 @@ test("marching cubes interpolates a single-cell surface and resets its field", (
   cubes.setCell(1, 1, 1, 1);
   assert.equal(cubes.getCell(1, 1, 1), 1);
   cubes.update();
-  assert.equal(cubes.count, 3);
   assert.equal(cubes.geometry.drawRange.count, 3);
   assert.deepEqual(
     Array.from(cubes.positionArray.slice(0, 9)),
@@ -19,7 +18,7 @@ test("marching cubes interpolates a single-cell surface and resets its field", (
   assert.deepEqual(Array.from(cubes.uvArray.slice(0, 6)), [-0.25, -0.5, -0.5, -0.5, -0.5, -0.25]);
   cubes.reset();
   cubes.update();
-  assert.equal(cubes.count, 0);
+  assert.equal(cubes.geometry.drawRange.count, 0);
   assert.equal(cubes.getCell(1, 1, 1), 0);
   let disposals = 0;
   cubes.geometry.addEventListener("dispose", () => disposals++);

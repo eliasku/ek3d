@@ -550,3 +550,30 @@ test("rounded box matches upstream vertices, normals and UVs across rounding and
   assertGeometry(restored, cases[0][1] as unknown as UpstreamBufferGeometry);
   assertOwnership(cases[0][0]);
 });
+
+test("degenerate UV tangents remain unit length and perpendicular to normals", () => {
+  for (const normal of [new Vector3(0, 0, 1), new Vector3(1, 0, 0), new Vector3(1, 2, 3).normalize()]) {
+    for (const uv of [
+      [0, 0, 0, 0, 0, 0],
+      [0, 0, 1, 1, 2, 2],
+    ]) {
+      const geometry = new BufferGeometry();
+      geometry.setIndex([0, 1, 2]);
+      geometry.setAttribute("position", new Float32BufferAttribute([0, 0, 0, 1, 0, 0, 0, 1, 0], 3));
+      geometry.setAttribute(
+        "normal",
+        new Float32BufferAttribute([...normal.toArray(), ...normal.toArray(), ...normal.toArray()], 3),
+      );
+      geometry.setAttribute("uv", new Float32BufferAttribute(uv, 2));
+      geometry.computeTangents();
+      const tangents = geometry.getAttribute("tangent") as Float32BufferAttribute;
+      for (let i = 0; i < 3; i++) {
+        const tangent = new Vector3().fromBufferAttribute(tangents, i);
+        assert.ok(Math.abs(tangent.length() - 1) < 1e-6);
+        assert.ok(Math.abs(tangent.dot(normal)) < 1e-6);
+        assert.equal(tangents.getW(i), 1);
+      }
+      geometry.dispose();
+    }
+  }
+});

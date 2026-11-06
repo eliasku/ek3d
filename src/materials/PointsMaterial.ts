@@ -101,7 +101,7 @@ export class PointsMaterial extends Material {
     /**
      * Defines the size of the points in pixels.
      *
-     * Might be capped if the value exceeds hardware dependent parameters like [GL.ALIASED_POINT_SIZE_RANGE](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParamete).
+     * Might be capped if the value exceeds hardware dependent parameters like [GL.ALIASED_POINT_SIZE_RANGE](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter).
      *
      * @default 1
      */

@@ -91,7 +91,7 @@ export interface WebGLRendererOptions {
   powerPreference?: WebGLPowerPreference;
   /** Rejects contexts with a major performance caveat. Defaults to false. */
   failIfMajorPerformanceCaveat?: boolean;
-  /** Supports large scene scales using gl_FragDepth, at the cost of early fragment tests. */
+  /** Supports large scene scales using gl_FragDepth, at the cost of early fragment tests. Ignored with reversed depth. */
   logarithmicDepthBuffer?: boolean;
   /** Enables reversed depth when EXT_clip_control is available. Defaults to false. */
   reversedDepthBuffer?: boolean;
@@ -300,7 +300,6 @@ export class WebGLRenderer {
     ]);
     const uintClearColor = new Uint32Array(4);
     const intClearColor = new Int32Array(4);
-    const objectPosition = new Vector3();
     let currentRenderList: any = null;
     let currentRenderState: any = null;
     // render() can be called from within a callback triggered by another render.
@@ -1616,6 +1615,11 @@ export class WebGLRenderer {
       }
       object.onAfterRender(_this, scene, camera, geometry, material, group);
     }
+    function countLightProbeGrids(grids: readonly { texture: Texture | null }[]): number {
+      let count = 0;
+      for (const grid of grids) if (grid.texture !== null) count++;
+      return count;
+    }
     function getProgram(material: any, scene: any, object?: any) {
       if (scene.isScene !== true) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
       const materialProperties = properties.get(material);
@@ -1707,7 +1711,7 @@ export class WebGLRenderer {
         uniforms.pointShadowMatrix.value = lights.state.pointShadowMatrix;
         // TODO (abelnation): add area lights shadow info to uniforms
       }
-      materialProperties.lightProbeGrid = currentRenderState.state.lightProbeGridArray.length > 0;
+      materialProperties.numLightProbeGrids = countLightProbeGrids(currentRenderState.state.lightProbeGridArray);
       materialProperties.currentProgram = program;
       materialProperties.uniformsList = null;
       return program;
@@ -1752,18 +1756,6 @@ export class WebGLRenderer {
       materialProperties.vertexAlphas = parameters.vertexAlphas;
       materialProperties.vertexTangents = parameters.vertexTangents;
       materialProperties.toneMapping = parameters.toneMapping;
-    }
-    function findLightProbeGrid(volumes: any, object?: any) {
-      if (volumes.length === 0) return null;
-      if (volumes.length === 1) {
-        return volumes[0].texture !== null ? volumes[0] : null;
-      }
-      objectPosition.setFromMatrixPosition(object.matrixWorld);
-      for (let i = 0, l = volumes.length; i < l; i++) {
-        const v = volumes[i];
-        if (v.texture !== null && v.boundingBox.containsPoint(objectPosition)) return v;
-      }
-      return null;
     }
     function setProgram(camera: any, scene: any, geometry: any, material: any, object?: any) {
       if (scene.isScene !== true) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
@@ -1881,7 +1873,9 @@ export class WebGLRenderer {
           needsProgramChange = true;
         } else if (materialProperties.morphTargetsCount !== morphTargetsCount) {
           needsProgramChange = true;
-        } else if (!!materialProperties.lightProbeGrid !== currentRenderState.state.lightProbeGridArray.length > 0) {
+        } else if (
+          materialProperties.numLightProbeGrids !== countLightProbeGrids(currentRenderState.state.lightProbeGridArray)
+        ) {
           needsProgramChange = true;
         } else if (
           materialProperties.outputColorSpace !== colorSpace ||
@@ -1914,13 +1908,6 @@ export class WebGLRenderer {
       if (material.id !== _currentMaterialId) {
         _currentMaterialId = material.id;
         refreshMaterial = true;
-      }
-      if (materialProperties.needsLights) {
-        const objectVolume = findLightProbeGrid(currentRenderState.state.lightProbeGridArray, object);
-        if (materialProperties.lightProbeGrid !== objectVolume) {
-          materialProperties.lightProbeGrid = objectVolume;
-          refreshMaterial = true;
-        }
       }
       if (refreshProgram || _currentCamera !== camera) {
         // common camera uniforms
@@ -2048,12 +2035,22 @@ export class WebGLRenderer {
           currentRenderState.state.transmissionRenderTarget[camera.id],
         );
         // light probe volume
-        if (materialProperties.needsLights && materialProperties.lightProbeGrid) {
-          const volume = materialProperties.lightProbeGrid;
-          m_uniforms.probesSH.value = volume.texture;
-          m_uniforms.probesMin.value.copy(volume.boundingBox.min);
-          m_uniforms.probesMax.value.copy(volume.boundingBox.max);
-          m_uniforms.probesResolution.value.copy(volume.resolution);
+        if (materialProperties.needsLights && materialProperties.numLightProbeGrids > 0) {
+          const grids = currentRenderState.state.lightProbeGridUniforms;
+          let count = 0;
+          for (const grid of currentRenderState.state.lightProbeGridArray) {
+            if (grid.texture === null) continue;
+            grids.textures[count] = grid.texture;
+            grids.min[count] = grid.boundingBox.min;
+            grids.max[count] = grid.boundingBox.max;
+            grids.resolution[count] = grid.resolution;
+            count++;
+          }
+          grids.textures.length = grids.min.length = grids.max.length = grids.resolution.length = count;
+          m_uniforms.probesSH.value = grids.textures;
+          m_uniforms.probesMin.value = grids.min;
+          m_uniforms.probesMax.value = grids.max;
+          m_uniforms.probesResolution.value = grids.resolution;
         }
         WebGLUniforms.upload(_gl, getUniformList(materialProperties), m_uniforms, textures);
       }
@@ -2540,10 +2537,13 @@ export class WebGLRenderer {
         minZ = srcRegion.isBox3 ? srcRegion.min.z : 0;
       } else {
         const levelScale = Math.pow(2, -srcLevel);
-        width = Math.floor(image.width * levelScale);
-        height = Math.floor(image.height * levelScale);
-        if ((srcTexture as any).isDataArrayTexture) {
-          depth = image.depth;
+        width = Math.floor(srcTexture.width * levelScale);
+        height = Math.floor(srcTexture.height * levelScale);
+        if (
+          ("isDataArrayTexture" in srcTexture && srcTexture.isDataArrayTexture === true) ||
+          ("isCompressedArrayTexture" in srcTexture && srcTexture.isCompressedArrayTexture === true)
+        ) {
+          depth = srcTexture.image.depth;
         } else if ((srcTexture as any).isData3DTexture) {
           depth = Math.floor(image.depth * levelScale);
         } else {
@@ -2593,7 +2593,10 @@ export class WebGLRenderer {
       state.pixelStorei(GL.UNPACK_SKIP_IMAGES, minZ);
       // set up the src texture
       const isSrc3D = (srcTexture as any).isDataArrayTexture || (srcTexture as any).isData3DTexture;
-      const isDst3D = (dstTexture as any).isDataArrayTexture || (dstTexture as any).isData3DTexture;
+      const isDst3D =
+        ("isDataArrayTexture" in dstTexture && dstTexture.isDataArrayTexture === true) ||
+        ("isData3DTexture" in dstTexture && dstTexture.isData3DTexture === true) ||
+        ("isCompressedArrayTexture" in dstTexture && dstTexture.isCompressedArrayTexture === true);
       if ((srcTexture as any).isDepthTexture) {
         const srcTextureProperties = properties.get(srcTexture);
         const dstTextureProperties = properties.get(dstTexture);
@@ -2724,8 +2727,8 @@ export class WebGLRenderer {
               dstX,
               dstY,
               dstZ,
-              width,
-              height,
+              image.width,
+              image.height,
               depth,
               glFormat,
               image.data,

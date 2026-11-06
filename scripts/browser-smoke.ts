@@ -37,13 +37,18 @@ const lifecycles = [
   ["browser-deformation.ts", "verifyDeformationRendering"],
   ["browser-lights.ts", "verifyLightRendering"],
   ["browser-materials.ts", "verifyMaterialRendering"],
+  ["browser-materials.ts", "verifyLightProbeGridRendering"],
   ["browser-textures.ts", "runTextureChecks"],
+  ["browser-textures.ts", "verifyTextureCopyDimensions"],
   ["browser-loaders.ts", "checkLoaders"],
   ["browser-object-loaders.ts", "objectLoaderBrowserChecks"],
+  ["browser-object-loaders.ts", "verifyAddonAssetContracts"],
   ["browser-targets.ts", "verifyLayeredTargets"],
   ["browser-addon-shaders.ts", "verifyAddonShaders"],
   ["browser-postprocessing.ts", "verifyPostprocessing"],
+  ["browser-postprocessing.ts", "verifyPassResourceDisposal"],
   ["browser-orbit-controls.ts", "verifyOrbitControls"],
+  ["browser-orbit-controls.ts", "verifyOrbitCursorInheritance"],
   ["browser-font-text.ts", "verifyFontText"],
   ["browser-lil-gui.ts", "verifyLilGui"],
   ["browser-htmlmesh.ts", "verifyHtmlMesh"],
@@ -814,7 +819,15 @@ export async function verifyBrowser(
         },
         { file, name },
       );
-      if (name === "checkLoaders" || name === "objectLoaderBrowserChecks") {
+      if (
+        [
+          "checkLoaders",
+          "objectLoaderBrowserChecks",
+          "verifyAddonAssetContracts",
+          "verifyPassResourceDisposal",
+          "verifyOrbitCursorInheritance",
+        ].includes(name)
+      ) {
         assert(evidence && typeof evidence === "object" && "checks" in evidence && Array.isArray(evidence.checks));
       } else {
         assert(

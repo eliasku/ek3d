@@ -53,7 +53,7 @@ scene.add(blueWall);
 
 // Dividing wall at x=0 with doorway
 
-const dividerMat = new MeshStandardMaterial({ color: 0xcccccc });
+const dividerMat = new MeshStandardMaterial({ color: 0xcccccc, shadowSide: Side.Front });
 const doorwayHalfGap = 1.25;
 
 // Left section of divider (z = -4 to -1.25)
@@ -112,7 +112,7 @@ for (const x of [-5.05, -2.95]) {
 
 const sphere = new Mesh(
   new SphereGeometry(0.35, 32, 32),
-  new MeshStandardMaterial({ color: 0xffd700, metalness: 0.3, roughness: 0.4 }),
+  new MeshStandardMaterial({ color: 0xffd700, metalness: 0.3, roughness: 0.4, shadowSide: Side.Front }),
 );
 sphere.position.set(-4, 1.41, 0);
 sphere.castShadow = true;
@@ -181,8 +181,9 @@ const warmLight = new PointLight(0xffaa44, 30);
 warmLight.position.set(-4, 4.5, 0);
 warmLight.castShadow = true;
 warmLight.shadow.mapSize.setScalar(256);
-warmLight.shadow.radius = 12;
+warmLight.shadow.radius = 6;
 warmLight.shadow.bias = -0.002;
+warmLight.shadow.normalBias = 0.05;
 scene.add(warmLight);
 
 // Cool point light in right room
@@ -190,8 +191,9 @@ const coolLight = new PointLight(0x88bbff, 30);
 coolLight.position.set(4, 4.5, 0);
 coolLight.castShadow = true;
 coolLight.shadow.mapSize.setScalar(256);
-coolLight.shadow.radius = 12;
+coolLight.shadow.radius = 6;
 coolLight.shadow.bias = -0.002;
+coolLight.shadow.normalBias = 0.05;
 scene.add(coolLight);
 
 const dfg = createDFGLUT();
@@ -221,9 +223,9 @@ function bake(resolution: number): void {
     scene.remove(probe);
     probe.dispose();
   }
-  probes = [-3.9, 3.9].map((x) => {
-    const probe = new LightProbeGridWebGL(7.8, 4.7, 7.6, resolution, resolution, resolution);
-    probe.position.set(x, 2.45, 0);
+  probes = [-4, 4].map((x) => {
+    const probe = new LightProbeGridWebGL(8, 5, 8, resolution, resolution, resolution);
+    probe.position.set(x, 2.5, 0);
     probe.bake(renderer, scene, { cubemapSize: 32, near: 0.05, far: 20 });
     probe.visible = params.enabled;
     return probe;

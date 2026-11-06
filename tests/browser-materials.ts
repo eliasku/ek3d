@@ -1,3 +1,9 @@
+import { LightProbeGridWebGL } from "ek3d/addons/lighting/LightProbeGridWebGL";
+import { MeshLambertMaterial } from "ek3d/materials/MeshLambertMaterial";
+import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
+import { Data3DTexture } from "ek3d/textures/Data3DTexture";
+import { WebGLRenderTarget } from "ek3d/renderers/WebGLRenderTarget";
+import { Color } from "ek3d/math/Color";
 import { GL } from "ek3d/GL";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { WebGLShadowMap } from "ek3d/renderers/webgl/WebGLShadowMap";
@@ -1252,5 +1258,144 @@ export async function verifyMaterialRendering() {
       "Material fixture leaked programs",
     );
     check(gl.getError() === GL.NO_ERROR, "Material fixture cleanup produced a WebGL error");
+  }
+}
+
+export function verifyLightProbeGridRendering() {
+  const size = 128;
+  const dfg = createDFGLUT();
+  const renderer = new WebGLRenderer({
+    antialias: false,
+    preserveDrawingBuffer: true,
+    getDFGLUT: () => dfg,
+    shaders: {
+      MeshLambertMaterial: lambertShader,
+      MeshPhongMaterial: phongShader,
+      MeshToonMaterial: toonShader,
+      MeshStandardMaterial: standardShader,
+      MeshPhysicalMaterial: physicalShader,
+    },
+  });
+  renderer.setSize(size, size, false);
+  renderer.outputColorSpace = ColorSpace.LinearSRGB;
+  renderer.setClearColor(0);
+  const gl = renderer.getContext();
+  const camera = new OrthographicCamera(-2, 2, 2, -2, 0.1, 10);
+  camera.position.z = 5;
+  const scene = new Scene();
+  const geometry = new PlaneGeometry(4, 4);
+  const materials = [
+    new MeshLambertMaterial(),
+    new MeshPhongMaterial(),
+    new MeshToonMaterial(),
+    new MeshStandardMaterial(),
+    new MeshPhysicalMaterial(),
+  ];
+  const mesh = new Mesh<Material>(geometry, materials[0]);
+  const red = new LightProbeGridWebGL(2, 2, 2, 1, 1, 1);
+  const blue = new LightProbeGridWebGL(2, 2, 2, 1, 1, 1);
+  const unbaked = new LightProbeGridWebGL(4, 4, 4, 1, 1, 1);
+  unbaked.priority = 99;
+  red.position.x = -0.734375;
+  blue.position.x = 0.75;
+  red.updateBoundingBox();
+  blue.updateBoundingBox();
+  const atlas = (channel: number) => {
+    const bytes = new Uint8Array(21 * 4);
+    // Constant SH coefficient in the first sub-volume, including both padding slices.
+    for (let slice = 0; slice < 3; slice++) bytes[slice * 4 + channel] = 255;
+    const texture = new Data3DTexture(bytes, 1, 1, 21);
+    texture.needsUpdate = true;
+    return texture;
+  };
+  const redAtlas = atlas(0);
+  const blueAtlas = atlas(2);
+  red.texture = redAtlas;
+  blue.texture = blueAtlas;
+  scene.add(mesh, blue, red, unbaked);
+  const pixels = new Uint8Array(size * size * 4);
+  const sample = (x: number, channel: number) => pixels[(64 * size + x) * 4 + channel];
+  const draw = () => {
+    renderer.render(scene, camera);
+    gl.readPixels(0, 0, size, size, GL.RGBA, GL.UNSIGNED_BYTE, pixels);
+    check(gl.getError() === GL.NO_ERROR, `${mesh.material.type}: probe-grid WebGL error`);
+  };
+  const expectColor = (x: number, channel: number, label: string) => {
+    check(sample(x, channel) > 30, `${mesh.material.type}: ${label} is dark`);
+    check(sample(x, 2 - channel) < 3, `${mesh.material.type}: ${label} mixed grids`);
+  };
+  const expectDark = (x: number, label: string) => {
+    check(sample(x, 0) + sample(x, 1) + sample(x, 2) < 3, `${mesh.material.type}: ${label} is lit`);
+  };
+  const nestedTarget = new WebGLRenderTarget(8, 8);
+  const nestedScene = new Scene();
+  const nestedMesh = new Mesh(geometry, materials[0]);
+  const nestedGrid = new LightProbeGridWebGL(4, 4, 2, 1, 1, 1);
+  nestedGrid.texture = blueAtlas;
+  nestedScene.add(nestedMesh, nestedGrid);
+  const baked = new LightProbeGridWebGL(2, 2, 2, 1, 1, 1);
+  try {
+    for (const material of materials) {
+      mesh.material = material;
+      red.priority = 0;
+      red.texture = redAtlas;
+      blue.texture = blueAtlas;
+      draw();
+      expectColor(32, 0, "left half of one mesh");
+      expectColor(96, 2, "right half of one mesh");
+      expectColor(64, 2, "creation-order overlap despite reversed scene order");
+      expectColor(8, 0, "exact cell boundary");
+      expectDark(7, "outside cell boundary");
+      expectDark(124, "outside both grids");
+      red.priority = 1;
+      draw();
+      expectColor(64, 0, "higher-priority overlap");
+      blue.texture = null;
+      draw();
+      expectDark(96, "two-to-one baked grid transition");
+      expectColor(32, 0, "remaining baked grid");
+      blue.texture = blueAtlas;
+      draw();
+      expectColor(96, 2, "one-to-two baked grid transition");
+      red.texture = blue.texture = null;
+      draw();
+      expectDark(32, "all grids unbaked");
+      expectDark(96, "zero baked grids");
+      scene.remove(red, blue, unbaked);
+      draw();
+      expectDark(64, "zero grids");
+      scene.add(blue, red, unbaked);
+    }
+    mesh.material = nestedMesh.material = materials[0];
+    red.texture = redAtlas;
+    blue.texture = blueAtlas;
+    mesh.onBeforeRender = () => {
+      const target = renderer.getRenderTarget();
+      renderer.setRenderTarget(nestedTarget);
+      renderer.render(nestedScene, camera);
+      renderer.setRenderTarget(target);
+    };
+    draw();
+    expectColor(32, 0, "outer render after nested grid render");
+    expectColor(96, 2, "outer render retains both grids");
+    mesh.onBeforeRender = () => {};
+    scene.remove(red, blue, unbaked);
+    const captureScene = new Scene();
+    captureScene.background = new Color(1, 0, 0);
+    baked.bake(renderer, captureScene, { cubemapSize: 4, near: 0.1, far: 10 });
+    scene.add(baked);
+    draw();
+    expectColor(64, 0, "single-cell grid baked on GPU");
+    expectDark(8, "baked grid does not illuminate outside its cells");
+    return { materials: materials.map((material) => material.type), glError: gl.getError() };
+  } finally {
+    geometry.dispose();
+    for (const material of materials) material.dispose();
+    redAtlas.dispose();
+    blueAtlas.dispose();
+    for (const grid of [red, blue, unbaked, nestedGrid, baked]) grid.dispose();
+    nestedTarget.dispose();
+    dfg.dispose();
+    renderer.dispose();
   }
 }

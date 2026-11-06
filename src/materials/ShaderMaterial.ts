@@ -249,6 +249,7 @@ export class ShaderMaterial extends Material {
     this.uniforms = cloneUniforms(source.uniforms);
     this.uniformsGroups = cloneUniformsGroups(source.uniformsGroups);
     this.defines = Object.assign({}, source.defines);
+    this.linewidth = source.linewidth;
     this.wireframe = source.wireframe;
     this.wireframeLinewidth = source.wireframeLinewidth;
     this.fog = source.fog;

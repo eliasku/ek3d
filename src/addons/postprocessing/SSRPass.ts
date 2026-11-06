@@ -474,6 +474,7 @@ export class SSRPass extends Pass {
 
     // dispose materials
 
+    this.ssrMaterial.dispose();
     this.normalMaterial.dispose();
     this.metalnessOnMaterial.dispose();
     this.metalnessOffMaterial.dispose();

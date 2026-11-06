@@ -244,6 +244,7 @@ export class UnrealBloomPass extends Pass {
       this.separableBlurMaterials[i].dispose();
     }
 
+    this.materialHighPassFilter.dispose();
     this.compositeMaterial.dispose();
     this.blendMaterial.dispose();
     this._basic.dispose();

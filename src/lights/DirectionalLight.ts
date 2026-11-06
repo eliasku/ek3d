@@ -79,8 +79,8 @@ export class DirectionalLight extends Light {
     super.dispose();
     this.shadow.dispose();
   }
-  copy(source?: any): this {
-    super.copy(source);
+  copy(source: DirectionalLight, recursive?: boolean): this {
+    super.copy(source, recursive);
     this.target = source.target.clone();
     this.shadow = source.shadow.clone();
     return this;

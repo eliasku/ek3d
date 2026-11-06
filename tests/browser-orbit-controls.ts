@@ -188,3 +188,30 @@ export function verifyOrbitControls() {
     orthoElement.remove();
   }
 }
+
+export function verifyOrbitCursorInheritance() {
+  const container = document.createElement("div");
+  const element = document.createElement("div");
+  container.style.cursor = "crosshair";
+  container.appendChild(element);
+  document.body.appendChild(container);
+  const controls = new OrbitControls(new PerspectiveCamera(), element);
+  try {
+    check(getComputedStyle(element).cursor === "crosshair", "Connecting must preserve the inherited cursor");
+    controls.cursorStyle = "grab";
+    check(getComputedStyle(element).cursor === "grab", "Grab must override the inherited cursor");
+    controls.cursorStyle = "";
+    check(getComputedStyle(element).cursor === "crosshair", "Clearing the override must restore inheritance");
+    element.style.cursor = "pointer";
+    controls.dispose();
+    check(element.style.cursor === "pointer", "Disposal without a grab override must preserve a caller cursor");
+    controls.connect(element);
+    controls.cursorStyle = "grab";
+    controls.dispose();
+    check(getComputedStyle(element).cursor === "crosshair", "Disposing a grab override must restore inheritance");
+    return { checks: ["inherited cursor", "explicit override reset", "caller cursor preservation on disposal"] };
+  } finally {
+    controls.dispose();
+    container.remove();
+  }
+}

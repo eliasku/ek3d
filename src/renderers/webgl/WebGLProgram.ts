@@ -164,7 +164,8 @@ function replaceLightNums(string?: any, parameters?: any) {
     .replace(/NUM_DIR_LIGHT_SHADOWS/g, parameters.numDirLightShadows)
     .replace(/NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS/g, parameters.numSpotLightShadowsWithMaps)
     .replace(/NUM_SPOT_LIGHT_SHADOWS/g, parameters.numSpotLightShadows)
-    .replace(/NUM_POINT_LIGHT_SHADOWS/g, parameters.numPointLightShadows);
+    .replace(/NUM_POINT_LIGHT_SHADOWS/g, parameters.numPointLightShadows)
+    .replace(/NUM_LIGHT_PROBE_GRIDS/g, parameters.numLightProbeGrids);
 }
 function replaceClippingPlaneNums(string?: any, parameters?: any) {
   return string
@@ -491,7 +492,6 @@ export function WebGLProgram(this: any, renderer?: any, cacheKey?: any, paramete
       parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
       parameters.premultipliedAlpha ? "#define PREMULTIPLIED_ALPHA" : "",
       parameters.numLightProbes > 0 ? "#define USE_LIGHT_PROBES" : "",
-      parameters.numLightProbeGrids > 0 ? "#define USE_LIGHT_PROBES_GRID" : "",
       parameters.decodeVideoTexture ? "#define DECODE_VIDEO_TEXTURE" : "",
       parameters.decodeVideoTextureEmissive ? "#define DECODE_VIDEO_TEXTURE_EMISSIVE" : "",
       parameters.logarithmicDepthBuffer ? "#define USE_LOGARITHMIC_DEPTH_BUFFER" : "",

@@ -46,9 +46,15 @@ export class LineSegmentsGeometry extends InstancedBufferGeometry {
   /** Sets pairs of start and end positions. */
   setPositions(array: Float32Array | number[]): this {
     const lineSegments = array instanceof Float32Array ? array : new Float32Array(array);
-    const buffer = new InstancedInterleavedBuffer(lineSegments, 6, 1);
-    this.setAttribute("instanceStart", new InterleavedBufferAttribute(buffer, 3, 0));
-    this.setAttribute("instanceEnd", new InterleavedBufferAttribute(buffer, 3, 3));
+    const instanceStart = this.attributes.instanceStart as InterleavedBufferAttribute | undefined;
+    if (instanceStart !== undefined && instanceStart.count === lineSegments.length / 6) {
+      instanceStart.data.array = lineSegments;
+      instanceStart.data.needsUpdate = true;
+    } else {
+      const buffer = new InstancedInterleavedBuffer(lineSegments, 6, 1);
+      this.setAttribute("instanceStart", new InterleavedBufferAttribute(buffer, 3, 0));
+      this.setAttribute("instanceEnd", new InterleavedBufferAttribute(buffer, 3, 3));
+    }
     this.instanceCount = this.attributes.instanceStart.count;
     this.computeBoundingBox();
     this.computeBoundingSphere();
@@ -58,9 +64,15 @@ export class LineSegmentsGeometry extends InstancedBufferGeometry {
   /** Sets pairs of start and end colors. */
   setColors(array: Float32Array | number[]): this {
     const colors = array instanceof Float32Array ? array : new Float32Array(array);
-    const buffer = new InstancedInterleavedBuffer(colors, 6, 1);
-    this.setAttribute("instanceColorStart", new InterleavedBufferAttribute(buffer, 3, 0));
-    this.setAttribute("instanceColorEnd", new InterleavedBufferAttribute(buffer, 3, 3));
+    const instanceColorStart = this.attributes.instanceColorStart as InterleavedBufferAttribute | undefined;
+    if (instanceColorStart !== undefined && instanceColorStart.count === colors.length / 6) {
+      instanceColorStart.data.array = colors;
+      instanceColorStart.data.needsUpdate = true;
+    } else {
+      const buffer = new InstancedInterleavedBuffer(colors, 6, 1);
+      this.setAttribute("instanceColorStart", new InterleavedBufferAttribute(buffer, 3, 0));
+      this.setAttribute("instanceColorEnd", new InterleavedBufferAttribute(buffer, 3, 3));
+    }
     return this;
   }
 

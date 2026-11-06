@@ -7,7 +7,7 @@ import { Vector3 } from "../src/math/Vector3";
 test("landing metaballs stay bounded and outward-facing through motion and separation", () => {
   const material = new MeshPhysicalMaterial();
   const surface = createLandingSculpture(material);
-  const initial = surface.positionArray.slice(0, surface.count * 3);
+  const initial = surface.positionArray.slice(0, surface.geometry.drawRange.count * 3);
   const a = new Vector3();
   const b = new Vector3();
   const c = new Vector3();
@@ -20,16 +20,17 @@ test("landing metaballs stay bounded and outward-facing through motion and separ
     for (const seconds of [0, 8, 25, 60, 200]) {
       for (const energy of [0, 0.5, 1]) {
         updateLandingSculpture(surface, seconds, energy);
-        assert.ok(surface.count <= surface.positionArray.length / 3, "the surface must fit its GPU buffer");
+        const vertexCount = surface.geometry.drawRange.count;
+        assert.ok(vertexCount <= surface.positionArray.length / 3, "the surface must fit its GPU buffer");
         let volume = 0;
-        for (let i = 0; i < surface.count; i++) {
+        for (let i = 0; i < vertexCount; i++) {
           a.fromArray(surface.positionArray, i * 3);
           normal.fromArray(surface.normalArray, i * 3);
           assert.ok(Number.isFinite(a.lengthSq()) && Number.isFinite(normal.lengthSq()));
           assert.ok(normal.lengthSq() > 1e-6, "the surface gradient must define a usable normal");
           assert.ok(Math.max(Math.abs(a.x), Math.abs(a.y), Math.abs(a.z)) < 0.94, "no lobe may hit the grid boundary");
         }
-        for (let i = 0; i < surface.count; i += 3) {
+        for (let i = 0; i < vertexCount; i += 3) {
           a.fromArray(surface.positionArray, i * 3);
           b.fromArray(surface.positionArray, (i + 1) * 3);
           c.fromArray(surface.positionArray, (i + 2) * 3);
@@ -74,7 +75,7 @@ test("landing metaballs stay bounded and outward-facing through motion and separ
     }
     updateLandingSculpture(surface, 0, 0);
     assert.deepEqual(
-      surface.positionArray.slice(0, surface.count * 3),
+      surface.positionArray.slice(0, surface.geometry.drawRange.count * 3),
       initial,
       "reset must not retain earlier fields",
     );

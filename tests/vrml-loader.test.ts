@@ -65,3 +65,9 @@ Shape {
 test("VRML reports malformed input", () => {
   assert.throws(() => new VRMLLoader(runtime).parse(header + "Shape { geometry Box {"), /Parsing errors detected/);
 });
+
+test("VRML cameras preserve all three position coordinates", () => {
+  const scene = new VRMLLoader(runtime).parse(header + "PerspectiveCamera { position 2 3 7 }");
+  assert.equal(scene.children.length, 1);
+  assert.deepEqual(scene.children[0].position.toArray(), [2, 3, 7]);
+});

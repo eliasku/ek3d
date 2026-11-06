@@ -1,6 +1,5 @@
 import { Color } from "../../math/Color";
 import { Vector2 } from "../../math/Vector2";
-import { Vector3 } from "../../math/Vector3";
 import { Matrix3 } from "../../math/Matrix3";
 // Uniforms library for shared webgl shaders
 export const common = {
@@ -177,10 +176,10 @@ export const lights = {
   },
   ltc_1: { value: null },
   ltc_2: { value: null },
-  probesSH: { value: null },
-  probesMin: { value: /*@__PURE__*/ new Vector3() },
-  probesMax: { value: /*@__PURE__*/ new Vector3() },
-  probesResolution: { value: /*@__PURE__*/ new Vector3() },
+  probesSH: { value: [] },
+  probesMin: { value: [] },
+  probesMax: { value: [] },
+  probesResolution: { value: [] },
 };
 export const points = {
   diffuse: { value: /*@__PURE__*/ new Color(0xffffff) },

@@ -11,7 +11,7 @@ test("grid positions, bounds and helper update follow the active grid", () => {
   grid.position.set(1, 2, 3);
   grid.updateBoundingBox();
   assert.deepEqual(grid.boundingBox.min.toArray(), [-1, 1, 0]);
-  assert.deepEqual(grid.getProbePosition(2, 1, 1, new Vector3()).toArray(), [3, 3, 6]);
+  assert.deepEqual(grid.getProbePosition(2, 1, 1, new Vector3()).toArray(), [-1 + 10 / 3, 2.5, 4.5]);
   const helper = new LightProbeGridHelperWebGL(grid);
   assert.equal(helper.count, 12);
   const next = new LightProbeGridWebGL(1, 1, 1, 2, 2, 2);
@@ -25,6 +25,20 @@ test("grid positions, bounds and helper update follow the active grid", () => {
   helper.dispose();
   grid.dispose();
   next.dispose();
+});
+
+test("probe positions are centered in cells, including single-probe axes", () => {
+  const grid = new LightProbeGridWebGL(4, 2, 6, 2, 1, 3);
+  grid.position.set(1, 2, 3);
+  grid.updateBoundingBox();
+  const position = new Vector3();
+  assert.deepEqual(grid.getProbePosition(0, 0, 0, position).toArray(), [0, 2, 1]);
+  assert.deepEqual(grid.getProbePosition(1, 0, 2, position).toArray(), [2, 2, 5]);
+  assert.ok(grid.boundingBox.containsPoint(position));
+  const small = new LightProbeGridWebGL(0.1, 0.2, 0.3);
+  assert.deepEqual(small.getProbePosition(0, 0, 0, position).toArray(), [0, 0, 0]);
+  grid.dispose();
+  small.dispose();
 });
 
 test("bake rejects invalid ranges and indirect pass ordering before touching renderer", () => {

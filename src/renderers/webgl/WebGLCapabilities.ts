@@ -11,7 +11,7 @@ export interface WebGLCapabilitiesState {
   textureTypeReadable(type: number): boolean;
   /** Shader precision currently used by the renderer. */
   precision: "highp" | "mediump" | "lowp";
-  /** Whether logarithmic depth was requested. */
+  /** Whether logarithmic depth was requested without active reversed depth. */
   logarithmicDepthBuffer: boolean;
   /** Whether reversed depth was requested and EXT_clip_control is available. */
   reversedDepthBuffer: boolean;
@@ -98,12 +98,15 @@ export function WebGLCapabilities(gl?: any, extensions?: any, parameters?: any, 
     warn("WebGLRenderer:", precision, "not supported, using", maxPrecision, "instead.");
     precision = maxPrecision;
   }
-  const logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true;
   const reversedDepthBuffer = parameters.reversedDepthBuffer === true && extensions.has("EXT_clip_control");
+  const logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true && reversedDepthBuffer === false;
   if (parameters.reversedDepthBuffer === true && reversedDepthBuffer === false) {
     warn(
       "WebGLRenderer: Unable to use reversed depth buffer due to missing EXT_clip_control extension. Fallback to default depth buffer.",
     );
+  }
+  if (parameters.logarithmicDepthBuffer === true && reversedDepthBuffer === true) {
+    warn("WebGLRenderer: Logarithmic depth buffer is ignored when reversed depth buffer is enabled.");
   }
   const maxTextures = gl.getParameter(GL.MAX_TEXTURE_IMAGE_UNITS);
   const maxVertexTextures = gl.getParameter(GL.MAX_VERTEX_TEXTURE_IMAGE_UNITS);

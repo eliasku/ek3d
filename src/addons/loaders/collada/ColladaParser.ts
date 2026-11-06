@@ -1303,6 +1303,8 @@ export class ColladaParser {
       hasUV: false,
     } as ColladaPrimitive;
 
+    const polygons: number[][] = [];
+
     for (let i = 0, l = xml.childNodes.length; i < l; i++) {
       const child = xml.childNodes[i] as Element;
 
@@ -1326,12 +1328,14 @@ export class ColladaParser {
 
         case "p":
           primitive.p = parseInts(child.textContent!);
+          polygons.push(primitive.p);
           break;
       }
     }
 
     if (primitive.type === "polygons") {
-      primitive.vcount = [primitive.p.length / primitive.stride];
+      primitive.p = polygons.flat();
+      primitive.vcount = polygons.map((polygon) => polygon.length / primitive.stride);
     }
 
     return primitive;

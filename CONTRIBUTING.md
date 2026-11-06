@@ -10,10 +10,14 @@ The ported Three.js snapshot is pinned to:
 
 - Repository: [https://github.com/mrdoob/three.js/](https://github.com/mrdoob/three.js/)
 - Branch at the snapshot: `dev`
-- Commit: [`56344393df8f47e725c4e706b61e248b23d3496d`](https://github.com/mrdoob/three.js/commit/56344393df8f47e725c4e706b61e248b23d3496d)
-- Commit date: `Thu Oct 29 10:00:57 2026 +0100`
+- Commit: [`2c916de7ad5a7995e345509fbcf8ee5ae161c05c`](https://github.com/mrdoob/three.js/commit/2c916de7ad5a7995e345509fbcf8ee5ae161c05c)
+- Commit date: `2026-11-06T20:20:46+01:00`
 
 Use this immutable commit as the baseline for future upstream diffs and ek3d updates, not the moving `dev` tip.
+
+The latest [synchronization report](UPSTREAM_SYNC.md) records the filtered delta, native adaptations
+and verification. Migration inventory records retain their original extraction commit; their
+`synchronization` metadata links the current baseline and scope delta without rewriting provenance.
 
 The library is distributed as uncompiled TypeScript source: `exports` maps package subpaths to `src/**/*.ts`, so consumers compile it with their own bundler. No compiled library output is checked in.
 
@@ -936,11 +940,15 @@ The completed iteration delivers practical WebGL coverage, not a drop-in port of
 
 ## Upstream coverage boundaries
 
-The inventory is compared with the pinned `upstream/three.js/src`, not inferred from the example. Beyond the excluded backend/stereo families and intentionally replaced aggregators/shader-source paths, seven upstream defining modules are absent: `textures/HTMLTexture`, `audio/Audio`, `audio/AudioAnalyser`, `audio/AudioContext`, `audio/AudioListener`, `audio/PositionalAudio` and `loaders/AudioLoader`. Defining-module coverage is not proof of full API parity or every renderer combination.
+Core and addon changes are compared with the immutable upstream commit above. The addon/page
+inventory records the original migration snapshot; the linked synchronization report records
+subsequent additions, removals and exclusions. All approved implementation ports are complete,
+including controls, audio and the experimental HTMLTexture port. Defining-module coverage is not
+proof of full API parity or every renderer combination.
 
-- `textures/HTMLTexture` remains unported: it relies on experimental DOM-to-canvas `requestPaint`/`onpaint` behavior. CanvasTexture does not promise that contract.
-- `extras/Controls` and addon `OrbitControls` are ported; the rest of the controls catalog remains pending. The feature testbed's local orbit interaction is separate from the standalone OrbitControls example.
-- Audio, including `AudioLoader`, is outside this canvas-rendering scope. Only the explicitly listed addons are included: shader modules, OrbitControls, FontLoader and TextGeometry; other loaders, helpers, geometries, postprocessing, codecs and transcoders remain pending.
+The native WebGL VDB page remains supported after upstream moved its example to WebGPU. Upstream
+backend migrations do not remove approved native WebGL functionality.
+
 - `StereoCamera`, XR, WebGPU/common/node/TSL backends, node materials/loaders, WebGPU lights and `ClippingGroup` are intentionally excluded. The `webgl-fallback` directory is the WebGPU renderer's backend, not the standalone WebGL renderer.
 - Upstream `Three*`, `Geometries`, `Materials`, `Curves`, `ShaderLib` and `ShaderChunk` aggregators are intentionally not public paths. Ported GLSL lives in explicit descriptors/shared chunks; an absent original shader filename does not mean its GLSL was omitted.
 - Compressed-format and experimental media support is limited to capabilities actually exercised. Full browser/device coverage and additional combinations of shadows, deformation, maps, targets and custom shaders remain release verification requirements, not unfinished module-porting steps.

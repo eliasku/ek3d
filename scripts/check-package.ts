@@ -29,7 +29,7 @@ function inside(base: string, target: string) {
 
 try {
   assert(!inside(root, consumer), "The consumer must not inherit repository resolution");
-  const [pack] = JSON.parse(run("npm", ["pack", "--json", "--pack-destination", consumer], root)) as {
+  const [pack] = Object.values(JSON.parse(run("npm", ["pack", "--json", "--pack-destination", consumer], root))) as {
     filename: string;
     files: { path: string }[];
     bundled: string[];

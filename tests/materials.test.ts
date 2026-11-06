@@ -10,6 +10,7 @@ import { Object3D } from "../src/core/Object3D";
 import { Material } from "../src/materials/Material";
 import type { MaterialProperties } from "../src/materials/Material";
 import { RawShaderMaterial } from "../src/materials/RawShaderMaterial";
+import { ShaderMaterial } from "../src/materials/ShaderMaterial";
 import { MeshPhongMaterial } from "../src/materials/MeshPhongMaterial";
 import { MeshNormalMaterial } from "../src/materials/MeshNormalMaterial";
 import { MeshMatcapMaterial } from "../src/materials/MeshMatcapMaterial";
@@ -431,4 +432,15 @@ test("material initialization and polymorphic copies preserve inherited state", 
   assert.equal(cloned.clearcoat, 0.7);
   assert.equal(copied.roughness, 0.2);
   assert.equal(cloned.label, "custom");
+});
+
+test("shader material copy and clone retain configured line widths", () => {
+  for (const MaterialType of [ShaderMaterial, RawShaderMaterial]) {
+    const source = new MaterialType({ linewidth: 4, wireframeLinewidth: 2 });
+    const copy = new MaterialType({ linewidth: 7 }).copy(source);
+    for (const result of [copy, source.clone()]) {
+      assert.equal(result.linewidth, 4);
+      assert.equal(result.wireframeLinewidth, 2);
+    }
+  }
 });

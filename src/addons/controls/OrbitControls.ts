@@ -295,7 +295,7 @@ export class OrbitControls<TObject extends OrbitCamera = OrbitCamera> extends Co
    */
   zoom0: number;
 
-  _cursorStyle: "auto" | "grab";
+  _cursorStyle: "" | "grab";
 
   // the target DOM element for key events
   _domElementKeyEvents: HTMLElement | Window | null;
@@ -376,7 +376,7 @@ export class OrbitControls<TObject extends OrbitCamera = OrbitCamera> extends Co
     this.position0 = this.object.position.clone();
     this.zoom0 = this.object.zoom;
 
-    this._cursorStyle = "auto";
+    this._cursorStyle = "";
 
     // the target DOM element for key events
     this._domElementKeyEvents = null;
@@ -464,17 +464,17 @@ export class OrbitControls<TObject extends OrbitCamera = OrbitCamera> extends Co
   /**
    * Defines the visual representation of the cursor.
    *
-   * @default 'auto'
+   * @default ''
    */
-  set cursorStyle(type: "auto" | "grab") {
+  set cursorStyle(type: "" | "grab") {
     this._cursorStyle = type;
 
     if (this.domElement !== null) {
-      this.domElement.style.cursor = type === "grab" ? "grab" : "auto";
+      this.domElement.style.cursor = type;
     }
   }
 
-  get cursorStyle(): "auto" | "grab" {
+  get cursorStyle(): "" | "grab" {
     return this._cursorStyle;
   }
 
@@ -520,7 +520,7 @@ export class OrbitControls<TObject extends OrbitCamera = OrbitCamera> extends Co
     this._pointerPositions = {};
 
     element.style.touchAction = ""; // Restore touch scroll
-    element.style.cursor = "auto";
+    if (this._cursorStyle === "grab") element.style.cursor = "";
   }
 
   dispose(): void {

@@ -84,8 +84,8 @@ export class RectAreaLight extends Light {
     // set the light's intensity (in nits) from the desired luminous power (in lumens)
     this.intensity = power / (this.width * this.height * Math.PI);
   }
-  copy(source: RectAreaLight): this {
-    super.copy(source);
+  copy(source: RectAreaLight, recursive?: boolean): this {
+    super.copy(source, recursive);
     this.width = source.width;
     this.height = source.height;
     return this;

@@ -1,6 +1,12 @@
 import { assert, test } from "vitest";
 import { LDrawLoader } from "../src/addons/loaders/LDrawLoader";
 import { LDrawConditionalLineMaterial } from "../src/addons/materials/LDrawConditionalLineMaterial";
+import { LDrawUtils } from "../src/addons/utils/LDrawUtils";
+import { Group } from "../src/objects/Group";
+import { Mesh } from "../src/objects/Mesh";
+import { BufferGeometry } from "../src/core/BufferGeometry";
+import { Float32BufferAttribute } from "../src/core/BufferAttribute";
+import { MeshBasicMaterial } from "../src/materials/MeshBasicMaterial";
 import fs from "node:fs";
 
 const carPath = "public/examples/models/ldraw/officialLibrary/models/car.ldr_Packed.mpd";
@@ -45,4 +51,25 @@ test("addDefaultMaterials builds the main colour library through meta parsing", 
 
   const edge = loader.getMaterial("24") as { name?: string } | null;
   assert.ok(edge !== null, "edge colour 24 missing");
+});
+
+test("merging LDraw geometry resets building-step metadata to one step", () => {
+  const geometry = new BufferGeometry().setAttribute(
+    "position",
+    new Float32BufferAttribute([0, 0, 0, 1, 0, 0, 0, 1, 0], 3),
+  );
+  const material = new MeshBasicMaterial();
+  const object = new Group();
+  object.userData.numBuildingSteps = 3;
+  const mesh = new Mesh(geometry, material);
+  mesh.userData.buildingStep = 2;
+  object.add(mesh);
+  const merged = LDrawUtils.mergeObject(object);
+  assert.equal(merged.userData.buildingStep, 0);
+  assert.equal(merged.userData.numBuildingSteps, 1);
+  assert.equal(merged.children.length, 1);
+  assert.ok(merged.children[0] instanceof Mesh);
+  merged.children[0].geometry.dispose();
+  geometry.dispose();
+  material.dispose();
 });

@@ -29,7 +29,9 @@ export interface SkyShader {
  * - {@link http://simonwallner.at/project/atmospheric-scattering/}
  * - {@link http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR}
  *
- * ```ts
+ * ```typescript
+ * import { Sky } from "ek3d/addons/objects/Sky";
+ *
  * const sky = new Sky();
  * sky.scale.setScalar( 10000 );
  * scene.add( sky );
@@ -37,12 +39,12 @@ export interface SkyShader {
  *
  * It can be useful to hide the sun disc when generating an environment map to avoid artifacts
  *
- * ```ts
+ * ```typescript
  * // disable before rendering environment map
- * sky.material.uniforms["showSunDisc"].value = false;
+ * sky.material.uniforms["showSunDisc"].value = 0;
  * // ...
  * // re-enable before scene sky box rendering
- * sky.material.uniforms["showSunDisc"].value = true;
+ * sky.material.uniforms["showSunDisc"].value = 1;
  * ```
  *
  * @augments Mesh
@@ -129,7 +131,11 @@ export class Sky extends Mesh<ShaderMaterial> {
 			vWorldPosition = worldPosition.xyz;
 
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-			gl_Position.z = gl_Position.w; // set z to camera.far
+			#ifdef USE_REVERSED_DEPTH_BUFFER
+				gl_Position.z = 0.0; // set z to camera.far
+			#else
+				gl_Position.z = gl_Position.w; // set z to camera.far
+			#endif
 
 			vSunDirection = normalize( sunPosition );
 

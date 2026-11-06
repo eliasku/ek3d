@@ -3,6 +3,9 @@ import assert from "node:assert/strict";
 import { LineGeometry } from "../src/addons/lines/LineGeometry";
 import { LineSegmentsGeometry } from "../src/addons/lines/LineSegmentsGeometry";
 import { WireframeGeometry2 } from "../src/addons/lines/WireframeGeometry2";
+import { LineSegments2 } from "../src/addons/lines/LineSegments2";
+import { Wireframe } from "../src/addons/lines/Wireframe";
+import { LineMaterial } from "../src/addons/lines/LineMaterial";
 import { Float32BufferAttribute } from "../src/core/BufferAttribute";
 import { BufferGeometry } from "../src/core/BufferGeometry";
 import { InterleavedBufferAttribute } from "../src/core/InterleavedBufferAttribute";
@@ -94,4 +97,44 @@ test("geometry source conversions preserve non-indexed positions and wireframe e
   assert.equal(segmentGeometry.instanceCount, 3);
   const fatWire = new WireframeGeometry2(source);
   assert.deepEqual(Array.from(data(fatWire, "instanceStart").array), expected);
+});
+
+test("fat line updates reuse same-sized GPU buffers and replace resized buffers", () => {
+  for (const LineObject of [LineSegments2, Wireframe]) {
+    const geometry = new LineSegmentsGeometry().setPositions([0, 0, 0, 1, 0, 0]).setColors([1, 0, 0, 0, 1, 0]);
+    const material = new LineMaterial();
+    const line = new LineObject(geometry, material).computeLineDistances();
+    const names = [
+      "instanceStart",
+      "instanceEnd",
+      "instanceColorStart",
+      "instanceColorEnd",
+      "instanceDistanceStart",
+      "instanceDistanceEnd",
+    ];
+    const attributes = names.map((name) => data(geometry, name));
+    const versions = attributes.map((attribute) => attribute.data.version);
+    geometry.setPositions(new Float32Array([2, 0, 0, 5, 0, 0]));
+    geometry.setColors(new Float32Array([0, 0, 1, 1, 1, 0]));
+    line.computeLineDistances();
+    names.forEach((name, i) => {
+      assert.equal(data(geometry, name), attributes[i]);
+      assert.equal(attributes[i].data.version, versions[i] + 1);
+    });
+    assert.equal(data(geometry, "instanceDistanceEnd").getX(0), 3);
+    assert.equal(data(geometry, "instanceColorStart").getZ(0), 1);
+    assert.deepEqual(geometry.boundingBox?.min.toArray(), [2, 0, 0]);
+    assert.deepEqual(geometry.boundingBox?.max.toArray(), [5, 0, 0]);
+    geometry.setPositions([0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 2, 0]);
+    geometry.setColors([1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1]);
+    line.computeLineDistances();
+    names.forEach((name, i) => {
+      assert.notEqual(data(geometry, name).data, attributes[i].data);
+      assert.equal(data(geometry, name).count, 2);
+    });
+    assert.equal(geometry.instanceCount, 2);
+    assert.equal(data(geometry, "instanceDistanceEnd").getX(1), 3);
+    geometry.dispose();
+    material.dispose();
+  }
 });
