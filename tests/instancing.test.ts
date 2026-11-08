@@ -22,6 +22,8 @@ import { BufferGeometry as UpstreamGeometry } from "../upstream/three.js/src/cor
 import { Float32BufferAttribute as UpstreamAttribute } from "../upstream/three.js/src/core/BufferAttribute.js";
 import { BoxGeometry as UpstreamBox } from "../upstream/three.js/src/geometries/BoxGeometry.js";
 import { MeshBasicMaterial as UpstreamMaterial } from "../upstream/three.js/src/materials/MeshBasicMaterial.js";
+import { Matrix4 as UpstreamMatrix4 } from "../upstream/three.js/src/math/Matrix4.js";
+import { Color as UpstreamColor } from "../upstream/three.js/src/math/Color.js";
 
 function pair(count: number) {
   return [
@@ -117,14 +119,14 @@ test("instance matrices and lazy colors retain capacity and require explicit upl
   const tint = new Color(0.125, 0.5, 0.75);
   assert.equal(actual.setMatrixAt(2, transform), actual);
   assert.equal(actual.setColorAt(2, tint), actual);
-  expected.setMatrixAt(2, transform);
-  expected.setColorAt(2, tint);
+  expected.setMatrixAt(2, new UpstreamMatrix4().fromArray(transform.elements));
+  expected.setColorAt(2, new UpstreamColor(tint.r, tint.g, tint.b));
   assert.deepEqual(actual.instanceMatrix.array, expected.instanceMatrix.array);
   assert.deepEqual(actual.instanceColor!.array, expected.instanceColor!.array);
   assert.equal(actual.instanceColor!.count, 3);
   assert.deepEqual(actual.getColorAt(0, color).toArray(), [1, 1, 1]);
   assert.deepEqual(actual.getColorAt(2, color).toArray(), tint.toArray());
-  assert.deepEqual(actual.getMatrixAt(2, matrix).elements, expected.getMatrixAt(2, new Matrix4()).elements);
+  assert.deepEqual(actual.getMatrixAt(2, matrix).elements, expected.getMatrixAt(2, new UpstreamMatrix4()).elements);
   assert.equal(actual.instanceMatrix.version, 0);
   assert.equal(actual.instanceColor!.version, 0);
   actual.instanceMatrix.setUsage(BufferUsage.DynamicDraw).addUpdateRange(32, 16);
@@ -146,7 +148,7 @@ test("bounds union transformed active instances, including empty counts, without
   ];
   transforms.forEach((matrix, i) => {
     actual.setMatrixAt(i, matrix);
-    expected.setMatrixAt(i, matrix);
+    expected.setMatrixAt(i, new UpstreamMatrix4().fromArray(matrix.elements));
   });
   for (const count of [3, 2, 1, 0, 3]) {
     actual.count = expected.count = count;
@@ -190,7 +192,8 @@ test("frustum and picking use instance bounds and require recomputation after ma
   expected.computeBoundingSphere();
   actual.computeBoundingBox();
   const oldBox = actual.boundingBox!.clone();
-  for (const object of [actual, expected]) object.setMatrixAt(0, new Matrix4().makeTranslation(30, 0, 0));
+  actual.setMatrixAt(0, new Matrix4().makeTranslation(30, 0, 0));
+  expected.setMatrixAt(0, new UpstreamMatrix4().makeTranslation(30, 0, 0));
   assert.deepEqual(actual.boundingBox, oldBox);
   assert.equal(frustum.intersectsObject(actual), true);
   assert.deepEqual(rayAt(30, 0.2).intersectObject(actual), []);
@@ -225,11 +228,11 @@ test("instance picks preserve IDs, world transforms, sorting, active count, clip
   actual.scale.set(2, 3, 2);
   actual.position.z = 1;
   root.updateMatrixWorld(true);
-  expected.matrixWorld.copy(actual.matrixWorld);
+  expected.matrixWorld.fromArray(actual.matrixWorld.elements);
   for (const [i, z] of [0, 2, -2].entries()) {
     const matrix = new Matrix4().makeTranslation(0, 0, z);
     actual.setMatrixAt(i, matrix);
-    expected.setMatrixAt(i, matrix);
+    expected.setMatrixAt(i, new UpstreamMatrix4().fromArray(matrix.elements));
   }
   const ray = rayAt(4, -2);
   const hits = ray.intersectObject(actual);
@@ -285,7 +288,7 @@ test("instanced picking respects indexed and nonindexed material groups and draw
     const actual = new InstancedMesh(geometry, [new MeshBasicMaterial(), new MeshBasicMaterial()], 2);
     const expected = new UpstreamInstancedMesh(reference, [new UpstreamMaterial(), new UpstreamMaterial()], 2);
     actual.setMatrixAt(1, new Matrix4().makeTranslation(0, 0, -2));
-    expected.setMatrixAt(1, new Matrix4().makeTranslation(0, 0, -2));
+    expected.setMatrixAt(1, new UpstreamMatrix4().makeTranslation(0, 0, -2));
     for (const [start, count] of [
       [0, 6],
       [3, 3],
@@ -350,11 +353,11 @@ test("clone and copy preserve subtype and resource sharing but isolate instance 
 
 test("JSON retains active count, full-capacity instance attributes and shared resource references", () => {
   const [actual, expected] = pair(2);
-  for (const object of [actual, expected]) {
-    object.setMatrixAt(1, new Matrix4().makeTranslation(2, 3, 4));
-    object.setColorAt(1, new Color(0.25, 0.5, 0.75));
-    object.count = 1;
-  }
+  actual.setMatrixAt(1, new Matrix4().makeTranslation(2, 3, 4));
+  expected.setMatrixAt(1, new UpstreamMatrix4().makeTranslation(2, 3, 4));
+  actual.setColorAt(1, new Color(0.25, 0.5, 0.75));
+  expected.setColorAt(1, new UpstreamColor(0.25, 0.5, 0.75));
+  actual.count = expected.count = 1;
   const json = actual.toJSON();
   const reference = expected.toJSON("") as { object: { instanceMatrix: unknown; instanceColor?: unknown } };
   assert.equal(json.object.type, "InstancedMesh");

@@ -1,9 +1,10 @@
 import type { WebGLRenderer, WebGLShaderDescriptor } from "../renderers/WebGLRenderer";
-import type { Scene } from "../scenes/Scene";
 import type { Camera } from "../cameras/Camera";
 import type { BufferGeometry } from "../core/BufferGeometry";
 import type { Object3D } from "../core/Object3D";
 import type { Texture } from "../textures/Texture";
+import type { Euler } from "../math/Euler";
+import type { Vector3 } from "../math/Vector3";
 import { Color } from "../math/Color";
 import { EventDispatcher } from "../core/EventDispatcher";
 import {
@@ -558,11 +559,11 @@ export class Material extends EventDispatcher {
    */
   onBeforeRender(
     _renderer: WebGLRenderer,
-    _scene: Scene,
+    _scene: Object3D,
     _camera: Camera,
     _geometry: BufferGeometry,
     _object: Object3D,
-    _group: BufferGeometry["groups"][number],
+    _group: BufferGeometry["groups"][number] | null,
   ): void {}
   /**
    * An optional callback that is executed immediately before the shader
@@ -608,13 +609,13 @@ export class Material extends EventDispatcher {
         continue;
       }
       if (currentValue && currentValue.isColor) {
-        currentValue.set(newValue);
-      } else if (
-        (currentValue && currentValue.isVector2 && newValue && newValue.isVector2) ||
-        (currentValue && currentValue.isEuler && newValue && newValue.isEuler) ||
-        (currentValue && currentValue.isVector3 && newValue && newValue.isVector3)
-      ) {
-        currentValue.copy(newValue);
+        (currentValue as Color).set(newValue);
+      } else if (currentValue && currentValue.isVector2 && newValue && newValue.isVector2) {
+        (currentValue as Vector2).copy(newValue);
+      } else if (currentValue && currentValue.isEuler && newValue && newValue.isEuler) {
+        (currentValue as Euler).copy(newValue);
+      } else if (currentValue && currentValue.isVector3 && newValue && newValue.isVector3) {
+        (currentValue as Vector3).copy(newValue);
       } else {
         (this as any)[key] = newValue;
       }

@@ -4,6 +4,7 @@ import type { Matrix4 } from "./Matrix4";
 import type { Quaternion } from "./Quaternion";
 import type { Vector3 } from "./Vector3";
 import { clamp } from "./MathUtils";
+import { ensureTypeFlag } from "../utils";
 /**
  * Class representing a 4D vector. A 4D vector is an ordered quadruplet of numbers
  * (labeled x, y, z and w), which can be used to represent a number of things, such as:
@@ -54,6 +55,7 @@ export class Vector4 {
    * @param [w=1] - The w value of this vector.
    */
   constructor(x: number = 0, y: number = 0, z: number = 0, w: number = 1) {
+    ensureTypeFlag(this, "isVector4");
     /**
      * The x value of this vector.
      *
@@ -218,7 +220,7 @@ export class Vector4 {
    * @return A clone of this instance.
    */
   clone(): Vector4 {
-    return new (this.constructor as any)(this.x, this.y, this.z, this.w);
+    return new Vector4(this.x, this.y, this.z, this.w);
   }
   /**
    * Copies the values of the given vector to this instance.
@@ -814,11 +816,5 @@ export class Vector4 {
     this.z = Math.random();
     this.w = Math.random();
     return this;
-  }
-  *[Symbol.iterator]() {
-    yield this.x;
-    yield this.y;
-    yield this.z;
-    yield this.w;
   }
 }

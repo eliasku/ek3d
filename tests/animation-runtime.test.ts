@@ -12,6 +12,13 @@ import { BooleanKeyframeTrack } from "../src/animation/tracks/BooleanKeyframeTra
 import { StringKeyframeTrack } from "../src/animation/tracks/StringKeyframeTrack";
 import { Object3D } from "../src/core/Object3D";
 import { Loop, AnimationBlendMode } from "../src/constants";
+import { Color } from "../src/math/Color";
+import { Matrix3 } from "../src/math/Matrix3";
+import { Matrix4 } from "../src/math/Matrix4";
+import { Quaternion } from "../src/math/Quaternion";
+import { Vector2 } from "../src/math/Vector2";
+import { Vector3 } from "../src/math/Vector3";
+import { Vector4 } from "../src/math/Vector4";
 import { AnimationMixer as UpstreamMixer } from "../upstream/three.js/src/animation/AnimationMixer.js";
 import { AnimationObjectGroup as UpstreamGroup } from "../upstream/three.js/src/animation/AnimationObjectGroup.js";
 import { PropertyBinding as UpstreamBinding } from "../upstream/three.js/src/animation/PropertyBinding.js";
@@ -40,6 +47,28 @@ test("binding dispatch tables stay shared while callbacks bind and unbind per in
   const buffer = [0];
   binding.getValue(buffer, 0);
   assert.deepEqual(buffer, [7]);
+});
+
+test("math bindings retain value identity and typed-buffer offsets", () => {
+  for (const value of [
+    new Color(0.1, 0.2, 0.3),
+    new Matrix3(),
+    new Matrix4(),
+    new Quaternion(0, 0, 0, 1),
+    new Vector2(1, 2),
+    new Vector3(1, 2, 3),
+    new Vector4(1, 2, 3, 4),
+  ]) {
+    const root = Object.assign(new Object3D(), { value });
+    const binding = new PropertyBinding(root, ".value");
+    const expected = value.toArray().map((component) => component + 0.25);
+    binding.setValue(new Float64Array([-1, ...expected, -1]), 1);
+    const result = new Float64Array(expected.length + 4).fill(-1);
+    binding.getValue(result, 2);
+    assert.deepEqual(Array.from(result), [-1, -1, ...expected, -1, -1]);
+    assert.equal(root.value, value);
+    assert.equal(root.matrixWorldNeedsUpdate, true);
+  }
 });
 
 test("mixer once/repeat/pingpong, reverse playback and finish/loop events match upstream", () => {

@@ -189,8 +189,8 @@ export class SphericalHarmonics3 {
    *
    * @return A clone of this instance.
    */
-  clone(): this {
-    return new (this.constructor as any)().copy(this);
+  clone(): SphericalHarmonics3 {
+    return new SphericalHarmonics3().copy(this);
   }
   /**
    * Sets the SH coefficients of this instance from the given array.

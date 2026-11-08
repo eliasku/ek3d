@@ -18,6 +18,8 @@ import { PerspectiveCamera } from "../src/cameras/PerspectiveCamera";
 import { OrthographicCamera } from "../src/cameras/OrthographicCamera";
 import { Vector2 } from "../src/math/Vector2";
 import { Vector3 } from "../src/math/Vector3";
+import { Vector4 } from "../src/math/Vector4";
+import { Matrix3 } from "../src/math/Matrix3";
 import { Matrix4 } from "../src/math/Matrix4";
 import { Box2 } from "../src/math/Box2";
 import { Line3 } from "../src/math/Line3";
@@ -45,7 +47,7 @@ import { ShaderMaterial } from "../src/materials/ShaderMaterial";
 import { Fog as UpstreamFog } from "../upstream/three.js/src/scenes/Fog.js";
 import { FogExp2 as UpstreamFogExp2 } from "../upstream/three.js/src/scenes/FogExp2.js";
 
-test("typed core fields preserve readonly descriptors and inherited math flags", () => {
+test("typed core fields preserve readonly descriptors and rotation coupling", () => {
   const object = new Object3D();
   const attribute = new BufferAttribute(new Float32Array(3), 3);
   for (const value of [object, attribute, new BufferGeometry(), new UniformsGroup()]) {
@@ -69,15 +71,60 @@ test("typed core fields preserve readonly descriptors and inherited math flags",
     assert.equal(descriptor.configurable, false);
     assert.equal(descriptor.writable, false);
   }
-  const vector = new Vector3();
-  const matrix = new Matrix4();
-  assert.equal(vector.isVector3, true);
-  assert.equal(matrix.isMatrix4, true);
-  assert.equal(Object.hasOwn(vector, "isVector3"), false);
-  assert.equal(Object.hasOwn(matrix, "isMatrix4"), false);
   const originalQuaternion = object.quaternion.clone();
   object.rotation.x = 0.5;
   assert.equal(object.quaternion.equals(originalQuaternion), false);
+});
+
+test("math type markers remain readonly without changing clone serialization", () => {
+  for (const [value, marker, serialized] of [
+    [new Vector2(1, 2), "isVector2", { x: 1, y: 2 }],
+    [new Vector3(1, 2, 3), "isVector3", { x: 1, y: 2, z: 3 }],
+    [new Vector4(1, 2, 3, 4), "isVector4", { x: 1, y: 2, z: 3, w: 4 }],
+    [new Matrix3(), "isMatrix3", { elements: [1, 0, 0, 0, 1, 0, 0, 0, 1] }],
+    [new Matrix4(), "isMatrix4", { elements: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] }],
+  ] as const) {
+    const clone = value.clone();
+    assert.notEqual(clone, value);
+    for (const current of [value, clone]) {
+      assert.equal(Reflect.get(current, marker), true);
+      assert.equal(Reflect.set(current, marker, false), false);
+      assert.deepEqual(Object.keys(current), Object.keys(serialized));
+      assert.equal(JSON.stringify(current), JSON.stringify(serialized));
+    }
+  }
+  class DynamicVector extends Vector3 {
+    enabled: boolean = true;
+    override get isVector3(): boolean {
+      return this.enabled;
+    }
+  }
+  const vector = new DynamicVector();
+  assert.equal(vector.isVector3, true);
+  vector.enabled = false;
+  assert.equal(vector.isVector3, false);
+});
+
+test("value cloning uses the declared type instead of a subclass constructor", () => {
+  class DerivedVector extends Vector3 {}
+  class DerivedBox extends Box2 {}
+
+  const vector = new DerivedVector(1, 2, 3).clone();
+  assert.equal(Object.getPrototypeOf(vector), Vector3.prototype);
+  assert.deepEqual(vector.toArray(), [1, 2, 3]);
+
+  const source = new DerivedBox(new Vector2(-4, -5), new Vector2(6, 7));
+  const box = source.clone();
+  assert.equal(Object.getPrototypeOf(box), Box2.prototype);
+  assert.deepEqual(
+    [box.min.toArray(), box.max.toArray()],
+    [
+      [-4, -5],
+      [6, 7],
+    ],
+  );
+  box.min.x = 10;
+  assert.equal(source.min.x, -4);
 });
 
 test("base cloning preserves concrete subclass contracts", () => {

@@ -24,7 +24,7 @@ export function WebGLClearBackground(renderer?: any, state?: any, alpha?: any, p
       renderer.clear(renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil);
     }
   }
-  function setClear(color?: any, alpha?: any) {
+  function setClear(color: Color, alpha: number) {
     color.getRGB(_rgb, getUnlitUniformColorSpace(renderer));
     state.buffers.color.setClear(_rgb.r, _rgb.g, _rgb.b, alpha, premultipliedAlpha);
   }

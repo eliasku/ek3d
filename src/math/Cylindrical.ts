@@ -91,6 +91,6 @@ export class Cylindrical {
    * @return A clone of this instance.
    */
   clone(): Cylindrical {
-    return new (this.constructor as any)().copy(this);
+    return new Cylindrical().copy(this);
   }
 }

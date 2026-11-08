@@ -10,6 +10,13 @@ The package contains TypeScript source, so use a bundler that supports TypeScrip
 Pass shaders and other required subsystems to the renderer explicitly.
 This keeps dependencies visible. It does not guarantee a smaller bundle.
 
+Unlike Three.js, math objects (`Vector2`, `Vector3`, `Vector4`, `Quaternion`,
+`Euler` and `Color`) are not iterable. Use `toArray()` or named components instead.
+
+Math value types and `UniformsGroup` clone to their declared class, not the receiver's
+runtime subclass. `Triangle` keeps polymorphic cloning for the maintained
+`ExtendedTriangle` subclass. Inheritance-based engine types retain subtype-preserving clones.
+
 ## Basic example
 
 ```typescript
@@ -39,6 +46,15 @@ It does not include the full Three.js addon catalog.
 WebGPU, TSL, WebXR and StereoCamera are not included.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, commands, API details and checks.
+
+Production builds use `@eliasku/ts-mangle/vite-plugin`, temporarily linked to
+`file:../ts-mangle`. Build that checkout before building ek3d. Property mangling is disabled.
+Development and unit tests use the original classes; verify optimized behavior with
+`npm run build` and `npm run preview`.
+Classes that need runtime prototypes can opt out with class-level `@class-crasher-ignore` JSDoc.
+Math classes remain extracted; their method calls need concrete receiver types.
+The optimized build is not release-ready: remaining dynamic dispatch and the full
+example/browser/device matrix still need verification.
 
 Run `npm run docs:llms` to generate [llms.txt](public/llms.txt) and
 [llms-full.txt](public/llms-full.txt) from this README and the maintained source.

@@ -1,16 +1,28 @@
 import type { AnimationBinding } from "./PropertyBinding";
+import type { AnimationBuffer, NumericAnimationBuffer } from "../math/Interpolant";
 import { Quaternion } from "../math/Quaternion";
+
+type MixFunction = (
+  this: PropertyMixer,
+  buffer: AnimationBuffer,
+  dstOffset: number,
+  srcOffset: number,
+  t: number,
+  stride: number,
+) => void;
+
 /**
  * Buffered scene graph property that allows weighted accumulation; used internally.
  */
 export class PropertyMixer {
   binding: AnimationBinding;
   valueSize: number;
-  buffer: any[] | Float64Array;
+  buffer: AnimationBuffer;
+  _cacheIndex: number | null;
   _workIndex: number | undefined;
-  _mixBufferRegion: (buffer: any, dstOffset: any, srcOffset: any, t: any, stride: any) => void;
-  _mixBufferRegionAdditive: (buffer: any, dstOffset: any, srcOffset: any, t: any, stride: any) => void;
-  _setIdentity: () => void;
+  _mixBufferRegion: MixFunction;
+  _mixBufferRegionAdditive: MixFunction;
+  _setIdentity: (this: PropertyMixer) => void;
   _origIndex: number;
   _addIndex: number;
   cumulativeWeight: number;
@@ -31,12 +43,13 @@ export class PropertyMixer {
      *
      */
     this.binding = binding;
+    this._cacheIndex = null;
     /**
      * The keyframe track value size.
      *
      */
     this.valueSize = valueSize;
-    let mixFunction: any, mixFunctionAdditive: any, setIdentity: any;
+    let mixFunction: MixFunction, mixFunctionAdditive: MixFunction, setIdentity: (this: PropertyMixer) => void;
     // buffer layout: [ incoming | accu0 | accu1 | orig | addAccu | (optional work) ]
     //
     // interpolators can use .buffer as their .result
@@ -52,31 +65,29 @@ export class PropertyMixer {
     //
     // 'work' is optional and is only present for quaternion types. It is used
     // to store intermediate quaternion multiplication results
-    /* oxlint-disable typescript/unbound-method -- Selected methods are installed on this mixer and invoked with its receiver. */
     switch (typeName) {
       case "quaternion":
-        mixFunction = this._slerp;
-        mixFunctionAdditive = this._slerpAdditive;
-        setIdentity = this._setAdditiveIdentityQuaternion;
+        mixFunction = _slerp;
+        mixFunctionAdditive = _slerpAdditive;
+        setIdentity = _setAdditiveIdentityQuaternion;
         this.buffer = new Float64Array(valueSize * 6);
         this._workIndex = 5;
         break;
       case "string":
       case "bool":
-        mixFunction = this._select;
+        mixFunction = _select;
         // Use the regular mix function and for additive on these types,
         // additive is not relevant for non-numeric types
-        mixFunctionAdditive = this._select;
-        setIdentity = this._setAdditiveIdentityOther;
-        this.buffer = Array(valueSize * 5);
+        mixFunctionAdditive = _select;
+        setIdentity = _setAdditiveIdentityOther;
+        this.buffer = Array<string | boolean>(valueSize * 5);
         break;
       default:
-        mixFunction = this._lerp;
-        mixFunctionAdditive = this._lerpAdditive;
-        setIdentity = this._setAdditiveIdentityNumeric;
+        mixFunction = _lerp;
+        mixFunctionAdditive = _lerpAdditive;
+        setIdentity = _setAdditiveIdentityNumeric;
         this.buffer = new Float64Array(valueSize * 5);
     }
-    /* oxlint-enable typescript/unbound-method */
     this._mixBufferRegion = mixFunction;
     this._mixBufferRegionAdditive = mixFunctionAdditive;
     this._setIdentity = setIdentity;
@@ -123,7 +134,7 @@ export class PropertyMixer {
     if (currentWeight === 0) {
       // accuN := incoming * weight
       for (let i = 0; i !== stride; ++i) {
-        (buffer as any)[offset + i] = (buffer as any)[i];
+        buffer[offset + i] = buffer[i];
       }
       currentWeight = weight;
     } else {
@@ -175,7 +186,7 @@ export class PropertyMixer {
       this._mixBufferRegionAdditive(buffer, offset, this._addIndex * stride, 1, stride);
     }
     for (let i = stride, e = stride + stride; i !== e; ++i) {
-      if ((buffer as any)[i] !== (buffer as any)[i + stride]) {
+      if (buffer[i] !== buffer[i + stride]) {
         // value has changed -> update scene graph
         binding.setValue(buffer, offset);
         break;
@@ -193,7 +204,7 @@ export class PropertyMixer {
     binding.getValue(buffer, originalValueOffset);
     // accu[0..1] := orig -- initially detect changes against the original
     for (let i = stride, e = originalValueOffset; i !== e; ++i) {
-      (buffer as any)[i] = (buffer as any)[originalValueOffset + (i % stride)];
+      buffer[i] = buffer[originalValueOffset + (i % stride)];
     }
     // Add to identity for additive
     this._setIdentity();
@@ -207,55 +218,72 @@ export class PropertyMixer {
     const originalValueOffset = this.valueSize * 3;
     this.binding.setValue(this.buffer, originalValueOffset);
   }
-  // internals
-  _setAdditiveIdentityNumeric() {
-    const startIndex = this._addIndex * this.valueSize;
-    const endIndex = startIndex + this.valueSize;
-    for (let i = startIndex; i < endIndex; i++) {
-      (this.buffer as any)[i] = 0;
-    }
+}
+
+function _setAdditiveIdentityNumeric(this: PropertyMixer): void {
+  const startIndex = this._addIndex * this.valueSize;
+  const endIndex = startIndex + this.valueSize;
+  for (let i = startIndex; i < endIndex; i++) {
+    this.buffer[i] = 0;
   }
-  _setAdditiveIdentityQuaternion() {
-    this._setAdditiveIdentityNumeric();
-    (this.buffer as any)[this._addIndex * this.valueSize + 3] = 1;
+}
+
+function _setAdditiveIdentityQuaternion(this: PropertyMixer): void {
+  _setAdditiveIdentityNumeric.call(this);
+  this.buffer[this._addIndex * this.valueSize + 3] = 1;
+}
+
+function _setAdditiveIdentityOther(this: PropertyMixer): void {
+  const startIndex = this._origIndex * this.valueSize;
+  const targetIndex = this._addIndex * this.valueSize;
+  for (let i = 0; i < this.valueSize; i++) {
+    this.buffer[targetIndex + i] = this.buffer[startIndex + i];
   }
-  _setAdditiveIdentityOther() {
-    const startIndex = this._origIndex * this.valueSize;
-    const targetIndex = this._addIndex * this.valueSize;
-    for (let i = 0; i < this.valueSize; i++) {
-      (this.buffer as any)[targetIndex + i] = (this.buffer as any)[startIndex + i];
-    }
-  }
-  // mix functions
-  _select(buffer: any, dstOffset: any, srcOffset: any, t: any, stride?: any) {
-    if (t >= 0.5) {
-      for (let i = 0; i !== stride; ++i) {
-        buffer[dstOffset + i] = buffer[srcOffset + i];
-      }
-    }
-  }
-  _slerp(buffer: any, dstOffset: any, srcOffset: any, t?: any) {
-    Quaternion.slerpFlat(buffer, dstOffset, buffer, dstOffset, buffer, srcOffset, t);
-  }
-  _slerpAdditive(buffer: any, dstOffset: any, srcOffset: any, t: any, stride?: any) {
-    // Only quaternion mixers select this method and initialize the work region.
-    const workOffset = this._workIndex! * stride;
-    // Store result in intermediate buffer offset
-    Quaternion.multiplyQuaternionsFlat(buffer, workOffset, buffer, dstOffset, buffer, srcOffset);
-    // Slerp to the intermediate result
-    Quaternion.slerpFlat(buffer, dstOffset, buffer, dstOffset, buffer, workOffset, t);
-  }
-  _lerp(buffer: any, dstOffset: any, srcOffset: any, t: any, stride?: any) {
-    const s = 1 - t;
+}
+
+function _select(buffer: AnimationBuffer, dstOffset: number, srcOffset: number, t: number, stride: number): void {
+  if (t >= 0.5) {
     for (let i = 0; i !== stride; ++i) {
-      const j = dstOffset + i;
-      buffer[j] = buffer[j] * s + buffer[srcOffset + i] * t;
+      buffer[dstOffset + i] = buffer[srcOffset + i];
     }
   }
-  _lerpAdditive(buffer: any, dstOffset: any, srcOffset: any, t: any, stride?: any) {
-    for (let i = 0; i !== stride; ++i) {
-      const j = dstOffset + i;
-      buffer[j] = buffer[j] + buffer[srcOffset + i] * t;
-    }
+}
+
+function _slerp(buffer: AnimationBuffer, dstOffset: number, srcOffset: number, t: number): void {
+  const values = buffer as NumericAnimationBuffer;
+  Quaternion.slerpFlat(values, dstOffset, values, dstOffset, values, srcOffset, t);
+}
+
+function _slerpAdditive(
+  this: PropertyMixer,
+  buffer: AnimationBuffer,
+  dstOffset: number,
+  srcOffset: number,
+  t: number,
+  stride: number,
+): void {
+  const values = buffer as NumericAnimationBuffer;
+  // Only quaternion mixers select this function and initialize the work region.
+  const workOffset = this._workIndex! * stride;
+  // Store result in intermediate buffer offset
+  Quaternion.multiplyQuaternionsFlat(values, workOffset, values, dstOffset, values, srcOffset);
+  // Slerp to the intermediate result
+  Quaternion.slerpFlat(values, dstOffset, values, dstOffset, values, workOffset, t);
+}
+
+function _lerp(buffer: AnimationBuffer, dstOffset: number, srcOffset: number, t: number, stride: number): void {
+  const values = buffer as NumericAnimationBuffer;
+  const s = 1 - t;
+  for (let i = 0; i !== stride; ++i) {
+    const j = dstOffset + i;
+    values[j] = values[j] * s + values[srcOffset + i] * t;
+  }
+}
+
+function _lerpAdditive(buffer: AnimationBuffer, dstOffset: number, srcOffset: number, t: number, stride: number): void {
+  const values = buffer as NumericAnimationBuffer;
+  for (let i = 0; i !== stride; ++i) {
+    const j = dstOffset + i;
+    values[j] = values[j] + values[srcOffset + i] * t;
   }
 }

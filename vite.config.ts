@@ -1,5 +1,7 @@
 import { existsSync, readdirSync } from "node:fs";
 import { defineConfig } from "vite-plus";
+import type { Plugin } from "vite-plus";
+import { vitePluginTsMangle } from "@eliasku/ts-mangle/vite-plugin";
 
 const exampleEntries = existsSync("examples")
   ? readdirSync("examples", { recursive: true })
@@ -8,6 +10,15 @@ const exampleEntries = existsSync("examples")
   : [];
 
 export default defineConfig(({ command }) => ({
+  plugins: [
+    // The plugin uses standard Vite types; Vite+ exposes Rolldown plugin types.
+    vitePluginTsMangle({
+      entrySourceFiles: [],
+      tsconfigPath: "tsconfig.crasher.json",
+      enabled: command === "build",
+      useMangler: false,
+    }) as Plugin,
+  ],
   // Let Rolldown inline const enums across modules; keep per-file transforms in development.
   oxc: command === "build" ? { exclude: /\.ts$/ } : undefined,
   // The upstream checkout is a read-only comparison baseline, not a development entry point.

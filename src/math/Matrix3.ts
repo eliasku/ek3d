@@ -1,7 +1,7 @@
 import type { Matrix4 } from "./Matrix4";
 import type { Vector2 } from "./Vector2";
 import type { Vector3 } from "./Vector3";
-import { warnOnce } from "../utils";
+import { warnOnce, ensureTypeFlag } from "../utils";
 /**
  * Represents a 3x3 matrix.
  *
@@ -73,6 +73,7 @@ export class Matrix3 {
     n32?: number,
     n33?: number,
   ) {
+    ensureTypeFlag(this, "isMatrix3");
     /**
      * A column-major list of matrix values.
      *
@@ -514,7 +515,7 @@ export class Matrix3 {
    * @return A clone of this instance.
    */
   clone(): Matrix3 {
-    return new (this.constructor as any)().fromArray(this.elements);
+    return new Matrix3().fromArray(this.elements);
   }
 }
 const _m3 = /*@__PURE__*/ new Matrix3();

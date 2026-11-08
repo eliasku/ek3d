@@ -46,8 +46,8 @@ export class Capsule {
    *
    * @return A clone of this instance.
    */
-  clone() {
-    return new (this.constructor as new () => this)().copy(this);
+  clone(): Capsule {
+    return new Capsule().copy(this);
   }
 
   /**

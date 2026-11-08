@@ -137,7 +137,7 @@ export class Box3 {
    * @return A clone of this instance.
    */
   clone(): Box3 {
-    return new (this.constructor as any)().copy(this);
+    return new Box3().copy(this);
   }
   /**
    * Copies the values of the given box to this instance.

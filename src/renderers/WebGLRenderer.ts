@@ -1,12 +1,27 @@
 import { GL } from "../GL";
 import type { ArrayCamera } from "../cameras/ArrayCamera";
+import type { BufferGeometry } from "../core/BufferGeometry";
+import type { InstancedBufferGeometry } from "../core/InstancedBufferGeometry";
 import type { Box2 } from "../math/Box2";
 import type { Box3 } from "../math/Box3";
 import type { Camera } from "../cameras/Camera";
 import type { FramebufferTexture } from "../textures/FramebufferTexture";
+import type { BatchedMesh } from "../objects/BatchedMesh";
+import type { Group } from "../objects/Group";
+import type { InstancedMesh } from "../objects/InstancedMesh";
+import type { LOD } from "../objects/LOD";
+import type { Light } from "../lights/Light";
+import type { Line } from "../objects/Line";
+import type { LineLoop } from "../objects/LineLoop";
+import type { LineSegments } from "../objects/LineSegments";
+import type { Mesh } from "../objects/Mesh";
 import type { LTCTextures } from "./shaders/LTCTextures";
 import type { Object3D } from "../core/Object3D";
 import type { Plane } from "../math/Plane";
+import type { Points } from "../objects/Points";
+import type { Sphere } from "../math/Sphere";
+import type { Sprite } from "../objects/Sprite";
+import type { Scene } from "../scenes/Scene";
 import type { Texture } from "../textures/Texture";
 import type { Vector2 } from "../math/Vector2";
 import type { WebGLBackground } from "./webgl/WebGLBackground";
@@ -15,9 +30,10 @@ import type { WebGLOutput } from "./webgl/WebGLOutput";
 import type { WebGLOutputEffect } from "./webgl/WebGLOutput";
 import type { WebGLShadowMap } from "./webgl/WebGLShadowMap";
 import type { WebGLShadowMapSystem } from "./webgl/WebGLShadowMap";
-import type { Material } from "../materials/Material";
+import type { Material, MaterialProperties } from "../materials/Material";
 import type { WebGLCapabilitiesState } from "./webgl/WebGLCapabilities";
 import type { WebGLInfoState } from "./webgl/WebGLInfo";
+import type { WebGLProgramInfo } from "./webgl/WebGLProgram";
 import { WebGLClearBackground } from "./webgl/WebGLClearBackground";
 import { getEnvironment } from "./webgl/WebGLEnvironmentAccess";
 import {
@@ -61,6 +77,21 @@ import { WebGLMaterials } from "./webgl/WebGLMaterials";
 import { WebGLUniformsGroups } from "./webgl/WebGLUniformsGroups";
 import { createCanvasElement, probeAsync, error, warn, log } from "../utils";
 import { ColorManagement } from "../math/ColorManagement";
+
+type GeometryGroup = BufferGeometry["groups"][number];
+
+interface RenderItem {
+  object: Object3D;
+  geometry: BufferGeometry;
+  material: Material;
+  group: GeometryGroup | null;
+}
+
+interface RenderList {
+  opaque: RenderItem[];
+  transmissive: RenderItem[];
+  transparent: RenderItem[];
+}
 
 export interface WebGLShaderDescriptor {
   vertexShader: string;
@@ -190,7 +221,14 @@ export class WebGLRenderer {
   clearDepth: () => void;
   clearStencil: () => void;
   dispose: () => void;
-  renderBufferDirect: (camera: any, scene: any, geometry: any, material: any, object: any, group: any) => void;
+  renderBufferDirect: (
+    camera: Camera,
+    scene: Object3D | null,
+    geometry: BufferGeometry,
+    material: Material,
+    object: Object3D,
+    group: GeometryGroup | null,
+  ) => void;
   compile: (scene: Object3D, camera: Camera, targetScene?: Object3D | null) => Set<Material>;
   compileAsync: (scene: Object3D, camera: Camera, targetScene?: Object3D | null) => Promise<Object3D>;
   setAnimationLoop: (callback: FrameRequestCallback | null) => void;
@@ -1049,21 +1087,21 @@ export class WebGLRenderer {
     }
     // Buffer rendering
     this.renderBufferDirect = function (
-      camera: any,
-      scene: any,
-      geometry: any,
-      material: any,
-      object: any,
-      group?: any,
+      camera: Camera,
+      scene: Object3D | null,
+      geometry: BufferGeometry,
+      material: Material,
+      object: Object3D,
+      group: GeometryGroup | null,
     ) {
-      if (scene === null) scene = _emptyScene; // renderBufferDirect second parameter used to be fog (could be null)
-      const frontFaceCW = object.isMesh && object.matrixWorld.determinantAffine() < 0;
-      const program = setProgram(camera, scene, geometry, material, object);
+      const materialProperties = material as Material & MaterialProperties;
+      const frontFaceCW = (object as Mesh).isMesh && object.matrixWorld.determinantAffine() < 0;
+      const program = setProgram(camera, scene === null ? _emptyScene : scene, geometry, material, object);
       state.setMaterial(material, frontFaceCW);
       //
       let index = geometry.index;
       let rangeFactor = 1;
-      if (material.wireframe === true) {
+      if (materialProperties.wireframe === true) {
         index = geometries.getWireframeAttribute(geometry);
         if (index === undefined) return;
         rangeFactor = 2;
@@ -1096,48 +1134,55 @@ export class WebGLRenderer {
         renderer.setIndex(attribute);
       }
       //
-      if (object.isMesh) {
-        if (material.wireframe === true) {
-          state.setLineWidth(material.wireframeLinewidth * getTargetPixelRatio());
+      if ((object as Mesh).isMesh) {
+        if (materialProperties.wireframe === true) {
+          state.setLineWidth(materialProperties.wireframeLinewidth! * getTargetPixelRatio());
           renderer.setMode(GL.LINES);
         } else {
           renderer.setMode(GL.TRIANGLES);
         }
-      } else if (object.isLine) {
-        let lineWidth = material.linewidth;
+      } else if ((object as Line).isLine) {
+        let lineWidth = materialProperties.linewidth;
         if (lineWidth === undefined) lineWidth = 1; // Not using Line*Material
         state.setLineWidth(lineWidth * getTargetPixelRatio());
-        if (object.isLineSegments) {
+        if ((object as LineSegments).isLineSegments) {
           renderer.setMode(GL.LINES);
-        } else if (object.isLineLoop) {
+        } else if ((object as LineLoop).isLineLoop) {
           renderer.setMode(GL.LINE_LOOP);
         } else {
           renderer.setMode(GL.LINE_STRIP);
         }
-      } else if (object.isPoints) {
+      } else if ((object as Points).isPoints) {
         renderer.setMode(GL.POINTS);
-      } else if (object.isSprite) {
+      } else if ((object as Sprite).isSprite) {
         renderer.setMode(GL.TRIANGLES);
       }
-      if (object.isBatchedMesh) {
+      if ((object as BatchedMesh).isBatchedMesh) {
+        const batchedMesh = object as BatchedMesh;
         if (!extensions.get("WEBGL_multi_draw")) {
-          const starts = object._multiDrawStarts;
-          const counts = object._multiDrawCounts;
-          const drawCount = object._multiDrawCount;
+          const starts = batchedMesh._multiDrawStarts;
+          const counts = batchedMesh._multiDrawCounts;
+          const drawCount = batchedMesh._multiDrawCount;
           const bytesPerElement = index ? attributes.get(index).bytesPerElement : 1;
-          const uniforms = properties.get(material).currentProgram.getUniforms();
+          const uniforms: WebGLUniforms = properties.get(material).currentProgram.getUniforms();
           for (let i = 0; i < drawCount; i++) {
             uniforms.setValue(_gl, "_gl_DrawID", i);
             renderer.render(starts[i] / bytesPerElement, counts[i]);
           }
         } else {
-          renderer.renderMultiDraw(object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount);
+          renderer.renderMultiDraw(
+            batchedMesh._multiDrawStarts,
+            batchedMesh._multiDrawCounts,
+            batchedMesh._multiDrawCount,
+          );
         }
-      } else if (object.isInstancedMesh) {
-        renderer.renderInstances(drawStart, drawCount, object.count);
-      } else if (geometry.isInstancedBufferGeometry) {
-        const maxInstanceCount = geometry._maxInstanceCount !== undefined ? geometry._maxInstanceCount : Infinity;
-        const instanceCount = Math.min(geometry.instanceCount, maxInstanceCount);
+      } else if ((object as InstancedMesh).isInstancedMesh) {
+        renderer.renderInstances(drawStart, drawCount, (object as InstancedMesh).count);
+      } else if ((geometry as InstancedBufferGeometry).isInstancedBufferGeometry) {
+        const instancedGeometry = geometry as InstancedBufferGeometry & { _maxInstanceCount?: number };
+        const maxInstanceCount =
+          instancedGeometry._maxInstanceCount !== undefined ? instancedGeometry._maxInstanceCount : Infinity;
+        const instanceCount = Math.min(instancedGeometry.instanceCount, maxInstanceCount);
         renderer.renderInstances(drawStart, drawCount, instanceCount);
       } else {
         renderer.render(drawStart, drawCount);
@@ -1170,15 +1215,20 @@ export class WebGLRenderer {
      * @param [targetScene=null] - The target scene.
      * @return The precompiled materials.
      */
-    this.compile = function (this: any, scene: Object3D, camera: Camera, targetScene: any = null) {
+    this.compile = function (
+      this: WebGLRenderer,
+      scene: Object3D,
+      camera: Camera,
+      targetScene: Object3D | null = null,
+    ) {
       if (targetScene === null) targetScene = scene;
       currentRenderState = renderStates.get(targetScene);
       currentRenderState.init(camera);
       renderStateStack.push(currentRenderState);
       try {
         // gather lights from both the target scene and the new object that will be added to the scene.
-        targetScene.traverseVisible(function (object?: any) {
-          if (object.isLight && object.layers.test(camera.layers)) {
+        targetScene.traverseVisible(function (object: Object3D) {
+          if ((object as Light).isLight && object.layers.test(camera.layers)) {
             currentRenderState.pushLight(object);
             if (object.castShadow) {
               if (shadowMap === null) throw new Error("Shadow-casting lights require createShadowMap.");
@@ -1187,8 +1237,8 @@ export class WebGLRenderer {
           }
         });
         if (scene !== targetScene) {
-          scene.traverseVisible(function (object?: any) {
-            if (object.isLight && object.layers.test(camera.layers)) {
+          scene.traverseVisible(function (object: Object3D) {
+            if ((object as Light).isLight && object.layers.test(camera.layers)) {
               currentRenderState.pushLight(object);
               if (object.castShadow) {
                 if (shadowMap === null) throw new Error("Shadow-casting lights require createShadowMap.");
@@ -1203,11 +1253,18 @@ export class WebGLRenderer {
         if (_clippingEnabled === true) clipping.setGlobalState(this.clippingPlanes, camera);
         // Only initialize materials in the new scene, not the targetScene.
         const materials = new Set<Material>();
-        scene.traverse(function (object?: any) {
-          if (!(object.isMesh || object.isPoints || object.isLine || object.isSprite)) {
+        scene.traverse(function (object: Object3D) {
+          if (
+            !(
+              (object as Mesh).isMesh ||
+              (object as Points).isPoints ||
+              (object as Line).isLine ||
+              (object as Sprite).isSprite
+            )
+          ) {
             return;
           }
-          const material = object.material;
+          const material = (object as Mesh | Points | Line | Sprite).material;
           if (material) {
             if (Array.isArray(material)) {
               for (let i = 0; i < material.length; i++) {
@@ -1239,7 +1296,12 @@ export class WebGLRenderer {
      * @param [targetScene=null] - The target scene.
      * @return A Promise that resolves when the given scene can be rendered without unnecessary stalling due to shader compilation.
      */
-    this.compileAsync = function (this: any, scene: Object3D, camera: Camera, targetScene: any = null) {
+    this.compileAsync = function (
+      this: WebGLRenderer,
+      scene: Object3D,
+      camera: Camera,
+      targetScene: Object3D | null = null,
+    ) {
       const materials = this.compile(scene, camera, targetScene);
       // Wait for all the materials in the new object to indicate that they're
       // ready to be used before resolving the promise.
@@ -1273,11 +1335,11 @@ export class WebGLRenderer {
       });
     };
     // Animation Loop
-    let onAnimationFrameCallback: any = null;
-    function onAnimationFrame(time?: any) {
+    let onAnimationFrameCallback: FrameRequestCallback | null = null;
+    function onAnimationFrame(time: number) {
       if (onAnimationFrameCallback) onAnimationFrameCallback(time);
     }
-    const animation = new (WebGLAnimation as any)();
+    const animation = WebGLAnimation();
     animation.setAnimationLoop(onAnimationFrame);
     if (typeof self !== "undefined") animation.setContext(self);
     /**
@@ -1287,7 +1349,7 @@ export class WebGLRenderer {
      *
      * @param callback - The application's animation loop.
      */
-    this.setAnimationLoop = function (callback?: any) {
+    this.setAnimationLoop = function (callback: FrameRequestCallback | null) {
       onAnimationFrameCallback = callback;
       if (callback === null) animation.stop();
       else animation.start();
@@ -1307,7 +1369,7 @@ export class WebGLRenderer {
      * @param scene - The scene to render.
      * @param camera - The camera.
      */
-    this.render = function (this: any, scene: Object3D, camera: Camera) {
+    this.render = function (this: WebGLRenderer, scene: Object3D, camera: Camera) {
       if (camera !== undefined && camera.isCamera !== true) {
         error("WebGLRenderer.render: camera is not an instance of THREE.Camera.");
         return;
@@ -1327,7 +1389,7 @@ export class WebGLRenderer {
         currentRenderState.state.textureUnits = textures.getTextureUnits();
         renderStateStack.push(currentRenderState);
         _projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-        if ((camera as any).isArrayCamera) {
+        if ((camera as ArrayCamera).isArrayCamera) {
           _frustumArray.setFromArrayCamera(camera as ArrayCamera);
         } else {
           _frustum.setFromProjectionMatrix(_projScreenMatrix, CoordinateSystem.WebGL, camera.reversedDepth);
@@ -1362,8 +1424,8 @@ export class WebGLRenderer {
             const opaqueObjects = currentRenderList.opaque;
             const transmissiveObjects = currentRenderList.transmissive;
             currentRenderState.setupLights();
-            if ((camera as any).isArrayCamera) {
-              const cameras = (camera as any).cameras;
+            if ((camera as ArrayCamera).isArrayCamera) {
+              const cameras = (camera as ArrayCamera).cameras;
               if (transmissiveObjects.length > 0) {
                 for (let i = 0, l = cameras.length; i < l; i++) {
                   const camera2 = cameras[i];
@@ -1420,44 +1482,50 @@ export class WebGLRenderer {
         if (useOutput) output.restore(_this);
       }
     };
-    function projectObject(object: any, camera: any, groupOrder: any, sortObjects?: any) {
+    function projectObject(object: Object3D, camera: Camera, groupOrder: number, sortObjects?: boolean) {
       if (object.visible === false) return;
       const visible = object.layers.test(camera.layers);
       if (visible) {
-        if (object.isGroup) {
+        if ((object as Group).isGroup) {
           groupOrder = object.renderOrder;
-        } else if (object.isLOD) {
-          if (object.autoUpdate === true) object.update(camera);
-        } else if (object.isLight) {
+        } else if ((object as LOD).isLOD) {
+          const lod = object as LOD;
+          if (lod.autoUpdate === true) lod.update(camera as Camera & { zoom: number });
+        } else if ((object as Light).isLight) {
           currentRenderState.pushLight(object);
           if (object.castShadow) {
             if (shadowMap === null) throw new Error("Shadow-casting lights require createShadowMap.");
             currentRenderState.pushShadow(object);
           }
-        } else if (object.isSprite) {
-          const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+        } else if ((object as Sprite).isSprite) {
+          const frustum = (camera as ArrayCamera).isArrayCamera ? _frustumArray : _frustum;
           if (!object.frustumCulled || object.intersectsFrustum(frustum)) {
             if (sortObjects) {
               _vector4.setFromMatrixPosition(object.matrixWorld).applyMatrix4(_projScreenMatrix);
             }
-            const geometry = objects.update(object);
-            const material = object.material;
+            const geometry: BufferGeometry = objects.update(object);
+            const material = (object as Sprite).material;
             if (material.visible) {
               currentRenderList.push(object, geometry, material, groupOrder, _vector4.z, null, camera);
             }
           }
-        } else if (object.isMesh || object.isLine || object.isPoints) {
-          const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+        } else if ((object as Mesh).isMesh || (object as Line).isLine || (object as Points).isPoints) {
+          // Subclasses may own bounds; keep their bounds computation virtual.
+          const renderable = object as (Mesh | Line | Points) & {
+            boundingSphere?: Sphere | null;
+            computeBoundingSphere?(): void;
+          };
+          const frustum = (camera as ArrayCamera).isArrayCamera ? _frustumArray : _frustum;
           if (!object.frustumCulled || object.intersectsFrustum(frustum)) {
-            const geometry = objects.update(object);
-            const material = object.material;
+            const geometry: BufferGeometry = objects.update(renderable);
+            const material = renderable.material;
             if (sortObjects) {
-              if (object.boundingSphere !== undefined) {
-                if (object.boundingSphere === null) object.computeBoundingSphere();
-                _vector4.copy(object.boundingSphere.center);
+              if (renderable.boundingSphere !== undefined) {
+                if (renderable.boundingSphere === null) renderable.computeBoundingSphere!();
+                _vector4.copy(renderable.boundingSphere!.center);
               } else {
                 if (geometry.boundingSphere === null) geometry.computeBoundingSphere();
-                _vector4.copy(geometry.boundingSphere.center);
+                _vector4.copy(geometry.boundingSphere!.center);
               }
               _vector4.applyMatrix4(object.matrixWorld).applyMatrix4(_projScreenMatrix);
             }
@@ -1481,7 +1549,7 @@ export class WebGLRenderer {
         projectObject(children[i], camera, groupOrder, sortObjects);
       }
     }
-    function renderScene(currentRenderList: any, scene: any, camera: any, viewport?: any) {
+    function renderScene(currentRenderList: RenderList, scene: Object3D, camera: Camera, viewport?: Vector4) {
       const {
         opaque: opaqueObjects,
         transmissive: transmissiveObjects,
@@ -1499,8 +1567,13 @@ export class WebGLRenderer {
       state.buffers.color.setMask(true);
       state.setPolygonOffset(false);
     }
-    function renderTransmissionPass(opaqueObjects: any, transmissiveObjects: any, scene: any, camera?: any) {
-      const overrideMaterial = scene.isScene === true ? scene.overrideMaterial : null;
+    function renderTransmissionPass(
+      opaqueObjects: RenderItem[],
+      transmissiveObjects: RenderItem[],
+      scene: Object3D,
+      camera: Camera & { viewport?: Vector4 },
+    ) {
+      const overrideMaterial = (scene as Scene).isScene === true ? (scene as Scene).overrideMaterial : null;
       if (overrideMaterial !== null) {
         return;
       }
@@ -1528,7 +1601,7 @@ export class WebGLRenderer {
                 scene.add( mesh );
                 */
       }
-      const transmissionRenderTarget = currentRenderState.state.transmissionRenderTarget[camera.id];
+      const transmissionRenderTarget: WebGLRenderTarget = currentRenderState.state.transmissionRenderTarget[camera.id];
       const activeViewport = camera.viewport || _currentViewport;
       transmissionRenderTarget.setSize(
         activeViewport.z * _this.transmissionResolutionScale,
@@ -1583,8 +1656,8 @@ export class WebGLRenderer {
       if (currentCameraViewport !== undefined) camera.viewport = currentCameraViewport;
       _this.toneMapping = currentToneMapping;
     }
-    function renderObjects(renderList: any, scene: any, camera?: any) {
-      const overrideMaterial = scene.isScene === true ? scene.overrideMaterial : null;
+    function renderObjects(renderList: RenderItem[], scene: Object3D, camera: Camera) {
+      const overrideMaterial = (scene as Scene).isScene === true ? (scene as Scene).overrideMaterial : null;
       for (let i = 0, l = renderList.length; i < l; i++) {
         const renderItem = renderList[i];
         const { object, geometry, group } = renderItem;
@@ -1597,7 +1670,14 @@ export class WebGLRenderer {
         }
       }
     }
-    function renderObject(object: any, scene: any, camera: any, geometry: any, material: any, group?: any) {
+    function renderObject(
+      object: Object3D,
+      scene: Object3D,
+      camera: Camera,
+      geometry: BufferGeometry,
+      material: Material,
+      group: GeometryGroup | null,
+    ) {
       object.onBeforeRender(_this, scene, camera, geometry, material, group);
       object.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, object.matrixWorld);
       object.normalMatrix.getNormalMatrix(object.modelViewMatrix);
@@ -1888,7 +1968,7 @@ export class WebGLRenderer {
         materialProperties.__version = material.version;
       }
       //
-      let program = materialProperties.currentProgram;
+      let program: WebGLProgramInfo = materialProperties.currentProgram;
       if (needsProgramChange === true || needsProgramVariant === true) {
         program =
           needsProgramVariant === true

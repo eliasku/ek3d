@@ -130,6 +130,6 @@ export class UniformsGroup extends EventDispatcher {
    * @return A clone of this instance.
    */
   clone(): UniformsGroup {
-    return new (this.constructor as any)().copy(this);
+    return new UniformsGroup().copy(this);
   }
 }

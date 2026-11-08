@@ -80,7 +80,7 @@ export class Box2 {
    * @return A clone of this instance.
    */
   clone(): Box2 {
-    return new (this.constructor as any)().copy(this);
+    return new Box2().copy(this);
   }
   /**
    * Copies the values of the given box to this instance.

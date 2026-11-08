@@ -27,6 +27,7 @@ import { SkeletonHelper } from "../src/helpers/SkeletonHelper";
 import { Vector2 } from "../src/math/Vector2";
 import { Vector3 } from "../src/math/Vector3";
 import { Frustum } from "../src/math/Frustum";
+import { FrustumArray } from "../src/math/FrustumArray";
 import { Matrix4 } from "../src/math/Matrix4";
 import { Texture } from "../src/textures/Texture";
 import { Line as UpstreamLine } from "../upstream/three.js/src/objects/Line.js";
@@ -147,7 +148,7 @@ test("line and point picks preserve world transforms, thresholds, clipping, recu
     actual.position.set(0.4, 0.2, -1);
     actual.scale.set(2, 1.5, 0.75);
     root.updateMatrixWorld(true);
-    expected.matrixWorld.copy(actual.matrixWorld);
+    expected.matrixWorld.fromArray(actual.matrixWorld.elements);
     // Upstream's Object.defineProperties accessors are absent from inferred JS declarations.
     const upstreamTransform = expected as unknown as { scale: Vector3 };
     upstreamTransform.scale.copy(actual.scale);
@@ -245,6 +246,22 @@ test("object clones retain runtime subtype, shared GPU resources and independent
   }
 });
 
+test("lookAt accepts numeric and vector targets under rotated parents", () => {
+  const target = new Vector3(2, 1, 3);
+  const expected = new Vector3(2, 1, 3).normalize();
+  for (const object of [new Object3D(), new PerspectiveCamera()]) {
+    const root = new Object3D();
+    root.rotation.y = 0.3;
+    root.add(object);
+    for (const useVector of [false, true]) {
+      if (useVector) object.lookAt(target);
+      else object.lookAt(target.x, target.y, target.z);
+      const direction = object.getWorldDirection(new Vector3());
+      assert.ok(direction.distanceTo(expected) < 1e-12, `${object.type}: ${useVector ? "vector" : "numeric"} target`);
+    }
+  }
+});
+
 test("sprite picking agrees with upstream for camera projection, center, rotation, scale and size attenuation", () => {
   for (const camera of [new PerspectiveCamera(50, 1, 0.1, 100), new OrthographicCamera(-3, 3, 3, -3, 0.1, 100)]) {
     camera.position.set(1, 2, 5);
@@ -254,14 +271,14 @@ test("sprite picking agrees with upstream for camera projection, center, rotatio
     const expected = new UpstreamSprite(new UpstreamSpriteMaterial());
     actual.scale.set(2, 0.75, 1);
     actual.updateMatrixWorld(true);
-    expected.matrixWorld.copy(actual.matrixWorld);
+    expected.matrixWorld.fromArray(actual.matrixWorld.elements);
     for (const center of [
       [0.5, 0.5],
       [0, 0],
       [0.2, 0.8],
     ]) {
       actual.center.set(center[0], center[1]);
-      expected.center.copy(actual.center);
+      expected.center.set(center[0], center[1]);
       for (const rotation of [0, Math.PI / 2, -0.7]) {
         for (const sizeAttenuation of [false, true]) {
           actual.material.rotation = expected.material.rotation = rotation;
@@ -353,7 +370,7 @@ test("sprite cloning shares internal quad and material but not center or childre
     for (const x of [0, 100]) {
       actual.position.x = x;
       actual.updateMatrixWorld(true);
-      expected.matrixWorld.copy(actual.matrixWorld);
+      expected.matrixWorld.fromArray(actual.matrixWorld.elements);
       assert.equal(actual.intersectsFrustum(frustum), expected.intersectsFrustum(frustum));
       assert.equal(actual.intersectsFrustum(frustum), x === 0);
     }
@@ -362,10 +379,46 @@ test("sprite cloning shares internal quad and material but not center or childre
   for (const x of [0, 100]) {
     sprite.position.x = x;
     sprite.updateMatrixWorld(true);
-    expected.matrixWorld.copy(sprite.matrixWorld);
+    expected.matrixWorld.fromArray(sprite.matrixWorld.elements);
     assert.equal(sprite.intersectsFrustum(frustum), expected.intersectsFrustum(frustum));
     assert.equal(sprite.intersectsFrustum(frustum), x === 0);
   }
+});
+
+test("renderable culling supports single and array frustums without bypassing overrides", () => {
+  const cameras = [new PerspectiveCamera(60, 1, 0.1, 100), new PerspectiveCamera(60, 1, 0.1, 100)];
+  for (let i = 0; i < cameras.length; i++) {
+    cameras[i].position.set(i * 100, 0, 5);
+    cameras[i].updateMatrixWorld(true);
+  }
+  const frustum = new Frustum().setFromProjectionMatrix(
+    new Matrix4().multiplyMatrices(cameras[0].projectionMatrix, cameras[0].matrixWorldInverse),
+  );
+  const array = new FrustumArray().setFromArrayCamera(new ArrayCamera(cameras));
+  class CulledMesh extends Mesh {
+    checks: number = 0;
+    override intersectsFrustum(current: Frustum | FrustumArray): boolean {
+      this.checks++;
+      return super.intersectsFrustum(current);
+    }
+  }
+  const bounds = geometry([-1, 0, 0, 1, 0, 0]);
+  const mesh = new CulledMesh(bounds, new MeshBasicMaterial());
+  const objects: Object3D[] = [
+    mesh,
+    new Line(bounds, new LineBasicMaterial()),
+    new Points(bounds, new PointsMaterial()),
+    new Sprite(new SpriteMaterial()),
+  ];
+  for (const object of objects) {
+    for (const x of [0, 100, 200]) {
+      object.position.x = x;
+      object.updateMatrixWorld(true);
+      assert.equal(object.intersectsFrustum(frustum), x === 0, `${object.type}: single frustum at ${x}`);
+      assert.equal(object.intersectsFrustum(array), x !== 200, `${object.type}: array frustum at ${x}`);
+    }
+  }
+  assert.equal(mesh.checks, 6);
 });
 
 test("material clones preserve colors, textures and disposal ownership", () => {

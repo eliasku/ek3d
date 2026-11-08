@@ -1,4 +1,6 @@
 import { ColorSpace, Transfer } from "../constants";
+import type { Color } from "./Color";
+import type { Vector3 } from "./Vector3";
 import { Matrix3 } from "./Matrix3";
 const LINEAR_REC709_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
   0.4123908,
@@ -45,7 +47,7 @@ function createColorManagement() {
      * - https://www.russellcottrell.com/photo/matrixCalculator.htm
      */
     spaces: {},
-    convert: function (this: any, color?: any, sourceColorSpace?: any, targetColorSpace?: any) {
+    convert: function (color: Color, sourceColorSpace?: string, targetColorSpace?: string): Color {
       if (this.enabled === false || sourceColorSpace === targetColorSpace || !sourceColorSpace || !targetColorSpace) {
         return color;
       }
@@ -65,10 +67,10 @@ function createColorManagement() {
       }
       return color;
     },
-    workingToColorSpace: function (this: any, color?: any, targetColorSpace?: any) {
+    workingToColorSpace: function (color: Color, targetColorSpace?: string): Color {
       return this.convert(color, this.workingColorSpace, targetColorSpace);
     },
-    colorSpaceToWorking: function (this: any, color?: any, sourceColorSpace?: any) {
+    colorSpaceToWorking: function (color: Color, sourceColorSpace?: string): Color {
       return this.convert(color, sourceColorSpace, this.workingColorSpace);
     },
     getPrimaries: function (this: any, colorSpace?: any) {
@@ -81,14 +83,18 @@ function createColorManagement() {
     getToneMappingMode: function (this: any, colorSpace?: any) {
       return (this.spaces as any)[colorSpace].outputColorSpaceConfig.toneMappingMode || "standard";
     },
-    getLuminanceCoefficients: function (this: any, target?: any, colorSpace: any = this.workingColorSpace) {
+    getLuminanceCoefficients: function (
+      this: typeof ColorManagement,
+      target: Vector3,
+      colorSpace: string = this.workingColorSpace,
+    ): Vector3 {
       return target.fromArray((this.spaces as any)[colorSpace].luminanceCoefficients);
     },
     define: function (this: any, colorSpaces?: any) {
       Object.assign(this.spaces, colorSpaces);
     },
     // Internal APIs
-    _getMatrix: function (this: any, targetMatrix?: any, sourceColorSpace?: any, targetColorSpace?: any) {
+    _getMatrix: function (targetMatrix: Matrix3, sourceColorSpace: string, targetColorSpace: string) {
       return targetMatrix
         .copy((this.spaces as any)[targetColorSpace].fromXYZ)
         .multiply((this.spaces as any)[sourceColorSpace].toXYZ);

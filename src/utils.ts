@@ -1,6 +1,14 @@
 import { GL } from "./GL";
 import type { Matrix4 } from "./math/Matrix4";
 import { DepthFunc } from "./constants";
+
+const _typeFlagDescriptor: PropertyDescriptor = { value: true };
+
+/** @private Preserve runtime type flags after class extraction without replacing inherited accessors. */
+export function ensureTypeFlag(value: object, flag: string): void {
+  if (!(flag in value)) Object.defineProperty(value, flag, _typeFlagDescriptor);
+}
+
 /**
  * Finds the minimum value in an array.
  *
@@ -237,7 +245,7 @@ export function error(...params: any[]) {
 export function warnOnce(...params: any[]) {
   const message = params.join(" ");
   if (message in _cache) return;
-  (_cache as any)[message] = true;
+  _cache[message] = true;
   warn(...params);
 }
 /**

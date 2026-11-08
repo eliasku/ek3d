@@ -272,7 +272,7 @@ export class Sphere {
    * @return A clone of this instance.
    */
   clone(): Sphere {
-    return new (this.constructor as any)().copy(this);
+    return new Sphere().copy(this);
   }
   /**
    * Returns a serialized structure of the bounding sphere.

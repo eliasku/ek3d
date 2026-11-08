@@ -56,9 +56,27 @@ export class Texture<TMipmap = any> extends EventDispatcher {
   isPMREMTexture: boolean;
   normalized: boolean;
   readonly id: number;
-  static DEFAULT_IMAGE: null;
-  static DEFAULT_MAPPING: Mapping;
-  static DEFAULT_ANISOTROPY: number;
+  /**
+   * The default image for all textures.
+   *
+   * @static
+   * @default null
+   */
+  static DEFAULT_IMAGE: null = null;
+  /**
+   * The default mapping for all textures.
+   *
+   * @static
+   * @default Mapping.UV
+   */
+  static DEFAULT_MAPPING: Mapping = Mapping.UV;
+  /**
+   * The default anisotropy value for all textures.
+   *
+   * @static
+   * @default 1
+   */
+  static DEFAULT_ANISOTROPY: number = 1;
 
   /**
    * Constructs a new texture.
@@ -645,24 +663,3 @@ export class Texture<TMipmap = any> extends EventDispatcher {
     }
   }
 }
-/**
- * The default image for all textures.
- *
- * @static
- * @default null
- */
-Texture.DEFAULT_IMAGE = null;
-/**
- * The default mapping for all textures.
- *
- * @static
- * @default Mapping.UV
- */
-Texture.DEFAULT_MAPPING = Mapping.UV;
-/**
- * The default anisotropy value for all textures.
- *
- * @static
- * @default 1
- */
-Texture.DEFAULT_ANISOTROPY = 1;

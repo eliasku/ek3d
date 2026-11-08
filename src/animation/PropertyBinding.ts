@@ -1,6 +1,14 @@
 import type { AnimationBuffer } from "../math/Interpolant";
 import type { AnimationObjectGroup } from "./AnimationObjectGroup";
 import type { Object3D } from "../core/Object3D";
+import type { Color } from "../math/Color";
+import type { Euler } from "../math/Euler";
+import type { Matrix3 } from "../math/Matrix3";
+import type { Matrix4 } from "../math/Matrix4";
+import type { Quaternion } from "../math/Quaternion";
+import type { Vector2 } from "../math/Vector2";
+import type { Vector3 } from "../math/Vector3";
+import type { Vector4 } from "../math/Vector4";
 import { warn, error } from "../utils";
 
 export interface ParsedTrackPath {
@@ -18,9 +26,54 @@ export interface AnimationBinding {
   unbind(): void;
 }
 type BoundProperty = AnimationBuffer & {
+  isColor?: boolean;
+  isEuler?: boolean;
+  isMatrix3?: boolean;
+  isMatrix4?: boolean;
+  isQuaternion?: boolean;
+  isVector2?: boolean;
+  isVector3?: boolean;
+  isVector4?: boolean;
   toArray(buffer: AnimationBuffer, offset: number): void;
   fromArray(buffer: AnimationBuffer, offset: number): void;
 };
+function isMathProperty(value: BoundProperty): boolean {
+  return !!(
+    value.isColor ||
+    value.isEuler ||
+    value.isMatrix3 ||
+    value.isMatrix4 ||
+    value.isQuaternion ||
+    value.isVector2 ||
+    value.isVector3 ||
+    value.isVector4
+  );
+}
+function readMathProperty(value: BoundProperty, buffer: AnimationBuffer, offset: number): void {
+  // These bindings use numeric indexed buffers, including typed arrays.
+  const numeric = buffer as number[];
+  if (value.isColor) (value as unknown as Color).toArray(numeric, offset);
+  else if (value.isEuler) (value as unknown as Euler).toArray(numeric, offset);
+  else if (value.isMatrix3) (value as unknown as Matrix3).toArray(numeric, offset);
+  else if (value.isMatrix4) (value as unknown as Matrix4).toArray(numeric, offset);
+  else if (value.isQuaternion) (value as unknown as Quaternion).toArray(numeric, offset);
+  else if (value.isVector2) (value as unknown as Vector2).toArray(numeric, offset);
+  else if (value.isVector3) (value as unknown as Vector3).toArray(numeric, offset);
+  else if (value.isVector4) (value as unknown as Vector4).toArray(numeric, offset);
+  else value.toArray(buffer, offset);
+}
+function writeMathProperty(value: BoundProperty, buffer: AnimationBuffer, offset: number): void {
+  const numeric = buffer as number[];
+  if (value.isColor) (value as unknown as Color).fromArray(numeric, offset);
+  else if (value.isEuler) (value as unknown as Euler).fromArray(numeric);
+  else if (value.isMatrix3) (value as unknown as Matrix3).fromArray(numeric, offset);
+  else if (value.isMatrix4) (value as unknown as Matrix4).fromArray(numeric, offset);
+  else if (value.isQuaternion) (value as unknown as Quaternion).fromArray(numeric, offset);
+  else if (value.isVector2) (value as unknown as Vector2).fromArray(numeric, offset);
+  else if (value.isVector3) (value as unknown as Vector3).fromArray(numeric, offset);
+  else if (value.isVector4) (value as unknown as Vector4).fromArray(numeric, offset);
+  else value.fromArray(buffer, offset);
+}
 // Runtime path traversal validates these states before choosing a bound getter/setter.
 type BindingTarget = { [key: string]: BindingTarget } & {
   length: number;
@@ -55,6 +108,10 @@ const _objectRe = /*@__PURE__*/ /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace("WC",
 const _propertyRe = /*@__PURE__*/ /\.(WC+)(?:\[(.+)\])?/.source.replace("WC", _wordChar);
 const _trackRe = new RegExp("" + "^" + _directoryRe + _nodeRe + _objectRe + _propertyRe + "$");
 const _supportedObjectNames = ["material", "materials", "bones", "map"];
+/**
+ * Constructed through PropertyBinding.Composite and used through AnimationBinding.
+ * @class-crasher-ignore
+ */
 class Composite {
   _targetGroup: AnimationObjectGroup;
   rootNode: AnimationObjectGroup;
@@ -101,6 +158,8 @@ class Composite {
 // become no-ops.
 /**
  * This holds a reference to a real property in the scene graph; used internally.
+ *
+ * @class-crasher-ignore
  */
 export class PropertyBinding {
   path: string;
@@ -323,7 +382,7 @@ export class PropertyBinding {
     buffer[offset] = this.resolvedProperty![this.propertyIndex];
   }
   _getValue_toArray(buffer: AnimationBuffer, offset: number) {
-    this.resolvedProperty!.toArray(buffer, offset);
+    readMathProperty(this.resolvedProperty!, buffer, offset);
   }
   // Direct
   _setValue_direct(buffer: AnimationBuffer, offset: number) {
@@ -372,14 +431,14 @@ export class PropertyBinding {
   }
   // HasToFromArray
   _setValue_fromArray(buffer: AnimationBuffer, offset: number) {
-    this.resolvedProperty!.fromArray(buffer, offset);
+    writeMathProperty(this.resolvedProperty!, buffer, offset);
   }
   _setValue_fromArray_setNeedsUpdate(buffer: AnimationBuffer, offset: number) {
-    this.resolvedProperty!.fromArray(buffer, offset);
+    writeMathProperty(this.resolvedProperty!, buffer, offset);
     this.targetObject.needsUpdate = true;
   }
   _setValue_fromArray_setMatrixWorldNeedsUpdate(buffer: AnimationBuffer, offset: number) {
-    this.resolvedProperty!.fromArray(buffer, offset);
+    writeMathProperty(this.resolvedProperty!, buffer, offset);
     this.targetObject.matrixWorldNeedsUpdate = true;
   }
   _getValue_unbound(targetArray: AnimationBuffer, offset: number) {
@@ -524,7 +583,10 @@ export class PropertyBinding {
       bindingType = this.BindingType.ArrayElement;
       this.resolvedProperty = nodeProperty as unknown as BoundProperty;
       this.propertyIndex = propertyIndex;
-    } else if (nodeProperty.fromArray !== undefined && nodeProperty.toArray !== undefined) {
+    } else if (
+      isMathProperty(nodeProperty as unknown as BoundProperty) ||
+      (nodeProperty.fromArray !== undefined && nodeProperty.toArray !== undefined)
+    ) {
       // must use copy for Object3D.Euler/Quaternion
       bindingType = this.BindingType.HasFromToArray;
       this.resolvedProperty = nodeProperty as unknown as BoundProperty;

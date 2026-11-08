@@ -1,3 +1,4 @@
+import type { WebGLRenderer } from "../WebGLRenderer";
 import type { Texture } from "../../textures/Texture";
 import { getEnvironment } from "./WebGLEnvironmentAccess";
 import { Side, NormalMap, ToneMapping, Blending, Transfer, PixelFormat } from "../../constants";
@@ -11,7 +12,7 @@ function isPackedRGFormat(format?: any) {
   return format === PixelFormat.RG || format === PixelFormat.RG11_EAC || format === PixelFormat.RED_GREEN_RGTC2;
 }
 export function WebGLPrograms(
-  renderer?: any,
+  renderer: WebGLRenderer,
   environments?: any,
   extensions?: any,
   capabilities?: any,

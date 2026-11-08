@@ -3,6 +3,7 @@ import type { Matrix3 } from "./Matrix3";
 import type { Quaternion } from "./Quaternion";
 import { CoordinateSystem } from "../constants";
 import { Vector3 } from "./Vector3";
+import { ensureTypeFlag } from "../utils";
 /**
  * Represents a 4x4 matrix.
  *
@@ -98,6 +99,7 @@ export class Matrix4 {
     n43?: number,
     n44?: number,
   ) {
+    ensureTypeFlag(this, "isMatrix4");
     /**
      * A column-major list of matrix values.
      *

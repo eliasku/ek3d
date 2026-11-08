@@ -1,17 +1,66 @@
+import type { SunLightShadow } from "../../addons/lights/SunLightShadow";
+import type { Light } from "../../lights/Light";
+import type { SpotLightShadow } from "../../lights/SpotLightShadow";
+import type { Vector4 } from "../../math/Vector4";
+import type { Texture } from "../../textures/Texture";
 import type { LTCTextures } from "../shaders/LTCTextures";
 import { Color } from "../../math/Color";
 import { Matrix4 } from "../../math/Matrix4";
 import { Vector2 } from "../../math/Vector2";
 import { Vector3 } from "../../math/Vector3";
 import { PixelFormat } from "../../constants";
+
+interface DirectionalUniforms {
+  direction: Vector3;
+  color: Color;
+}
+
+interface PointUniforms {
+  position: Vector3;
+  color: Color;
+  distance: number;
+  decay: number;
+}
+
+interface SpotUniforms extends PointUniforms {
+  direction: Vector3;
+  coneCos: number;
+  penumbraCos: number;
+}
+
+interface HemisphereUniforms {
+  direction: Vector3;
+  skyColor: Color;
+  groundColor: Color;
+}
+
+interface RectAreaUniforms {
+  color: Color;
+  position: Vector3;
+  halfWidth: Vector3;
+  halfHeight: Vector3;
+}
+
+type LightUniforms = DirectionalUniforms | PointUniforms | SpotUniforms | HemisphereUniforms | RectAreaUniforms;
+
+interface ShadowUniforms {
+  shadowIntensity: number;
+  shadowBias: number;
+  shadowNormalBias: number;
+  shadowRadius: number;
+  shadowMapSize: Vector2;
+  shadowCameraNear?: number;
+  shadowCameraFar?: number;
+}
+
 function UniformsCache() {
-  const lights: any = {};
+  const lights: Record<number, LightUniforms | undefined> = {};
   return {
-    get: function (light?: any) {
-      if ((lights as any)[light.id] !== undefined) {
-        return (lights as any)[light.id];
+    get: function (light: Light) {
+      if (lights[light.id] !== undefined) {
+        return lights[light.id];
       }
-      let uniforms: any;
+      let uniforms: LightUniforms | undefined;
       switch (light.type) {
         case "SunLight":
         case "DirectionalLight":
@@ -55,19 +104,19 @@ function UniformsCache() {
           };
           break;
       }
-      (lights as any)[light.id] = uniforms;
+      lights[light.id] = uniforms;
       return uniforms;
     },
   };
 }
 function ShadowUniformsCache() {
-  const lights: any = {};
+  const lights: Record<number, ShadowUniforms | undefined> = {};
   return {
-    get: function (light?: any) {
-      if ((lights as any)[light.id] !== undefined) {
-        return (lights as any)[light.id];
+    get: function (light: Light) {
+      if (lights[light.id] !== undefined) {
+        return lights[light.id];
       }
-      let uniforms: any;
+      let uniforms: ShadowUniforms | undefined;
       switch (light.type) {
         case "SunLight":
         case "DirectionalLight":
@@ -101,7 +150,7 @@ function ShadowUniformsCache() {
           break;
         // TODO (abelnation): set RectAreaLight shadow uniforms
       }
-      (lights as any)[light.id] = uniforms;
+      lights[light.id] = uniforms;
       return uniforms;
     },
   };
@@ -111,9 +160,9 @@ function shadowCastingAndTexturingLightsFirst(lightA?: any, lightB?: any) {
   return (lightB.castShadow ? 2 : 0) - (lightA.castShadow ? 2 : 0) + (lightB.map ? 1 : 0) - (lightA.map ? 1 : 0);
 }
 export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = null) {
-  const cache = new (UniformsCache as any)();
+  const cache = UniformsCache();
   const shadowCache = ShadowUniformsCache();
-  const state: any = {
+  const state = {
     version: 0,
     hash: {
       sunLength: -1,
@@ -130,29 +179,29 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
       numLightProbes: -1,
     },
     ambient: [0, 0, 0],
-    probe: [],
-    sun: [],
-    sunShadow: [],
-    sunShadowMap: [],
-    sunShadowMatrix: [],
-    sunShadowCascade: [],
-    directional: [],
-    directionalShadow: [],
-    directionalShadowMap: [],
-    directionalShadowMatrix: [],
-    spot: [],
-    spotLightMap: [],
-    spotShadow: [],
-    spotShadowMap: [],
-    spotLightMatrix: [],
-    rectArea: [],
-    rectAreaLTC1: null,
-    rectAreaLTC2: null,
-    point: [],
-    pointShadow: [],
-    pointShadowMap: [],
-    pointShadowMatrix: [],
-    hemi: [],
+    probe: [] as Vector3[],
+    sun: [] as DirectionalUniforms[],
+    sunShadow: [] as ShadowUniforms[],
+    sunShadowMap: [] as (Texture | null)[],
+    sunShadowMatrix: [] as Matrix4[],
+    sunShadowCascade: [] as Vector4[],
+    directional: [] as DirectionalUniforms[],
+    directionalShadow: [] as ShadowUniforms[],
+    directionalShadowMap: [] as (Texture | null)[],
+    directionalShadowMatrix: [] as Matrix4[],
+    spot: [] as SpotUniforms[],
+    spotLightMap: [] as Texture[],
+    spotShadow: [] as ShadowUniforms[],
+    spotShadowMap: [] as (Texture | null)[],
+    spotLightMatrix: [] as Matrix4[],
+    rectArea: [] as RectAreaUniforms[],
+    rectAreaLTC1: null as Texture | null,
+    rectAreaLTC2: null as Texture | null,
+    point: [] as PointUniforms[],
+    pointShadow: [] as ShadowUniforms[],
+    pointShadowMap: [] as (Texture | null)[],
+    pointShadowMatrix: [] as Matrix4[],
+    hemi: [] as HemisphereUniforms[],
     numSpotLightShadowsWithMaps: 0,
     numLightProbes: 0,
   };
@@ -186,7 +235,7 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
       const color = light.color;
       const intensity = light.intensity;
       const distance = light.distance;
-      let shadowMap: any = null;
+      let shadowMap: Texture | null = null;
       if (light.shadow && light.shadow.map) {
         if (light.shadow.map.texture.format === PixelFormat.RG) {
           // VSM uses color texture with blurred mean/std_dev
@@ -206,11 +255,11 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
         }
         numLightProbes++;
       } else if (light.isSunLight) {
-        const uniforms = cache.get(light);
+        const uniforms = cache.get(light) as DirectionalUniforms;
         uniforms.color.copy(light.color).multiplyScalar(light.intensity);
         if (light.castShadow) {
-          const shadow = light.shadow;
-          const shadowUniforms = shadowCache.get(light);
+          const shadow = light.shadow as SunLightShadow;
+          const shadowUniforms = shadowCache.get(light)!;
           shadowUniforms.shadowIntensity = shadow.intensity;
           shadowUniforms.shadowBias = shadow.bias;
           shadowUniforms.shadowNormalBias = shadow.normalBias;
@@ -229,11 +278,11 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
         state.sun[sunLength] = uniforms;
         sunLength++;
       } else if (light.isDirectionalLight) {
-        const uniforms = cache.get(light);
+        const uniforms = cache.get(light) as DirectionalUniforms;
         uniforms.color.copy(light.color).multiplyScalar(light.intensity);
         if (light.castShadow) {
           const shadow = light.shadow;
-          const shadowUniforms = shadowCache.get(light);
+          const shadowUniforms = shadowCache.get(light)!;
           shadowUniforms.shadowIntensity = shadow.intensity;
           shadowUniforms.shadowBias = shadow.bias;
           shadowUniforms.shadowNormalBias = shadow.normalBias;
@@ -247,7 +296,7 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
         state.directional[directionalLength] = uniforms;
         directionalLength++;
       } else if (light.isSpotLight) {
-        const uniforms = cache.get(light);
+        const uniforms = cache.get(light) as SpotUniforms;
         uniforms.position.setFromMatrixPosition(light.matrixWorld);
         uniforms.color.copy(color).multiplyScalar(intensity);
         uniforms.distance = distance;
@@ -255,7 +304,7 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
         uniforms.penumbraCos = Math.cos(light.angle * (1 - light.penumbra));
         uniforms.decay = light.decay;
         state.spot[spotLength] = uniforms;
-        const shadow = light.shadow;
+        const shadow = light.shadow as SpotLightShadow;
         if (light.map) {
           state.spotLightMap[numSpotMaps] = light.map;
           numSpotMaps++;
@@ -266,7 +315,7 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
         }
         state.spotLightMatrix[spotLength] = shadow.matrix;
         if (light.castShadow) {
-          const shadowUniforms = shadowCache.get(light);
+          const shadowUniforms = shadowCache.get(light)!;
           shadowUniforms.shadowIntensity = shadow.intensity;
           shadowUniforms.shadowBias = shadow.bias;
           shadowUniforms.shadowNormalBias = shadow.normalBias;
@@ -278,20 +327,20 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
         }
         spotLength++;
       } else if (light.isRectAreaLight) {
-        const uniforms = cache.get(light);
+        const uniforms = cache.get(light) as RectAreaUniforms;
         uniforms.color.copy(color).multiplyScalar(intensity);
         uniforms.halfWidth.set(light.width * 0.5, 0.0, 0.0);
         uniforms.halfHeight.set(0.0, light.height * 0.5, 0.0);
         state.rectArea[rectAreaLength] = uniforms;
         rectAreaLength++;
       } else if (light.isPointLight) {
-        const uniforms = cache.get(light);
+        const uniforms = cache.get(light) as PointUniforms;
         uniforms.color.copy(light.color).multiplyScalar(light.intensity);
         uniforms.distance = light.distance;
         uniforms.decay = light.decay;
         if (light.castShadow) {
           const shadow = light.shadow;
-          const shadowUniforms = shadowCache.get(light);
+          const shadowUniforms = shadowCache.get(light)!;
           shadowUniforms.shadowIntensity = shadow.intensity;
           shadowUniforms.shadowBias = shadow.bias;
           shadowUniforms.shadowNormalBias = shadow.normalBias;
@@ -307,7 +356,7 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
         state.point[pointLength] = uniforms;
         pointLength++;
       } else if (light.isHemisphereLight) {
-        const uniforms = cache.get(light);
+        const uniforms = cache.get(light) as HemisphereUniforms;
         uniforms.skyColor.copy(light.color).multiplyScalar(intensity);
         uniforms.groundColor.copy(light.groundColor).multiplyScalar(intensity);
         state.hemi[hemiLength] = uniforms;

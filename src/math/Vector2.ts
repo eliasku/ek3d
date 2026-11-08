@@ -2,6 +2,7 @@ import type { BufferAttribute } from "../core/BufferAttribute";
 import type { InterleavedBufferAttribute } from "../core/InterleavedBufferAttribute";
 import type { Matrix3 } from "./Matrix3";
 import { clamp } from "./MathUtils";
+import { ensureTypeFlag } from "../utils";
 /**
  * Class representing a 2D vector. A 2D vector is an ordered pair of numbers
  * (labeled x and y), which can be used to represent a number of things, such as:
@@ -49,6 +50,7 @@ export class Vector2 {
    * @param [y=0] - The y value of this vector.
    */
   constructor(x: number = 0, y: number = 0) {
+    ensureTypeFlag(this, "isVector2");
     /**
      * The x value of this vector.
      *
@@ -165,7 +167,7 @@ export class Vector2 {
    * @return A clone of this instance.
    */
   clone(): Vector2 {
-    return new (this.constructor as any)(this.x, this.y);
+    return new Vector2(this.x, this.y);
   }
   /**
    * Copies the values of the given vector to this instance.
@@ -654,9 +656,5 @@ export class Vector2 {
     this.x = Math.random();
     this.y = Math.random();
     return this;
-  }
-  *[Symbol.iterator]() {
-    yield this.x;
-    yield this.y;
   }
 }

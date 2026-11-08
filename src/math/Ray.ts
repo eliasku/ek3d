@@ -534,6 +534,6 @@ export class Ray {
    * @return A clone of this instance.
    */
   clone(): Ray {
-    return new (this.constructor as any)().copy(this);
+    return new Ray().copy(this);
   }
 }

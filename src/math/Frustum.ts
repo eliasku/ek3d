@@ -226,6 +226,6 @@ export class Frustum {
    * @return A clone of this instance.
    */
   clone(): Frustum {
-    return new (this.constructor as any)().copy(this);
+    return new Frustum().copy(this);
   }
 }

@@ -1,6 +1,13 @@
 import type { UniformsGroup } from "../../core/UniformsGroup";
 import type { Texture } from "../../textures/Texture";
 import type { ShaderMaterial } from "../../materials/ShaderMaterial";
+import type { Color } from "../../math/Color";
+import type { Matrix3 } from "../../math/Matrix3";
+import type { Matrix4 } from "../../math/Matrix4";
+import type { Quaternion } from "../../math/Quaternion";
+import type { Vector2 } from "../../math/Vector2";
+import type { Vector3 } from "../../math/Vector3";
+import type { Vector4 } from "../../math/Vector4";
 import { ColorManagement } from "../../math/ColorManagement";
 import { warn } from "../../utils";
 
@@ -49,14 +56,14 @@ export function cloneUniforms<T extends Record<string, object> = Record<string, 
           warn("UniformsUtils: Textures of render targets cannot be cloned via cloneUniforms() or mergeUniforms().");
           target[p] = null;
         } else {
-          target[p] = property.clone();
+          target[p] = cloneUniformValue(property);
         }
       } else if (Array.isArray(property)) {
         if (isThreeObject(property[0])) {
           const values = property as CloneableUniformValue[];
           const clonedProperty: unknown[] = [];
           for (let i = 0, l = values.length; i < l; i++) {
-            clonedProperty[i] = values[i].clone();
+            clonedProperty[i] = cloneUniformValue(values[i]);
           }
           target[p] = clonedProperty;
         } else {
@@ -86,6 +93,18 @@ export function mergeUniforms(uniforms: ShaderMaterial["uniforms"][]): ShaderMat
     }
   }
   return merged;
+}
+function cloneUniformValue(value: CloneableUniformValue): unknown {
+  if (value.isColor) return (value as Color).clone();
+  if (value.isMatrix3) return (value as Matrix3).clone();
+  if (value.isMatrix4) return (value as Matrix4).clone();
+  if (value.isVector2) return (value as Vector2).clone();
+  if (value.isVector3) return (value as Vector3).clone();
+  if (value.isVector4) return (value as Vector4).clone();
+  if (value.isQuaternion) return (value as Quaternion).clone();
+  if (value.isTexture) return (value as Texture).clone();
+  // Recognized arrays can also contain custom cloneable values.
+  return value.clone();
 }
 function isThreeObject(property: unknown): property is CloneableUniformValue {
   const value = property as CloneableUniformValue | null | undefined;

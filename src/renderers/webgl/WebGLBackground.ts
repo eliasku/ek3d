@@ -1,3 +1,4 @@
+import type { Camera } from "../../cameras/Camera";
 import type { BufferGeometry } from "../../core/BufferGeometry";
 import type { Material } from "../../materials/Material";
 import type { Object3D } from "../../core/Object3D";
@@ -55,8 +56,8 @@ export function WebGLBackground(
 ): WebGLBackgroundSystem {
   const clearColor = new Color(0x000000);
   let clearAlpha = alpha === true ? 0 : 1;
-  let planeMesh: any;
-  let boxMesh: any;
+  let planeMesh: Mesh<ShaderMaterial> | undefined;
+  let boxMesh: Mesh<ShaderMaterial> | undefined;
   let currentBackground: any = null;
   let currentBackgroundVersion = 0;
   let currentTonemapping: any = null;
@@ -105,8 +106,8 @@ export function WebGLBackground(
         );
         boxMesh.geometry.deleteAttribute("normal");
         boxMesh.geometry.deleteAttribute("uv");
-        boxMesh.onBeforeRender = function (this: any, renderer?: any, scene?: any, camera?: any) {
-          this.matrixWorld.copyPosition(camera.matrixWorld);
+        boxMesh.onBeforeRender = function (mesh: Mesh, _renderer: WebGLRenderer, _scene: Object3D, camera: Camera) {
+          mesh.matrixWorld.copyPosition(camera.matrixWorld);
         };
         // add "envMap" material property so the renderer can evaluate it like for built-in materials
         Object.defineProperty(boxMesh.material, "envMap", {
@@ -120,11 +121,10 @@ export function WebGLBackground(
       boxMesh.material.uniforms.backgroundBlurriness.value = (scene as any).backgroundBlurriness;
       boxMesh.material.uniforms.backgroundIntensity.value = (scene as any).backgroundIntensity;
       // note: since the matrix is orthonormal, we can use the more-efficient transpose() in lieu of invert()
-      boxMesh.material.uniforms.backgroundRotation.value
-        .setFromMatrix4(_m1.makeRotationFromEuler((scene as any).backgroundRotation))
-        .transpose();
+      const backgroundRotation = boxMesh.material.uniforms.backgroundRotation.value as Matrix3;
+      backgroundRotation.setFromMatrix4(_m1.makeRotationFromEuler((scene as any).backgroundRotation)).transpose();
       if (background.isRenderTargetTexture === false) {
-        boxMesh.material.uniforms.backgroundRotation.value.premultiply(_m);
+        backgroundRotation.premultiply(_m);
       }
       boxMesh.material.toneMapped = ColorManagement.getTransfer(background.colorSpace) !== Transfer.SRGB;
       if (
@@ -171,7 +171,7 @@ export function WebGLBackground(
       if (background.matrixAutoUpdate === true) {
         background.updateMatrix();
       }
-      planeMesh.material.uniforms.uvTransform.value.copy(background.matrix);
+      (planeMesh.material.uniforms.uvTransform.value as Matrix3).copy(background.matrix);
       if (
         currentBackground !== background ||
         currentBackgroundVersion !== background.version ||

@@ -10,6 +10,7 @@ import type { Spherical } from "./Spherical";
 import type { Vector4 } from "./Vector4";
 import { clamp } from "./MathUtils";
 import { Quaternion } from "./Quaternion";
+import { ensureTypeFlag } from "../utils";
 /**
  * Class representing a 3D vector. A 3D vector is an ordered triplet of numbers
  * (labeled x, y and z), which can be used to represent a number of things, such as:
@@ -59,6 +60,7 @@ export class Vector3 {
    * @param [z=0] - The z value of this vector.
    */
   constructor(x: number = 0, y: number = 0, z: number = 0) {
+    ensureTypeFlag(this, "isVector3");
     /**
      * The x value of this vector.
      *
@@ -179,7 +181,7 @@ export class Vector3 {
    * @return A clone of this instance.
    */
   clone(): Vector3 {
-    return new (this.constructor as any)(this.x, this.y, this.z);
+    return new Vector3(this.x, this.y, this.z);
   }
   /**
    * Copies the values of the given vector to this instance.
@@ -1022,11 +1024,6 @@ export class Vector3 {
     this.y = u;
     this.z = c * Math.sin(theta);
     return this;
-  }
-  *[Symbol.iterator]() {
-    yield this.x;
-    yield this.y;
-    yield this.z;
   }
 }
 const _vector = /*@__PURE__*/ new Vector3();

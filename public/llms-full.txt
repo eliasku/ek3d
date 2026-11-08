@@ -31,6 +31,9 @@ The package contains TypeScript source, so use a bundler that supports TypeScrip
 Pass shaders and other required subsystems to the renderer explicitly.
 This keeps dependencies visible. It does not guarantee a smaller bundle.
 
+Unlike Three.js, math objects (`Vector2`, `Vector3`, `Vector4`, `Quaternion`,
+`Euler` and `Color`) are not iterable. Use `toArray()` or named components instead.
+
 ## Basic example
 
 ```typescript
@@ -60,6 +63,15 @@ It does not include the full Three.js addon catalog.
 WebGPU, TSL, WebXR and StereoCamera are not included.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, commands, API details and checks.
+
+Production builds use `@eliasku/ts-mangle/vite-plugin`, temporarily linked to
+`file:../ts-mangle`. Build that checkout before building ek3d. Property mangling is disabled.
+Development and unit tests use the original classes; verify optimized behavior with
+`npm run build` and `npm run preview`.
+Classes that need runtime prototypes can opt out with class-level `@class-crasher-ignore` JSDoc.
+Math classes remain extracted; their method calls need concrete receiver types.
+The optimized build is not release-ready: remaining dynamic dispatch and the full
+example/browser/device matrix still need verification.
 
 Run `npm run docs:llms` to generate [llms.txt](public/llms.txt) and
 [llms-full.txt](public/llms-full.txt) from this README and the maintained source.
@@ -134375,7 +134387,8 @@ function solveLSCM(positions: Vector3[], triangles: number[][], initial: number[
 import type { AnimationClip } from "./AnimationClip";
 import type { AnimationMixer } from "./AnimationMixer";
 import type { AnimationObjectGroup } from "./AnimationObjectGroup";
-import type { AnimationBuffer, Interpolant } from "../math/Interpolant";
+import type { PropertyMixer } from "./PropertyMixer";
+import type { AnimationBuffer, Interpolant, InterpolantSettings } from "../math/Interpolant";
 import type { LinearInterpolant } from "../math/interpolants/LinearInterpolant";
 import type { Object3D } from "../core/Object3D";
 import { EndingMode, Loop, AnimationBlendMode } from "../constants";
@@ -134388,9 +134401,9 @@ export class AnimationAction {
   _clip: AnimationClip;
   _localRoot: Object3D | AnimationObjectGroup | null;
   blendMode: AnimationBlendMode;
-  _interpolantSettings: any;
-  _interpolants: any[];
-  _propertyBindings: any[];
+  _interpolantSettings: InterpolantSettings;
+  _interpolants: Interpolant<AnimationBuffer>[];
+  _propertyBindings: PropertyMixer[];
   _cacheIndex: number | null;
   _byClipCacheIndex: number | null;
   _timeScaleInterpolant: LinearInterpolant | null;
@@ -134437,7 +134450,7 @@ export class AnimationAction {
     const tracks = clip.tracks,
       nTracks = tracks.length,
       interpolants = Array<Interpolant<AnimationBuffer>>(nTracks);
-    const interpolantSettings: any = {
+    const interpolantSettings: InterpolantSettings = {
       endingStart: EndingMode.ZeroCurvature,
       endingEnd: EndingMode.ZeroCurvature,
     };
@@ -134448,8 +134461,7 @@ export class AnimationAction {
     }
     this._interpolantSettings = interpolantSettings;
     this._interpolants = interpolants; // bound by the mixer
-    // inside: PropertyMixer (managed by the mixer)
-    this._propertyBindings = Array(nTracks);
+    this._propertyBindings = Array<PropertyMixer>(nTracks);
     this._cacheIndex = null; // for the memory manager
     this._byClipCacheIndex = null; // for the memory manager
     this._timeScaleInterpolant = null;
@@ -134827,7 +134839,7 @@ export class AnimationAction {
     return this._localRoot || this._mixer._root;
   }
   // Internal
-  _update(time: any, deltaTime: any, timeDirection: any, accuIndex?: any) {
+  _update(time: number, deltaTime: number, timeDirection: number, accuIndex: number): void {
     // called by the mixer
     if (!this.enabled) {
       // call ._updateWeight() to update ._effectiveWeight
@@ -134870,7 +134882,7 @@ export class AnimationAction {
       }
     }
   }
-  _updateWeight(time?: any) {
+  _updateWeight(time: number): number {
     let weight = 0;
     if (this.enabled) {
       weight = this.weight;
@@ -134890,7 +134902,7 @@ export class AnimationAction {
     this._effectiveWeight = weight;
     return weight;
   }
-  _updateTimeScale(time?: any) {
+  _updateTimeScale(time: number): number {
     let timeScale = 0;
     if (!this.paused) {
       timeScale = this.timeScale;
@@ -134916,7 +134928,7 @@ export class AnimationAction {
     this._effectiveTimeScale = timeScale;
     return timeScale;
   }
-  _updateTime(deltaTime?: any) {
+  _updateTime(deltaTime: number): number {
     const duration = this._clip.duration;
     const loop = this.loop;
     let time = this.time + deltaTime;
@@ -135009,7 +135021,7 @@ export class AnimationAction {
     }
     return time;
   }
-  _setEndings(atStart: any, atEnd: any, pingPong?: any) {
+  _setEndings(atStart: boolean, atEnd: boolean, pingPong: boolean): void {
     const settings = this._interpolantSettings;
     if (pingPong) {
       settings.endingStart = EndingMode.ZeroSlope;
@@ -135028,7 +135040,7 @@ export class AnimationAction {
       }
     }
   }
-  _scheduleFading(duration: any, weightNow: any, weightThen?: any) {
+  _scheduleFading(duration: number, weightNow: number, weightThen: number): AnimationAction {
     const mixer = this._mixer,
       now = mixer.time;
     let interpolant = this._weightInterpolant;
@@ -135415,7 +135427,6 @@ function parseKeyframeTrack(json?: any) {
 
 ```typescript
 import type { AnimationObjectGroup } from "./AnimationObjectGroup";
-import type { NumericAnimationBuffer } from "../math/Interpolant";
 import type { Object3D } from "../core/Object3D";
 import { AnimationAction } from "./AnimationAction";
 import { EventDispatcher } from "../core/EventDispatcher";
@@ -135424,6 +135435,14 @@ import { PropertyBinding } from "./PropertyBinding";
 import { PropertyMixer } from "./PropertyMixer";
 import { AnimationClip } from "./AnimationClip";
 import { AnimationBlendMode } from "../constants";
+
+type ClipActions = {
+  knownActions: AnimationAction[];
+  actionByRoot: Record<string, AnimationAction>;
+};
+type CachedControlInterpolant = LinearInterpolant & { __cacheIndex: number };
+type CacheStats = { readonly total: number; readonly inUse: number };
+
 const _controlInterpolantsResultBuffer = new Float32Array(1);
 /**
  * `AnimationMixer` is a player for animations on a particular object in
@@ -135436,15 +135455,15 @@ export class AnimationMixer extends EventDispatcher {
   time: number;
   timeScale: number;
   // Initialized together by _initMemoryManager() in the constructor.
-  _actions!: any[];
+  _actions!: AnimationAction[];
   _nActiveActions!: number;
-  _actionsByClip: any;
-  _bindings!: any[];
+  _actionsByClip!: Record<string, ClipActions>;
+  _bindings!: PropertyMixer[];
   _nActiveBindings!: number;
-  _bindingsByRootAndName: any;
-  _controlInterpolants!: any[];
+  _bindingsByRootAndName!: Record<string, Record<string, PropertyMixer>>;
+  _controlInterpolants!: CachedControlInterpolant[];
   _nActiveControlInterpolants!: number;
-  stats: any;
+  stats!: { actions: CacheStats; bindings: CacheStats; controlInterpolants: CacheStats };
 
   /**
    * Constructs a new animation mixer.
@@ -135473,7 +135492,7 @@ export class AnimationMixer extends EventDispatcher {
      */
     this.timeScale = 1.0;
   }
-  _bindAction(action: any, prototypeAction?: any) {
+  _bindAction(action: AnimationAction, prototypeAction?: AnimationAction): void {
     const root = action._localRoot || this._root,
       tracks = action._clip.tracks,
       nTracks = tracks.length,
@@ -135481,10 +135500,10 @@ export class AnimationMixer extends EventDispatcher {
       interpolants = action._interpolants,
       rootUuid = root.uuid,
       bindingsByRoot = this._bindingsByRootAndName;
-    let bindingsByName = (bindingsByRoot as any)[rootUuid];
+    let bindingsByName = bindingsByRoot[rootUuid];
     if (bindingsByName === undefined) {
       bindingsByName = {};
-      (bindingsByRoot as any)[rootUuid] = bindingsByName;
+      bindingsByRoot[rootUuid] = bindingsByName;
     }
     for (let i = 0; i !== nTracks; ++i) {
       const track = tracks[i],
@@ -135503,7 +135522,7 @@ export class AnimationMixer extends EventDispatcher {
           }
           continue;
         }
-        const path = prototypeAction && prototypeAction._propertyBindings[i].binding.parsedPath;
+        const path = prototypeAction && (prototypeAction._propertyBindings[i].binding as PropertyBinding).parsedPath;
         binding = new PropertyMixer(
           PropertyBinding.create(root, trackName, path),
           track.ValueTypeName,
@@ -135516,14 +135535,14 @@ export class AnimationMixer extends EventDispatcher {
       interpolants[i].resultBuffer = binding.buffer;
     }
   }
-  _activateAction(action?: any) {
+  _activateAction(action: AnimationAction): void {
     if (!this._isActiveAction(action)) {
       if (action._cacheIndex === null) {
         // this action has been forgotten by the cache, but the user
         // appears to be still using it -> rebind
         const rootUuid = (action._localRoot || this._root).uuid,
           clipUuid = action._clip.uuid,
-          actionsForClip = (this._actionsByClip as any)[clipUuid];
+          actionsForClip = this._actionsByClip[clipUuid];
         this._bindAction(action, actionsForClip && actionsForClip.knownActions[0]);
         this._addInactiveAction(action, clipUuid, rootUuid);
       }
@@ -135539,7 +135558,7 @@ export class AnimationMixer extends EventDispatcher {
       this._lendAction(action);
     }
   }
-  _deactivateAction(action?: any) {
+  _deactivateAction(action: AnimationAction): void {
     if (this._isActiveAction(action)) {
       const bindings = action._propertyBindings;
       // decrement reference counts / sort out state
@@ -135558,11 +135577,6 @@ export class AnimationMixer extends EventDispatcher {
     this._actions = []; // 'nActiveActions' followed by inactive ones
     this._nActiveActions = 0;
     this._actionsByClip = {};
-    // inside:
-    // {
-    // 	knownActions: Array< AnimationAction > - used as prototypes
-    // 	actionByRoot: AnimationAction - lookup
-    // }
     this._bindings = []; // 'nActiveBindings' followed by inactive ones
     this._nActiveBindings = 0;
     this._bindingsByRootAndName = {}; // inside: Map< name, PropertyMixer >
@@ -135598,21 +135612,21 @@ export class AnimationMixer extends EventDispatcher {
     };
   }
   // Memory management for AnimationAction objects
-  _isActiveAction(action?: any) {
+  _isActiveAction(action: AnimationAction): boolean {
     const index = action._cacheIndex;
     return index !== null && index < this._nActiveActions;
   }
-  _addInactiveAction(action: any, clipUuid: any, rootUuid?: any) {
+  _addInactiveAction(action: AnimationAction, clipUuid: string, rootUuid: string): void {
     const actions = this._actions,
       actionsByClip = this._actionsByClip;
-    let actionsForClip = (actionsByClip as any)[clipUuid];
+    let actionsForClip = actionsByClip[clipUuid];
     if (actionsForClip === undefined) {
       actionsForClip = {
         knownActions: [action],
         actionByRoot: {},
       };
       action._byClipCacheIndex = 0;
-      (actionsByClip as any)[clipUuid] = actionsForClip;
+      actionsByClip[clipUuid] = actionsForClip;
     } else {
       const knownActions = actionsForClip.knownActions;
       action._byClipCacheIndex = knownActions.length;
@@ -135622,20 +135636,20 @@ export class AnimationMixer extends EventDispatcher {
     actions.push(action);
     actionsForClip.actionByRoot[rootUuid] = action;
   }
-  _removeInactiveAction(action?: any) {
+  _removeInactiveAction(action: AnimationAction): void {
     const actions = this._actions,
       lastInactiveAction = actions[actions.length - 1],
-      cacheIndex = action._cacheIndex;
+      cacheIndex = action._cacheIndex!;
     lastInactiveAction._cacheIndex = cacheIndex;
     actions[cacheIndex] = lastInactiveAction;
     actions.pop();
     action._cacheIndex = null;
     const clipUuid = action._clip.uuid,
       actionsByClip = this._actionsByClip,
-      actionsForClip = (actionsByClip as any)[clipUuid],
+      actionsForClip = actionsByClip[clipUuid],
       knownActionsForClip = actionsForClip.knownActions,
       lastKnownAction = knownActionsForClip[knownActionsForClip.length - 1],
-      byClipCacheIndex = action._byClipCacheIndex;
+      byClipCacheIndex = action._byClipCacheIndex!;
     lastKnownAction._byClipCacheIndex = byClipCacheIndex;
     knownActionsForClip[byClipCacheIndex] = lastKnownAction;
     knownActionsForClip.pop();
@@ -135644,11 +135658,11 @@ export class AnimationMixer extends EventDispatcher {
       rootUuid = (action._localRoot || this._root).uuid;
     delete actionByRoot[rootUuid];
     if (knownActionsForClip.length === 0) {
-      delete (actionsByClip as any)[clipUuid];
+      delete actionsByClip[clipUuid];
     }
     this._removeInactiveBindingsForAction(action);
   }
-  _removeInactiveBindingsForAction(action?: any) {
+  _removeInactiveBindingsForAction(action: AnimationAction): void {
     const bindings = action._propertyBindings;
     for (let i = 0, n = bindings.length; i !== n; ++i) {
       const binding = bindings[i];
@@ -135657,14 +135671,14 @@ export class AnimationMixer extends EventDispatcher {
       }
     }
   }
-  _lendAction(action?: any) {
+  _lendAction(action: AnimationAction): void {
     // [ active actions |  inactive actions  ]
     // [  active actions >| inactive actions ]
     //                 s        a
     //                  <-swap->
     //                 a        s
     const actions = this._actions,
-      prevIndex = action._cacheIndex,
+      prevIndex = action._cacheIndex!,
       lastActiveIndex = this._nActiveActions++,
       firstInactiveAction = actions[lastActiveIndex];
     action._cacheIndex = lastActiveIndex;
@@ -135672,14 +135686,14 @@ export class AnimationMixer extends EventDispatcher {
     firstInactiveAction._cacheIndex = prevIndex;
     actions[prevIndex] = firstInactiveAction;
   }
-  _takeBackAction(action?: any) {
+  _takeBackAction(action: AnimationAction): void {
     // [  active actions  | inactive actions ]
     // [ active actions |< inactive actions  ]
     //        a        s
     //         <-swap->
     //        s        a
     const actions = this._actions,
-      prevIndex = action._cacheIndex,
+      prevIndex = action._cacheIndex!,
       firstInactiveIndex = --this._nActiveActions,
       lastActiveAction = actions[firstInactiveIndex];
     action._cacheIndex = firstInactiveIndex;
@@ -135688,39 +135702,40 @@ export class AnimationMixer extends EventDispatcher {
     actions[prevIndex] = lastActiveAction;
   }
   // Memory management for PropertyMixer objects
-  _addInactiveBinding(binding: any, rootUuid: any, trackName?: any) {
+  _addInactiveBinding(binding: PropertyMixer, rootUuid: string, trackName: string): void {
     const bindingsByRoot = this._bindingsByRootAndName,
       bindings = this._bindings;
-    let bindingByName = (bindingsByRoot as any)[rootUuid];
+    let bindingByName = bindingsByRoot[rootUuid];
     if (bindingByName === undefined) {
       bindingByName = {};
-      (bindingsByRoot as any)[rootUuid] = bindingByName;
+      bindingsByRoot[rootUuid] = bindingByName;
     }
     bindingByName[trackName] = binding;
     binding._cacheIndex = bindings.length;
     bindings.push(binding);
   }
-  _removeInactiveBinding(binding?: any) {
+  _removeInactiveBinding(binding: PropertyMixer): void {
+    // Mixer caches contain bindings created by PropertyBinding.create.
     const bindings = this._bindings,
-      propBinding = binding.binding,
+      propBinding = binding.binding as unknown as { rootNode: Object3D | AnimationObjectGroup; path: string },
       rootUuid = propBinding.rootNode.uuid,
       trackName = propBinding.path,
       bindingsByRoot = this._bindingsByRootAndName,
-      bindingByName = (bindingsByRoot as any)[rootUuid],
+      bindingByName = bindingsByRoot[rootUuid],
       lastInactiveBinding = bindings[bindings.length - 1],
-      cacheIndex = binding._cacheIndex;
+      cacheIndex = binding._cacheIndex!;
     lastInactiveBinding._cacheIndex = cacheIndex;
     bindings[cacheIndex] = lastInactiveBinding;
     bindings.pop();
     binding._cacheIndex = null;
     delete bindingByName[trackName];
     if (Object.keys(bindingByName).length === 0) {
-      delete (bindingsByRoot as any)[rootUuid];
+      delete bindingsByRoot[rootUuid];
     }
   }
-  _lendBinding(binding?: any) {
+  _lendBinding(binding: PropertyMixer): void {
     const bindings = this._bindings,
-      prevIndex = binding._cacheIndex,
+      prevIndex = binding._cacheIndex!,
       lastActiveIndex = this._nActiveBindings++,
       firstInactiveBinding = bindings[lastActiveIndex];
     binding._cacheIndex = lastActiveIndex;
@@ -135728,9 +135743,9 @@ export class AnimationMixer extends EventDispatcher {
     firstInactiveBinding._cacheIndex = prevIndex;
     bindings[prevIndex] = firstInactiveBinding;
   }
-  _takeBackBinding(binding?: any) {
+  _takeBackBinding(binding: PropertyMixer): void {
     const bindings = this._bindings,
-      prevIndex = binding._cacheIndex,
+      prevIndex = binding._cacheIndex!,
       firstInactiveIndex = --this._nActiveBindings,
       lastActiveBinding = bindings[firstInactiveIndex];
     binding._cacheIndex = firstInactiveIndex;
@@ -135746,22 +135761,23 @@ export class AnimationMixer extends EventDispatcher {
     if (interpolant === undefined) {
       interpolant = new LinearInterpolant(
         new Float32Array(2),
-        new Float32Array(2) as NumericAnimationBuffer,
+        new Float32Array(2),
         1,
-        _controlInterpolantsResultBuffer as NumericAnimationBuffer | null | undefined,
-      );
+        _controlInterpolantsResultBuffer,
+      ) as CachedControlInterpolant;
       interpolant.__cacheIndex = lastActiveIndex;
       interpolants[lastActiveIndex] = interpolant;
     }
     return interpolant;
   }
-  _takeBackControlInterpolant(interpolant?: any) {
+  _takeBackControlInterpolant(interpolant: LinearInterpolant): void {
+    const cachedInterpolant = interpolant as CachedControlInterpolant;
     const interpolants = this._controlInterpolants,
-      prevIndex = interpolant.__cacheIndex,
+      prevIndex = cachedInterpolant.__cacheIndex,
       firstInactiveIndex = --this._nActiveControlInterpolants,
       lastActiveInterpolant = interpolants[firstInactiveIndex];
-    interpolant.__cacheIndex = firstInactiveIndex;
-    interpolants[firstInactiveIndex] = interpolant;
+    cachedInterpolant.__cacheIndex = firstInactiveIndex;
+    interpolants[firstInactiveIndex] = cachedInterpolant;
     lastActiveInterpolant.__cacheIndex = prevIndex;
     interpolants[prevIndex] = lastActiveInterpolant;
   }
@@ -135787,13 +135803,17 @@ export class AnimationMixer extends EventDispatcher {
     optionalRoot?: Object3D | AnimationObjectGroup,
     blendMode?: AnimationBlendMode,
   ): AnimationAction | null;
-  clipAction(clip?: any, optionalRoot?: any, blendMode?: AnimationBlendMode): AnimationAction | null {
+  clipAction(
+    clip: AnimationClip | string,
+    optionalRoot?: Object3D | AnimationObjectGroup,
+    blendMode?: AnimationBlendMode,
+  ): AnimationAction | null {
     const root = optionalRoot || this._root,
       rootUuid = root.uuid;
-    let clipObject = typeof clip === "string" ? AnimationClip.findByName(root, clip) : clip;
-    const clipUuid = clipObject !== null ? clipObject.uuid : clip;
-    const actionsForClip = (this._actionsByClip as any)[clipUuid];
-    let prototypeAction: any = null;
+    let clipObject = typeof clip === "string" ? AnimationClip.findByName(root as Object3D, clip) : clip;
+    const clipUuid = clipObject !== null ? clipObject.uuid : (clip as string);
+    const actionsForClip = this._actionsByClip[clipUuid];
+    let prototypeAction: AnimationAction | undefined;
     if (blendMode === undefined) {
       if (clipObject !== null) {
         blendMode = clipObject.blendMode;
@@ -135828,13 +135848,12 @@ export class AnimationMixer extends EventDispatcher {
    * @param [optionalRoot] - An alternative root object.
    * @return The animation action. Returns `null` if no action was found.
    */
-  existingAction(clip: AnimationClip | string, optionalRoot?: Object3D | AnimationObjectGroup): AnimationAction | null;
-  existingAction(clip?: any, optionalRoot?: any): AnimationAction | null {
+  existingAction(clip: AnimationClip | string, optionalRoot?: Object3D | AnimationObjectGroup): AnimationAction | null {
     const root = optionalRoot || this._root,
       rootUuid = root.uuid,
-      clipObject = typeof clip === "string" ? AnimationClip.findByName(root, clip) : clip,
-      clipUuid = clipObject ? clipObject.uuid : clip,
-      actionsForClip = (this._actionsByClip as any)[clipUuid];
+      clipObject = typeof clip === "string" ? AnimationClip.findByName(root as Object3D, clip) : clip,
+      clipUuid = clipObject ? clipObject.uuid : (clip as string),
+      actionsForClip = this._actionsByClip[clipUuid];
     if (actionsForClip !== undefined) {
       return actionsForClip.actionByRoot[rootUuid] || null;
     }
@@ -135916,7 +135935,7 @@ export class AnimationMixer extends EventDispatcher {
     const actions = this._actions,
       clipUuid = clip.uuid,
       actionsByClip = this._actionsByClip,
-      actionsForClip = (actionsByClip as any)[clipUuid];
+      actionsForClip = actionsByClip[clipUuid];
     if (actionsForClip !== undefined) {
       // note: just calling _removeInactiveAction would mess up the
       // iteration state and also require updating the state we can
@@ -135925,7 +135944,7 @@ export class AnimationMixer extends EventDispatcher {
       for (let i = 0, n = actionsToRemove.length; i !== n; ++i) {
         const action = actionsToRemove[i];
         this._deactivateAction(action);
-        const cacheIndex = action._cacheIndex,
+        const cacheIndex = action._cacheIndex!,
           lastInactiveAction = actions[actions.length - 1];
         action._byClipCacheIndex = null;
         lastInactiveAction._cacheIndex = cacheIndex;
@@ -135934,7 +135953,7 @@ export class AnimationMixer extends EventDispatcher {
         action._cacheIndex = null;
         this._removeInactiveBindingsForAction(action);
       }
-      delete (actionsByClip as any)[clipUuid];
+      delete actionsByClip[clipUuid];
     }
   }
   /**
@@ -135945,12 +135964,11 @@ export class AnimationMixer extends EventDispatcher {
    *
    * @param root - The root object to uncache.
    */
-  uncacheRoot(root: Object3D | AnimationObjectGroup): void;
-  uncacheRoot(root?: any) {
+  uncacheRoot(root: Object3D | AnimationObjectGroup): void {
     const rootUuid = root.uuid,
       actionsByClip = this._actionsByClip;
     for (const clipUuid in actionsByClip) {
-      const knownActions = (actionsByClip as any)[clipUuid].knownActions;
+      const knownActions = actionsByClip[clipUuid].knownActions;
       for (let i = knownActions.length - 1; i >= 0; --i) {
         const action = knownActions[i];
         if ((action._localRoot || this._root).uuid === rootUuid) {
@@ -135960,7 +135978,7 @@ export class AnimationMixer extends EventDispatcher {
       }
     }
     const bindingsByRoot = this._bindingsByRootAndName,
-      bindingByName = (bindingsByRoot as any)[rootUuid];
+      bindingByName = bindingsByRoot[rootUuid];
     if (bindingByName !== undefined) {
       for (const trackName in bindingByName) {
         const binding = bindingByName[trackName];
@@ -135977,8 +135995,7 @@ export class AnimationMixer extends EventDispatcher {
    * @param clip - An animation clip or alternatively the name of the animation clip.
    * @param [optionalRoot] - An alternative root object.
    */
-  uncacheAction(clip: AnimationClip | string, optionalRoot?: Object3D | AnimationObjectGroup): void;
-  uncacheAction(clip?: any, optionalRoot?: any) {
+  uncacheAction(clip: AnimationClip | string, optionalRoot?: Object3D | AnimationObjectGroup): void {
     const action = this.existingAction(clip, optionalRoot);
     if (action !== null) {
       this._deactivateAction(action);
@@ -137086,6 +137103,14 @@ function scaleTangentTimes(tangents?: any, timeScale?: any) {
 import type { AnimationBuffer } from "../math/Interpolant";
 import type { AnimationObjectGroup } from "./AnimationObjectGroup";
 import type { Object3D } from "../core/Object3D";
+import type { Color } from "../math/Color";
+import type { Euler } from "../math/Euler";
+import type { Matrix3 } from "../math/Matrix3";
+import type { Matrix4 } from "../math/Matrix4";
+import type { Quaternion } from "../math/Quaternion";
+import type { Vector2 } from "../math/Vector2";
+import type { Vector3 } from "../math/Vector3";
+import type { Vector4 } from "../math/Vector4";
 import { warn, error } from "../utils";
 
 export interface ParsedTrackPath {
@@ -137103,9 +137128,54 @@ export interface AnimationBinding {
   unbind(): void;
 }
 type BoundProperty = AnimationBuffer & {
+  isColor?: boolean;
+  isEuler?: boolean;
+  isMatrix3?: boolean;
+  isMatrix4?: boolean;
+  isQuaternion?: boolean;
+  isVector2?: boolean;
+  isVector3?: boolean;
+  isVector4?: boolean;
   toArray(buffer: AnimationBuffer, offset: number): void;
   fromArray(buffer: AnimationBuffer, offset: number): void;
 };
+function isMathProperty(value: BoundProperty): boolean {
+  return !!(
+    value.isColor ||
+    value.isEuler ||
+    value.isMatrix3 ||
+    value.isMatrix4 ||
+    value.isQuaternion ||
+    value.isVector2 ||
+    value.isVector3 ||
+    value.isVector4
+  );
+}
+function readMathProperty(value: BoundProperty, buffer: AnimationBuffer, offset: number): void {
+  // These bindings use numeric indexed buffers, including typed arrays.
+  const numeric = buffer as number[];
+  if (value.isColor) (value as unknown as Color).toArray(numeric, offset);
+  else if (value.isEuler) (value as unknown as Euler).toArray(numeric, offset);
+  else if (value.isMatrix3) (value as unknown as Matrix3).toArray(numeric, offset);
+  else if (value.isMatrix4) (value as unknown as Matrix4).toArray(numeric, offset);
+  else if (value.isQuaternion) (value as unknown as Quaternion).toArray(numeric, offset);
+  else if (value.isVector2) (value as unknown as Vector2).toArray(numeric, offset);
+  else if (value.isVector3) (value as unknown as Vector3).toArray(numeric, offset);
+  else if (value.isVector4) (value as unknown as Vector4).toArray(numeric, offset);
+  else value.toArray(buffer, offset);
+}
+function writeMathProperty(value: BoundProperty, buffer: AnimationBuffer, offset: number): void {
+  const numeric = buffer as number[];
+  if (value.isColor) (value as unknown as Color).fromArray(numeric, offset);
+  else if (value.isEuler) (value as unknown as Euler).fromArray(numeric);
+  else if (value.isMatrix3) (value as unknown as Matrix3).fromArray(numeric, offset);
+  else if (value.isMatrix4) (value as unknown as Matrix4).fromArray(numeric, offset);
+  else if (value.isQuaternion) (value as unknown as Quaternion).fromArray(numeric, offset);
+  else if (value.isVector2) (value as unknown as Vector2).fromArray(numeric, offset);
+  else if (value.isVector3) (value as unknown as Vector3).fromArray(numeric, offset);
+  else if (value.isVector4) (value as unknown as Vector4).fromArray(numeric, offset);
+  else value.fromArray(buffer, offset);
+}
 // Runtime path traversal validates these states before choosing a bound getter/setter.
 type BindingTarget = { [key: string]: BindingTarget } & {
   length: number;
@@ -137140,6 +137210,10 @@ const _objectRe = /*@__PURE__*/ /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace("WC",
 const _propertyRe = /*@__PURE__*/ /\.(WC+)(?:\[(.+)\])?/.source.replace("WC", _wordChar);
 const _trackRe = new RegExp("" + "^" + _directoryRe + _nodeRe + _objectRe + _propertyRe + "$");
 const _supportedObjectNames = ["material", "materials", "bones", "map"];
+/**
+ * Constructed through PropertyBinding.Composite and used through AnimationBinding.
+ * @class-crasher-ignore
+ */
 class Composite {
   _targetGroup: AnimationObjectGroup;
   rootNode: AnimationObjectGroup;
@@ -137186,6 +137260,8 @@ class Composite {
 // become no-ops.
 /**
  * This holds a reference to a real property in the scene graph; used internally.
+ *
+ * @class-crasher-ignore
  */
 export class PropertyBinding {
   path: string;
@@ -137408,7 +137484,7 @@ export class PropertyBinding {
     buffer[offset] = this.resolvedProperty![this.propertyIndex];
   }
   _getValue_toArray(buffer: AnimationBuffer, offset: number) {
-    this.resolvedProperty!.toArray(buffer, offset);
+    readMathProperty(this.resolvedProperty!, buffer, offset);
   }
   // Direct
   _setValue_direct(buffer: AnimationBuffer, offset: number) {
@@ -137457,14 +137533,14 @@ export class PropertyBinding {
   }
   // HasToFromArray
   _setValue_fromArray(buffer: AnimationBuffer, offset: number) {
-    this.resolvedProperty!.fromArray(buffer, offset);
+    writeMathProperty(this.resolvedProperty!, buffer, offset);
   }
   _setValue_fromArray_setNeedsUpdate(buffer: AnimationBuffer, offset: number) {
-    this.resolvedProperty!.fromArray(buffer, offset);
+    writeMathProperty(this.resolvedProperty!, buffer, offset);
     this.targetObject.needsUpdate = true;
   }
   _setValue_fromArray_setMatrixWorldNeedsUpdate(buffer: AnimationBuffer, offset: number) {
-    this.resolvedProperty!.fromArray(buffer, offset);
+    writeMathProperty(this.resolvedProperty!, buffer, offset);
     this.targetObject.matrixWorldNeedsUpdate = true;
   }
   _getValue_unbound(targetArray: AnimationBuffer, offset: number) {
@@ -137609,7 +137685,10 @@ export class PropertyBinding {
       bindingType = this.BindingType.ArrayElement;
       this.resolvedProperty = nodeProperty as unknown as BoundProperty;
       this.propertyIndex = propertyIndex;
-    } else if (nodeProperty.fromArray !== undefined && nodeProperty.toArray !== undefined) {
+    } else if (
+      isMathProperty(nodeProperty as unknown as BoundProperty) ||
+      (nodeProperty.fromArray !== undefined && nodeProperty.toArray !== undefined)
+    ) {
       // must use copy for Object3D.Euler/Quaternion
       bindingType = this.BindingType.HasFromToArray;
       this.resolvedProperty = nodeProperty as unknown as BoundProperty;
@@ -137688,18 +137767,30 @@ const _setterByBindingTypeAndVersioning: BindingAccessor[][] = [
 
 ```typescript
 import type { AnimationBinding } from "./PropertyBinding";
+import type { AnimationBuffer, NumericAnimationBuffer } from "../math/Interpolant";
 import { Quaternion } from "../math/Quaternion";
+
+type MixFunction = (
+  this: PropertyMixer,
+  buffer: AnimationBuffer,
+  dstOffset: number,
+  srcOffset: number,
+  t: number,
+  stride: number,
+) => void;
+
 /**
  * Buffered scene graph property that allows weighted accumulation; used internally.
  */
 export class PropertyMixer {
   binding: AnimationBinding;
   valueSize: number;
-  buffer: any[] | Float64Array;
+  buffer: AnimationBuffer;
+  _cacheIndex: number | null;
   _workIndex: number | undefined;
-  _mixBufferRegion: (buffer: any, dstOffset: any, srcOffset: any, t: any, stride: any) => void;
-  _mixBufferRegionAdditive: (buffer: any, dstOffset: any, srcOffset: any, t: any, stride: any) => void;
-  _setIdentity: () => void;
+  _mixBufferRegion: MixFunction;
+  _mixBufferRegionAdditive: MixFunction;
+  _setIdentity: (this: PropertyMixer) => void;
   _origIndex: number;
   _addIndex: number;
   cumulativeWeight: number;
@@ -137720,12 +137811,13 @@ export class PropertyMixer {
      *
      */
     this.binding = binding;
+    this._cacheIndex = null;
     /**
      * The keyframe track value size.
      *
      */
     this.valueSize = valueSize;
-    let mixFunction: any, mixFunctionAdditive: any, setIdentity: any;
+    let mixFunction: MixFunction, mixFunctionAdditive: MixFunction, setIdentity: (this: PropertyMixer) => void;
     // buffer layout: [ incoming | accu0 | accu1 | orig | addAccu | (optional work) ]
     //
     // interpolators can use .buffer as their .result
@@ -137741,31 +137833,29 @@ export class PropertyMixer {
     //
     // 'work' is optional and is only present for quaternion types. It is used
     // to store intermediate quaternion multiplication results
-    /* oxlint-disable typescript/unbound-method -- Selected methods are installed on this mixer and invoked with its receiver. */
     switch (typeName) {
       case "quaternion":
-        mixFunction = this._slerp;
-        mixFunctionAdditive = this._slerpAdditive;
-        setIdentity = this._setAdditiveIdentityQuaternion;
+        mixFunction = _slerp;
+        mixFunctionAdditive = _slerpAdditive;
+        setIdentity = _setAdditiveIdentityQuaternion;
         this.buffer = new Float64Array(valueSize * 6);
         this._workIndex = 5;
         break;
       case "string":
       case "bool":
-        mixFunction = this._select;
+        mixFunction = _select;
         // Use the regular mix function and for additive on these types,
         // additive is not relevant for non-numeric types
-        mixFunctionAdditive = this._select;
-        setIdentity = this._setAdditiveIdentityOther;
-        this.buffer = Array(valueSize * 5);
+        mixFunctionAdditive = _select;
+        setIdentity = _setAdditiveIdentityOther;
+        this.buffer = Array<string | boolean>(valueSize * 5);
         break;
       default:
-        mixFunction = this._lerp;
-        mixFunctionAdditive = this._lerpAdditive;
-        setIdentity = this._setAdditiveIdentityNumeric;
+        mixFunction = _lerp;
+        mixFunctionAdditive = _lerpAdditive;
+        setIdentity = _setAdditiveIdentityNumeric;
         this.buffer = new Float64Array(valueSize * 5);
     }
-    /* oxlint-enable typescript/unbound-method */
     this._mixBufferRegion = mixFunction;
     this._mixBufferRegionAdditive = mixFunctionAdditive;
     this._setIdentity = setIdentity;
@@ -137812,7 +137902,7 @@ export class PropertyMixer {
     if (currentWeight === 0) {
       // accuN := incoming * weight
       for (let i = 0; i !== stride; ++i) {
-        (buffer as any)[offset + i] = (buffer as any)[i];
+        buffer[offset + i] = buffer[i];
       }
       currentWeight = weight;
     } else {
@@ -137864,7 +137954,7 @@ export class PropertyMixer {
       this._mixBufferRegionAdditive(buffer, offset, this._addIndex * stride, 1, stride);
     }
     for (let i = stride, e = stride + stride; i !== e; ++i) {
-      if ((buffer as any)[i] !== (buffer as any)[i + stride]) {
+      if (buffer[i] !== buffer[i + stride]) {
         // value has changed -> update scene graph
         binding.setValue(buffer, offset);
         break;
@@ -137882,7 +137972,7 @@ export class PropertyMixer {
     binding.getValue(buffer, originalValueOffset);
     // accu[0..1] := orig -- initially detect changes against the original
     for (let i = stride, e = originalValueOffset; i !== e; ++i) {
-      (buffer as any)[i] = (buffer as any)[originalValueOffset + (i % stride)];
+      buffer[i] = buffer[originalValueOffset + (i % stride)];
     }
     // Add to identity for additive
     this._setIdentity();
@@ -137896,56 +137986,73 @@ export class PropertyMixer {
     const originalValueOffset = this.valueSize * 3;
     this.binding.setValue(this.buffer, originalValueOffset);
   }
-  // internals
-  _setAdditiveIdentityNumeric() {
-    const startIndex = this._addIndex * this.valueSize;
-    const endIndex = startIndex + this.valueSize;
-    for (let i = startIndex; i < endIndex; i++) {
-      (this.buffer as any)[i] = 0;
-    }
+}
+
+function _setAdditiveIdentityNumeric(this: PropertyMixer): void {
+  const startIndex = this._addIndex * this.valueSize;
+  const endIndex = startIndex + this.valueSize;
+  for (let i = startIndex; i < endIndex; i++) {
+    this.buffer[i] = 0;
   }
-  _setAdditiveIdentityQuaternion() {
-    this._setAdditiveIdentityNumeric();
-    (this.buffer as any)[this._addIndex * this.valueSize + 3] = 1;
+}
+
+function _setAdditiveIdentityQuaternion(this: PropertyMixer): void {
+  _setAdditiveIdentityNumeric.call(this);
+  this.buffer[this._addIndex * this.valueSize + 3] = 1;
+}
+
+function _setAdditiveIdentityOther(this: PropertyMixer): void {
+  const startIndex = this._origIndex * this.valueSize;
+  const targetIndex = this._addIndex * this.valueSize;
+  for (let i = 0; i < this.valueSize; i++) {
+    this.buffer[targetIndex + i] = this.buffer[startIndex + i];
   }
-  _setAdditiveIdentityOther() {
-    const startIndex = this._origIndex * this.valueSize;
-    const targetIndex = this._addIndex * this.valueSize;
-    for (let i = 0; i < this.valueSize; i++) {
-      (this.buffer as any)[targetIndex + i] = (this.buffer as any)[startIndex + i];
-    }
-  }
-  // mix functions
-  _select(buffer: any, dstOffset: any, srcOffset: any, t: any, stride?: any) {
-    if (t >= 0.5) {
-      for (let i = 0; i !== stride; ++i) {
-        buffer[dstOffset + i] = buffer[srcOffset + i];
-      }
-    }
-  }
-  _slerp(buffer: any, dstOffset: any, srcOffset: any, t?: any) {
-    Quaternion.slerpFlat(buffer, dstOffset, buffer, dstOffset, buffer, srcOffset, t);
-  }
-  _slerpAdditive(buffer: any, dstOffset: any, srcOffset: any, t: any, stride?: any) {
-    // Only quaternion mixers select this method and initialize the work region.
-    const workOffset = this._workIndex! * stride;
-    // Store result in intermediate buffer offset
-    Quaternion.multiplyQuaternionsFlat(buffer, workOffset, buffer, dstOffset, buffer, srcOffset);
-    // Slerp to the intermediate result
-    Quaternion.slerpFlat(buffer, dstOffset, buffer, dstOffset, buffer, workOffset, t);
-  }
-  _lerp(buffer: any, dstOffset: any, srcOffset: any, t: any, stride?: any) {
-    const s = 1 - t;
+}
+
+function _select(buffer: AnimationBuffer, dstOffset: number, srcOffset: number, t: number, stride: number): void {
+  if (t >= 0.5) {
     for (let i = 0; i !== stride; ++i) {
-      const j = dstOffset + i;
-      buffer[j] = buffer[j] * s + buffer[srcOffset + i] * t;
+      buffer[dstOffset + i] = buffer[srcOffset + i];
     }
   }
-  _lerpAdditive(buffer: any, dstOffset: any, srcOffset: any, t: any, stride?: any) {
-    for (let i = 0; i !== stride; ++i) {
-      const j = dstOffset + i;
-      buffer[j] = buffer[j] + buffer[srcOffset + i] * t;
-    }
+}
+
+function _slerp(buffer: AnimationBuffer, dstOffset: number, srcOffset: number, t: number): void {
+  const values = buffer as NumericAnimationBuffer;
+  Quaternion.slerpFlat(values, dstOffset, values, dstOffset, values, srcOffset, t);
+}
+
+function _slerpAdditive(
+  this: PropertyMixer,
+  buffer: AnimationBuffer,
+  dstOffset: number,
+  srcOffset: number,
+  t: number,
+  stride: number,
+): void {
+  const values = buffer as NumericAnimationBuffer;
+  // Only quaternion mixers select this function and initialize the work region.
+  const workOffset = this._workIndex! * stride;
+  // Store result in intermediate buffer offset
+  Quaternion.multiplyQuaternionsFlat(values, workOffset, values, dstOffset, values, srcOffset);
+  // Slerp to the intermediate result
+  Quaternion.slerpFlat(values, dstOffset, values, dstOffset, values, workOffset, t);
+}
+
+function _lerp(buffer: AnimationBuffer, dstOffset: number, srcOffset: number, t: number, stride: number): void {
+  const values = buffer as NumericAnimationBuffer;
+  const s = 1 - t;
+  for (let i = 0; i !== stride; ++i) {
+    const j = dstOffset + i;
+    values[j] = values[j] * s + values[srcOffset + i] * t;
+  }
+}
+
+function _lerpAdditive(buffer: AnimationBuffer, dstOffset: number, srcOffset: number, t: number, stride: number): void {
+  const values = buffer as NumericAnimationBuffer;
+  for (let i = 0; i !== stride; ++i) {
+    const j = dstOffset + i;
+    values[j] = values[j] + values[srcOffset + i] * t;
   }
 }
 ```
@@ -144809,13 +144916,12 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    * @param [y] - The y coordinate in world space.
    * @param [z] - The z coordinate in world space.
    */
-  lookAt(x: number | Vector3, y?: number, z?: number): void;
-  lookAt(x?: any, y?: number, z?: number) {
+  lookAt(x: number | Vector3, y?: number, z?: number): void {
     // This method does not support objects having non-uniformly-scaled parent(s)
-    if ((x as any).isVector3) {
-      _target.copy(x);
-    } else {
+    if (typeof x === "number") {
       _target.set(x, y!, z!);
+    } else {
+      _target.copy(x);
     }
     const parent = this.parent;
     this.updateWorldMatrix(true, false);
@@ -144825,11 +144931,11 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
     } else {
       _m1.lookAt(_target, _position, this.up);
     }
-    (this as any).quaternion.setFromRotationMatrix(_m1);
+    this.quaternion.setFromRotationMatrix(_m1);
     if (parent) {
       _m1.extractRotation(parent.matrixWorld);
       _q1.setFromRotationMatrix(_m1);
-      (this as any).quaternion.premultiply(_q1.invert());
+      this.quaternion.premultiply(_q1.invert());
     }
   }
   /**
@@ -153727,8 +153833,8 @@ export class PolyhedronGeometry extends BufferGeometry {
       detail: detail,
     };
     // default buffer data
-    const vertexBuffer: any[] = [];
-    const uvBuffer: any[] = [];
+    const vertexBuffer: number[] = [];
+    const uvBuffer: number[] = [];
     // the subdivision creates the vertex buffer data
     subdivide(detail);
     // all vertices should lie on a conceptual sphere with a given radius
@@ -153745,7 +153851,7 @@ export class PolyhedronGeometry extends BufferGeometry {
       this.normalizeNormals(); // smooth normals
     }
     // helper functions
-    function subdivide(detail?: any) {
+    function subdivide(detail: number) {
       const a = new Vector3();
       const b = new Vector3();
       const c = new Vector3();
@@ -153759,10 +153865,10 @@ export class PolyhedronGeometry extends BufferGeometry {
         subdivideFace(a, b, c, detail);
       }
     }
-    function subdivideFace(a: any, b: any, c: any, detail?: any) {
+    function subdivideFace(a: Vector3, b: Vector3, c: Vector3, detail: number) {
       const cols = detail + 1;
       // we use this multidimensional array as a data structure for creating the subdivision
-      const v: any[] = [];
+      const v: Vector3[][] = [];
       // construct all of the vertices for this subdivision
       for (let i = 0; i <= cols; i++) {
         v[i] = [];
@@ -153793,7 +153899,7 @@ export class PolyhedronGeometry extends BufferGeometry {
         }
       }
     }
-    function applyRadius(radius?: any) {
+    function applyRadius(radius: number) {
       const vertex = new Vector3();
       // iterate over the entire buffer and apply the radius to each vertex
       for (let i = 0; i < vertexBuffer.length; i += 3) {
@@ -153836,10 +153942,10 @@ export class PolyhedronGeometry extends BufferGeometry {
         }
       }
     }
-    function pushVertex(vertex?: any) {
+    function pushVertex(vertex: Vector3) {
       vertexBuffer.push(vertex.x, vertex.y, vertex.z);
     }
-    function getVertexByIndex(index: any, vertex?: any) {
+    function getVertexByIndex(index: number, vertex: Vector3) {
       const stride = index * 3;
       vertex.x = vertices[stride + 0];
       vertex.y = vertices[stride + 1];
@@ -153867,7 +153973,7 @@ export class PolyhedronGeometry extends BufferGeometry {
         correctUV(uvC, j + 4, c, azi);
       }
     }
-    function correctUV(uv: any, stride: any, vector: any, azimuth?: any) {
+    function correctUV(uv: Vector2, stride: number, vector: Vector3, azimuth: number) {
       if (azimuth < 0 && uv.x === 1) {
         uvBuffer[stride] = uv.x - 1;
       }
@@ -153876,11 +153982,11 @@ export class PolyhedronGeometry extends BufferGeometry {
       }
     }
     // Angle around the Y axis, counter-clockwise when looking from above.
-    function azimuth(vector?: any) {
+    function azimuth(vector: Vector3) {
       return Math.atan2(vector.z, -vector.x);
     }
     // Angle above the XZ plane.
-    function inclination(vector?: any) {
+    function inclination(vector: Vector3) {
       return Math.atan2(-vector.y, Math.sqrt(vector.x * vector.x + vector.z * vector.z));
     }
   }
@@ -156812,7 +156918,7 @@ export class DirectionalLight extends Light {
      */
     this.isDirectionalLight = true;
     this.type = "DirectionalLight";
-    (this as any).position.copy(Object3D.DEFAULT_UP);
+    this.position.copy(Object3D.DEFAULT_UP);
     this.updateMatrix();
     /**
      * The directional light points from its position to the
@@ -161030,11 +161136,12 @@ export class LineDashedMaterial extends LineBasicMaterial {
 
 ```typescript
 import type { WebGLRenderer, WebGLShaderDescriptor } from "../renderers/WebGLRenderer";
-import type { Scene } from "../scenes/Scene";
 import type { Camera } from "../cameras/Camera";
 import type { BufferGeometry } from "../core/BufferGeometry";
 import type { Object3D } from "../core/Object3D";
 import type { Texture } from "../textures/Texture";
+import type { Euler } from "../math/Euler";
+import type { Vector3 } from "../math/Vector3";
 import { Color } from "../math/Color";
 import { EventDispatcher } from "../core/EventDispatcher";
 import {
@@ -161589,11 +161696,11 @@ export class Material extends EventDispatcher {
    */
   onBeforeRender(
     _renderer: WebGLRenderer,
-    _scene: Scene,
+    _scene: Object3D,
     _camera: Camera,
     _geometry: BufferGeometry,
     _object: Object3D,
-    _group: BufferGeometry["groups"][number],
+    _group: BufferGeometry["groups"][number] | null,
   ): void {}
   /**
    * An optional callback that is executed immediately before the shader
@@ -161639,13 +161746,13 @@ export class Material extends EventDispatcher {
         continue;
       }
       if (currentValue && currentValue.isColor) {
-        currentValue.set(newValue);
-      } else if (
-        (currentValue && currentValue.isVector2 && newValue && newValue.isVector2) ||
-        (currentValue && currentValue.isEuler && newValue && newValue.isEuler) ||
-        (currentValue && currentValue.isVector3 && newValue && newValue.isVector3)
-      ) {
-        currentValue.copy(newValue);
+        (currentValue as Color).set(newValue);
+      } else if (currentValue && currentValue.isVector2 && newValue && newValue.isVector2) {
+        (currentValue as Vector2).copy(newValue);
+      } else if (currentValue && currentValue.isEuler && newValue && newValue.isEuler) {
+        (currentValue as Euler).copy(newValue);
+      } else if (currentValue && currentValue.isVector3 && newValue && newValue.isVector3) {
+        (currentValue as Vector3).copy(newValue);
       } else {
         (this as any)[key] = newValue;
       }
@@ -167921,7 +168028,7 @@ export class Color {
    * @return A clone of this instance.
    */
   clone(): Color {
-    return new (this.constructor as any)(this.r, this.g, this.b);
+    return new (this.constructor as typeof Color)(this.r, this.g, this.b);
   }
   /**
    * Copies the values of the given color to this instance.
@@ -168337,11 +168444,6 @@ export class Color {
   toJSON(): number {
     return this.getHex();
   }
-  *[Symbol.iterator]() {
-    yield this.r;
-    yield this.g;
-    yield this.b;
-  }
 }
 const _color = /*@__PURE__*/ new Color();
 /**
@@ -168358,6 +168460,8 @@ Color.NAMES = _colorKeywords;
 
 ```typescript
 import { ColorSpace, Transfer } from "../constants";
+import type { Color } from "./Color";
+import type { Vector3 } from "./Vector3";
 import { Matrix3 } from "./Matrix3";
 const LINEAR_REC709_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
   0.4123908,
@@ -168404,7 +168508,7 @@ function createColorManagement() {
      * - https://www.russellcottrell.com/photo/matrixCalculator.htm
      */
     spaces: {},
-    convert: function (this: any, color?: any, sourceColorSpace?: any, targetColorSpace?: any) {
+    convert: function (color: Color, sourceColorSpace?: string, targetColorSpace?: string): Color {
       if (this.enabled === false || sourceColorSpace === targetColorSpace || !sourceColorSpace || !targetColorSpace) {
         return color;
       }
@@ -168424,10 +168528,10 @@ function createColorManagement() {
       }
       return color;
     },
-    workingToColorSpace: function (this: any, color?: any, targetColorSpace?: any) {
+    workingToColorSpace: function (color: Color, targetColorSpace?: string): Color {
       return this.convert(color, this.workingColorSpace, targetColorSpace);
     },
-    colorSpaceToWorking: function (this: any, color?: any, sourceColorSpace?: any) {
+    colorSpaceToWorking: function (color: Color, sourceColorSpace?: string): Color {
       return this.convert(color, sourceColorSpace, this.workingColorSpace);
     },
     getPrimaries: function (this: any, colorSpace?: any) {
@@ -168440,14 +168544,18 @@ function createColorManagement() {
     getToneMappingMode: function (this: any, colorSpace?: any) {
       return (this.spaces as any)[colorSpace].outputColorSpaceConfig.toneMappingMode || "standard";
     },
-    getLuminanceCoefficients: function (this: any, target?: any, colorSpace: any = this.workingColorSpace) {
+    getLuminanceCoefficients: function (
+      this: typeof ColorManagement,
+      target: Vector3,
+      colorSpace: string = this.workingColorSpace,
+    ): Vector3 {
       return target.fromArray((this.spaces as any)[colorSpace].luminanceCoefficients);
     },
     define: function (this: any, colorSpaces?: any) {
       Object.assign(this.spaces, colorSpaces);
     },
     // Internal APIs
-    _getMatrix: function (this: any, targetMatrix?: any, sourceColorSpace?: any, targetColorSpace?: any) {
+    _getMatrix: function (targetMatrix: Matrix3, sourceColorSpace: string, targetColorSpace: string) {
       return targetMatrix
         .copy((this.spaces as any)[targetColorSpace].fromXYZ)
         .multiply((this.spaces as any)[sourceColorSpace].toXYZ);
@@ -168727,7 +168835,7 @@ export class Euler {
    * @return A clone of this instance.
    */
   clone(): Euler {
-    return new (this.constructor as any)(this._x, this._y, this._z, this._order);
+    return new (this.constructor as typeof Euler)(this._x, this._y, this._z, this._order);
   }
   /**
    * Copies the values of the given Euler instance to this instance.
@@ -168913,12 +169021,6 @@ export class Euler {
     return this;
   }
   _onChangeCallback() {}
-  *[Symbol.iterator]() {
-    yield this._x;
-    yield this._y;
-    yield this._z;
-    yield this._order;
-  }
 }
 /**
  * The default Euler angle order.
@@ -170616,7 +170718,7 @@ export class Matrix2 {
 import type { Matrix4 } from "./Matrix4";
 import type { Vector2 } from "./Vector2";
 import type { Vector3 } from "./Vector3";
-import { warnOnce } from "../utils";
+import { warnOnce, ensureTypeFlag } from "../utils";
 /**
  * Represents a 3x3 matrix.
  *
@@ -170688,6 +170790,7 @@ export class Matrix3 {
     n32?: number,
     n33?: number,
   ) {
+    ensureTypeFlag(this, "isMatrix3");
     /**
      * A column-major list of matrix values.
      *
@@ -171129,7 +171232,7 @@ export class Matrix3 {
    * @return A clone of this instance.
    */
   clone(): Matrix3 {
-    return new (this.constructor as any)().fromArray(this.elements);
+    return new (this.constructor as typeof Matrix3)().fromArray(this.elements);
   }
 }
 const _m3 = /*@__PURE__*/ new Matrix3();
@@ -171143,6 +171246,7 @@ import type { Matrix3 } from "./Matrix3";
 import type { Quaternion } from "./Quaternion";
 import { CoordinateSystem } from "../constants";
 import { Vector3 } from "./Vector3";
+import { ensureTypeFlag } from "../utils";
 /**
  * Represents a 4x4 matrix.
  *
@@ -171238,6 +171342,7 @@ export class Matrix4 {
     n43?: number,
     n44?: number,
   ) {
+    ensureTypeFlag(this, "isMatrix4");
     /**
      * A column-major list of matrix values.
      *
@@ -172903,7 +173008,7 @@ export class Quaternion {
    * @return A clone of this instance.
    */
   clone(): Quaternion {
-    return new (this.constructor as any)(this._x, this._y, this._z, this._w);
+    return new (this.constructor as typeof Quaternion)(this._x, this._y, this._z, this._w);
   }
   /**
    * Copies the values of the given quaternion to this instance.
@@ -173372,12 +173477,6 @@ export class Quaternion {
     return this;
   }
   _onChangeCallback() {}
-  *[Symbol.iterator]() {
-    yield this._x;
-    yield this._y;
-    yield this._z;
-    yield this._w;
-  }
 }
 ````
 
@@ -175135,6 +175234,7 @@ import type { BufferAttribute } from "../core/BufferAttribute";
 import type { InterleavedBufferAttribute } from "../core/InterleavedBufferAttribute";
 import type { Matrix3 } from "./Matrix3";
 import { clamp } from "./MathUtils";
+import { ensureTypeFlag } from "../utils";
 /**
  * Class representing a 2D vector. A 2D vector is an ordered pair of numbers
  * (labeled x and y), which can be used to represent a number of things, such as:
@@ -175182,6 +175282,7 @@ export class Vector2 {
    * @param [y=0] - The y value of this vector.
    */
   constructor(x: number = 0, y: number = 0) {
+    ensureTypeFlag(this, "isVector2");
     /**
      * The x value of this vector.
      *
@@ -175298,7 +175399,7 @@ export class Vector2 {
    * @return A clone of this instance.
    */
   clone(): Vector2 {
-    return new (this.constructor as any)(this.x, this.y);
+    return new (this.constructor as typeof Vector2)(this.x, this.y);
   }
   /**
    * Copies the values of the given vector to this instance.
@@ -175788,10 +175889,6 @@ export class Vector2 {
     this.y = Math.random();
     return this;
   }
-  *[Symbol.iterator]() {
-    yield this.x;
-    yield this.y;
-  }
 }
 ````
 
@@ -175810,6 +175907,7 @@ import type { Spherical } from "./Spherical";
 import type { Vector4 } from "./Vector4";
 import { clamp } from "./MathUtils";
 import { Quaternion } from "./Quaternion";
+import { ensureTypeFlag } from "../utils";
 /**
  * Class representing a 3D vector. A 3D vector is an ordered triplet of numbers
  * (labeled x, y and z), which can be used to represent a number of things, such as:
@@ -175859,6 +175957,7 @@ export class Vector3 {
    * @param [z=0] - The z value of this vector.
    */
   constructor(x: number = 0, y: number = 0, z: number = 0) {
+    ensureTypeFlag(this, "isVector3");
     /**
      * The x value of this vector.
      *
@@ -175979,7 +176078,7 @@ export class Vector3 {
    * @return A clone of this instance.
    */
   clone(): Vector3 {
-    return new (this.constructor as any)(this.x, this.y, this.z);
+    return new (this.constructor as typeof Vector3)(this.x, this.y, this.z);
   }
   /**
    * Copies the values of the given vector to this instance.
@@ -176823,11 +176922,6 @@ export class Vector3 {
     this.z = c * Math.sin(theta);
     return this;
   }
-  *[Symbol.iterator]() {
-    yield this.x;
-    yield this.y;
-    yield this.z;
-  }
 }
 const _vector = /*@__PURE__*/ new Vector3();
 const _quaternion = /*@__PURE__*/ new Quaternion();
@@ -176842,6 +176936,7 @@ import type { Matrix4 } from "./Matrix4";
 import type { Quaternion } from "./Quaternion";
 import type { Vector3 } from "./Vector3";
 import { clamp } from "./MathUtils";
+import { ensureTypeFlag } from "../utils";
 /**
  * Class representing a 4D vector. A 4D vector is an ordered quadruplet of numbers
  * (labeled x, y, z and w), which can be used to represent a number of things, such as:
@@ -176892,6 +176987,7 @@ export class Vector4 {
    * @param [w=1] - The w value of this vector.
    */
   constructor(x: number = 0, y: number = 0, z: number = 0, w: number = 1) {
+    ensureTypeFlag(this, "isVector4");
     /**
      * The x value of this vector.
      *
@@ -177056,7 +177152,7 @@ export class Vector4 {
    * @return A clone of this instance.
    */
   clone(): Vector4 {
-    return new (this.constructor as any)(this.x, this.y, this.z, this.w);
+    return new (this.constructor as typeof Vector4)(this.x, this.y, this.z, this.w);
   }
   /**
    * Copies the values of the given vector to this instance.
@@ -177652,12 +177748,6 @@ export class Vector4 {
     this.z = Math.random();
     this.w = Math.random();
     return this;
-  }
-  *[Symbol.iterator]() {
-    yield this.x;
-    yield this.y;
-    yield this.z;
-    yield this.w;
   }
 }
 ````
@@ -180135,8 +180225,9 @@ export class Line<TMaterial extends Material | Material[] = Material | Material[
    * @param frustum - The frustum to test.
    * @return Whether this line intersects the given frustum or not.
    */
-  intersectsFrustum(frustum: Frustum | FrustumArray): boolean;
-  intersectsFrustum(frustum?: any): boolean {
+  intersectsFrustum(frustum: Frustum | FrustumArray): boolean {
+    // Keep each receiver concrete for class extraction.
+    if ("planes" in frustum) return frustum.intersectsObject(this);
     return frustum.intersectsObject(this);
   }
   /**
@@ -180520,8 +180611,9 @@ export class Mesh<TMaterial extends Material | Material[] = Material | Material[
    * @param frustum - The frustum to test.
    * @return Whether this mesh intersects the given frustum or not.
    */
-  intersectsFrustum(frustum: Frustum | FrustumArray): boolean;
-  intersectsFrustum(frustum?: any): boolean {
+  intersectsFrustum(frustum: Frustum | FrustumArray): boolean {
+    // Keep each receiver concrete for class extraction.
+    if ("planes" in frustum) return frustum.intersectsObject(this);
     return frustum.intersectsObject(this);
   }
   /**
@@ -180836,8 +180928,9 @@ export class Points extends Object3D {
    * @param frustum - The frustum to test.
    * @return Whether this point cloud intersects the given frustum or not.
    */
-  intersectsFrustum(frustum: Frustum | FrustumArray): boolean;
-  intersectsFrustum(frustum?: any): boolean {
+  intersectsFrustum(frustum: Frustum | FrustumArray): boolean {
+    // Keep each receiver concrete for class extraction.
+    if ("planes" in frustum) return frustum.intersectsObject(this);
     return frustum.intersectsObject(this);
   }
   /**
@@ -181582,8 +181675,9 @@ export class Sprite extends Object3D {
    * @param frustum - The frustum to test.
    * @return Whether this sprite intersects the given frustum or not.
    */
-  intersectsFrustum(frustum: Frustum | FrustumArray): boolean;
-  intersectsFrustum(frustum?: any): boolean {
+  intersectsFrustum(frustum: Frustum | FrustumArray): boolean {
+    // Keep each receiver concrete for class extraction.
+    if ("planes" in frustum) return frustum.intersectsSprite(this);
     return frustum.intersectsSprite(this);
   }
   /**
@@ -181950,13 +182044,28 @@ export class WebGLRenderTarget extends RenderTarget {
 ````typescript
 import { GL } from "../GL";
 import type { ArrayCamera } from "../cameras/ArrayCamera";
+import type { BufferGeometry } from "../core/BufferGeometry";
+import type { InstancedBufferGeometry } from "../core/InstancedBufferGeometry";
 import type { Box2 } from "../math/Box2";
 import type { Box3 } from "../math/Box3";
 import type { Camera } from "../cameras/Camera";
 import type { FramebufferTexture } from "../textures/FramebufferTexture";
+import type { BatchedMesh } from "../objects/BatchedMesh";
+import type { Group } from "../objects/Group";
+import type { InstancedMesh } from "../objects/InstancedMesh";
+import type { LOD } from "../objects/LOD";
+import type { Light } from "../lights/Light";
+import type { Line } from "../objects/Line";
+import type { LineLoop } from "../objects/LineLoop";
+import type { LineSegments } from "../objects/LineSegments";
+import type { Mesh } from "../objects/Mesh";
 import type { LTCTextures } from "./shaders/LTCTextures";
 import type { Object3D } from "../core/Object3D";
 import type { Plane } from "../math/Plane";
+import type { Points } from "../objects/Points";
+import type { Sphere } from "../math/Sphere";
+import type { Sprite } from "../objects/Sprite";
+import type { Scene } from "../scenes/Scene";
 import type { Texture } from "../textures/Texture";
 import type { Vector2 } from "../math/Vector2";
 import type { WebGLBackground } from "./webgl/WebGLBackground";
@@ -181965,9 +182074,10 @@ import type { WebGLOutput } from "./webgl/WebGLOutput";
 import type { WebGLOutputEffect } from "./webgl/WebGLOutput";
 import type { WebGLShadowMap } from "./webgl/WebGLShadowMap";
 import type { WebGLShadowMapSystem } from "./webgl/WebGLShadowMap";
-import type { Material } from "../materials/Material";
+import type { Material, MaterialProperties } from "../materials/Material";
 import type { WebGLCapabilitiesState } from "./webgl/WebGLCapabilities";
 import type { WebGLInfoState } from "./webgl/WebGLInfo";
+import type { WebGLProgramInfo } from "./webgl/WebGLProgram";
 import { WebGLClearBackground } from "./webgl/WebGLClearBackground";
 import { getEnvironment } from "./webgl/WebGLEnvironmentAccess";
 import {
@@ -182011,6 +182121,21 @@ import { WebGLMaterials } from "./webgl/WebGLMaterials";
 import { WebGLUniformsGroups } from "./webgl/WebGLUniformsGroups";
 import { createCanvasElement, probeAsync, error, warn, log } from "../utils";
 import { ColorManagement } from "../math/ColorManagement";
+
+type GeometryGroup = BufferGeometry["groups"][number];
+
+interface RenderItem {
+  object: Object3D;
+  geometry: BufferGeometry;
+  material: Material;
+  group: GeometryGroup | null;
+}
+
+interface RenderList {
+  opaque: RenderItem[];
+  transmissive: RenderItem[];
+  transparent: RenderItem[];
+}
 
 export interface WebGLShaderDescriptor {
   vertexShader: string;
@@ -182140,7 +182265,14 @@ export class WebGLRenderer {
   clearDepth: () => void;
   clearStencil: () => void;
   dispose: () => void;
-  renderBufferDirect: (camera: any, scene: any, geometry: any, material: any, object: any, group: any) => void;
+  renderBufferDirect: (
+    camera: Camera,
+    scene: Object3D | null,
+    geometry: BufferGeometry,
+    material: Material,
+    object: Object3D,
+    group: GeometryGroup | null,
+  ) => void;
   compile: (scene: Object3D, camera: Camera, targetScene?: Object3D | null) => Set<Material>;
   compileAsync: (scene: Object3D, camera: Camera, targetScene?: Object3D | null) => Promise<Object3D>;
   setAnimationLoop: (callback: FrameRequestCallback | null) => void;
@@ -182999,21 +183131,21 @@ export class WebGLRenderer {
     }
     // Buffer rendering
     this.renderBufferDirect = function (
-      camera: any,
-      scene: any,
-      geometry: any,
-      material: any,
-      object: any,
-      group?: any,
+      camera: Camera,
+      scene: Object3D | null,
+      geometry: BufferGeometry,
+      material: Material,
+      object: Object3D,
+      group: GeometryGroup | null,
     ) {
-      if (scene === null) scene = _emptyScene; // renderBufferDirect second parameter used to be fog (could be null)
-      const frontFaceCW = object.isMesh && object.matrixWorld.determinantAffine() < 0;
-      const program = setProgram(camera, scene, geometry, material, object);
+      const materialProperties = material as Material & MaterialProperties;
+      const frontFaceCW = (object as Mesh).isMesh && object.matrixWorld.determinantAffine() < 0;
+      const program = setProgram(camera, scene === null ? _emptyScene : scene, geometry, material, object);
       state.setMaterial(material, frontFaceCW);
       //
       let index = geometry.index;
       let rangeFactor = 1;
-      if (material.wireframe === true) {
+      if (materialProperties.wireframe === true) {
         index = geometries.getWireframeAttribute(geometry);
         if (index === undefined) return;
         rangeFactor = 2;
@@ -183046,48 +183178,55 @@ export class WebGLRenderer {
         renderer.setIndex(attribute);
       }
       //
-      if (object.isMesh) {
-        if (material.wireframe === true) {
-          state.setLineWidth(material.wireframeLinewidth * getTargetPixelRatio());
+      if ((object as Mesh).isMesh) {
+        if (materialProperties.wireframe === true) {
+          state.setLineWidth(materialProperties.wireframeLinewidth! * getTargetPixelRatio());
           renderer.setMode(GL.LINES);
         } else {
           renderer.setMode(GL.TRIANGLES);
         }
-      } else if (object.isLine) {
-        let lineWidth = material.linewidth;
+      } else if ((object as Line).isLine) {
+        let lineWidth = materialProperties.linewidth;
         if (lineWidth === undefined) lineWidth = 1; // Not using Line*Material
         state.setLineWidth(lineWidth * getTargetPixelRatio());
-        if (object.isLineSegments) {
+        if ((object as LineSegments).isLineSegments) {
           renderer.setMode(GL.LINES);
-        } else if (object.isLineLoop) {
+        } else if ((object as LineLoop).isLineLoop) {
           renderer.setMode(GL.LINE_LOOP);
         } else {
           renderer.setMode(GL.LINE_STRIP);
         }
-      } else if (object.isPoints) {
+      } else if ((object as Points).isPoints) {
         renderer.setMode(GL.POINTS);
-      } else if (object.isSprite) {
+      } else if ((object as Sprite).isSprite) {
         renderer.setMode(GL.TRIANGLES);
       }
-      if (object.isBatchedMesh) {
+      if ((object as BatchedMesh).isBatchedMesh) {
+        const batchedMesh = object as BatchedMesh;
         if (!extensions.get("WEBGL_multi_draw")) {
-          const starts = object._multiDrawStarts;
-          const counts = object._multiDrawCounts;
-          const drawCount = object._multiDrawCount;
+          const starts = batchedMesh._multiDrawStarts;
+          const counts = batchedMesh._multiDrawCounts;
+          const drawCount = batchedMesh._multiDrawCount;
           const bytesPerElement = index ? attributes.get(index).bytesPerElement : 1;
-          const uniforms = properties.get(material).currentProgram.getUniforms();
+          const uniforms: WebGLUniforms = properties.get(material).currentProgram.getUniforms();
           for (let i = 0; i < drawCount; i++) {
             uniforms.setValue(_gl, "_gl_DrawID", i);
             renderer.render(starts[i] / bytesPerElement, counts[i]);
           }
         } else {
-          renderer.renderMultiDraw(object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount);
+          renderer.renderMultiDraw(
+            batchedMesh._multiDrawStarts,
+            batchedMesh._multiDrawCounts,
+            batchedMesh._multiDrawCount,
+          );
         }
-      } else if (object.isInstancedMesh) {
-        renderer.renderInstances(drawStart, drawCount, object.count);
-      } else if (geometry.isInstancedBufferGeometry) {
-        const maxInstanceCount = geometry._maxInstanceCount !== undefined ? geometry._maxInstanceCount : Infinity;
-        const instanceCount = Math.min(geometry.instanceCount, maxInstanceCount);
+      } else if ((object as InstancedMesh).isInstancedMesh) {
+        renderer.renderInstances(drawStart, drawCount, (object as InstancedMesh).count);
+      } else if ((geometry as InstancedBufferGeometry).isInstancedBufferGeometry) {
+        const instancedGeometry = geometry as InstancedBufferGeometry & { _maxInstanceCount?: number };
+        const maxInstanceCount =
+          instancedGeometry._maxInstanceCount !== undefined ? instancedGeometry._maxInstanceCount : Infinity;
+        const instanceCount = Math.min(instancedGeometry.instanceCount, maxInstanceCount);
         renderer.renderInstances(drawStart, drawCount, instanceCount);
       } else {
         renderer.render(drawStart, drawCount);
@@ -183120,15 +183259,20 @@ export class WebGLRenderer {
      * @param [targetScene=null] - The target scene.
      * @return The precompiled materials.
      */
-    this.compile = function (this: any, scene: Object3D, camera: Camera, targetScene: any = null) {
+    this.compile = function (
+      this: WebGLRenderer,
+      scene: Object3D,
+      camera: Camera,
+      targetScene: Object3D | null = null,
+    ) {
       if (targetScene === null) targetScene = scene;
       currentRenderState = renderStates.get(targetScene);
       currentRenderState.init(camera);
       renderStateStack.push(currentRenderState);
       try {
         // gather lights from both the target scene and the new object that will be added to the scene.
-        targetScene.traverseVisible(function (object?: any) {
-          if (object.isLight && object.layers.test(camera.layers)) {
+        targetScene.traverseVisible(function (object: Object3D) {
+          if ((object as Light).isLight && object.layers.test(camera.layers)) {
             currentRenderState.pushLight(object);
             if (object.castShadow) {
               if (shadowMap === null) throw new Error("Shadow-casting lights require createShadowMap.");
@@ -183137,8 +183281,8 @@ export class WebGLRenderer {
           }
         });
         if (scene !== targetScene) {
-          scene.traverseVisible(function (object?: any) {
-            if (object.isLight && object.layers.test(camera.layers)) {
+          scene.traverseVisible(function (object: Object3D) {
+            if ((object as Light).isLight && object.layers.test(camera.layers)) {
               currentRenderState.pushLight(object);
               if (object.castShadow) {
                 if (shadowMap === null) throw new Error("Shadow-casting lights require createShadowMap.");
@@ -183153,11 +183297,18 @@ export class WebGLRenderer {
         if (_clippingEnabled === true) clipping.setGlobalState(this.clippingPlanes, camera);
         // Only initialize materials in the new scene, not the targetScene.
         const materials = new Set<Material>();
-        scene.traverse(function (object?: any) {
-          if (!(object.isMesh || object.isPoints || object.isLine || object.isSprite)) {
+        scene.traverse(function (object: Object3D) {
+          if (
+            !(
+              (object as Mesh).isMesh ||
+              (object as Points).isPoints ||
+              (object as Line).isLine ||
+              (object as Sprite).isSprite
+            )
+          ) {
             return;
           }
-          const material = object.material;
+          const material = (object as Mesh | Points | Line | Sprite).material;
           if (material) {
             if (Array.isArray(material)) {
               for (let i = 0; i < material.length; i++) {
@@ -183189,7 +183340,12 @@ export class WebGLRenderer {
      * @param [targetScene=null] - The target scene.
      * @return A Promise that resolves when the given scene can be rendered without unnecessary stalling due to shader compilation.
      */
-    this.compileAsync = function (this: any, scene: Object3D, camera: Camera, targetScene: any = null) {
+    this.compileAsync = function (
+      this: WebGLRenderer,
+      scene: Object3D,
+      camera: Camera,
+      targetScene: Object3D | null = null,
+    ) {
       const materials = this.compile(scene, camera, targetScene);
       // Wait for all the materials in the new object to indicate that they're
       // ready to be used before resolving the promise.
@@ -183223,11 +183379,11 @@ export class WebGLRenderer {
       });
     };
     // Animation Loop
-    let onAnimationFrameCallback: any = null;
-    function onAnimationFrame(time?: any) {
+    let onAnimationFrameCallback: FrameRequestCallback | null = null;
+    function onAnimationFrame(time: number) {
       if (onAnimationFrameCallback) onAnimationFrameCallback(time);
     }
-    const animation = new (WebGLAnimation as any)();
+    const animation = WebGLAnimation();
     animation.setAnimationLoop(onAnimationFrame);
     if (typeof self !== "undefined") animation.setContext(self);
     /**
@@ -183237,7 +183393,7 @@ export class WebGLRenderer {
      *
      * @param callback - The application's animation loop.
      */
-    this.setAnimationLoop = function (callback?: any) {
+    this.setAnimationLoop = function (callback: FrameRequestCallback | null) {
       onAnimationFrameCallback = callback;
       if (callback === null) animation.stop();
       else animation.start();
@@ -183257,7 +183413,7 @@ export class WebGLRenderer {
      * @param scene - The scene to render.
      * @param camera - The camera.
      */
-    this.render = function (this: any, scene: Object3D, camera: Camera) {
+    this.render = function (this: WebGLRenderer, scene: Object3D, camera: Camera) {
       if (camera !== undefined && camera.isCamera !== true) {
         error("WebGLRenderer.render: camera is not an instance of THREE.Camera.");
         return;
@@ -183277,7 +183433,7 @@ export class WebGLRenderer {
         currentRenderState.state.textureUnits = textures.getTextureUnits();
         renderStateStack.push(currentRenderState);
         _projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-        if ((camera as any).isArrayCamera) {
+        if ((camera as ArrayCamera).isArrayCamera) {
           _frustumArray.setFromArrayCamera(camera as ArrayCamera);
         } else {
           _frustum.setFromProjectionMatrix(_projScreenMatrix, CoordinateSystem.WebGL, camera.reversedDepth);
@@ -183312,8 +183468,8 @@ export class WebGLRenderer {
             const opaqueObjects = currentRenderList.opaque;
             const transmissiveObjects = currentRenderList.transmissive;
             currentRenderState.setupLights();
-            if ((camera as any).isArrayCamera) {
-              const cameras = (camera as any).cameras;
+            if ((camera as ArrayCamera).isArrayCamera) {
+              const cameras = (camera as ArrayCamera).cameras;
               if (transmissiveObjects.length > 0) {
                 for (let i = 0, l = cameras.length; i < l; i++) {
                   const camera2 = cameras[i];
@@ -183370,44 +183526,50 @@ export class WebGLRenderer {
         if (useOutput) output.restore(_this);
       }
     };
-    function projectObject(object: any, camera: any, groupOrder: any, sortObjects?: any) {
+    function projectObject(object: Object3D, camera: Camera, groupOrder: number, sortObjects?: boolean) {
       if (object.visible === false) return;
       const visible = object.layers.test(camera.layers);
       if (visible) {
-        if (object.isGroup) {
+        if ((object as Group).isGroup) {
           groupOrder = object.renderOrder;
-        } else if (object.isLOD) {
-          if (object.autoUpdate === true) object.update(camera);
-        } else if (object.isLight) {
+        } else if ((object as LOD).isLOD) {
+          const lod = object as LOD;
+          if (lod.autoUpdate === true) lod.update(camera as Camera & { zoom: number });
+        } else if ((object as Light).isLight) {
           currentRenderState.pushLight(object);
           if (object.castShadow) {
             if (shadowMap === null) throw new Error("Shadow-casting lights require createShadowMap.");
             currentRenderState.pushShadow(object);
           }
-        } else if (object.isSprite) {
-          const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+        } else if ((object as Sprite).isSprite) {
+          const frustum = (camera as ArrayCamera).isArrayCamera ? _frustumArray : _frustum;
           if (!object.frustumCulled || object.intersectsFrustum(frustum)) {
             if (sortObjects) {
               _vector4.setFromMatrixPosition(object.matrixWorld).applyMatrix4(_projScreenMatrix);
             }
-            const geometry = objects.update(object);
-            const material = object.material;
+            const geometry: BufferGeometry = objects.update(object);
+            const material = (object as Sprite).material;
             if (material.visible) {
               currentRenderList.push(object, geometry, material, groupOrder, _vector4.z, null, camera);
             }
           }
-        } else if (object.isMesh || object.isLine || object.isPoints) {
-          const frustum = camera.isArrayCamera ? _frustumArray : _frustum;
+        } else if ((object as Mesh).isMesh || (object as Line).isLine || (object as Points).isPoints) {
+          // Subclasses may own bounds; keep their bounds computation virtual.
+          const renderable = object as (Mesh | Line | Points) & {
+            boundingSphere?: Sphere | null;
+            computeBoundingSphere?(): void;
+          };
+          const frustum = (camera as ArrayCamera).isArrayCamera ? _frustumArray : _frustum;
           if (!object.frustumCulled || object.intersectsFrustum(frustum)) {
-            const geometry = objects.update(object);
-            const material = object.material;
+            const geometry: BufferGeometry = objects.update(renderable);
+            const material = renderable.material;
             if (sortObjects) {
-              if (object.boundingSphere !== undefined) {
-                if (object.boundingSphere === null) object.computeBoundingSphere();
-                _vector4.copy(object.boundingSphere.center);
+              if (renderable.boundingSphere !== undefined) {
+                if (renderable.boundingSphere === null) renderable.computeBoundingSphere!();
+                _vector4.copy(renderable.boundingSphere!.center);
               } else {
                 if (geometry.boundingSphere === null) geometry.computeBoundingSphere();
-                _vector4.copy(geometry.boundingSphere.center);
+                _vector4.copy(geometry.boundingSphere!.center);
               }
               _vector4.applyMatrix4(object.matrixWorld).applyMatrix4(_projScreenMatrix);
             }
@@ -183431,7 +183593,7 @@ export class WebGLRenderer {
         projectObject(children[i], camera, groupOrder, sortObjects);
       }
     }
-    function renderScene(currentRenderList: any, scene: any, camera: any, viewport?: any) {
+    function renderScene(currentRenderList: RenderList, scene: Object3D, camera: Camera, viewport?: Vector4) {
       const {
         opaque: opaqueObjects,
         transmissive: transmissiveObjects,
@@ -183449,8 +183611,13 @@ export class WebGLRenderer {
       state.buffers.color.setMask(true);
       state.setPolygonOffset(false);
     }
-    function renderTransmissionPass(opaqueObjects: any, transmissiveObjects: any, scene: any, camera?: any) {
-      const overrideMaterial = scene.isScene === true ? scene.overrideMaterial : null;
+    function renderTransmissionPass(
+      opaqueObjects: RenderItem[],
+      transmissiveObjects: RenderItem[],
+      scene: Object3D,
+      camera: Camera & { viewport?: Vector4 },
+    ) {
+      const overrideMaterial = (scene as Scene).isScene === true ? (scene as Scene).overrideMaterial : null;
       if (overrideMaterial !== null) {
         return;
       }
@@ -183478,7 +183645,7 @@ export class WebGLRenderer {
                 scene.add( mesh );
                 */
       }
-      const transmissionRenderTarget = currentRenderState.state.transmissionRenderTarget[camera.id];
+      const transmissionRenderTarget: WebGLRenderTarget = currentRenderState.state.transmissionRenderTarget[camera.id];
       const activeViewport = camera.viewport || _currentViewport;
       transmissionRenderTarget.setSize(
         activeViewport.z * _this.transmissionResolutionScale,
@@ -183533,8 +183700,8 @@ export class WebGLRenderer {
       if (currentCameraViewport !== undefined) camera.viewport = currentCameraViewport;
       _this.toneMapping = currentToneMapping;
     }
-    function renderObjects(renderList: any, scene: any, camera?: any) {
-      const overrideMaterial = scene.isScene === true ? scene.overrideMaterial : null;
+    function renderObjects(renderList: RenderItem[], scene: Object3D, camera: Camera) {
+      const overrideMaterial = (scene as Scene).isScene === true ? (scene as Scene).overrideMaterial : null;
       for (let i = 0, l = renderList.length; i < l; i++) {
         const renderItem = renderList[i];
         const { object, geometry, group } = renderItem;
@@ -183547,7 +183714,14 @@ export class WebGLRenderer {
         }
       }
     }
-    function renderObject(object: any, scene: any, camera: any, geometry: any, material: any, group?: any) {
+    function renderObject(
+      object: Object3D,
+      scene: Object3D,
+      camera: Camera,
+      geometry: BufferGeometry,
+      material: Material,
+      group: GeometryGroup | null,
+    ) {
       object.onBeforeRender(_this, scene, camera, geometry, material, group);
       object.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, object.matrixWorld);
       object.normalMatrix.getNormalMatrix(object.modelViewMatrix);
@@ -183838,7 +184012,7 @@ export class WebGLRenderer {
         materialProperties.__version = material.version;
       }
       //
-      let program = materialProperties.currentProgram;
+      let program: WebGLProgramInfo = materialProperties.currentProgram;
       if (needsProgramChange === true || needsProgramVariant === true) {
         program =
           needsProgramVariant === true
@@ -191696,7 +191870,7 @@ export const standardShader = {
     "\n" +
     "\n#ifndef FLAT_SHADED\n\n\tvarying vec3 vNormal;\n\n\t#ifdef USE_TANGENT\n\n\t\tvarying vec3 vTangent;\n\t\tvarying vec3 vBitangent;\n\n\t#endif\n\n#endif\n" +
     "\n" +
-    "\n\nuniform sampler2D dfgLUT;\n\nstruct PhysicalMaterial {\n\n\tvec3 diffuseColor;\n\tvec3 diffuseContribution;\n\tvec3 specularColor;\n\tvec3 specularColorBlended;\n\n\tfloat roughness;\n\tfloat metalness;\n\tfloat specularF90;\n\tfloat dispersion;\n\tvec2 dfg;\n\tvec3 multiScatteringCompensation;\n\n\t#ifdef USE_DIFFUSE_ROUGHNESS\n\t\tfloat diffuseRoughness;\n\t#endif\n\n\t#ifdef USE_RETROREFLECTION\n\t\tfloat retroreflectivity;\n\t#endif\n\n\t#ifdef USE_CLEARCOAT\n\t\tfloat clearcoat;\n\t\tfloat clearcoatRoughness;\n\t\tvec3 clearcoatF0;\n\t\tfloat clearcoatF90;\n\t#endif\n\n\t#ifdef USE_IRIDESCENCE\n\t\tfloat iridescence;\n\t\tfloat iridescenceIOR;\n\t\tfloat iridescenceThickness;\n\t\tvec3 iridescenceFresnel;\n\t\tvec3 iridescenceF0Dielectric;\n\t\tvec3 iridescenceF0Metallic;\n\t#endif\n\n\t#ifdef USE_SHEEN\n\t\tvec3 sheenColor;\n\t\tfloat sheenRoughness;\n\t#endif\n\n\t#ifdef IOR\n\t\tfloat ior;\n\t#endif\n\n\t#ifdef USE_TRANSMISSION\n\t\tfloat transmission;\n\t\tfloat transmissionAlpha;\n\t\tfloat thickness;\n\t\tfloat attenuationDistance;\n\t\tvec3 attenuationColor;\n\t#endif\n\n\t#ifdef USE_ANISOTROPY\n\t\tfloat anisotropy;\n\t\tfloat alphaT;\n\t\tvec3 anisotropyT;\n\t\tvec3 anisotropyB;\n\t#endif\n\n};\n\n// temporary\nvec3 clearcoatSpecularDirect = vec3( 0.0 );\nvec3 clearcoatSpecularIndirect = vec3( 0.0 );\nvec3 sheenSpecularDirect = vec3( 0.0 );\nvec3 sheenSpecularIndirect = vec3(0.0 );\n\nvec3 Schlick_to_F0( const in vec3 f, const in float f90, const in float dotVH ) {\n    float x = clamp( 1.0 - dotVH, 0.0, 1.0 );\n    float x2 = x * x;\n    float x5 = clamp( x * x2 * x2, 0.0, 0.9999 );\n\n    return ( f - vec3( f90 ) * x5 ) / ( 1.0 - x5 );\n}\n\n#ifdef USE_DIFFUSE_ROUGHNESS\n\n\t// Portsmouth et al. 2025, \"EON: A Practical Energy-Preserving Rough Diffuse BRDF\"\n\t// https://jcgt.org/published/0014/01/06/\n\tconst float EON_EPSILON = 1e-7;\n\n\tfloat FON_DirectionalAlbedo( const in float mu, const in float roughness, const in float A ) {\n\n\t\tfloat muComp = 1.0 - mu;\n\t\tfloat gOverPi = muComp * ( 0.0571085289 + muComp * ( 0.491881867 + muComp * ( - 0.332181442 + muComp * 0.0714429953 ) ) );\n\n\t\treturn A * ( 1.0 + roughness * gOverPi );\n\n\t}\n\n\tvec3 BRDF_EON( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in vec3 diffuseColor, const in float roughness ) {\n\n\t\tvec3 rho = saturate( diffuseColor );\n\n\t\tif ( roughness <= EON_EPSILON ) return BRDF_Lambert( rho );\n\n\t\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\t\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\t\tfloat s = dot( lightDir, viewDir ) - dotNL * dotNV;\n\t\tfloat sOverT = ( s > 0.0 ) ? s / max( max( dotNL, dotNV ), EON_EPSILON ) : s;\n\n\t\tfloat A = 1.0 / ( 1.0 + ( 0.5 - 2.0 / ( 3.0 * PI ) ) * roughness );\n\t\tvec3 singleScatter = rho * RECIPROCAL_PI * A * ( 1.0 + roughness * sOverT );\n\n\t\tfloat averageAlbedo = A * ( 1.0 + ( 2.0 / 3.0 - 28.0 / ( 15.0 * PI ) ) * roughness );\n\t\tfloat albedoV = FON_DirectionalAlbedo( dotNV, roughness, A );\n\t\tfloat albedoL = FON_DirectionalAlbedo( dotNL, roughness, A );\n\n\t\tvec3 rhoMultiScatter = rho * rho * averageAlbedo / max( vec3( EON_EPSILON ), vec3( 1.0 ) - rho * ( 1.0 - averageAlbedo ) );\n\t\tvec3 multiScatter = rhoMultiScatter * RECIPROCAL_PI\n\t\t\t* max( EON_EPSILON, 1.0 - albedoV )\n\t\t\t* max( EON_EPSILON, 1.0 - albedoL )\n\t\t\t/ max( EON_EPSILON, 1.0 - averageAlbedo );\n\n\t\treturn singleScatter + multiScatter;\n\n\t}\n\n\tvec3 EON_DirectionalAlbedo( const in vec3 diffuseColor, const in float roughness, const in float dotNV ) {\n\n\t\tvec3 rho = saturate( diffuseColor );\n\n\t\tif ( roughness <= EON_EPSILON ) return rho;\n\n\t\tfloat A = 1.0 / ( 1.0 + ( 0.5 - 2.0 / ( 3.0 * PI ) ) * roughness );\n\t\tfloat directionalAlbedo = FON_DirectionalAlbedo( dotNV, roughness, A );\n\t\tfloat averageAlbedo = A * ( 1.0 + ( 2.0 / 3.0 - 28.0 / ( 15.0 * PI ) ) * roughness );\n\t\tvec3 rhoMultiScatter = rho * rho * averageAlbedo / max( vec3( EON_EPSILON ), vec3( 1.0 ) - rho * ( 1.0 - averageAlbedo ) );\n\n\t\treturn rho * directionalAlbedo + rhoMultiScatter * ( 1.0 - directionalAlbedo );\n\n\t}\n\n#endif\n\n// Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2\n// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf\nfloat V_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {\n\n\tfloat a2 = pow2( alpha );\n\tfloat gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n\tfloat gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n\n\treturn 0.5 / max( gv + gl, EPSILON );\n\n}\n\n// Microfacet Models for Refraction through Rough Surfaces - equation (33)\n// http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html\n// alpha is \"roughness squared\" in Disney’s reparameterization\nfloat D_GGX( const in float alpha, const in float dotNH ) {\n\n\tfloat a2 = pow2( alpha );\n\n\tfloat denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0; // avoid alpha = 0 with dotNH = 1\n\n\treturn RECIPROCAL_PI * a2 / pow2( denom );\n\n}\n\n// https://google.github.io/filament/Filament.md.html#materialsystem/anisotropicmodel/anisotropicspecularbrdf\n#ifdef USE_ANISOTROPY\n\n\tfloat V_GGX_SmithCorrelated_Anisotropic( const in float alphaT, const in float alphaB, const in float dotTV, const in float dotBV, const in float dotTL, const in float dotBL, const in float dotNV, const in float dotNL ) {\n\n\t\tfloat gv = dotNL * length( vec3( alphaT * dotTV, alphaB * dotBV, dotNV ) );\n\t\tfloat gl = dotNV * length( vec3( alphaT * dotTL, alphaB * dotBL, dotNL ) );\n\t\treturn 0.5 / max( gv + gl, EPSILON );\n\n\t}\n\n\tfloat D_GGX_Anisotropic( const in float alphaT, const in float alphaB, const in float dotNH, const in float dotTH, const in float dotBH ) {\n\n\t\tfloat a2 = alphaT * alphaB;\n\t\thighp vec3 v = vec3( alphaB * dotTH, alphaT * dotBH, a2 * dotNH );\n\t\thighp float v2 = dot( v, v );\n\t\tfloat w2 = a2 / v2;\n\n\t\treturn RECIPROCAL_PI * a2 * pow2 ( w2 );\n\n\t}\n\n#endif\n\n#ifdef USE_CLEARCOAT\n\n\t// GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility\n\tvec3 BRDF_GGX_Clearcoat( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material) {\n\n\t\tvec3 f0 = material.clearcoatF0;\n\t\tfloat f90 = material.clearcoatF90;\n\t\tfloat roughness = max( material.clearcoatRoughness, 0.045 ); // punctual lights need a minimum roughness to show a highlight\n\n\t\tfloat alpha = pow2( roughness ); // UE4's roughness\n\n\t\tvec3 halfDir = normalize( lightDir + viewDir );\n\n\t\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\t\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\t\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\t\tfloat dotVH = saturate( dot( viewDir, halfDir ) );\n\n\t\tvec3 F = F_Schlick( f0, f90, dotVH );\n\n\t\tfloat V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\n\t\tfloat D = D_GGX( alpha, dotNH );\n\n\t\treturn F * ( V * D );\n\n\t}\n\n#endif\n\nvec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {\n\n\tvec3 f0 = material.specularColorBlended;\n\tfloat f90 = material.specularF90;\n\tfloat roughness = max( material.roughness, 0.045 ); // punctual lights need a minimum roughness to show a highlight\n\n\tfloat alpha = pow2( roughness ); // UE4's roughness\n\n\tvec3 halfDir = normalize( lightDir + viewDir );\n\n\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\tfloat dotVH = saturate( dot( viewDir, halfDir ) );\n\n\tvec3 F = F_Schlick( f0, f90, dotVH );\n\n\t#ifdef USE_IRIDESCENCE\n\n\t\tF = mix( F, material.iridescenceFresnel, material.iridescence );\n\n\t#endif\n\n\t#ifdef USE_ANISOTROPY\n\n\t\tfloat dotTL = dot( material.anisotropyT, lightDir );\n\t\tfloat dotTV = dot( material.anisotropyT, viewDir );\n\t\tfloat dotTH = dot( material.anisotropyT, halfDir );\n\t\tfloat dotBL = dot( material.anisotropyB, lightDir );\n\t\tfloat dotBV = dot( material.anisotropyB, viewDir );\n\t\tfloat dotBH = dot( material.anisotropyB, halfDir );\n\n\t\tfloat alphaT = max( material.alphaT, alpha );\n\n\t\tfloat V = V_GGX_SmithCorrelated_Anisotropic( alphaT, alpha, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL );\n\n\t\tfloat D = D_GGX_Anisotropic( alphaT, alpha, dotNH, dotTH, dotBH );\n\n\t#else\n\n\t\tfloat V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\n\t\tfloat D = D_GGX( alpha, dotNH );\n\n\t#endif\n\n\treturn F * ( V * D );\n\n}\n\n// Rect Area Light\n\n// Real-Time Polygonal-Light Shading with Linearly Transformed Cosines\n// by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt\n// code: https://github.com/selfshadow/ltc_code/\n\nvec2 LTC_Uv( const in vec3 N, const in vec3 V, const in float roughness ) {\n\n\tconst float LUT_SIZE = 64.0;\n\tconst float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;\n\tconst float LUT_BIAS = 0.5 / LUT_SIZE;\n\n\tfloat dotNV = saturate( dot( N, V ) );\n\n\t// texture parameterized by sqrt( GGX alpha ) and sqrt( 1 - cos( theta ) )\n\tvec2 uv = vec2( roughness, sqrt( 1.0 - dotNV ) );\n\n\tuv = uv * LUT_SCALE + LUT_BIAS;\n\n\treturn uv;\n\n}\n\nfloat LTC_ClippedSphereFormFactor( const in vec3 f ) {\n\n\t// Real-Time Area Lighting: a Journey from Research to Production (p.102)\n\t// An approximation of the form factor of a horizon-clipped rectangle.\n\n\tfloat l = length( f );\n\n\treturn max( ( l * l + f.z ) / ( l + 1.0 ), 0.0 );\n\n}\n\nvec3 LTC_EdgeVectorFormFactor( const in vec3 v1, const in vec3 v2 ) {\n\n\tfloat x = dot( v1, v2 );\n\n\tfloat y = abs( x );\n\n\t// rational polynomial approximation to theta / sin( theta ) / 2PI\n\tfloat a = 0.8543985 + ( 0.4965155 + 0.0145206 * y ) * y;\n\tfloat b = 3.4175940 + ( 4.1616724 + y ) * y;\n\tfloat v = a / b;\n\n\tfloat theta_sintheta = ( x > 0.0 ) ? v : 0.5 * inversesqrt( max( 1.0 - x * x, 1e-7 ) ) - v;\n\n\treturn cross( v1, v2 ) * theta_sintheta;\n\n}\n\nvec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in mat3 mInv, const in vec3 rectCoords[ 4 ] ) {\n\n\t// bail if point is on back side of plane of light\n\t// assumes ccw winding order of light vertices\n\tvec3 v1 = rectCoords[ 1 ] - rectCoords[ 0 ];\n\tvec3 v2 = rectCoords[ 3 ] - rectCoords[ 0 ];\n\tvec3 lightNormal = cross( v1, v2 );\n\n\tif( dot( lightNormal, P - rectCoords[ 0 ] ) < 0.0 ) return vec3( 0.0 );\n\n\t// construct orthonormal basis around N\n\tvec3 T1, T2;\n\tT1 = normalize( V - N * dot( V, N ) );\n\tT2 = - cross( N, T1 ); // negated from paper; possibly due to a different handedness of world coordinate system\n\n\t// compute transform\n\tmat3 mat = mInv * transpose( mat3( T1, T2, N ) );\n\n\t// transform rect\n\tvec3 coords[ 4 ];\n\tcoords[ 0 ] = mat * ( rectCoords[ 0 ] - P );\n\tcoords[ 1 ] = mat * ( rectCoords[ 1 ] - P );\n\tcoords[ 2 ] = mat * ( rectCoords[ 2 ] - P );\n\tcoords[ 3 ] = mat * ( rectCoords[ 3 ] - P );\n\n\t// project rect onto sphere\n\tcoords[ 0 ] = normalize( coords[ 0 ] );\n\tcoords[ 1 ] = normalize( coords[ 1 ] );\n\tcoords[ 2 ] = normalize( coords[ 2 ] );\n\tcoords[ 3 ] = normalize( coords[ 3 ] );\n\n\t// calculate vector form factor\n\tvec3 vectorFormFactor = vec3( 0.0 );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 0 ], coords[ 1 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 1 ], coords[ 2 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 2 ], coords[ 3 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 3 ], coords[ 0 ] );\n\n\t// adjust for horizon clipping\n\tfloat result = LTC_ClippedSphereFormFactor( vectorFormFactor );\n\n/*\n\t// alternate method of adjusting for horizon clipping (see reference)\n\t// refactoring required\n\tfloat len = length( vectorFormFactor );\n\tfloat z = vectorFormFactor.z / len;\n\n\tconst float LUT_SIZE = 64.0;\n\tconst float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;\n\tconst float LUT_BIAS = 0.5 / LUT_SIZE;\n\n\t// tabulated horizon-clipped sphere, apparently...\n\tvec2 uv = vec2( z * 0.5 + 0.5, len );\n\tuv = uv * LUT_SCALE + LUT_BIAS;\n\n\tfloat scale = texture2D( ltc_2, uv ).w;\n\n\tfloat result = len * scale;\n*/\n\n\treturn vec3( result );\n\n}\n\n// End Rect Area Light\n\n#if defined( USE_SHEEN )\n\n// https://github.com/google/filament/blob/main/shaders/src/surface_brdf.fs\nfloat D_Charlie( float roughness, float dotNH ) {\n\n\tfloat alpha = pow2( roughness );\n\n\t// Estevez and Kulla 2017, \"Production Friendly Microfacet Sheen BRDF\"\n\tfloat invAlpha = 1.0 / alpha;\n\tfloat cos2h = dotNH * dotNH;\n\tfloat sin2h = max( 1.0 - cos2h, 0.0078125 ); // 2^(-14/2), so sin2h^2 > 0 in fp16\n\n\treturn ( 2.0 + invAlpha ) * pow( sin2h, invAlpha * 0.5 ) / ( 2.0 * PI );\n\n}\n\n// https://github.com/google/filament/blob/main/shaders/src/surface_brdf.fs\nfloat V_Neubelt( float dotNV, float dotNL ) {\n\n\t// Neubelt and Pettineo 2013, \"Crafting a Next-gen Material Pipeline for The Order: 1886\"\n\treturn saturate( 1.0 / ( 4.0 * ( dotNL + dotNV - dotNL * dotNV ) ) );\n\n}\n\nvec3 BRDF_Sheen( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, vec3 sheenColor, const in float sheenRoughness ) {\n\n\tvec3 halfDir = normalize( lightDir + viewDir );\n\n\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\n\tfloat D = D_Charlie( sheenRoughness, dotNH );\n\tfloat V = V_Neubelt( dotNV, dotNL );\n\n\treturn sheenColor * ( D * V );\n\n}\n\n#endif\n\n// This is a curve-fit approximation to the \"Charlie sheen\" BRDF integrated over the hemisphere from\n// Estevez and Kulla 2017, \"Production Friendly Microfacet Sheen BRDF\".\nfloat IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {\n\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\n\tfloat r2 = roughness * roughness;\n\tfloat rInv = 1.0 / ( roughness + 0.1 );\n\n\tfloat a = -1.9362 + 1.0678 * roughness + 0.4573 * r2 - 0.8469 * rInv;\n\tfloat b = -0.6014 + 0.5538 * roughness - 0.4670 * r2 - 0.1255 * rInv;\n\n\tfloat DG = exp( a * dotNV + b );\n\n\treturn saturate( DG );\n\n}\n\nvec3 EnvironmentBRDF( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness ) {\n\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tvec2 fab = texture2D( dfgLUT, vec2( roughness, dotNV ) ).rg;\n\n\treturn specularColor * fab.x + specularF90 * fab.y;\n\n}\n\n// Fdez-Agüera's \"Multiple-Scattering Microfacet Model for Real-Time Image Based Lighting\"\n// Approximates multiscattering in order to preserve energy.\n// http://www.jcgt.org/published/0008/01/03/\n#ifdef USE_IRIDESCENCE\nvoid computeMultiscatteringIridescence( const in vec2 fab, const in vec3 specularColor, const in float specularF90, const in float iridescence, const in vec3 iridescenceF0, inout vec3 singleScatter, inout vec3 multiScatter ) {\n#else\nvoid computeMultiscattering( const in vec2 fab, const in vec3 specularColor, const in float specularF90, inout vec3 singleScatter, inout vec3 multiScatter ) {\n#endif\n\n\t#ifdef USE_IRIDESCENCE\n\n\t\tvec3 Fr = mix( specularColor, iridescenceF0, iridescence );\n\n\t#else\n\n\t\tvec3 Fr = specularColor;\n\n\t#endif\n\n\tvec3 FssEss = Fr * fab.x + specularF90 * fab.y;\n\n\tfloat Ess = fab.x + fab.y;\n\tfloat Ems = 1.0 - Ess;\n\n\tvec3 Favg = Fr + ( 1.0 - Fr ) * 0.047619; // 1/21\n\tvec3 Fms = FssEss * Favg / ( 1.0 - Ems * Favg );\n\n\tsingleScatter += FssEss;\n\tmultiScatter += Fms * Ems;\n\n}\n\n#if NUM_RECT_AREA_LIGHTS > 0\n\n\tvoid RE_Direct_RectArea_Physical( const in RectAreaLight rectAreaLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\n\t\tvec3 normal = geometryNormal;\n\t\tvec3 viewDir = geometryViewDir;\n\t\tvec3 position = geometryPosition;\n\t\tvec3 lightPos = rectAreaLight.position;\n\t\tvec3 halfWidth = rectAreaLight.halfWidth;\n\t\tvec3 halfHeight = rectAreaLight.halfHeight;\n\t\tvec3 lightColor = rectAreaLight.color;\n\t\tfloat roughness = material.roughness;\n\n\t\tvec3 rectCoords[ 4 ];\n\t\trectCoords[ 0 ] = lightPos + halfWidth - halfHeight; // counterclockwise; light shines in local neg z direction\n\t\trectCoords[ 1 ] = lightPos - halfWidth - halfHeight;\n\t\trectCoords[ 2 ] = lightPos - halfWidth + halfHeight;\n\t\trectCoords[ 3 ] = lightPos + halfWidth + halfHeight;\n\n\t\tvec2 uv = LTC_Uv( normal, viewDir, roughness );\n\n\t\tvec4 t1 = texture2D( ltc_1, uv );\n\t\tvec4 t2 = texture2D( ltc_2, uv );\n\n\t\tmat3 mInv = mat3(\n\t\t\tvec3( t1.x, 0, t1.y ),\n\t\t\tvec3(    0, 1,    0 ),\n\t\t\tvec3( t1.z, 0, t1.w )\n\t\t);\n\n\t\t// LTC Fresnel Approximation by Stephen Hill\n\t\t// http://blog.selfshadow.com/publications/s2016-advances/s2016_ltc_fresnel.pdf\n\t\tvec3 fresnel = ( material.specularColorBlended * t2.x + ( material.specularF90 - material.specularColorBlended ) * t2.y );\n\n\t\treflectedLight.directSpecular += lightColor * fresnel * LTC_Evaluate( normal, viewDir, position, mInv, rectCoords );\n\n\t\treflectedLight.directDiffuse += lightColor * material.diffuseContribution * LTC_Evaluate( normal, viewDir, position, mat3( 1.0 ), rectCoords );\n\n\t\t#ifdef USE_CLEARCOAT\n\n\t\t\tvec3 Ncc = geometryClearcoatNormal;\n\n\t\t\tvec2 uvClearcoat = LTC_Uv( Ncc, viewDir, material.clearcoatRoughness );\n\n\t\t\tvec4 t1Clearcoat = texture2D( ltc_1, uvClearcoat );\n\t\t\tvec4 t2Clearcoat = texture2D( ltc_2, uvClearcoat );\n\n\t\t\tmat3 mInvClearcoat = mat3(\n\t\t\t\tvec3( t1Clearcoat.x, 0, t1Clearcoat.y ),\n\t\t\t\tvec3(             0, 1,             0 ),\n\t\t\t\tvec3( t1Clearcoat.z, 0, t1Clearcoat.w )\n\t\t\t);\n\n\t\t\t// LTC Fresnel Approximation for clearcoat\n\t\t\tvec3 fresnelClearcoat = material.clearcoatF0 * t2Clearcoat.x + ( material.clearcoatF90 - material.clearcoatF0 ) * t2Clearcoat.y;\n\n\t\t\tclearcoatSpecularDirect += lightColor * fresnelClearcoat * LTC_Evaluate( Ncc, viewDir, position, mInvClearcoat, rectCoords );\n\n\t\t#endif\n\n\t}\n\n#endif\n\nvoid RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\n\tfloat dotNL = saturate( dot( geometryNormal, directLight.direction ) );\n\n\tvec3 irradiance = dotNL * directLight.color;\n\n\t#ifdef USE_CLEARCOAT\n\n\t\tfloat dotNLcc = saturate( dot( geometryClearcoatNormal, directLight.direction ) );\n\n\t\tvec3 ccIrradiance = dotNLcc * directLight.color;\n\n\t\tclearcoatSpecularDirect += ccIrradiance * BRDF_GGX_Clearcoat( directLight.direction, geometryViewDir, geometryClearcoatNormal, material );\n\n\t#endif\n\n\t#ifdef USE_SHEEN\n \n \t\tsheenSpecularDirect += irradiance * BRDF_Sheen( directLight.direction, geometryViewDir, geometryNormal, material.sheenColor, material.sheenRoughness );\n \n \t\tfloat sheenAlbedoV = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n \t\tfloat sheenAlbedoL = IBLSheenBRDF( geometryNormal, directLight.direction, material.sheenRoughness );\n \n \t\tfloat sheenEnergyComp = 1.0 - max3( material.sheenColor ) * max( sheenAlbedoV, sheenAlbedoL );\n \n \t\tirradiance *= sheenEnergyComp;\n \n \t#endif\n\n\tvec3 specularBRDF = BRDF_GGX( directLight.direction, geometryViewDir, geometryNormal, material );\n\n\t#ifdef USE_RETROREFLECTION\n\n\t\t// Minimal Retroreflective Microfacet Model:\n\t\t// https://jcgt.org/published/0015/01/04/\n\t\tvec3 retroViewDir = reflect( - geometryViewDir, geometryNormal );\n\t\tvec3 retroSpecularBRDF = BRDF_GGX( directLight.direction, retroViewDir, geometryNormal, material );\n\n\t\tspecularBRDF = mix( specularBRDF, retroSpecularBRDF, saturate( material.retroreflectivity ) );\n\n\t#endif\n\n\treflectedLight.directSpecular += irradiance * specularBRDF * material.multiScatteringCompensation;\n\n\t// Light reflected by the specular interface is not available to the diffuse layer ( glTF fresnel_mix )\n\tvec3 halfDir = normalize( directLight.direction + geometryViewDir );\n\tfloat dotVH = saturate( dot( geometryViewDir, halfDir ) );\n\tvec3 F = F_Schlick( material.specularColor, material.specularF90, dotVH );\n\n\t#ifdef USE_RETROREFLECTION\n\n\t\tvec3 retroHalfDir = normalize( directLight.direction + retroViewDir );\n\t\tfloat dotRetroVH = saturate( dot( retroViewDir, retroHalfDir ) );\n\t\tvec3 retroF = F_Schlick( material.specularColor, material.specularF90, dotRetroVH );\n\n\t\tF = mix( F, retroF, saturate( material.retroreflectivity ) );\n\n\t#endif\n\n\t#ifdef USE_DIFFUSE_ROUGHNESS\n\n\t\tvec3 diffuseBRDF = BRDF_EON( directLight.direction, geometryViewDir, geometryNormal, material.diffuseColor, material.diffuseRoughness ) * ( 1.0 - material.metalness );\n\n\t#else\n\n\t\tvec3 diffuseBRDF = BRDF_Lambert( material.diffuseContribution );\n\n\t#endif\n\n\treflectedLight.directDiffuse += irradiance * diffuseBRDF * ( 1.0 - F );\n}\n\nvoid RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\n\t// Energy reflected by the specular lobe is not available to the diffuse layer\n\tvec3 singleScattering = vec3( 0.0 );\n\tvec3 multiScattering = vec3( 0.0 );\n\n\t#ifdef USE_IRIDESCENCE\n\n\t\tcomputeMultiscatteringIridescence( material.dfg, material.specularColor, material.specularF90, material.iridescence, material.iridescenceF0Dielectric, singleScattering, multiScattering );\n\n\t#else\n\n\t\tcomputeMultiscattering( material.dfg, material.specularColor, material.specularF90, singleScattering, multiScattering );\n\n\t#endif\n\n\t#ifdef USE_DIFFUSE_ROUGHNESS\n\n\t\tfloat dotNV = saturate( dot( geometryNormal, geometryViewDir ) );\n\t\t// Irradiance has already integrated the cosine term, so use the directional\n\t\t// albedo to approximate EON under locally uniform incident radiance.\n\t\tvec3 diffuseAlbedo = EON_DirectionalAlbedo( material.diffuseColor, material.diffuseRoughness, dotNV ) * ( 1.0 - material.metalness );\n\t\tvec3 diffuse = irradiance * RECIPROCAL_PI * diffuseAlbedo * ( 1.0 - singleScattering - multiScattering );\n\n\t#else\n\n\t\tvec3 diffuse = irradiance * BRDF_Lambert( material.diffuseContribution ) * ( 1.0 - singleScattering - multiScattering );\n\n\t#endif\n\n\t#ifdef USE_SHEEN\n\n\t\tfloat sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n\n\t\tsheenSpecularIndirect += irradiance * material.sheenColor * sheenAlbedo * RECIPROCAL_PI;\n\n\t\tfloat sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;\n\n\t\tdiffuse *= sheenEnergyComp;\n\n\t#endif\n\n\treflectedLight.indirectDiffuse += diffuse;\n\n}\n\nvoid RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradiance, const in vec3 clearcoatRadiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {\n\n\t#ifdef USE_CLEARCOAT\n\n\t\tclearcoatSpecularIndirect += clearcoatRadiance * EnvironmentBRDF( geometryClearcoatNormal, geometryViewDir, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );\n\n\t#endif\n\n\t#ifdef USE_SHEEN\n\n\t\tsheenSpecularIndirect += irradiance * material.sheenColor * IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness ) * RECIPROCAL_PI;\n\n \t#endif\n\n\t// Both indirect specular and indirect diffuse light accumulate here\n\t// Compute multiscattering separately for dielectric and metallic, then mix\n\n\tvec3 singleScatteringDielectric = vec3( 0.0 );\n\tvec3 multiScatteringDielectric = vec3( 0.0 );\n\n\tvec3 singleScatteringMetallic = vec3( 0.0 );\n\tvec3 multiScatteringMetallic = vec3( 0.0 );\n\n\t#ifdef USE_IRIDESCENCE\n\n\t\tcomputeMultiscatteringIridescence( material.dfg, material.specularColor, material.specularF90, material.iridescence, material.iridescenceF0Dielectric, singleScatteringDielectric, multiScatteringDielectric );\n\t\tcomputeMultiscatteringIridescence( material.dfg, material.diffuseColor, material.specularF90, material.iridescence, material.iridescenceF0Metallic, singleScatteringMetallic, multiScatteringMetallic );\n\n\t#else\n\n\t\tcomputeMultiscattering( material.dfg, material.specularColor, material.specularF90, singleScatteringDielectric, multiScatteringDielectric );\n\t\tcomputeMultiscattering( material.dfg, material.diffuseColor, material.specularF90, singleScatteringMetallic, multiScatteringMetallic );\n\n\t#endif\n\n\t// Mix based on metalness\n\tvec3 singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, material.metalness );\n\tvec3 multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, material.metalness );\n\n\t// Diffuse energy conservation uses dielectric path\n\tvec3 totalScatteringDielectric = singleScatteringDielectric + multiScatteringDielectric;\n\t#ifdef USE_DIFFUSE_ROUGHNESS\n\n\t\tfloat dotNV = saturate( dot( geometryNormal, geometryViewDir ) );\n\t\tvec3 diffuse = EON_DirectionalAlbedo( material.diffuseColor, material.diffuseRoughness, dotNV ) * ( 1.0 - material.metalness ) * ( 1.0 - totalScatteringDielectric );\n\n\t#else\n\n\t\tvec3 diffuse = material.diffuseContribution * ( 1.0 - totalScatteringDielectric );\n\n\t#endif\n\n\tvec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;\n\n\tvec3 indirectSpecular = radiance * singleScattering;\n\tindirectSpecular += multiScattering * cosineWeightedIrradiance;\n\n\tvec3 indirectDiffuse = diffuse * cosineWeightedIrradiance;\n\n\t#ifdef USE_SHEEN\n\n\t\tfloat sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n\n\t\tfloat sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;\n\n\t\tindirectSpecular *= sheenEnergyComp;\n\t\tindirectDiffuse *= sheenEnergyComp;\n\n\t#endif\n\n\treflectedLight.indirectSpecular += indirectSpecular;\n\treflectedLight.indirectDiffuse += indirectDiffuse;\n\n}\n\n#define RE_Direct\t\t\t\tRE_Direct_Physical\n#define RE_Direct_RectArea\t\tRE_Direct_RectArea_Physical\n#define RE_IndirectDiffuse\t\tRE_IndirectDiffuse_Physical\n#define RE_IndirectSpecular\t\tRE_IndirectSpecular_Physical\n\n// ref: https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf\nfloat computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {\n\n\treturn saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );\n\n}\n" +
+    '\n\nuniform sampler2D dfgLUT;\n\nstruct PhysicalMaterial {\n\n\tvec3 diffuseColor;\n\tvec3 diffuseContribution;\n\tvec3 specularColor;\n\tvec3 specularColorBlended;\n\n\tfloat roughness;\n\tfloat metalness;\n\tfloat specularF90;\n\tfloat dispersion;\n\tvec2 dfg;\n\tvec3 multiScatteringCompensation;\n\n\t#ifdef USE_DIFFUSE_ROUGHNESS\n\t\tfloat diffuseRoughness;\n\t#endif\n\n\t#ifdef USE_RETROREFLECTION\n\t\tfloat retroreflectivity;\n\t#endif\n\n\t#ifdef USE_CLEARCOAT\n\t\tfloat clearcoat;\n\t\tfloat clearcoatRoughness;\n\t\tvec3 clearcoatF0;\n\t\tfloat clearcoatF90;\n\t#endif\n\n\t#ifdef USE_IRIDESCENCE\n\t\tfloat iridescence;\n\t\tfloat iridescenceIOR;\n\t\tfloat iridescenceThickness;\n\t\tvec3 iridescenceFresnel;\n\t\tvec3 iridescenceF0Dielectric;\n\t\tvec3 iridescenceF0Metallic;\n\t#endif\n\n\t#ifdef USE_SHEEN\n\t\tvec3 sheenColor;\n\t\tfloat sheenRoughness;\n\t#endif\n\n\t#ifdef IOR\n\t\tfloat ior;\n\t#endif\n\n\t#ifdef USE_TRANSMISSION\n\t\tfloat transmission;\n\t\tfloat transmissionAlpha;\n\t\tfloat thickness;\n\t\tfloat attenuationDistance;\n\t\tvec3 attenuationColor;\n\t#endif\n\n\t#ifdef USE_ANISOTROPY\n\t\tfloat anisotropy;\n\t\tfloat alphaT;\n\t\tvec3 anisotropyT;\n\t\tvec3 anisotropyB;\n\t#endif\n\n};\n\n// temporary\nvec3 clearcoatSpecularDirect = vec3( 0.0 );\nvec3 clearcoatSpecularIndirect = vec3( 0.0 );\nvec3 sheenSpecularDirect = vec3( 0.0 );\nvec3 sheenSpecularIndirect = vec3(0.0 );\n\nvec3 Schlick_to_F0( const in vec3 f, const in float f90, const in float dotVH ) {\n    float x = clamp( 1.0 - dotVH, 0.0, 1.0 );\n    float x2 = x * x;\n    float x5 = clamp( x * x2 * x2, 0.0, 0.9999 );\n\n    return ( f - vec3( f90 ) * x5 ) / ( 1.0 - x5 );\n}\n\n#ifdef USE_DIFFUSE_ROUGHNESS\n\n\t// Portsmouth et al. 2025, "EON: A Practical Energy-Preserving Rough Diffuse BRDF"\n\t// https://jcgt.org/published/0014/01/06/\n\tconst float EON_EPSILON = 1e-7;\n\n\tfloat FON_DirectionalAlbedo( const in float mu, const in float roughness, const in float A ) {\n\n\t\tfloat muComp = 1.0 - mu;\n\t\tfloat gOverPi = muComp * ( 0.0571085289 + muComp * ( 0.491881867 + muComp * ( - 0.332181442 + muComp * 0.0714429953 ) ) );\n\n\t\treturn A * ( 1.0 + roughness * gOverPi );\n\n\t}\n\n\tvec3 BRDF_EON( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in vec3 diffuseColor, const in float roughness ) {\n\n\t\tvec3 rho = saturate( diffuseColor );\n\n\t\tif ( roughness <= EON_EPSILON ) return BRDF_Lambert( rho );\n\n\t\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\t\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\t\tfloat s = dot( lightDir, viewDir ) - dotNL * dotNV;\n\t\tfloat sOverT = ( s > 0.0 ) ? s / max( max( dotNL, dotNV ), EON_EPSILON ) : s;\n\n\t\tfloat A = 1.0 / ( 1.0 + ( 0.5 - 2.0 / ( 3.0 * PI ) ) * roughness );\n\t\tvec3 singleScatter = rho * RECIPROCAL_PI * A * ( 1.0 + roughness * sOverT );\n\n\t\tfloat averageAlbedo = A * ( 1.0 + ( 2.0 / 3.0 - 28.0 / ( 15.0 * PI ) ) * roughness );\n\t\tfloat albedoV = FON_DirectionalAlbedo( dotNV, roughness, A );\n\t\tfloat albedoL = FON_DirectionalAlbedo( dotNL, roughness, A );\n\n\t\tvec3 rhoMultiScatter = rho * rho * averageAlbedo / max( vec3( EON_EPSILON ), vec3( 1.0 ) - rho * ( 1.0 - averageAlbedo ) );\n\t\tvec3 multiScatter = rhoMultiScatter * RECIPROCAL_PI\n\t\t\t* max( EON_EPSILON, 1.0 - albedoV )\n\t\t\t* max( EON_EPSILON, 1.0 - albedoL )\n\t\t\t/ max( EON_EPSILON, 1.0 - averageAlbedo );\n\n\t\treturn singleScatter + multiScatter;\n\n\t}\n\n\tvec3 EON_DirectionalAlbedo( const in vec3 diffuseColor, const in float roughness, const in float dotNV ) {\n\n\t\tvec3 rho = saturate( diffuseColor );\n\n\t\tif ( roughness <= EON_EPSILON ) return rho;\n\n\t\tfloat A = 1.0 / ( 1.0 + ( 0.5 - 2.0 / ( 3.0 * PI ) ) * roughness );\n\t\tfloat directionalAlbedo = FON_DirectionalAlbedo( dotNV, roughness, A );\n\t\tfloat averageAlbedo = A * ( 1.0 + ( 2.0 / 3.0 - 28.0 / ( 15.0 * PI ) ) * roughness );\n\t\tvec3 rhoMultiScatter = rho * rho * averageAlbedo / max( vec3( EON_EPSILON ), vec3( 1.0 ) - rho * ( 1.0 - averageAlbedo ) );\n\n\t\treturn rho * directionalAlbedo + rhoMultiScatter * ( 1.0 - directionalAlbedo );\n\n\t}\n\n#endif\n\n// Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2\n// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf\nfloat V_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {\n\n\tfloat a2 = pow2( alpha );\n\tfloat gv = dotNL * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNV ) );\n\tfloat gl = dotNV * sqrt( a2 + ( 1.0 - a2 ) * pow2( dotNL ) );\n\n\treturn 0.5 / max( gv + gl, EPSILON );\n\n}\n\n// Microfacet Models for Refraction through Rough Surfaces - equation (33)\n// http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html\n// alpha is "roughness squared" in Disney’s reparameterization\nfloat D_GGX( const in float alpha, const in float dotNH ) {\n\n\tfloat a2 = pow2( alpha );\n\n\tfloat denom = pow2( dotNH ) * ( a2 - 1.0 ) + 1.0; // avoid alpha = 0 with dotNH = 1\n\n\treturn RECIPROCAL_PI * a2 / pow2( denom );\n\n}\n\n// https://google.github.io/filament/Filament.md.html#materialsystem/anisotropicmodel/anisotropicspecularbrdf\n#ifdef USE_ANISOTROPY\n\n\tfloat V_GGX_SmithCorrelated_Anisotropic( const in float alphaT, const in float alphaB, const in float dotTV, const in float dotBV, const in float dotTL, const in float dotBL, const in float dotNV, const in float dotNL ) {\n\n\t\tfloat gv = dotNL * length( vec3( alphaT * dotTV, alphaB * dotBV, dotNV ) );\n\t\tfloat gl = dotNV * length( vec3( alphaT * dotTL, alphaB * dotBL, dotNL ) );\n\t\treturn 0.5 / max( gv + gl, EPSILON );\n\n\t}\n\n\tfloat D_GGX_Anisotropic( const in float alphaT, const in float alphaB, const in float dotNH, const in float dotTH, const in float dotBH ) {\n\n\t\tfloat a2 = alphaT * alphaB;\n\t\thighp vec3 v = vec3( alphaB * dotTH, alphaT * dotBH, a2 * dotNH );\n\t\thighp float v2 = dot( v, v );\n\t\tfloat w2 = a2 / v2;\n\n\t\treturn RECIPROCAL_PI * a2 * pow2 ( w2 );\n\n\t}\n\n#endif\n\n#ifdef USE_CLEARCOAT\n\n\t// GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility\n\tvec3 BRDF_GGX_Clearcoat( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material) {\n\n\t\tvec3 f0 = material.clearcoatF0;\n\t\tfloat f90 = material.clearcoatF90;\n\t\tfloat roughness = max( material.clearcoatRoughness, 0.045 ); // punctual lights need a minimum roughness to show a highlight\n\n\t\tfloat alpha = pow2( roughness ); // UE4\'s roughness\n\n\t\tvec3 halfDir = normalize( lightDir + viewDir );\n\n\t\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\t\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\t\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\t\tfloat dotVH = saturate( dot( viewDir, halfDir ) );\n\n\t\tvec3 F = F_Schlick( f0, f90, dotVH );\n\n\t\tfloat V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\n\t\tfloat D = D_GGX( alpha, dotNH );\n\n\t\treturn F * ( V * D );\n\n\t}\n\n#endif\n\nvec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {\n\n\tvec3 f0 = material.specularColorBlended;\n\tfloat f90 = material.specularF90;\n\tfloat roughness = max( material.roughness, 0.045 ); // punctual lights need a minimum roughness to show a highlight\n\n\tfloat alpha = pow2( roughness ); // UE4\'s roughness\n\n\tvec3 halfDir = normalize( lightDir + viewDir );\n\n\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\tfloat dotVH = saturate( dot( viewDir, halfDir ) );\n\n\tvec3 F = F_Schlick( f0, f90, dotVH );\n\n\t#ifdef USE_IRIDESCENCE\n\n\t\tF = mix( F, material.iridescenceFresnel, material.iridescence );\n\n\t#endif\n\n\t#ifdef USE_ANISOTROPY\n\n\t\tfloat dotTL = dot( material.anisotropyT, lightDir );\n\t\tfloat dotTV = dot( material.anisotropyT, viewDir );\n\t\tfloat dotTH = dot( material.anisotropyT, halfDir );\n\t\tfloat dotBL = dot( material.anisotropyB, lightDir );\n\t\tfloat dotBV = dot( material.anisotropyB, viewDir );\n\t\tfloat dotBH = dot( material.anisotropyB, halfDir );\n\n\t\tfloat alphaT = max( material.alphaT, alpha );\n\n\t\tfloat V = V_GGX_SmithCorrelated_Anisotropic( alphaT, alpha, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL );\n\n\t\tfloat D = D_GGX_Anisotropic( alphaT, alpha, dotNH, dotTH, dotBH );\n\n\t#else\n\n\t\tfloat V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );\n\n\t\tfloat D = D_GGX( alpha, dotNH );\n\n\t#endif\n\n\treturn F * ( V * D );\n\n}\n\n// Rect Area Light\n\n// Real-Time Polygonal-Light Shading with Linearly Transformed Cosines\n// by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt\n// code: https://github.com/selfshadow/ltc_code/\n\nvec2 LTC_Uv( const in vec3 N, const in vec3 V, const in float roughness ) {\n\n\tconst float LUT_SIZE = 64.0;\n\tconst float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;\n\tconst float LUT_BIAS = 0.5 / LUT_SIZE;\n\n\tfloat dotNV = saturate( dot( N, V ) );\n\n\t// texture parameterized by sqrt( GGX alpha ) and sqrt( 1 - cos( theta ) )\n\tvec2 uv = vec2( roughness, sqrt( 1.0 - dotNV ) );\n\n\tuv = uv * LUT_SCALE + LUT_BIAS;\n\n\treturn uv;\n\n}\n\nfloat LTC_ClippedSphereFormFactor( const in vec3 f ) {\n\n\t// Real-Time Area Lighting: a Journey from Research to Production (p.102)\n\t// An approximation of the form factor of a horizon-clipped rectangle.\n\n\tfloat l = length( f );\n\n\treturn max( ( l * l + f.z ) / ( l + 1.0 ), 0.0 );\n\n}\n\nvec3 LTC_EdgeVectorFormFactor( const in vec3 v1, const in vec3 v2 ) {\n\n\tfloat x = dot( v1, v2 );\n\n\tfloat y = abs( x );\n\n\t// rational polynomial approximation to theta / sin( theta ) / 2PI\n\tfloat a = 0.8543985 + ( 0.4965155 + 0.0145206 * y ) * y;\n\tfloat b = 3.4175940 + ( 4.1616724 + y ) * y;\n\tfloat v = a / b;\n\n\tfloat theta_sintheta = ( x > 0.0 ) ? v : 0.5 * inversesqrt( max( 1.0 - x * x, 1e-7 ) ) - v;\n\n\treturn cross( v1, v2 ) * theta_sintheta;\n\n}\n\nvec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in mat3 mInv, const in vec3 rectCoords[ 4 ] ) {\n\n\t// bail if point is on back side of plane of light\n\t// assumes ccw winding order of light vertices\n\tvec3 v1 = rectCoords[ 1 ] - rectCoords[ 0 ];\n\tvec3 v2 = rectCoords[ 3 ] - rectCoords[ 0 ];\n\tvec3 lightNormal = cross( v1, v2 );\n\n\tif( dot( lightNormal, P - rectCoords[ 0 ] ) < 0.0 ) return vec3( 0.0 );\n\n\t// construct orthonormal basis around N\n\tvec3 T1, T2;\n\tT1 = normalize( V - N * dot( V, N ) );\n\tT2 = - cross( N, T1 ); // negated from paper; possibly due to a different handedness of world coordinate system\n\n\t// compute transform\n\tmat3 mat = mInv * transpose( mat3( T1, T2, N ) );\n\n\t// transform rect\n\tvec3 coords[ 4 ];\n\tcoords[ 0 ] = mat * ( rectCoords[ 0 ] - P );\n\tcoords[ 1 ] = mat * ( rectCoords[ 1 ] - P );\n\tcoords[ 2 ] = mat * ( rectCoords[ 2 ] - P );\n\tcoords[ 3 ] = mat * ( rectCoords[ 3 ] - P );\n\n\t// project rect onto sphere\n\tcoords[ 0 ] = normalize( coords[ 0 ] );\n\tcoords[ 1 ] = normalize( coords[ 1 ] );\n\tcoords[ 2 ] = normalize( coords[ 2 ] );\n\tcoords[ 3 ] = normalize( coords[ 3 ] );\n\n\t// calculate vector form factor\n\tvec3 vectorFormFactor = vec3( 0.0 );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 0 ], coords[ 1 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 1 ], coords[ 2 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 2 ], coords[ 3 ] );\n\tvectorFormFactor += LTC_EdgeVectorFormFactor( coords[ 3 ], coords[ 0 ] );\n\n\t// adjust for horizon clipping\n\tfloat result = LTC_ClippedSphereFormFactor( vectorFormFactor );\n\n/*\n\t// alternate method of adjusting for horizon clipping (see reference)\n\t// refactoring required\n\tfloat len = length( vectorFormFactor );\n\tfloat z = vectorFormFactor.z / len;\n\n\tconst float LUT_SIZE = 64.0;\n\tconst float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;\n\tconst float LUT_BIAS = 0.5 / LUT_SIZE;\n\n\t// tabulated horizon-clipped sphere, apparently...\n\tvec2 uv = vec2( z * 0.5 + 0.5, len );\n\tuv = uv * LUT_SCALE + LUT_BIAS;\n\n\tfloat scale = texture2D( ltc_2, uv ).w;\n\n\tfloat result = len * scale;\n*/\n\n\treturn vec3( result );\n\n}\n\n// End Rect Area Light\n\n#if defined( USE_SHEEN )\n\n// https://github.com/google/filament/blob/main/shaders/src/surface_brdf.fs\nfloat D_Charlie( float roughness, float dotNH ) {\n\n\tfloat alpha = pow2( roughness );\n\n\t// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF"\n\tfloat invAlpha = 1.0 / alpha;\n\tfloat cos2h = dotNH * dotNH;\n\tfloat sin2h = max( 1.0 - cos2h, 0.0078125 ); // 2^(-14/2), so sin2h^2 > 0 in fp16\n\n\treturn ( 2.0 + invAlpha ) * pow( sin2h, invAlpha * 0.5 ) / ( 2.0 * PI );\n\n}\n\n// https://github.com/google/filament/blob/main/shaders/src/surface_brdf.fs\nfloat V_Neubelt( float dotNV, float dotNL ) {\n\n\t// Neubelt and Pettineo 2013, "Crafting a Next-gen Material Pipeline for The Order: 1886"\n\treturn saturate( 1.0 / ( 4.0 * ( dotNL + dotNV - dotNL * dotNV ) ) );\n\n}\n\nvec3 BRDF_Sheen( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, vec3 sheenColor, const in float sheenRoughness ) {\n\n\tvec3 halfDir = normalize( lightDir + viewDir );\n\n\tfloat dotNL = saturate( dot( normal, lightDir ) );\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tfloat dotNH = saturate( dot( normal, halfDir ) );\n\n\tfloat D = D_Charlie( sheenRoughness, dotNH );\n\tfloat V = V_Neubelt( dotNV, dotNL );\n\n\treturn sheenColor * ( D * V );\n\n}\n\n#endif\n\n// This is a curve-fit approximation to the "Charlie sheen" BRDF integrated over the hemisphere from\n// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF".\nfloat IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {\n\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\n\tfloat r2 = roughness * roughness;\n\tfloat rInv = 1.0 / ( roughness + 0.1 );\n\n\tfloat a = -1.9362 + 1.0678 * roughness + 0.4573 * r2 - 0.8469 * rInv;\n\tfloat b = -0.6014 + 0.5538 * roughness - 0.4670 * r2 - 0.1255 * rInv;\n\n\tfloat DG = exp( a * dotNV + b );\n\n\treturn saturate( DG );\n\n}\n\nvec3 EnvironmentBRDF( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness ) {\n\n\tfloat dotNV = saturate( dot( normal, viewDir ) );\n\tvec2 fab = texture2D( dfgLUT, vec2( roughness, dotNV ) ).rg;\n\n\treturn specularColor * fab.x + specularF90 * fab.y;\n\n}\n\n// Fdez-Agüera\'s "Multiple-Scattering Microfacet Model for Real-Time Image Based Lighting"\n// Approximates multiscattering in order to preserve energy.\n// http://www.jcgt.org/published/0008/01/03/\n#ifdef USE_IRIDESCENCE\nvoid computeMultiscatteringIridescence( const in vec2 fab, const in vec3 specularColor, const in float specularF90, const in float iridescence, const in vec3 iridescenceF0, inout vec3 singleScatter, inout vec3 multiScatter ) {\n#else\nvoid computeMultiscattering( const in vec2 fab, const in vec3 specularColor, const in float specularF90, inout vec3 singleScatter, inout vec3 multiScatter ) {\n#endif\n\n\t#ifdef USE_IRIDESCENCE\n\n\t\tvec3 Fr = mix( specularColor, iridescenceF0, iridescence );\n\n\t#else\n\n\t\tvec3 Fr = specularColor;\n\n\t#endif\n\n\tvec3 FssEss = Fr * fab.x + specularF90 * fab.y;\n\n\tfloat Ess = fab.x + fab.y;\n\tfloat Ems = 1.0 - Ess;\n\n\tvec3 Favg = Fr + ( 1.0 - Fr ) * 0.047619; // 1/21\n\tvec3 Fms = FssEss * Favg / ( 1.0 - Ems * Favg );\n\n\tsingleScatter += FssEss;\n\tmultiScatter += Fms * Ems;\n\n}\n\n#if NUM_RECT_AREA_LIGHTS > 0\n\n\tvoid RE_Direct_RectArea_Physical( const in RectAreaLight rectAreaLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\n\t\tvec3 normal = geometryNormal;\n\t\tvec3 viewDir = geometryViewDir;\n\t\tvec3 position = geometryPosition;\n\t\tvec3 lightPos = rectAreaLight.position;\n\t\tvec3 halfWidth = rectAreaLight.halfWidth;\n\t\tvec3 halfHeight = rectAreaLight.halfHeight;\n\t\tvec3 lightColor = rectAreaLight.color;\n\t\tfloat roughness = material.roughness;\n\n\t\tvec3 rectCoords[ 4 ];\n\t\trectCoords[ 0 ] = lightPos + halfWidth - halfHeight; // counterclockwise; light shines in local neg z direction\n\t\trectCoords[ 1 ] = lightPos - halfWidth - halfHeight;\n\t\trectCoords[ 2 ] = lightPos - halfWidth + halfHeight;\n\t\trectCoords[ 3 ] = lightPos + halfWidth + halfHeight;\n\n\t\tvec2 uv = LTC_Uv( normal, viewDir, roughness );\n\n\t\tvec4 t1 = texture2D( ltc_1, uv );\n\t\tvec4 t2 = texture2D( ltc_2, uv );\n\n\t\tmat3 mInv = mat3(\n\t\t\tvec3( t1.x, 0, t1.y ),\n\t\t\tvec3(    0, 1,    0 ),\n\t\t\tvec3( t1.z, 0, t1.w )\n\t\t);\n\n\t\t// LTC Fresnel Approximation by Stephen Hill\n\t\t// http://blog.selfshadow.com/publications/s2016-advances/s2016_ltc_fresnel.pdf\n\t\tvec3 fresnel = ( material.specularColorBlended * t2.x + ( material.specularF90 - material.specularColorBlended ) * t2.y );\n\n\t\treflectedLight.directSpecular += lightColor * fresnel * LTC_Evaluate( normal, viewDir, position, mInv, rectCoords );\n\n\t\treflectedLight.directDiffuse += lightColor * material.diffuseContribution * LTC_Evaluate( normal, viewDir, position, mat3( 1.0 ), rectCoords );\n\n\t\t#ifdef USE_CLEARCOAT\n\n\t\t\tvec3 Ncc = geometryClearcoatNormal;\n\n\t\t\tvec2 uvClearcoat = LTC_Uv( Ncc, viewDir, material.clearcoatRoughness );\n\n\t\t\tvec4 t1Clearcoat = texture2D( ltc_1, uvClearcoat );\n\t\t\tvec4 t2Clearcoat = texture2D( ltc_2, uvClearcoat );\n\n\t\t\tmat3 mInvClearcoat = mat3(\n\t\t\t\tvec3( t1Clearcoat.x, 0, t1Clearcoat.y ),\n\t\t\t\tvec3(             0, 1,             0 ),\n\t\t\t\tvec3( t1Clearcoat.z, 0, t1Clearcoat.w )\n\t\t\t);\n\n\t\t\t// LTC Fresnel Approximation for clearcoat\n\t\t\tvec3 fresnelClearcoat = material.clearcoatF0 * t2Clearcoat.x + ( material.clearcoatF90 - material.clearcoatF0 ) * t2Clearcoat.y;\n\n\t\t\tclearcoatSpecularDirect += lightColor * fresnelClearcoat * LTC_Evaluate( Ncc, viewDir, position, mInvClearcoat, rectCoords );\n\n\t\t#endif\n\n\t}\n\n#endif\n\nvoid RE_Direct_Physical( const in IncidentLight directLight, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\n\tfloat dotNL = saturate( dot( geometryNormal, directLight.direction ) );\n\n\tvec3 irradiance = dotNL * directLight.color;\n\n\t#ifdef USE_CLEARCOAT\n\n\t\tfloat dotNLcc = saturate( dot( geometryClearcoatNormal, directLight.direction ) );\n\n\t\tvec3 ccIrradiance = dotNLcc * directLight.color;\n\n\t\tclearcoatSpecularDirect += ccIrradiance * BRDF_GGX_Clearcoat( directLight.direction, geometryViewDir, geometryClearcoatNormal, material );\n\n\t#endif\n\n\t#ifdef USE_SHEEN\n \n \t\tsheenSpecularDirect += irradiance * BRDF_Sheen( directLight.direction, geometryViewDir, geometryNormal, material.sheenColor, material.sheenRoughness );\n \n \t\tfloat sheenAlbedoV = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n \t\tfloat sheenAlbedoL = IBLSheenBRDF( geometryNormal, directLight.direction, material.sheenRoughness );\n \n \t\tfloat sheenEnergyComp = 1.0 - max3( material.sheenColor ) * max( sheenAlbedoV, sheenAlbedoL );\n \n \t\tirradiance *= sheenEnergyComp;\n \n \t#endif\n\n\tvec3 specularBRDF = BRDF_GGX( directLight.direction, geometryViewDir, geometryNormal, material );\n\n\t#ifdef USE_RETROREFLECTION\n\n\t\t// Minimal Retroreflective Microfacet Model:\n\t\t// https://jcgt.org/published/0015/01/04/\n\t\tvec3 retroViewDir = reflect( - geometryViewDir, geometryNormal );\n\t\tvec3 retroSpecularBRDF = BRDF_GGX( directLight.direction, retroViewDir, geometryNormal, material );\n\n\t\tspecularBRDF = mix( specularBRDF, retroSpecularBRDF, saturate( material.retroreflectivity ) );\n\n\t#endif\n\n\treflectedLight.directSpecular += irradiance * specularBRDF * material.multiScatteringCompensation;\n\n\t// Light reflected by the specular interface is not available to the diffuse layer ( glTF fresnel_mix )\n\tvec3 halfDir = normalize( directLight.direction + geometryViewDir );\n\tfloat dotVH = saturate( dot( geometryViewDir, halfDir ) );\n\tvec3 F = F_Schlick( material.specularColor, material.specularF90, dotVH );\n\n\t#ifdef USE_RETROREFLECTION\n\n\t\tvec3 retroHalfDir = normalize( directLight.direction + retroViewDir );\n\t\tfloat dotRetroVH = saturate( dot( retroViewDir, retroHalfDir ) );\n\t\tvec3 retroF = F_Schlick( material.specularColor, material.specularF90, dotRetroVH );\n\n\t\tF = mix( F, retroF, saturate( material.retroreflectivity ) );\n\n\t#endif\n\n\t#ifdef USE_DIFFUSE_ROUGHNESS\n\n\t\tvec3 diffuseBRDF = BRDF_EON( directLight.direction, geometryViewDir, geometryNormal, material.diffuseColor, material.diffuseRoughness ) * ( 1.0 - material.metalness );\n\n\t#else\n\n\t\tvec3 diffuseBRDF = BRDF_Lambert( material.diffuseContribution );\n\n\t#endif\n\n\treflectedLight.directDiffuse += irradiance * diffuseBRDF * ( 1.0 - F );\n}\n\nvoid RE_IndirectDiffuse_Physical( const in vec3 irradiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight ) {\n\n\t// Energy reflected by the specular lobe is not available to the diffuse layer\n\tvec3 singleScattering = vec3( 0.0 );\n\tvec3 multiScattering = vec3( 0.0 );\n\n\t#ifdef USE_IRIDESCENCE\n\n\t\tcomputeMultiscatteringIridescence( material.dfg, material.specularColor, material.specularF90, material.iridescence, material.iridescenceF0Dielectric, singleScattering, multiScattering );\n\n\t#else\n\n\t\tcomputeMultiscattering( material.dfg, material.specularColor, material.specularF90, singleScattering, multiScattering );\n\n\t#endif\n\n\t#ifdef USE_DIFFUSE_ROUGHNESS\n\n\t\tfloat dotNV = saturate( dot( geometryNormal, geometryViewDir ) );\n\t\t// Irradiance has already integrated the cosine term, so use the directional\n\t\t// albedo to approximate EON under locally uniform incident radiance.\n\t\tvec3 diffuseAlbedo = EON_DirectionalAlbedo( material.diffuseColor, material.diffuseRoughness, dotNV ) * ( 1.0 - material.metalness );\n\t\tvec3 diffuse = irradiance * RECIPROCAL_PI * diffuseAlbedo * ( 1.0 - singleScattering - multiScattering );\n\n\t#else\n\n\t\tvec3 diffuse = irradiance * BRDF_Lambert( material.diffuseContribution ) * ( 1.0 - singleScattering - multiScattering );\n\n\t#endif\n\n\t#ifdef USE_SHEEN\n\n\t\tfloat sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n\n\t\tsheenSpecularIndirect += irradiance * material.sheenColor * sheenAlbedo * RECIPROCAL_PI;\n\n\t\tfloat sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;\n\n\t\tdiffuse *= sheenEnergyComp;\n\n\t#endif\n\n\treflectedLight.indirectDiffuse += diffuse;\n\n}\n\nvoid RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradiance, const in vec3 clearcoatRadiance, const in vec3 geometryPosition, const in vec3 geometryNormal, const in vec3 geometryViewDir, const in vec3 geometryClearcoatNormal, const in PhysicalMaterial material, inout ReflectedLight reflectedLight) {\n\n\t#ifdef USE_CLEARCOAT\n\n\t\tclearcoatSpecularIndirect += clearcoatRadiance * EnvironmentBRDF( geometryClearcoatNormal, geometryViewDir, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );\n\n\t#endif\n\n\t#ifdef USE_SHEEN\n\n\t\tsheenSpecularIndirect += irradiance * material.sheenColor * IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness ) * RECIPROCAL_PI;\n\n \t#endif\n\n\t// Both indirect specular and indirect diffuse light accumulate here\n\t// Compute multiscattering separately for dielectric and metallic, then mix\n\n\tvec3 singleScatteringDielectric = vec3( 0.0 );\n\tvec3 multiScatteringDielectric = vec3( 0.0 );\n\n\tvec3 singleScatteringMetallic = vec3( 0.0 );\n\tvec3 multiScatteringMetallic = vec3( 0.0 );\n\n\t#ifdef USE_IRIDESCENCE\n\n\t\tcomputeMultiscatteringIridescence( material.dfg, material.specularColor, material.specularF90, material.iridescence, material.iridescenceF0Dielectric, singleScatteringDielectric, multiScatteringDielectric );\n\t\tcomputeMultiscatteringIridescence( material.dfg, material.diffuseColor, material.specularF90, material.iridescence, material.iridescenceF0Metallic, singleScatteringMetallic, multiScatteringMetallic );\n\n\t#else\n\n\t\tcomputeMultiscattering( material.dfg, material.specularColor, material.specularF90, singleScatteringDielectric, multiScatteringDielectric );\n\t\tcomputeMultiscattering( material.dfg, material.diffuseColor, material.specularF90, singleScatteringMetallic, multiScatteringMetallic );\n\n\t#endif\n\n\t// Mix based on metalness\n\tvec3 singleScattering = mix( singleScatteringDielectric, singleScatteringMetallic, material.metalness );\n\tvec3 multiScattering = mix( multiScatteringDielectric, multiScatteringMetallic, material.metalness );\n\n\t// Diffuse energy conservation uses dielectric path\n\tvec3 totalScatteringDielectric = singleScatteringDielectric + multiScatteringDielectric;\n\t#ifdef USE_DIFFUSE_ROUGHNESS\n\n\t\tfloat dotNV = saturate( dot( geometryNormal, geometryViewDir ) );\n\t\tvec3 diffuse = EON_DirectionalAlbedo( material.diffuseColor, material.diffuseRoughness, dotNV ) * ( 1.0 - material.metalness ) * ( 1.0 - totalScatteringDielectric );\n\n\t#else\n\n\t\tvec3 diffuse = material.diffuseContribution * ( 1.0 - totalScatteringDielectric );\n\n\t#endif\n\n\tvec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;\n\n\tvec3 indirectSpecular = radiance * singleScattering;\n\tindirectSpecular += multiScattering * cosineWeightedIrradiance;\n\n\tvec3 indirectDiffuse = diffuse * cosineWeightedIrradiance;\n\n\t#ifdef USE_SHEEN\n\n\t\tfloat sheenAlbedo = IBLSheenBRDF( geometryNormal, geometryViewDir, material.sheenRoughness );\n\n\t\tfloat sheenEnergyComp = 1.0 - max3( material.sheenColor ) * sheenAlbedo;\n\n\t\tindirectSpecular *= sheenEnergyComp;\n\t\tindirectDiffuse *= sheenEnergyComp;\n\n\t#endif\n\n\treflectedLight.indirectSpecular += indirectSpecular;\n\treflectedLight.indirectDiffuse += indirectDiffuse;\n\n}\n\n#define RE_Direct\t\t\t\tRE_Direct_Physical\n#define RE_Direct_RectArea\t\tRE_Direct_RectArea_Physical\n#define RE_IndirectDiffuse\t\tRE_IndirectDiffuse_Physical\n#define RE_IndirectSpecular\t\tRE_IndirectSpecular_Physical\n\n// ref: https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf\nfloat computeSpecularOcclusion( const in float dotNV, const in float ambientOcclusion, const in float roughness ) {\n\n\treturn saturate( pow( dotNV + ambientOcclusion, exp2( - 16.0 * roughness - 1.0 ) ) - 1.0 + ambientOcclusion );\n\n}\n' +
     "\n" +
     "\n#ifdef USE_TRANSMISSION\n\n\t// Transmission code is based on glTF-Sampler-Viewer\n\t// https://github.com/KhronosGroup/glTF-Sample-Viewer\n\n\tuniform float transmission;\n\tuniform float thickness;\n\tuniform float attenuationDistance;\n\tuniform vec3 attenuationColor;\n\n\t#ifdef USE_TRANSMISSIONMAP\n\n\t\tuniform sampler2D transmissionMap;\n\n\t#endif\n\n\t#ifdef USE_THICKNESSMAP\n\n\t\tuniform sampler2D thicknessMap;\n\n\t#endif\n\n\tuniform vec2 transmissionSamplerSize;\n\tuniform sampler2D transmissionSamplerMap;\n\n\tuniform mat4 modelMatrix;\n\tuniform mat4 projectionMatrix;\n\n\tvarying vec3 vWorldPosition;\n\n\t// Mipped Bicubic Texture Filtering by N8\n\t// https://www.shadertoy.com/view/Dl2SDW\n\n\tfloat w0( float a ) {\n\n\t\treturn ( 1.0 / 6.0 ) * ( a * ( a * ( - a + 3.0 ) - 3.0 ) + 1.0 );\n\n\t}\n\n\tfloat w1( float a ) {\n\n\t\treturn ( 1.0 / 6.0 ) * ( a *  a * ( 3.0 * a - 6.0 ) + 4.0 );\n\n\t}\n\n\tfloat w2( float a ){\n\n\t\treturn ( 1.0 / 6.0 ) * ( a * ( a * ( - 3.0 * a + 3.0 ) + 3.0 ) + 1.0 );\n\n\t}\n\n\tfloat w3( float a ) {\n\n\t\treturn ( 1.0 / 6.0 ) * ( a * a * a );\n\n\t}\n\n\t// g0 and g1 are the two amplitude functions\n\tfloat g0( float a ) {\n\n\t\treturn w0( a ) + w1( a );\n\n\t}\n\n\tfloat g1( float a ) {\n\n\t\treturn w2( a ) + w3( a );\n\n\t}\n\n\t// h0 and h1 are the two offset functions\n\tfloat h0( float a ) {\n\n\t\treturn - 1.0 + w1( a ) / ( w0( a ) + w1( a ) );\n\n\t}\n\n\tfloat h1( float a ) {\n\n\t\treturn 1.0 + w3( a ) / ( w2( a ) + w3( a ) );\n\n\t}\n\n\tvec4 bicubic( sampler2D tex, vec2 uv, vec4 texelSize, float lod ) {\n\n\t\tuv = uv * texelSize.zw + 0.5;\n\n\t\tvec2 iuv = floor( uv );\n\t\tvec2 fuv = fract( uv );\n\n\t\tfloat g0x = g0( fuv.x );\n\t\tfloat g1x = g1( fuv.x );\n\t\tfloat h0x = h0( fuv.x );\n\t\tfloat h1x = h1( fuv.x );\n\t\tfloat h0y = h0( fuv.y );\n\t\tfloat h1y = h1( fuv.y );\n\n\t\tvec2 p0 = ( vec2( iuv.x + h0x, iuv.y + h0y ) - 0.5 ) * texelSize.xy;\n\t\tvec2 p1 = ( vec2( iuv.x + h1x, iuv.y + h0y ) - 0.5 ) * texelSize.xy;\n\t\tvec2 p2 = ( vec2( iuv.x + h0x, iuv.y + h1y ) - 0.5 ) * texelSize.xy;\n\t\tvec2 p3 = ( vec2( iuv.x + h1x, iuv.y + h1y ) - 0.5 ) * texelSize.xy;\n\n\t\treturn g0( fuv.y ) * ( g0x * textureLod( tex, p0, lod ) + g1x * textureLod( tex, p1, lod ) ) +\n\t\t\tg1( fuv.y ) * ( g0x * textureLod( tex, p2, lod ) + g1x * textureLod( tex, p3, lod ) );\n\n\t}\n\n\tvec4 textureBicubic( sampler2D sampler, vec2 uv, float lod ) {\n\n\t\tvec2 fLodSize = vec2( textureSize( sampler, int( lod ) ) );\n\t\tvec2 cLodSize = vec2( textureSize( sampler, int( lod + 1.0 ) ) );\n\t\tvec2 fLodSizeInv = 1.0 / fLodSize;\n\t\tvec2 cLodSizeInv = 1.0 / cLodSize;\n\t\tvec4 fSample = bicubic( sampler, uv, vec4( fLodSizeInv, fLodSize ), floor( lod ) );\n\t\tvec4 cSample = bicubic( sampler, uv, vec4( cLodSizeInv, cLodSize ), ceil( lod ) );\n\t\treturn mix( fSample, cSample, fract( lod ) );\n\n\t}\n\n\tvec3 getVolumeTransmissionRay( const in vec3 n, const in vec3 v, const in float thickness, const in float ior, const in mat4 modelMatrix ) {\n\n\t\t// Direction of refracted light.\n\t\tvec3 refractionVector = refract( - v, normalize( n ), 1.0 / ior );\n\n\t\t// Compute rotation-independent scaling of the model matrix.\n\t\tvec3 modelScale;\n\t\tmodelScale.x = length( vec3( modelMatrix[ 0 ].xyz ) );\n\t\tmodelScale.y = length( vec3( modelMatrix[ 1 ].xyz ) );\n\t\tmodelScale.z = length( vec3( modelMatrix[ 2 ].xyz ) );\n\n\t\t// The thickness is specified in local space.\n\t\treturn normalize( refractionVector ) * thickness * modelScale;\n\n\t}\n\n\tfloat applyIorToRoughness( const in float roughness, const in float ior ) {\n\n\t\t// Scale roughness with IOR so that an IOR of 1.0 results in no microfacet refraction and\n\t\t// an IOR of 1.5 results in the default amount of microfacet refraction.\n\t\treturn roughness * clamp( ior * 2.0 - 2.0, 0.0, 1.0 );\n\n\t}\n\n\tvec4 getTransmissionSample( const in vec2 fragCoord, const in float roughness, const in float ior ) {\n\n\t\tfloat lod = log2( transmissionSamplerSize.x ) * applyIorToRoughness( roughness, ior );\n\t\treturn textureBicubic( transmissionSamplerMap, fragCoord.xy, lod );\n\n\t}\n\n\tvec3 volumeAttenuation( const in float transmissionDistance, const in vec3 attenuationColor, const in float attenuationDistance ) {\n\n\t\tif ( isinf( attenuationDistance ) ) {\n\n\t\t\t// Attenuation distance is +∞, i.e. the transmitted color is not attenuated at all.\n\t\t\treturn vec3( 1.0 );\n\n\t\t} else {\n\n\t\t\t// Compute light attenuation using Beer's law.\n\t\t\tvec3 attenuationCoefficient = -log( attenuationColor ) / attenuationDistance;\n\t\t\tvec3 transmittance = exp( - attenuationCoefficient * transmissionDistance ); // Beer's law\n\t\t\treturn transmittance;\n\n\t\t}\n\n\t}\n\n\tvec4 getIBLVolumeRefraction( const in vec3 n, const in vec3 v, const in float roughness, const in vec3 diffuseColor,\n\t\tconst in vec3 specularColor, const in float specularF90, const in vec3 position, const in mat4 modelMatrix,\n\t\tconst in mat4 viewMatrix, const in mat4 projMatrix, const in float dispersion, const in float ior, const in float thickness,\n\t\tconst in vec3 attenuationColor, const in float attenuationDistance ) {\n\n\t\tvec4 transmittedLight;\n\t\tvec3 transmittance;\n\n\t\t#ifdef USE_DISPERSION\n\n\t\t\tfloat halfSpread = ( ior - 1.0 ) * 0.025 * dispersion;\n\t\t\tvec3 iors = vec3( ior - halfSpread, ior, ior + halfSpread );\n\n\t\t\tfor ( int i = 0; i < 3; i ++ ) {\n\n\t\t\t\tvec3 transmissionRay = getVolumeTransmissionRay( n, v, thickness, iors[ i ], modelMatrix );\n\t\t\t\tvec3 refractedRayExit = position + transmissionRay;\n\n\t\t\t\t// Project refracted vector on the framebuffer, while mapping to normalized device coordinates.\n\t\t\t\tvec4 ndcPos = projMatrix * viewMatrix * vec4( refractedRayExit, 1.0 );\n\t\t\t\tvec2 refractionCoords = ndcPos.xy / ndcPos.w;\n\t\t\t\trefractionCoords += 1.0;\n\t\t\t\trefractionCoords /= 2.0;\n\n\t\t\t\t// Sample framebuffer to get pixel the refracted ray hits.\n\t\t\t\tvec4 transmissionSample = getTransmissionSample( refractionCoords, roughness, iors[ i ] );\n\t\t\t\ttransmittedLight[ i ] = transmissionSample[ i ];\n\t\t\t\ttransmittedLight.a += transmissionSample.a;\n\n\t\t\t\ttransmittance[ i ] = diffuseColor[ i ] * volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance )[ i ];\n\n\t\t\t}\n\n\t\t\ttransmittedLight.a /= 3.0;\n\n\t\t#else\n\n\t\t\tvec3 transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );\n\t\t\tvec3 refractedRayExit = position + transmissionRay;\n\n\t\t\t// Project refracted vector on the framebuffer, while mapping to normalized device coordinates.\n\t\t\tvec4 ndcPos = projMatrix * viewMatrix * vec4( refractedRayExit, 1.0 );\n\t\t\tvec2 refractionCoords = ndcPos.xy / ndcPos.w;\n\t\t\trefractionCoords += 1.0;\n\t\t\trefractionCoords /= 2.0;\n\n\t\t\t// Sample framebuffer to get pixel the refracted ray hits.\n\t\t\ttransmittedLight = getTransmissionSample( refractionCoords, roughness, ior );\n\t\t\ttransmittance = diffuseColor * volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance );\n\n\t\t#endif\n\n\t\tvec3 attenuatedColor = transmittance * transmittedLight.rgb;\n\n\t\t// Get the specular component.\n\t\tvec3 F = EnvironmentBRDF( n, v, specularColor, specularF90, roughness );\n\n\t\t// As less light is transmitted, the opacity should be increased. This simple approximation does a decent job\n\t\t// of modulating a CSS background, and has no effect when the buffer is opaque, due to a solid object or clear color.\n\t\tfloat transmittanceFactor = ( transmittance.r + transmittance.g + transmittance.b ) / 3.0;\n\n\t\treturn vec4( ( 1.0 - F ) * attenuatedColor, 1.0 - ( 1.0 - transmittedLight.a ) * transmittanceFactor );\n\n\t}\n#endif\n" +
     "\n" +
@@ -192239,6 +192413,13 @@ export const sprite = {
 import type { UniformsGroup } from "../../core/UniformsGroup";
 import type { Texture } from "../../textures/Texture";
 import type { ShaderMaterial } from "../../materials/ShaderMaterial";
+import type { Color } from "../../math/Color";
+import type { Matrix3 } from "../../math/Matrix3";
+import type { Matrix4 } from "../../math/Matrix4";
+import type { Quaternion } from "../../math/Quaternion";
+import type { Vector2 } from "../../math/Vector2";
+import type { Vector3 } from "../../math/Vector3";
+import type { Vector4 } from "../../math/Vector4";
 import { ColorManagement } from "../../math/ColorManagement";
 import { warn } from "../../utils";
 
@@ -192287,14 +192468,14 @@ export function cloneUniforms<T extends Record<string, object> = Record<string, 
           warn("UniformsUtils: Textures of render targets cannot be cloned via cloneUniforms() or mergeUniforms().");
           target[p] = null;
         } else {
-          target[p] = property.clone();
+          target[p] = cloneUniformValue(property);
         }
       } else if (Array.isArray(property)) {
         if (isThreeObject(property[0])) {
           const values = property as CloneableUniformValue[];
           const clonedProperty: unknown[] = [];
           for (let i = 0, l = values.length; i < l; i++) {
-            clonedProperty[i] = values[i].clone();
+            clonedProperty[i] = cloneUniformValue(values[i]);
           }
           target[p] = clonedProperty;
         } else {
@@ -192324,6 +192505,18 @@ export function mergeUniforms(uniforms: ShaderMaterial["uniforms"][]): ShaderMat
     }
   }
   return merged;
+}
+function cloneUniformValue(value: CloneableUniformValue): unknown {
+  if (value.isColor) return (value as Color).clone();
+  if (value.isMatrix3) return (value as Matrix3).clone();
+  if (value.isMatrix4) return (value as Matrix4).clone();
+  if (value.isVector2) return (value as Vector2).clone();
+  if (value.isVector3) return (value as Vector3).clone();
+  if (value.isVector4) return (value as Vector4).clone();
+  if (value.isQuaternion) return (value as Quaternion).clone();
+  if (value.isTexture) return (value as Texture).clone();
+  // Recognized arrays can also contain custom cloneable values.
+  return value.clone();
 }
 function isThreeObject(property: unknown): property is CloneableUniformValue {
   const value = property as CloneableUniformValue | null | undefined;
@@ -192534,6 +192727,7 @@ export function WebGLAttributes(gl?: any) {
 ## ek3d/renderers/webgl/WebGLBackground
 
 ```typescript
+import type { Camera } from "../../cameras/Camera";
 import type { BufferGeometry } from "../../core/BufferGeometry";
 import type { Material } from "../../materials/Material";
 import type { Object3D } from "../../core/Object3D";
@@ -192591,8 +192785,8 @@ export function WebGLBackground(
 ): WebGLBackgroundSystem {
   const clearColor = new Color(0x000000);
   let clearAlpha = alpha === true ? 0 : 1;
-  let planeMesh: any;
-  let boxMesh: any;
+  let planeMesh: Mesh<ShaderMaterial> | undefined;
+  let boxMesh: Mesh<ShaderMaterial> | undefined;
   let currentBackground: any = null;
   let currentBackgroundVersion = 0;
   let currentTonemapping: any = null;
@@ -192641,7 +192835,7 @@ export function WebGLBackground(
         );
         boxMesh.geometry.deleteAttribute("normal");
         boxMesh.geometry.deleteAttribute("uv");
-        boxMesh.onBeforeRender = function (this: any, renderer?: any, scene?: any, camera?: any) {
+        boxMesh.onBeforeRender = function (this: Mesh, _renderer: WebGLRenderer, _scene: Object3D, camera: Camera) {
           this.matrixWorld.copyPosition(camera.matrixWorld);
         };
         // add "envMap" material property so the renderer can evaluate it like for built-in materials
@@ -192656,11 +192850,10 @@ export function WebGLBackground(
       boxMesh.material.uniforms.backgroundBlurriness.value = (scene as any).backgroundBlurriness;
       boxMesh.material.uniforms.backgroundIntensity.value = (scene as any).backgroundIntensity;
       // note: since the matrix is orthonormal, we can use the more-efficient transpose() in lieu of invert()
-      boxMesh.material.uniforms.backgroundRotation.value
-        .setFromMatrix4(_m1.makeRotationFromEuler((scene as any).backgroundRotation))
-        .transpose();
+      const backgroundRotation = boxMesh.material.uniforms.backgroundRotation.value as Matrix3;
+      backgroundRotation.setFromMatrix4(_m1.makeRotationFromEuler((scene as any).backgroundRotation)).transpose();
       if (background.isRenderTargetTexture === false) {
-        boxMesh.material.uniforms.backgroundRotation.value.premultiply(_m);
+        backgroundRotation.premultiply(_m);
       }
       boxMesh.material.toneMapped = ColorManagement.getTransfer(background.colorSpace) !== Transfer.SRGB;
       if (
@@ -192707,7 +192900,7 @@ export function WebGLBackground(
       if (background.matrixAutoUpdate === true) {
         background.updateMatrix();
       }
-      planeMesh.material.uniforms.uvTransform.value.copy(background.matrix);
+      (planeMesh.material.uniforms.uvTransform.value as Matrix3).copy(background.matrix);
       if (
         currentBackground !== background ||
         currentBackgroundVersion !== background.version ||
@@ -193356,7 +193549,7 @@ export function WebGLClearBackground(renderer?: any, state?: any, alpha?: any, p
       renderer.clear(renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil);
     }
   }
-  function setClear(color?: any, alpha?: any) {
+  function setClear(color: Color, alpha: number) {
     color.getRGB(_rgb, getUnlitUniformColorSpace(renderer));
     state.buffers.color.setClear(_rgb.r, _rgb.g, _rgb.b, alpha, premultipliedAlpha);
   }
@@ -193965,20 +194158,69 @@ export function WebGLInfo(): WebGLInfoState {
 ## ek3d/renderers/webgl/WebGLLights
 
 ```typescript
+import type { SunLightShadow } from "../../addons/lights/SunLightShadow";
+import type { Light } from "../../lights/Light";
+import type { SpotLightShadow } from "../../lights/SpotLightShadow";
+import type { Vector4 } from "../../math/Vector4";
+import type { Texture } from "../../textures/Texture";
 import type { LTCTextures } from "../shaders/LTCTextures";
 import { Color } from "../../math/Color";
 import { Matrix4 } from "../../math/Matrix4";
 import { Vector2 } from "../../math/Vector2";
 import { Vector3 } from "../../math/Vector3";
 import { PixelFormat } from "../../constants";
+
+interface DirectionalUniforms {
+  direction: Vector3;
+  color: Color;
+}
+
+interface PointUniforms {
+  position: Vector3;
+  color: Color;
+  distance: number;
+  decay: number;
+}
+
+interface SpotUniforms extends PointUniforms {
+  direction: Vector3;
+  coneCos: number;
+  penumbraCos: number;
+}
+
+interface HemisphereUniforms {
+  direction: Vector3;
+  skyColor: Color;
+  groundColor: Color;
+}
+
+interface RectAreaUniforms {
+  color: Color;
+  position: Vector3;
+  halfWidth: Vector3;
+  halfHeight: Vector3;
+}
+
+type LightUniforms = DirectionalUniforms | PointUniforms | SpotUniforms | HemisphereUniforms | RectAreaUniforms;
+
+interface ShadowUniforms {
+  shadowIntensity: number;
+  shadowBias: number;
+  shadowNormalBias: number;
+  shadowRadius: number;
+  shadowMapSize: Vector2;
+  shadowCameraNear?: number;
+  shadowCameraFar?: number;
+}
+
 function UniformsCache() {
-  const lights: any = {};
+  const lights: Record<number, LightUniforms | undefined> = {};
   return {
-    get: function (light?: any) {
-      if ((lights as any)[light.id] !== undefined) {
-        return (lights as any)[light.id];
+    get: function (light: Light) {
+      if (lights[light.id] !== undefined) {
+        return lights[light.id];
       }
-      let uniforms: any;
+      let uniforms: LightUniforms | undefined;
       switch (light.type) {
         case "SunLight":
         case "DirectionalLight":
@@ -194022,19 +194264,19 @@ function UniformsCache() {
           };
           break;
       }
-      (lights as any)[light.id] = uniforms;
+      lights[light.id] = uniforms;
       return uniforms;
     },
   };
 }
 function ShadowUniformsCache() {
-  const lights: any = {};
+  const lights: Record<number, ShadowUniforms | undefined> = {};
   return {
-    get: function (light?: any) {
-      if ((lights as any)[light.id] !== undefined) {
-        return (lights as any)[light.id];
+    get: function (light: Light) {
+      if (lights[light.id] !== undefined) {
+        return lights[light.id];
       }
-      let uniforms: any;
+      let uniforms: ShadowUniforms | undefined;
       switch (light.type) {
         case "SunLight":
         case "DirectionalLight":
@@ -194068,7 +194310,7 @@ function ShadowUniformsCache() {
           break;
         // TODO (abelnation): set RectAreaLight shadow uniforms
       }
-      (lights as any)[light.id] = uniforms;
+      lights[light.id] = uniforms;
       return uniforms;
     },
   };
@@ -194078,9 +194320,9 @@ function shadowCastingAndTexturingLightsFirst(lightA?: any, lightB?: any) {
   return (lightB.castShadow ? 2 : 0) - (lightA.castShadow ? 2 : 0) + (lightB.map ? 1 : 0) - (lightA.map ? 1 : 0);
 }
 export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = null) {
-  const cache = new (UniformsCache as any)();
+  const cache = UniformsCache();
   const shadowCache = ShadowUniformsCache();
-  const state: any = {
+  const state = {
     version: 0,
     hash: {
       sunLength: -1,
@@ -194097,29 +194339,29 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
       numLightProbes: -1,
     },
     ambient: [0, 0, 0],
-    probe: [],
-    sun: [],
-    sunShadow: [],
-    sunShadowMap: [],
-    sunShadowMatrix: [],
-    sunShadowCascade: [],
-    directional: [],
-    directionalShadow: [],
-    directionalShadowMap: [],
-    directionalShadowMatrix: [],
-    spot: [],
-    spotLightMap: [],
-    spotShadow: [],
-    spotShadowMap: [],
-    spotLightMatrix: [],
-    rectArea: [],
-    rectAreaLTC1: null,
-    rectAreaLTC2: null,
-    point: [],
-    pointShadow: [],
-    pointShadowMap: [],
-    pointShadowMatrix: [],
-    hemi: [],
+    probe: [] as Vector3[],
+    sun: [] as DirectionalUniforms[],
+    sunShadow: [] as ShadowUniforms[],
+    sunShadowMap: [] as (Texture | null)[],
+    sunShadowMatrix: [] as Matrix4[],
+    sunShadowCascade: [] as Vector4[],
+    directional: [] as DirectionalUniforms[],
+    directionalShadow: [] as ShadowUniforms[],
+    directionalShadowMap: [] as (Texture | null)[],
+    directionalShadowMatrix: [] as Matrix4[],
+    spot: [] as SpotUniforms[],
+    spotLightMap: [] as Texture[],
+    spotShadow: [] as ShadowUniforms[],
+    spotShadowMap: [] as (Texture | null)[],
+    spotLightMatrix: [] as Matrix4[],
+    rectArea: [] as RectAreaUniforms[],
+    rectAreaLTC1: null as Texture | null,
+    rectAreaLTC2: null as Texture | null,
+    point: [] as PointUniforms[],
+    pointShadow: [] as ShadowUniforms[],
+    pointShadowMap: [] as (Texture | null)[],
+    pointShadowMatrix: [] as Matrix4[],
+    hemi: [] as HemisphereUniforms[],
     numSpotLightShadowsWithMaps: 0,
     numLightProbes: 0,
   };
@@ -194153,7 +194395,7 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
       const color = light.color;
       const intensity = light.intensity;
       const distance = light.distance;
-      let shadowMap: any = null;
+      let shadowMap: Texture | null = null;
       if (light.shadow && light.shadow.map) {
         if (light.shadow.map.texture.format === PixelFormat.RG) {
           // VSM uses color texture with blurred mean/std_dev
@@ -194173,11 +194415,11 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
         }
         numLightProbes++;
       } else if (light.isSunLight) {
-        const uniforms = cache.get(light);
+        const uniforms = cache.get(light) as DirectionalUniforms;
         uniforms.color.copy(light.color).multiplyScalar(light.intensity);
         if (light.castShadow) {
-          const shadow = light.shadow;
-          const shadowUniforms = shadowCache.get(light);
+          const shadow = light.shadow as SunLightShadow;
+          const shadowUniforms = shadowCache.get(light)!;
           shadowUniforms.shadowIntensity = shadow.intensity;
           shadowUniforms.shadowBias = shadow.bias;
           shadowUniforms.shadowNormalBias = shadow.normalBias;
@@ -194196,11 +194438,11 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
         state.sun[sunLength] = uniforms;
         sunLength++;
       } else if (light.isDirectionalLight) {
-        const uniforms = cache.get(light);
+        const uniforms = cache.get(light) as DirectionalUniforms;
         uniforms.color.copy(light.color).multiplyScalar(light.intensity);
         if (light.castShadow) {
           const shadow = light.shadow;
-          const shadowUniforms = shadowCache.get(light);
+          const shadowUniforms = shadowCache.get(light)!;
           shadowUniforms.shadowIntensity = shadow.intensity;
           shadowUniforms.shadowBias = shadow.bias;
           shadowUniforms.shadowNormalBias = shadow.normalBias;
@@ -194214,7 +194456,7 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
         state.directional[directionalLength] = uniforms;
         directionalLength++;
       } else if (light.isSpotLight) {
-        const uniforms = cache.get(light);
+        const uniforms = cache.get(light) as SpotUniforms;
         uniforms.position.setFromMatrixPosition(light.matrixWorld);
         uniforms.color.copy(color).multiplyScalar(intensity);
         uniforms.distance = distance;
@@ -194222,7 +194464,7 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
         uniforms.penumbraCos = Math.cos(light.angle * (1 - light.penumbra));
         uniforms.decay = light.decay;
         state.spot[spotLength] = uniforms;
-        const shadow = light.shadow;
+        const shadow = light.shadow as SpotLightShadow;
         if (light.map) {
           state.spotLightMap[numSpotMaps] = light.map;
           numSpotMaps++;
@@ -194233,7 +194475,7 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
         }
         state.spotLightMatrix[spotLength] = shadow.matrix;
         if (light.castShadow) {
-          const shadowUniforms = shadowCache.get(light);
+          const shadowUniforms = shadowCache.get(light)!;
           shadowUniforms.shadowIntensity = shadow.intensity;
           shadowUniforms.shadowBias = shadow.bias;
           shadowUniforms.shadowNormalBias = shadow.normalBias;
@@ -194245,20 +194487,20 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
         }
         spotLength++;
       } else if (light.isRectAreaLight) {
-        const uniforms = cache.get(light);
+        const uniforms = cache.get(light) as RectAreaUniforms;
         uniforms.color.copy(color).multiplyScalar(intensity);
         uniforms.halfWidth.set(light.width * 0.5, 0.0, 0.0);
         uniforms.halfHeight.set(0.0, light.height * 0.5, 0.0);
         state.rectArea[rectAreaLength] = uniforms;
         rectAreaLength++;
       } else if (light.isPointLight) {
-        const uniforms = cache.get(light);
+        const uniforms = cache.get(light) as PointUniforms;
         uniforms.color.copy(light.color).multiplyScalar(light.intensity);
         uniforms.distance = light.distance;
         uniforms.decay = light.decay;
         if (light.castShadow) {
           const shadow = light.shadow;
-          const shadowUniforms = shadowCache.get(light);
+          const shadowUniforms = shadowCache.get(light)!;
           shadowUniforms.shadowIntensity = shadow.intensity;
           shadowUniforms.shadowBias = shadow.bias;
           shadowUniforms.shadowNormalBias = shadow.normalBias;
@@ -194274,7 +194516,7 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
         state.point[pointLength] = uniforms;
         pointLength++;
       } else if (light.isHemisphereLight) {
-        const uniforms = cache.get(light);
+        const uniforms = cache.get(light) as HemisphereUniforms;
         uniforms.skyColor.copy(light.color).multiplyScalar(intensity);
         uniforms.groundColor.copy(light.groundColor).multiplyScalar(intensity);
         state.hemi[hemiLength] = uniforms;
@@ -194417,31 +194659,69 @@ export function WebGLLights(extensions?: any, ltcTextures: LTCTextures | null = 
 ## ek3d/renderers/webgl/WebGLMaterials
 
 ```typescript
+import type { PointLight } from "../../lights/PointLight";
+import type { Euler } from "../../math/Euler";
+import type { Color } from "../../math/Color";
+import type { Vector2 } from "../../math/Vector2";
+import type { Vector3 } from "../../math/Vector3";
+import type { Fog } from "../../scenes/Fog";
+import type { FogExp2 } from "../../scenes/FogExp2";
+import type { Texture } from "../../textures/Texture";
+import type { WebGLRenderer } from "../WebGLRenderer";
 import { Side } from "../../constants";
 import { getUnlitUniformColorSpace } from "../shaders/UniformsUtils";
 import { Matrix3 } from "../../math/Matrix3";
 import { Matrix4 } from "../../math/Matrix4";
+
+type MaterialUniforms = Record<string, { value: unknown }> & {
+  [
+    name in
+      | "color"
+      | "diffuse"
+      | "emissive"
+      | "fogColor"
+      | "specular"
+      | "sheenColor"
+      | "attenuationColor"
+      | "specularColor"
+  ]?: { value: Color };
+} & {
+  [name in "normalScale" | "clearcoatNormalScale" | "transmissionSamplerSize" | "anisotropyVector"]?: {
+    value: Vector2;
+  };
+} & {
+  envMapRotation?: { value: Matrix3 };
+  referencePosition?: { value: Vector3 };
+  bumpScale?: { value: number };
+};
+
+interface MaterialProperties {
+  envMap?: (Texture & { isCubeTexture?: boolean }) | null;
+  envMapRotation?: Euler;
+  light?: PointLight;
+}
+
 const _m1 = /*@__PURE__*/ new Matrix4();
 const _m = /*@__PURE__*/ new Matrix3();
 _m.set(-1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-export function WebGLMaterials(renderer?: any, properties?: any) {
-  function refreshTransformUniform(map?: any, uniform?: any) {
+export function WebGLMaterials(renderer: WebGLRenderer, properties: { get(material: object): MaterialProperties }) {
+  function refreshTransformUniform(map: Texture, uniform: { value: unknown }) {
     if (map.matrixAutoUpdate === true) {
       map.updateMatrix();
     }
-    uniform.value.copy(map.matrix);
+    (uniform.value as Matrix3).copy(map.matrix);
   }
-  function refreshFogUniforms(uniforms?: any, fog?: any) {
-    fog.color.getRGB(uniforms.fogColor.value, getUnlitUniformColorSpace(renderer));
-    if (fog.isFog) {
-      uniforms.fogNear.value = fog.near;
-      uniforms.fogFar.value = fog.far;
-    } else if (fog.isFogExp2) {
-      uniforms.fogDensity.value = fog.density;
+  function refreshFogUniforms(uniforms: MaterialUniforms, fog: Fog | FogExp2) {
+    fog.color.getRGB(uniforms.fogColor!.value, getUnlitUniformColorSpace(renderer));
+    if ((fog as Fog).isFog) {
+      uniforms.fogNear.value = (fog as Fog).near;
+      uniforms.fogFar.value = (fog as Fog).far;
+    } else if ((fog as FogExp2).isFogExp2) {
+      uniforms.fogDensity.value = (fog as FogExp2).density;
     }
   }
   function refreshMaterialUniforms(
-    uniforms?: any,
+    uniforms: MaterialUniforms,
     material?: any,
     pixelRatio?: any,
     height?: any,
@@ -194489,19 +194769,19 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
     } else if (material.isSpriteMaterial) {
       refreshUniformsSprites(uniforms, material);
     } else if (material.isShadowMaterial) {
-      uniforms.color.value.copy(material.color);
+      uniforms.color!.value.copy(material.color);
       uniforms.opacity.value = material.opacity;
     } else if (material.isShaderMaterial) {
       material.uniformsNeedUpdate = false; // #15581
     }
   }
-  function refreshUniformsCommon(uniforms?: any, material?: any) {
+  function refreshUniformsCommon(uniforms: MaterialUniforms, material?: any) {
     uniforms.opacity.value = material.opacity;
     if (material.color) {
-      uniforms.diffuse.value.copy(material.color);
+      uniforms.diffuse!.value.copy(material.color);
     }
     if (material.emissive) {
-      uniforms.emissive.value.copy(material.emissive).multiplyScalar(material.emissiveIntensity);
+      uniforms.emissive!.value.copy(material.emissive).multiplyScalar(material.emissiveIntensity);
     }
     if (material.map) {
       uniforms.map.value = material.map;
@@ -194514,17 +194794,17 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
     if (material.bumpMap) {
       uniforms.bumpMap.value = material.bumpMap;
       refreshTransformUniform(material.bumpMap, uniforms.bumpMapTransform);
-      uniforms.bumpScale.value = material.bumpScale;
+      uniforms.bumpScale!.value = material.bumpScale;
       if (material.side === Side.Back) {
-        uniforms.bumpScale.value *= -1;
+        uniforms.bumpScale!.value *= -1;
       }
     }
     if (material.normalMap) {
       uniforms.normalMap.value = material.normalMap;
       refreshTransformUniform(material.normalMap, uniforms.normalMapTransform);
-      uniforms.normalScale.value.copy(material.normalScale);
+      uniforms.normalScale!.value.copy(material.normalScale);
       if (material.side === Side.Back) {
-        uniforms.normalScale.value.negate();
+        uniforms.normalScale!.value.negate();
       }
     }
     if (material.displacementMap) {
@@ -194550,9 +194830,9 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
     if (envMap) {
       uniforms.envMap.value = envMap;
       // note: since the matrix is orthonormal, we can use the more-efficient transpose() in lieu of invert()
-      uniforms.envMapRotation.value.setFromMatrix4(_m1.makeRotationFromEuler(envMapRotation)).transpose();
+      uniforms.envMapRotation!.value.setFromMatrix4(_m1.makeRotationFromEuler(envMapRotation!)).transpose();
       if (envMap.isCubeTexture && envMap.isRenderTargetTexture === false) {
-        uniforms.envMapRotation.value.premultiply(_m);
+        uniforms.envMapRotation!.value.premultiply(_m);
       }
       uniforms.reflectivity.value = material.reflectivity;
       uniforms.ior.value = material.ior;
@@ -194569,21 +194849,21 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
       refreshTransformUniform(material.aoMap, uniforms.aoMapTransform);
     }
   }
-  function refreshUniformsLine(uniforms?: any, material?: any) {
-    uniforms.diffuse.value.copy(material.color);
+  function refreshUniformsLine(uniforms: MaterialUniforms, material?: any) {
+    uniforms.diffuse!.value.copy(material.color);
     uniforms.opacity.value = material.opacity;
     if (material.map) {
       uniforms.map.value = material.map;
       refreshTransformUniform(material.map, uniforms.mapTransform);
     }
   }
-  function refreshUniformsDash(uniforms?: any, material?: any) {
+  function refreshUniformsDash(uniforms: MaterialUniforms, material?: any) {
     uniforms.dashSize.value = material.dashSize;
     uniforms.totalSize.value = material.dashSize + material.gapSize;
     uniforms.scale.value = material.scale;
   }
-  function refreshUniformsPoints(uniforms?: any, material?: any, pixelRatio?: any, height?: any) {
-    uniforms.diffuse.value.copy(material.color);
+  function refreshUniformsPoints(uniforms: MaterialUniforms, material?: any, pixelRatio?: any, height?: any) {
+    uniforms.diffuse!.value.copy(material.color);
     uniforms.opacity.value = material.opacity;
     uniforms.size.value = material.size * pixelRatio;
     uniforms.scale.value = height * 0.5;
@@ -194599,8 +194879,8 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
       uniforms.alphaTest.value = material.alphaTest;
     }
   }
-  function refreshUniformsSprites(uniforms?: any, material?: any) {
-    uniforms.diffuse.value.copy(material.color);
+  function refreshUniformsSprites(uniforms: MaterialUniforms, material?: any) {
+    uniforms.diffuse!.value.copy(material.color);
     uniforms.opacity.value = material.opacity;
     uniforms.rotation.value = material.rotation;
     if (material.map) {
@@ -194615,16 +194895,16 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
       uniforms.alphaTest.value = material.alphaTest;
     }
   }
-  function refreshUniformsPhong(uniforms?: any, material?: any) {
-    uniforms.specular.value.copy(material.specular);
+  function refreshUniformsPhong(uniforms: MaterialUniforms, material?: any) {
+    uniforms.specular!.value.copy(material.specular);
     uniforms.shininess.value = Math.max(material.shininess, 1e-4); // to prevent pow( 0.0, 0.0 )
   }
-  function refreshUniformsToon(uniforms?: any, material?: any) {
+  function refreshUniformsToon(uniforms: MaterialUniforms, material?: any) {
     if (material.gradientMap) {
       uniforms.gradientMap.value = material.gradientMap;
     }
   }
-  function refreshUniformsStandard(uniforms?: any, material?: any) {
+  function refreshUniformsStandard(uniforms: MaterialUniforms, material?: any) {
     uniforms.metalness.value = material.metalness;
     if (material.metalnessMap) {
       uniforms.metalnessMap.value = material.metalnessMap;
@@ -194640,7 +194920,7 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
       uniforms.envMapIntensity.value = material.envMapIntensity;
     }
   }
-  function refreshUniformsPhysical(uniforms?: any, material?: any, transmissionRenderTarget?: any) {
+  function refreshUniformsPhysical(uniforms: MaterialUniforms, material?: any, transmissionRenderTarget?: any) {
     uniforms.ior.value = material.ior; // also part of uniforms common
     if (material.diffuseRoughness > 0) {
       uniforms.diffuseRoughness.value = material.diffuseRoughness;
@@ -194650,7 +194930,7 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
       }
     }
     if (material.sheen > 0) {
-      uniforms.sheenColor.value.copy(material.sheenColor).multiplyScalar(material.sheen);
+      uniforms.sheenColor!.value.copy(material.sheenColor).multiplyScalar(material.sheen);
       uniforms.sheenRoughness.value = material.sheenRoughness;
       if (material.sheenColorMap) {
         uniforms.sheenColorMap.value = material.sheenColorMap;
@@ -194675,9 +194955,9 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
       if (material.clearcoatNormalMap) {
         uniforms.clearcoatNormalMap.value = material.clearcoatNormalMap;
         refreshTransformUniform(material.clearcoatNormalMap, uniforms.clearcoatNormalMapTransform);
-        uniforms.clearcoatNormalScale.value.copy(material.clearcoatNormalScale);
+        uniforms.clearcoatNormalScale!.value.copy(material.clearcoatNormalScale);
         if (material.side === Side.Back) {
-          uniforms.clearcoatNormalScale.value.negate();
+          uniforms.clearcoatNormalScale!.value.negate();
         }
       }
     }
@@ -194704,7 +194984,7 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
     if (material.transmission > 0) {
       uniforms.transmission.value = material.transmission;
       uniforms.transmissionSamplerMap.value = transmissionRenderTarget.texture;
-      uniforms.transmissionSamplerSize.value.set(transmissionRenderTarget.width, transmissionRenderTarget.height);
+      uniforms.transmissionSamplerSize!.value.set(transmissionRenderTarget.width, transmissionRenderTarget.height);
       if (material.transmissionMap) {
         uniforms.transmissionMap.value = material.transmissionMap;
         refreshTransformUniform(material.transmissionMap, uniforms.transmissionMapTransform);
@@ -194715,10 +194995,10 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
         refreshTransformUniform(material.thicknessMap, uniforms.thicknessMapTransform);
       }
       uniforms.attenuationDistance.value = material.attenuationDistance;
-      uniforms.attenuationColor.value.copy(material.attenuationColor);
+      uniforms.attenuationColor!.value.copy(material.attenuationColor);
     }
     if (material.anisotropy > 0) {
-      uniforms.anisotropyVector.value.set(
+      uniforms.anisotropyVector!.value.set(
         material.anisotropy * Math.cos(material.anisotropyRotation),
         material.anisotropy * Math.sin(material.anisotropyRotation),
       );
@@ -194728,7 +195008,7 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
       }
     }
     uniforms.specularIntensity.value = material.specularIntensity;
-    uniforms.specularColor.value.copy(material.specularColor);
+    uniforms.specularColor!.value.copy(material.specularColor);
     if (material.specularColorMap) {
       uniforms.specularColorMap.value = material.specularColorMap;
       refreshTransformUniform(material.specularColorMap, uniforms.specularColorMapTransform);
@@ -194738,14 +195018,14 @@ export function WebGLMaterials(renderer?: any, properties?: any) {
       refreshTransformUniform(material.specularIntensityMap, uniforms.specularIntensityMapTransform);
     }
   }
-  function refreshUniformsMatcap(uniforms?: any, material?: any) {
+  function refreshUniformsMatcap(uniforms: MaterialUniforms, material?: any) {
     if (material.matcap) {
       uniforms.matcap.value = material.matcap;
     }
   }
-  function refreshUniformsDistance(uniforms?: any, material?: any) {
-    const light = properties.get(material).light;
-    uniforms.referencePosition.value.setFromMatrixPosition(light.matrixWorld);
+  function refreshUniformsDistance(uniforms: MaterialUniforms, material?: any) {
+    const light = properties.get(material).light!;
+    uniforms.referencePosition!.value.setFromMatrixPosition(light.matrixWorld);
     uniforms.nearDistance.value = light.shadow.camera.near;
     uniforms.farDistance.value = light.shadow.camera.far;
   }
@@ -195866,6 +196146,7 @@ export function WebGLProgram(this: any, renderer?: any, cacheKey?: any, paramete
 ## ek3d/renderers/webgl/WebGLPrograms
 
 ```typescript
+import type { WebGLRenderer } from "../WebGLRenderer";
 import type { Texture } from "../../textures/Texture";
 import { getEnvironment } from "./WebGLEnvironmentAccess";
 import { Side, NormalMap, ToneMapping, Blending, Transfer, PixelFormat } from "../../constants";
@@ -195879,7 +196160,7 @@ function isPackedRGFormat(format?: any) {
   return format === PixelFormat.RG || format === PixelFormat.RG11_EAC || format === PixelFormat.RED_GREEN_RGTC2;
 }
 export function WebGLPrograms(
-  renderer?: any,
+  renderer: WebGLRenderer,
   environments?: any,
   extensions?: any,
   capabilities?: any,
@@ -200064,6 +200345,13 @@ export function WebGLTextures(
 ## ek3d/renderers/webgl/WebGLUniforms
 
 ```typescript
+import type { Color } from "../../math/Color";
+import type { Matrix3 } from "../../math/Matrix3";
+import type { Matrix4 } from "../../math/Matrix4";
+import type { Quaternion } from "../../math/Quaternion";
+import type { Vector2 } from "../../math/Vector2";
+import type { Vector3 } from "../../math/Vector3";
+import type { Vector4 } from "../../math/Vector4";
 import { GL } from "../../GL";
 import { CubeTexture } from "../../textures/CubeTexture";
 import { Texture } from "../../textures/Texture";
@@ -200080,16 +200368,28 @@ const empty3dTexture = /*@__PURE__*/ new Data3DTexture();
 const emptyCubeTexture = /*@__PURE__*/ new CubeTexture();
 // --- Utilities ---
 // Array Caches (provide typed arrays for temporary by size)
-const arrayCacheF32: any[] = [];
+const arrayCacheF32: Float32Array[] = [];
 const arrayCacheI32: any[] = [];
 // Float32Array caches used for uploading Matrix uniforms
 const mat4array = new Float32Array(16);
 const mat3array = new Float32Array(9);
 const mat2array = new Float32Array(4);
+
+interface UniformArrayValue {
+  toArray(array: number[], offset: number): unknown;
+  isColor?: boolean;
+  isMatrix3?: boolean;
+  isMatrix4?: boolean;
+  isVector2?: boolean;
+  isVector3?: boolean;
+  isVector4?: boolean;
+  isQuaternion?: boolean;
+}
+
 // Flattening for arrays of vectors and matrices
-function flatten(array?: any, nBlocks?: any, blockSize?: any) {
+function flatten(array: ArrayLike<number> | ArrayLike<UniformArrayValue>, nBlocks: number, blockSize: number) {
   const firstElem = array[0];
-  if (firstElem <= 0 || firstElem > 0) return array;
+  if ((firstElem as number) <= 0 || (firstElem as number) > 0) return array;
   // unoptimized: ! isNaN( firstElem )
   // see http://jacksondunstan.com/articles/983
   const n = nBlocks * blockSize;
@@ -200098,12 +200398,19 @@ function flatten(array?: any, nBlocks?: any, blockSize?: any) {
     r = new Float32Array(n);
     arrayCacheF32[n] = r;
   }
-  if (nBlocks !== 0) {
-    firstElem.toArray(r, 0);
-    for (let i = 1, offset = 0; i !== nBlocks; ++i) {
-      offset += blockSize;
-      array[i].toArray(r, offset);
-    }
+  const values = array as ArrayLike<UniformArrayValue>;
+  // Math serializers support indexed numeric buffers, but some signatures still require number[].
+  const numeric = r as unknown as number[];
+  for (let i = 0, offset = 0; i !== nBlocks; ++i, offset += blockSize) {
+    const value = values[i];
+    if (value.isColor) (value as Color).toArray(numeric, offset);
+    else if (value.isMatrix3) (value as Matrix3).toArray(numeric, offset);
+    else if (value.isMatrix4) (value as Matrix4).toArray(numeric, offset);
+    else if (value.isVector2) (value as Vector2).toArray(numeric, offset);
+    else if (value.isVector3) (value as Vector3).toArray(numeric, offset);
+    else if (value.isVector4) (value as Vector4).toArray(numeric, offset);
+    else if (value.isQuaternion) (value as Quaternion).toArray(numeric, offset);
+    else value.toArray(numeric, offset);
   }
   return r;
 }
@@ -200671,22 +200978,30 @@ class PureArrayUniform {
     // this.path = activeInfo.name; // DEBUG
   }
 }
+function setValueStructured(
+  this: StructuredUniform,
+  gl: WebGL2RenderingContext,
+  value: Record<string | number, unknown>,
+  textures?: unknown,
+) {
+  const seq = this.seq;
+  for (let i = 0, n = seq.length; i !== n; ++i) {
+    const u = seq[i];
+    u.setValue(gl, value[u.id], textures);
+  }
+}
+
 class StructuredUniform {
   id: any;
   seq: any[];
   map: any;
+  setValue: typeof setValueStructured;
 
   constructor(id?: any) {
     this.id = id;
     this.seq = [];
     this.map = {};
-  }
-  setValue(gl: any, value: any, textures?: any) {
-    const seq = this.seq;
-    for (let i = 0, n = seq.length; i !== n; ++i) {
-      const u = seq[i];
-      u.setValue(gl, value[u.id], textures);
-    }
+    this.setValue = setValueStructured;
   }
 }
 // --- Top-level ---
@@ -203907,6 +204222,14 @@ export class VideoTexture extends Texture {
 import { GL } from "./GL";
 import type { Matrix4 } from "./math/Matrix4";
 import { DepthFunc } from "./constants";
+
+const _typeFlagDescriptor: PropertyDescriptor = { value: true };
+
+/** @private Preserve runtime type flags after class extraction without replacing inherited accessors. */
+export function ensureTypeFlag(value: object, flag: string): void {
+  if (!(flag in value)) Object.defineProperty(value, flag, _typeFlagDescriptor);
+}
+
 /**
  * Finds the minimum value in an array.
  *

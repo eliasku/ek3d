@@ -152,8 +152,9 @@ export class Line<TMaterial extends Material | Material[] = Material | Material[
    * @param frustum - The frustum to test.
    * @return Whether this line intersects the given frustum or not.
    */
-  intersectsFrustum(frustum: Frustum | FrustumArray): boolean;
-  intersectsFrustum(frustum?: any): boolean {
+  intersectsFrustum(frustum: Frustum | FrustumArray): boolean {
+    // Keep each receiver concrete for class extraction.
+    if ("planes" in frustum) return frustum.intersectsObject(this);
     return frustum.intersectsObject(this);
   }
   /**

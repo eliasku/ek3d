@@ -30,7 +30,13 @@ export class Euler {
   _y: number;
   _z: number;
   _order: string;
-  static DEFAULT_ORDER: string;
+  /**
+   * The default Euler angle order.
+   *
+   * @static
+   * @default 'XYZ'
+   */
+  static DEFAULT_ORDER: string = "XYZ";
 
   /**
    * Constructs a new euler instance.
@@ -124,7 +130,7 @@ export class Euler {
    * @return A clone of this instance.
    */
   clone(): Euler {
-    return new (this.constructor as any)(this._x, this._y, this._z, this._order);
+    return new Euler(this._x, this._y, this._z, this._order);
   }
   /**
    * Copies the values of the given Euler instance to this instance.
@@ -310,17 +316,4 @@ export class Euler {
     return this;
   }
   _onChangeCallback() {}
-  *[Symbol.iterator]() {
-    yield this._x;
-    yield this._y;
-    yield this._z;
-    yield this._order;
-  }
 }
-/**
- * The default Euler angle order.
- *
- * @static
- * @default 'XYZ'
- */
-Euler.DEFAULT_ORDER = "XYZ";

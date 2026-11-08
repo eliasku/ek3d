@@ -1,3 +1,10 @@
+import type { Color } from "../../math/Color";
+import type { Matrix3 } from "../../math/Matrix3";
+import type { Matrix4 } from "../../math/Matrix4";
+import type { Quaternion } from "../../math/Quaternion";
+import type { Vector2 } from "../../math/Vector2";
+import type { Vector3 } from "../../math/Vector3";
+import type { Vector4 } from "../../math/Vector4";
 import { GL } from "../../GL";
 import { CubeTexture } from "../../textures/CubeTexture";
 import { Texture } from "../../textures/Texture";
@@ -14,16 +21,28 @@ const empty3dTexture = /*@__PURE__*/ new Data3DTexture();
 const emptyCubeTexture = /*@__PURE__*/ new CubeTexture();
 // --- Utilities ---
 // Array Caches (provide typed arrays for temporary by size)
-const arrayCacheF32: any[] = [];
+const arrayCacheF32: Float32Array[] = [];
 const arrayCacheI32: any[] = [];
 // Float32Array caches used for uploading Matrix uniforms
 const mat4array = new Float32Array(16);
 const mat3array = new Float32Array(9);
 const mat2array = new Float32Array(4);
+
+interface UniformArrayValue {
+  toArray(array: number[], offset: number): unknown;
+  isColor?: boolean;
+  isMatrix3?: boolean;
+  isMatrix4?: boolean;
+  isVector2?: boolean;
+  isVector3?: boolean;
+  isVector4?: boolean;
+  isQuaternion?: boolean;
+}
+
 // Flattening for arrays of vectors and matrices
-function flatten(array?: any, nBlocks?: any, blockSize?: any) {
+function flatten(array: ArrayLike<number> | ArrayLike<UniformArrayValue>, nBlocks: number, blockSize: number) {
   const firstElem = array[0];
-  if (firstElem <= 0 || firstElem > 0) return array;
+  if ((firstElem as number) <= 0 || (firstElem as number) > 0) return array;
   // unoptimized: ! isNaN( firstElem )
   // see http://jacksondunstan.com/articles/983
   const n = nBlocks * blockSize;
@@ -32,12 +51,19 @@ function flatten(array?: any, nBlocks?: any, blockSize?: any) {
     r = new Float32Array(n);
     arrayCacheF32[n] = r;
   }
-  if (nBlocks !== 0) {
-    firstElem.toArray(r, 0);
-    for (let i = 1, offset = 0; i !== nBlocks; ++i) {
-      offset += blockSize;
-      array[i].toArray(r, offset);
-    }
+  const values = array as ArrayLike<UniformArrayValue>;
+  // Math serializers support indexed numeric buffers, but some signatures still require number[].
+  const numeric = r as unknown as number[];
+  for (let i = 0, offset = 0; i !== nBlocks; ++i, offset += blockSize) {
+    const value = values[i];
+    if (value.isColor) (value as Color).toArray(numeric, offset);
+    else if (value.isMatrix3) (value as Matrix3).toArray(numeric, offset);
+    else if (value.isMatrix4) (value as Matrix4).toArray(numeric, offset);
+    else if (value.isVector2) (value as Vector2).toArray(numeric, offset);
+    else if (value.isVector3) (value as Vector3).toArray(numeric, offset);
+    else if (value.isVector4) (value as Vector4).toArray(numeric, offset);
+    else if (value.isQuaternion) (value as Quaternion).toArray(numeric, offset);
+    else value.toArray(numeric, offset);
   }
   return r;
 }
@@ -605,22 +631,30 @@ class PureArrayUniform {
     // this.path = activeInfo.name; // DEBUG
   }
 }
+function setValueStructured(
+  this: StructuredUniform,
+  gl: WebGL2RenderingContext,
+  value: Record<string | number, unknown>,
+  textures?: unknown,
+) {
+  const seq = this.seq;
+  for (let i = 0, n = seq.length; i !== n; ++i) {
+    const u = seq[i];
+    u.setValue(gl, value[u.id], textures);
+  }
+}
+
 class StructuredUniform {
   id: any;
   seq: any[];
   map: any;
+  setValue: typeof setValueStructured;
 
   constructor(id?: any) {
     this.id = id;
     this.seq = [];
     this.map = {};
-  }
-  setValue(gl: any, value: any, textures?: any) {
-    const seq = this.seq;
-    for (let i = 0, n = seq.length; i !== n; ++i) {
-      const u = seq[i];
-      u.setValue(gl, value[u.id], textures);
-    }
+    this.setValue = setValueStructured;
   }
 }
 // --- Top-level ---

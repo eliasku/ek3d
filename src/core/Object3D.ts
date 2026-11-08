@@ -93,9 +93,30 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
   scale!: Vector3;
   modelViewMatrix!: Matrix4;
   normalMatrix!: Matrix3;
-  static DEFAULT_UP: Vector3;
-  static DEFAULT_MATRIX_AUTO_UPDATE: boolean;
-  static DEFAULT_MATRIX_WORLD_AUTO_UPDATE: boolean;
+  /**
+   * The default up direction for objects, also used as the default
+   * position for {@link DirectionalLight} and {@link HemisphereLight}.
+   *
+   * @static
+   * @default (0,1,0)
+   */
+  static DEFAULT_UP: Vector3 = /*@__PURE__*/ new Vector3(0, 1, 0);
+  /**
+   * The default setting for {@link Object3D#matrixAutoUpdate} for
+   * newly created 3D objects.
+   *
+   * @static
+   * @default true
+   */
+  static DEFAULT_MATRIX_AUTO_UPDATE: boolean = true;
+  /**
+   * The default setting for {@link Object3D#matrixWorldAutoUpdate} for
+   * newly created 3D objects.
+   *
+   * @static
+   * @default true
+   */
+  static DEFAULT_MATRIX_WORLD_AUTO_UPDATE: boolean = true;
 
   /**
    * Constructs a new 3D object.
@@ -583,13 +604,12 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    * @param [y] - The y coordinate in world space.
    * @param [z] - The z coordinate in world space.
    */
-  lookAt(x: number | Vector3, y?: number, z?: number): void;
-  lookAt(x?: any, y?: number, z?: number) {
+  lookAt(x: number | Vector3, y?: number, z?: number): void {
     // This method does not support objects having non-uniformly-scaled parent(s)
-    if ((x as any).isVector3) {
-      _target.copy(x);
-    } else {
+    if (typeof x === "number") {
       _target.set(x, y!, z!);
+    } else {
+      _target.copy(x);
     }
     const parent = this.parent;
     this.updateWorldMatrix(true, false);
@@ -599,11 +619,11 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
     } else {
       _m1.lookAt(_target, _position, this.up);
     }
-    (this as any).quaternion.setFromRotationMatrix(_m1);
+    this.quaternion.setFromRotationMatrix(_m1);
     if (parent) {
       _m1.extractRotation(parent.matrixWorld);
       _q1.setFromRotationMatrix(_m1);
-      (this as any).quaternion.premultiply(_q1.invert());
+      this.quaternion.premultiply(_q1.invert());
     }
   }
   /**
@@ -1228,27 +1248,3 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
     this.dispatchEvent({ type: "dispose" });
   }
 }
-/**
- * The default up direction for objects, also used as the default
- * position for {@link DirectionalLight} and {@link HemisphereLight}.
- *
- * @static
- * @default (0,1,0)
- */
-Object3D.DEFAULT_UP = /*@__PURE__*/ new Vector3(0, 1, 0);
-/**
- * The default setting for {@link Object3D#matrixAutoUpdate} for
- * newly created 3D objects.
- *
- * @static
- * @default true
- */
-Object3D.DEFAULT_MATRIX_AUTO_UPDATE = true;
-/**
- * The default setting for {@link Object3D#matrixWorldAutoUpdate} for
- * newly created 3D objects.
- *
- * @static
- * @default true
- */
-Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE = true;

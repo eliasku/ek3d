@@ -65,6 +65,58 @@ import {
 } from "./KTX2Container";
 import { DisplayP3ColorSpace, LinearDisplayP3ColorSpace } from "../math/ColorSpaces";
 
+/* CONSTANTS */
+
+const KTX2Loader_BasisFormat = {
+  ETC1S: 0,
+  UASTC: 1,
+  UASTC_HDR: 2,
+} as const;
+
+// Source: https://github.com/BinomialLLC/basis_universal/blob/master/webgl/texture_test/index.html
+const KTX2Loader_TranscoderFormat = {
+  ETC1: 0,
+  ETC2: 1,
+  BC1: 2,
+  BC3: 3,
+  BC4: 4,
+  BC5: 5,
+  BC7_M6_OPAQUE_ONLY: 6,
+  BC7_M5: 7,
+  PVRTC1_4_RGB: 8,
+  PVRTC1_4_RGBA: 9,
+  ASTC_4x4: 10,
+  ATC_RGB: 11,
+  ATC_RGBA_INTERPOLATED_ALPHA: 12,
+  RGBA32: 13,
+  RGB565: 14,
+  BGR565: 15,
+  RGBA4444: 16,
+  BC6H: 22,
+  RGB_HALF: 24,
+  RGBA_HALF: 25,
+} as const;
+
+const KTX2Loader_EngineFormat = {
+  RGBAFormat: PixelFormat.RGBA,
+  RGBA_ASTC_4x4_Format: PixelFormat.RGBA_ASTC_4x4,
+  RGB_BPTC_UNSIGNED_Format: PixelFormat.RGB_BPTC_UNSIGNED,
+  RGBA_BPTC_Format: PixelFormat.RGBA_BPTC,
+  RGBA_ETC2_EAC_Format: PixelFormat.RGBA_ETC2_EAC,
+  RGBA_PVRTC_4BPPV1_Format: PixelFormat.RGBA_PVRTC_4BPPV1,
+  RGBA_S3TC_DXT5_Format: PixelFormat.RGBA_S3TC_DXT5,
+  RGB_ETC1_Format: PixelFormat.RGB_ETC1,
+  RGB_ETC2_Format: PixelFormat.RGB_ETC2,
+  RGB_PVRTC_4BPPV1_Format: PixelFormat.RGB_PVRTC_4BPPV1,
+  RGBA_S3TC_DXT1_Format: PixelFormat.RGBA_S3TC_DXT1,
+} as const;
+
+const KTX2Loader_EngineType = {
+  UnsignedByteType: TextureType.UnsignedByte,
+  HalfFloatType: TextureType.HalfFloat,
+  FloatType: TextureType.Float,
+} as const;
+
 const WASM_BIN_URL = "/libs/basis/basis_transcoder.wasm";
 const WASM_JS_URL = "/libs/basis/basis_transcoder.js";
 
@@ -132,11 +184,11 @@ export class KTX2Loader extends Loader<
   /** Loader flag for type testing. */
   isKTX2Loader: true;
 
-  static BasisFormat: typeof KTX2Loader_BasisFormat | undefined;
-  static TranscoderFormat: typeof KTX2Loader_TranscoderFormat | undefined;
-  static EngineFormat: typeof KTX2Loader_EngineFormat | undefined;
-  static EngineType: typeof KTX2Loader_EngineType | undefined;
-  static BasisWorker: (() => void) | undefined;
+  static BasisFormat: typeof KTX2Loader_BasisFormat | undefined = KTX2Loader_BasisFormat;
+  static TranscoderFormat: typeof KTX2Loader_TranscoderFormat | undefined = KTX2Loader_TranscoderFormat;
+  static EngineFormat: typeof KTX2Loader_EngineFormat | undefined = KTX2Loader_EngineFormat;
+  static EngineType: typeof KTX2Loader_EngineType | undefined = KTX2Loader_EngineType;
+  static BasisWorker: (() => void) | undefined = KTX2Loader_BasisWorker;
 
   transcoderPath: string;
   transcoderBinary: ArrayBuffer | null;
@@ -526,58 +578,6 @@ export type KTX2LoaderTexture =
   | DataTexture
   | Data3DTexture;
 
-/* CONSTANTS */
-
-const KTX2Loader_BasisFormat = {
-  ETC1S: 0,
-  UASTC: 1,
-  UASTC_HDR: 2,
-} as const;
-
-// Source: https://github.com/BinomialLLC/basis_universal/blob/master/webgl/texture_test/index.html
-const KTX2Loader_TranscoderFormat = {
-  ETC1: 0,
-  ETC2: 1,
-  BC1: 2,
-  BC3: 3,
-  BC4: 4,
-  BC5: 5,
-  BC7_M6_OPAQUE_ONLY: 6,
-  BC7_M5: 7,
-  PVRTC1_4_RGB: 8,
-  PVRTC1_4_RGBA: 9,
-  ASTC_4x4: 10,
-  ATC_RGB: 11,
-  ATC_RGBA_INTERPOLATED_ALPHA: 12,
-  RGBA32: 13,
-  RGB565: 14,
-  BGR565: 15,
-  RGBA4444: 16,
-  BC6H: 22,
-  RGB_HALF: 24,
-  RGBA_HALF: 25,
-} as const;
-
-const KTX2Loader_EngineFormat = {
-  RGBAFormat: PixelFormat.RGBA,
-  RGBA_ASTC_4x4_Format: PixelFormat.RGBA_ASTC_4x4,
-  RGB_BPTC_UNSIGNED_Format: PixelFormat.RGB_BPTC_UNSIGNED,
-  RGBA_BPTC_Format: PixelFormat.RGBA_BPTC,
-  RGBA_ETC2_EAC_Format: PixelFormat.RGBA_ETC2_EAC,
-  RGBA_PVRTC_4BPPV1_Format: PixelFormat.RGBA_PVRTC_4BPPV1,
-  RGBA_S3TC_DXT5_Format: PixelFormat.RGBA_S3TC_DXT5,
-  RGB_ETC1_Format: PixelFormat.RGB_ETC1,
-  RGB_ETC2_Format: PixelFormat.RGB_ETC2,
-  RGB_PVRTC_4BPPV1_Format: PixelFormat.RGB_PVRTC_4BPPV1,
-  RGBA_S3TC_DXT1_Format: PixelFormat.RGBA_S3TC_DXT1,
-} as const;
-
-const KTX2Loader_EngineType = {
-  UnsignedByteType: TextureType.UnsignedByte,
-  HalfFloatType: TextureType.HalfFloat,
-  FloatType: TextureType.Float,
-} as const;
-
 /* WEB WORKER */
 
 /** Basis Universal KTX2File surface used by the transcode worker. */
@@ -624,7 +624,7 @@ declare global {
   function BASIS(module: Record<string, unknown>): void;
 }
 
-const KTX2Loader_BasisWorker = function (): void {
+function KTX2Loader_BasisWorker(): void {
   let config: Record<string, boolean>;
   let transcoderPending: Promise<void> | null;
   let BasisModule: {
@@ -984,7 +984,7 @@ const KTX2Loader_BasisWorker = function (): void {
 
     return result;
   }
-};
+}
 
 // Parsing for non-Basis textures. These textures may have supercompression
 // like Zstd, but they do not require transcoding.
@@ -1265,9 +1265,3 @@ function parseColorSpace(container: KTX2Container): string {
     return ColorSpace.No;
   }
 }
-
-KTX2Loader.BasisFormat = KTX2Loader_BasisFormat;
-KTX2Loader.TranscoderFormat = KTX2Loader_TranscoderFormat;
-KTX2Loader.EngineFormat = KTX2Loader_EngineFormat;
-KTX2Loader.EngineType = KTX2Loader_EngineType;
-KTX2Loader.BasisWorker = KTX2Loader_BasisWorker;

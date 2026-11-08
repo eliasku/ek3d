@@ -230,6 +230,6 @@ export class Line3 {
    * @return A clone of this instance.
    */
   clone(): Line3 {
-    return new (this.constructor as any)().copy(this);
+    return new Line3().copy(this);
   }
 }

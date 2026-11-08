@@ -222,7 +222,14 @@ export class Color {
   r: number;
   g: number;
   b: number;
-  static NAMES: any;
+  /**
+   * A dictionary with X11 color names.
+   *
+   * Note that multiple words such as Dark Orange become the string 'darkorange'.
+   *
+   * @static
+   */
+  static NAMES: any = _colorKeywords;
 
   /**
    * Constructs a new color.
@@ -487,7 +494,7 @@ export class Color {
    * @return A clone of this instance.
    */
   clone(): Color {
-    return new (this.constructor as any)(this.r, this.g, this.b);
+    return new Color(this.r, this.g, this.b);
   }
   /**
    * Copies the values of the given color to this instance.
@@ -903,18 +910,5 @@ export class Color {
   toJSON(): number {
     return this.getHex();
   }
-  *[Symbol.iterator]() {
-    yield this.r;
-    yield this.g;
-    yield this.b;
-  }
 }
 const _color = /*@__PURE__*/ new Color();
-/**
- * A dictionary with X11 color names.
- *
- * Note that multiple words such as Dark Orange become the string 'darkorange'.
- *
- * @static
- */
-Color.NAMES = _colorKeywords;

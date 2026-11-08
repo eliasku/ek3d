@@ -276,7 +276,7 @@ export class Plane {
    * @return A clone of this instance.
    */
   clone(): Plane {
-    return new (this.constructor as any)().copy(this);
+    return new Plane().copy(this);
   }
   /**
    * Returns a serialized structure of the plane.

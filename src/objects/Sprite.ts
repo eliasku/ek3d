@@ -106,8 +106,9 @@ export class Sprite extends Object3D {
    * @param frustum - The frustum to test.
    * @return Whether this sprite intersects the given frustum or not.
    */
-  intersectsFrustum(frustum: Frustum | FrustumArray): boolean;
-  intersectsFrustum(frustum?: any): boolean {
+  intersectsFrustum(frustum: Frustum | FrustumArray): boolean {
+    // Keep each receiver concrete for class extraction.
+    if ("planes" in frustum) return frustum.intersectsSprite(this);
     return frustum.intersectsSprite(this);
   }
   /**

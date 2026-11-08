@@ -226,7 +226,7 @@ export class Quaternion {
    * @return A clone of this instance.
    */
   clone(): Quaternion {
-    return new (this.constructor as any)(this._x, this._y, this._z, this._w);
+    return new Quaternion(this._x, this._y, this._z, this._w);
   }
   /**
    * Copies the values of the given quaternion to this instance.
@@ -695,10 +695,4 @@ export class Quaternion {
     return this;
   }
   _onChangeCallback() {}
-  *[Symbol.iterator]() {
-    yield this._x;
-    yield this._y;
-    yield this._z;
-    yield this._w;
-  }
 }

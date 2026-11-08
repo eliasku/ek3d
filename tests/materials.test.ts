@@ -25,6 +25,7 @@ import { toHalfFloat } from "../src/extras/DataUtils";
 import { LightProbe as UpstreamProbe } from "../upstream/three.js/src/lights/LightProbe.js";
 import { RectAreaLight as UpstreamArea } from "../upstream/three.js/src/lights/RectAreaLight.js";
 import { SphericalHarmonics3 as UpstreamSH } from "../upstream/three.js/src/math/SphericalHarmonics3.js";
+import { Vector3 as UpstreamVector3 } from "../upstream/three.js/src/math/Vector3.js";
 import { MeshPhongMaterial as UpstreamPhong } from "../upstream/three.js/src/materials/MeshPhongMaterial.js";
 import { MeshNormalMaterial as UpstreamNormal } from "../upstream/three.js/src/materials/MeshNormalMaterial.js";
 import { MeshMatcapMaterial as UpstreamMatcap } from "../upstream/three.js/src/materials/MeshMatcapMaterial.js";
@@ -44,7 +45,7 @@ function json(value: unknown): unknown {
 
 test("SH radiance and irradiance preserve all bands, target reuse and directional basis", () => {
   const actual = new SphericalHarmonics3().fromArray(coefficients);
-  const expected = new UpstreamSH().fromArray(coefficients) as unknown as SphericalHarmonics3;
+  const expected = new UpstreamSH().fromArray(coefficients);
   for (const direction of [
     new Vector3(1, 0, 0),
     new Vector3(0, -1, 0),
@@ -53,18 +54,22 @@ test("SH radiance and irradiance preserve all bands, target reuse and directiona
   ]) {
     const basis: number[] = [];
     const reference: number[] = [];
+    const upstreamDirection = new UpstreamVector3(direction.x, direction.y, direction.z);
     SphericalHarmonics3.getBasisAt(direction, basis);
-    UpstreamSH.getBasisAt(direction, reference);
+    UpstreamSH.getBasisAt(upstreamDirection, reference);
     assert.deepEqual(basis, reference);
     const radiance = new Vector3();
     assert.equal(actual.getAt(direction, radiance), radiance);
-    assert.deepEqual(radiance.toArray(), expected.getAt(direction, new Vector3()).toArray());
+    assert.deepEqual(radiance.toArray(), expected.getAt(upstreamDirection, new UpstreamVector3()).toArray());
     const reconstructed = new Vector3();
     actual.coefficients.forEach((coefficient, i) => reconstructed.addScaledVector(coefficient, basis[i]));
     assert.ok(radiance.distanceTo(reconstructed) < 1e-14);
     const irradiance = new Vector3();
     assert.equal(actual.getIrradianceAt(direction, irradiance), irradiance);
-    assert.deepEqual(irradiance.toArray(), expected.getIrradianceAt(direction, new Vector3()).toArray());
+    assert.deepEqual(
+      irradiance.toArray(),
+      expected.getIrradianceAt(upstreamDirection, new UpstreamVector3()).toArray(),
+    );
   }
   actual.zero();
   assert.deepEqual(actual.getAt(new Vector3(0, 0, 1), new Vector3(9, 8, 7)).toArray(), [0, 0, 0]);

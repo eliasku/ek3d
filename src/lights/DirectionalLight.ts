@@ -55,7 +55,7 @@ export class DirectionalLight extends Light {
      */
     this.isDirectionalLight = true;
     this.type = "DirectionalLight";
-    (this as any).position.copy(Object3D.DEFAULT_UP);
+    this.position.copy(Object3D.DEFAULT_UP);
     this.updateMatrix();
     /**
      * The directional light points from its position to the

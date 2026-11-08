@@ -108,6 +108,6 @@ export class Spherical {
    * @return A clone of this instance.
    */
   clone(): Spherical {
-    return new (this.constructor as any)().copy(this);
+    return new Spherical().copy(this);
   }
 }

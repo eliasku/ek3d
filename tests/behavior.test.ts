@@ -1,6 +1,8 @@
 import { test } from "vite-plus/test";
 import assert from "node:assert/strict";
 import { Vector3 } from "../src/math/Vector3";
+import { Vector4 } from "../src/math/Vector4";
+import { Color } from "../src/math/Color";
 import { Matrix4 } from "../src/math/Matrix4";
 import { Quaternion } from "../src/math/Quaternion";
 import { Euler } from "../src/math/Euler";
@@ -51,6 +53,20 @@ import { OrthographicCamera } from "../src/cameras/OrthographicCamera";
 import { OrthographicCamera as UpstreamOrthographicCamera } from "../upstream/three.js/src/cameras/OrthographicCamera.js";
 import { DepthFunc } from "../src/constants";
 import { ReversedDepthFuncs } from "../src/utils";
+
+test("math objects expose component arrays without supporting iteration", () => {
+  for (const [value, components] of [
+    [new Vector2(1, 2), [1, 2]],
+    [new Vector3(1, 2, 3), [1, 2, 3]],
+    [new Vector4(1, 2, 3, 4), [1, 2, 3, 4]],
+    [new Quaternion(1, 2, 3, 4), [1, 2, 3, 4]],
+    [new Euler(1, 2, 3, "ZYX"), [1, 2, 3, "ZYX"]],
+    [new Color(0.25, 0.5, 0.75), [0.25, 0.5, 0.75]],
+  ] as const) {
+    assert.equal(Symbol.iterator in value, false);
+    assert.deepEqual(value.toArray(), components);
+  }
+});
 
 // Differential checks guard against migration changing the numerical algorithms.
 test("compose/invert/transform agrees exactly with upstream, including negative scale", () => {
