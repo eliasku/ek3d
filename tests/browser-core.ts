@@ -15,6 +15,10 @@ import { Uniform } from "ek3d/core/Uniform";
 import { UniformsGroup } from "ek3d/core/UniformsGroup";
 import { Matrix3 } from "ek3d/math/Matrix3";
 import { Vector3 } from "ek3d/math/Vector3";
+import { Color } from "ek3d/math/Color";
+import { Vector2 } from "ek3d/math/Vector2";
+import { Vector4 } from "ek3d/math/Vector4";
+import { Matrix4 } from "ek3d/math/Matrix4";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
 import { BufferUsage, GLSL, ColorSpace } from "ek3d/constants";
@@ -176,8 +180,13 @@ export async function verifyUniformGroups() {
   const unsigned = new Uniform(4);
   unsigned.type = "uint";
   const amount = new Uniform(1);
+  const colorScale = new Uniform(new Color(1, 1, 1));
+  const uvScale = new Uniform(new Vector2(1, 1));
+  const channelScale = new Uniform(new Vector4(1, 1, 1, 1));
+  const colorMatrix = new Uniform(new Matrix4());
   const group = new UniformsGroup().setName("Frame").setUsage(BufferUsage.DynamicDraw);
   group.add(gain).add(tint).add(transform).add(weights).add(offsets).add(signed).add(unsigned);
+  group.add(colorScale).add(uvScale).add(channelScale).add(colorMatrix);
   const fragmentShader = `precision highp float;
 layout(std140) uniform Frame {
   float gain;
@@ -187,12 +196,17 @@ layout(std140) uniform Frame {
   vec3 offsets[2];
   int signedValue;
   uint unsignedValue;
+  vec3 colorScale;
+  vec2 uvScale;
+  vec4 channelScale;
+  mat4 colorMatrix;
 };
 uniform float amount;
 out vec4 fragColor;
 void main() {
   vec3 color = transform * (tint * gain * weights[1] + offsets[0] + offsets[1]);
-  fragColor = vec4(color * amount * (float(signedValue) + float(unsignedValue)) / 3.0, 1.0);
+  color *= colorScale * vec3(uvScale, 1.0);
+  fragColor = colorMatrix * (vec4(color * amount * (float(signedValue) + float(unsignedValue)) / 3.0, 1.0) * channelScale);
 }`;
   const materials = [
     new ShaderMaterial({
@@ -252,9 +266,17 @@ void main() {
     signed.value = -2;
     unsigned.value = 5;
     sample([0, 32, 96, 255]);
+    colorScale.value.g = 0.5;
+    sample([0, 16, 96, 255]);
+    uvScale.value.set(1, 0.5);
+    sample([0, 8, 96, 255]);
+    channelScale.value.set(1, 1, 0.5, 1);
+    sample([0, 8, 48, 255]);
+    colorMatrix.value.makeScale(1, 1, 0.5);
+    sample([0, 8, 24, 255]);
     group.dispose();
     check(!gl.isBuffer(first), "Group disposal did not delete its GPU buffer");
-    sample([0, 32, 96, 255]);
+    sample([0, 8, 24, 255]);
     check(buffer() !== first, "Disposed uniform storage was reused");
     const extension = gl.getExtension("WEBGL_lose_context");
     check(extension !== null, "Context restoration requires WEBGL_lose_context");
@@ -274,7 +296,7 @@ void main() {
     await contextEvent("webglcontextlost", () => extension.loseContext());
     await contextEvent("webglcontextrestored", () => setTimeout(() => extension.restoreContext(), 0));
     mesh.material = materials[0];
-    sample([0, 32, 96, 255]);
+    sample([0, 8, 24, 255]);
     const restored = buffer();
     group.dispose();
     check(!gl.isBuffer(restored), "Restored group leaked its GPU buffer");
@@ -283,6 +305,7 @@ void main() {
       std140: true,
       sharedPrograms: true,
       updates: true,
+      mathValues: true,
       disposed: true,
       restored: true,
       glError: gl.getError(),

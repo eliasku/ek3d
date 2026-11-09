@@ -1,4 +1,5 @@
 import type { UniformsGroup } from "../../core/UniformsGroup";
+import type { WebGLRenderer } from "../WebGLRenderer";
 import type { Texture } from "../../textures/Texture";
 import type { ShaderMaterial } from "../../materials/ShaderMaterial";
 import type { Color } from "../../math/Color";
@@ -127,7 +128,7 @@ export function cloneUniformsGroups(src: UniformsGroup[]): UniformsGroup[] {
   }
   return dst;
 }
-export function getUnlitUniformColorSpace(renderer?: any) {
+export function getUnlitUniformColorSpace(renderer: WebGLRenderer) {
   const currentRenderTarget = renderer.getRenderTarget();
   if (currentRenderTarget === null) {
     // https://github.com/mrdoob/three.js/pull/23937#issuecomment-1111067398

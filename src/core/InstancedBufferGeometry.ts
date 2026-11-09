@@ -27,6 +27,9 @@ export class InstancedBufferGeometry extends BufferGeometry {
      */
     this.instanceCount = Infinity;
   }
+  override clone(): InstancedBufferGeometry {
+    return new InstancedBufferGeometry().copy(this);
+  }
   copy(source: InstancedBufferGeometry) {
     super.copy(source);
     this.instanceCount = source.instanceCount;

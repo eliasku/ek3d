@@ -13,9 +13,9 @@ This keeps dependencies visible. It does not guarantee a smaller bundle.
 Unlike Three.js, math objects (`Vector2`, `Vector3`, `Vector4`, `Quaternion`,
 `Euler` and `Color`) are not iterable. Use `toArray()` or named components instead.
 
-Math value types and `UniformsGroup` clone to their declared class, not the receiver's
-runtime subclass. `Triangle` keeps polymorphic cloning for the maintained
-`ExtendedTriangle` subclass. Inheritance-based engine types retain subtype-preserving clones.
+Core `clone()` methods construct their declared class, not the receiver's runtime subclass.
+Custom subclasses must override `clone()` with their own constructor to keep their subtype.
+Typed child containers and camera-dependent shadows require matching clone return types.
 
 ## Basic example
 
@@ -48,13 +48,17 @@ WebGPU, TSL, WebXR and StereoCamera are not included.
 See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, commands, API details and checks.
 
 Production builds use `@eliasku/ts-mangle/vite-plugin`, temporarily linked to
-`file:../ts-mangle`. Build that checkout before building ek3d. Property mangling is disabled.
+`file:../ts-mangle`. Build that checkout before building ek3d. Property mangling is disabled:
+dynamic WebGL backend calls still erase types and miss renamed properties.
 Development and unit tests use the original classes; verify optimized behavior with
 `npm run build` and `npm run preview`.
 Classes that need runtime prototypes can opt out with class-level `@class-crasher-ignore` JSDoc.
-Math classes remain extracted; their method calls need concrete receiver types.
-The optimized build is not release-ready: remaining dynamic dispatch and the full
-example/browser/device matrix still need verification.
+Extracted math method calls need concrete receiver types in implementations, not just overloads.
+Narrow math unions with runtime tag guards before concrete calls; do not cast tag probes to a class.
+Keep native property descriptors when restoring those types.
+Call object-returning factories directly; keep typed construct signatures for genuine constructors.
+Use concrete constructors and return types in clone methods, without constructor or result assertions.
+The class-crashed build still needs the full example/browser/device matrix.
 
 Run `npm run docs:llms` to generate [llms.txt](public/llms.txt) and
 [llms-full.txt](public/llms-full.txt) from this README and the maintained source.

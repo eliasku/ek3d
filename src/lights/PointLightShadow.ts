@@ -20,4 +20,8 @@ export class PointLightShadow extends LightShadow<PerspectiveCamera> {
      */
     this.isPointLightShadow = true;
   }
+
+  override clone(_recursive?: boolean): PointLightShadow {
+    return new PointLightShadow().copy(this);
+  }
 }

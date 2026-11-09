@@ -50,6 +50,12 @@ export class ExtendedTriangle extends Triangle {
     this.needsUpdate = true;
   }
 
+  override clone(): ExtendedTriangle {
+    const triangle = new ExtendedTriangle();
+    triangle.copy(this);
+    return triangle;
+  }
+
   /**
    * Returns whether the triangle intersects the given sphere.
    */

@@ -253,8 +253,8 @@ export class CameraHelper extends LineSegments<LineBasicMaterial> {
     this.geometry.dispose();
     this.material.dispose();
   }
-  clone(recursive: boolean = true): this {
-    return new (this.constructor as any)().copy(this, recursive);
+  clone(recursive: boolean = true): CameraHelper {
+    return new CameraHelper(this.camera).copy(this, recursive);
   }
 }
 function setPoint(point?: any, pointMap?: any, geometry?: any, camera?: any, x?: any, y?: any, z?: any) {

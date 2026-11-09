@@ -55,6 +55,19 @@ export class CubeDepthTexture extends DepthTexture {
      */
     this.isCubeTexture = true;
   }
+  clone(): CubeDepthTexture {
+    return new CubeDepthTexture(
+      this.image[0].width,
+      this.type,
+      this.mapping,
+      this.wrapS,
+      this.wrapT,
+      this.magFilter,
+      this.minFilter,
+      this.anisotropy,
+      this.format,
+    ).copy(this);
+  }
   /**
    * Alias for {@link CubeDepthTexture#image}.
    *

@@ -162,8 +162,8 @@ export class Sprite extends Object3D {
       object: this,
     });
   }
-  clone(recursive: boolean = true): this {
-    return new (this.constructor as any)(this.material).copy(this, recursive);
+  clone(recursive: boolean = true): Sprite {
+    return new Sprite(this.material).copy(this, recursive);
   }
   copy(source: Sprite, recursive?: boolean): this {
     super.copy(source, recursive);

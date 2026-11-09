@@ -115,6 +115,9 @@ export class DodecahedronGeometry extends PolyhedronGeometry {
       detail: detail,
     };
   }
+  override clone(): DodecahedronGeometry {
+    return new DodecahedronGeometry().copy(this);
+  }
   /**
    * Factory method for creating an instance of this class from the given
    * JSON object.

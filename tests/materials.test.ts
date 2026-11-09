@@ -422,7 +422,7 @@ test("material IDs and physical setters retain descriptor and update contracts",
   assert.equal(restored.toJSON().roughness, 0.4);
 });
 
-test("material initialization and polymorphic copies preserve inherited state", () => {
+test("material initialization and copies preserve state while clones use declared classes", () => {
   const shader = new RawShaderMaterial({ uniforms: { time: { value: 3 } }, name: "custom" });
   assert.equal(shader.uniforms.time.value, 3);
   assert.equal(shader.name, "custom");
@@ -431,12 +431,13 @@ test("material initialization and polymorphic copies preserve inherited state", 
     label: string = "custom";
   }
   const material = new CustomPhysicalMaterial({ clearcoat: 0.7, roughness: 0.2 });
-  const cloned: CustomPhysicalMaterial = material.clone();
+  const cloned: MeshPhysicalMaterial = material.clone();
   const copied: CustomPhysicalMaterial = new CustomPhysicalMaterial().copy(material);
-  assert.ok(cloned instanceof CustomPhysicalMaterial);
+  assert.equal(cloned.constructor, MeshPhysicalMaterial);
   assert.equal(cloned.clearcoat, 0.7);
   assert.equal(copied.roughness, 0.2);
-  assert.equal(cloned.label, "custom");
+  assert.equal("label" in cloned, false);
+  assert.equal(copied.label, "custom");
 });
 
 test("shader material copy and clone retain configured line widths", () => {
@@ -444,6 +445,7 @@ test("shader material copy and clone retain configured line widths", () => {
     const source = new MaterialType({ linewidth: 4, wireframeLinewidth: 2 });
     const copy = new MaterialType({ linewidth: 7 }).copy(source);
     for (const result of [copy, source.clone()]) {
+      assert.equal(result.constructor, MaterialType);
       assert.equal(result.linewidth, 4);
       assert.equal(result.wireframeLinewidth, 2);
     }

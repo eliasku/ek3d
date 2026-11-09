@@ -15,6 +15,7 @@ import { LineDashedMaterial } from "ek3d/materials/LineDashedMaterial";
 import { PointsMaterial } from "ek3d/materials/PointsMaterial";
 import { SpriteMaterial } from "ek3d/materials/SpriteMaterial";
 import { DataTexture } from "ek3d/textures/DataTexture";
+import { Matrix4 } from "ek3d/math/Matrix4";
 import { basicShader } from "ek3d/renderers/shaders/BasicShader";
 import { dashedShader } from "ek3d/renderers/shaders/DashedShader";
 import { pointsShader } from "ek3d/renderers/shaders/PointsShader";
@@ -165,6 +166,19 @@ export async function verifyObjectRendering() {
         `${object.type} connectivity`,
       );
     }
+    const transformedClone = line.clone(false);
+    transformedClone.applyMatrix4(new Matrix4().makeRotationZ(Math.PI / 2));
+    transformedClone.translateX(0.5);
+    const transformedPixels = draw(transformedClone);
+    check(
+      nearLine(transformedPixels, 48, 40) &&
+        nearLine(transformedPixels, 32, 56) &&
+        nearLine(transformedPixels, 16, 40) &&
+        !nearLine(transformedPixels, 32, 24),
+      "Cloned line lost its matrix rotation or local translation",
+    );
+    check(line.position.lengthSq() === 0 && line.rotation.z === 0, "Clone transforms changed the source");
+
     square.setDrawRange(2, 2);
     const ranged = draw(segments);
     check(
@@ -401,6 +415,7 @@ export async function verifyObjectRendering() {
     return {
       explicitDescriptors: ["PointsMaterial", "SpriteMaterial"],
       lineModes: ["LINE_STRIP", "LINE_LOOP", "LINES"],
+      transformedClone: true,
       dashed: { gaps: true, distanceUpload: true, scaleUpdate: true },
       points: { size: true, attenuation: true, positionUpload: true, maps: true, transparency: true },
       sprite: { cameraFacing: true, center: true, rotation: true, attenuation: true, maps: true, transparency: true },

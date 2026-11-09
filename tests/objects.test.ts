@@ -1,5 +1,6 @@
 import { test, vi } from "vite-plus/test";
 import assert from "node:assert/strict";
+import { CoordinateSystem } from "../src/constants";
 import { BufferGeometry } from "../src/core/BufferGeometry";
 import { Float32BufferAttribute } from "../src/core/BufferAttribute";
 import { Raycaster } from "../src/core/Raycaster";
@@ -26,6 +27,7 @@ import { AxesHelper } from "../src/helpers/AxesHelper";
 import { SkeletonHelper } from "../src/helpers/SkeletonHelper";
 import { Vector2 } from "../src/math/Vector2";
 import { Vector3 } from "../src/math/Vector3";
+import { Vector4 } from "../src/math/Vector4";
 import { Frustum } from "../src/math/Frustum";
 import { FrustumArray } from "../src/math/FrustumArray";
 import { Matrix4 } from "../src/math/Matrix4";
@@ -513,6 +515,74 @@ test("typed camera and helper specializations retain inherited constructor state
   target.dispose();
 });
 
+test("array camera clones retain independent subcamera viewports and culling state", () => {
+  const subcamera = new PerspectiveCamera(70, 2, 0.25, 100);
+  subcamera.viewport = new Vector4(2, 3, 400, 300);
+  subcamera.add(new Object3D());
+  const camera = new ArrayCamera([subcamera]);
+  camera.perCameraFrustumCulled = true;
+  camera.isMultiViewCamera = true;
+  camera.add(new Object3D());
+  const clone = camera.clone();
+  assert.equal(clone.constructor, ArrayCamera);
+  assert.equal(clone.perCameraFrustumCulled, true);
+  assert.equal(clone.isMultiViewCamera, true);
+  assert.notEqual(clone.cameras, camera.cameras);
+  assert.notEqual(clone.cameras[0], subcamera);
+  assert.deepEqual(clone.cameras[0].projectionMatrix, subcamera.projectionMatrix);
+  assert.notEqual(clone.cameras[0].viewport, subcamera.viewport);
+  assert.deepEqual(clone.cameras[0].viewport.toArray(), [2, 3, 400, 300]);
+  assert.notEqual(clone.cameras[0].children[0], subcamera.children[0]);
+  assert.notEqual(clone.children[0], camera.children[0]);
+  clone.cameras[0].viewport.x = 99;
+  assert.equal(subcamera.viewport.x, 2);
+  const shallow = camera.clone(false);
+  assert.equal(shallow.cameras.length, 1);
+  assert.equal(shallow.cameras[0].children.length, 0);
+  assert.equal(shallow.children.length, 0);
+});
+
+test("cube camera clones reuse six owned faces and retain render target and layer ownership", () => {
+  const target = new WebGLCubeRenderTarget(16);
+  const camera = new CubeCamera(0.25, 100, target);
+  camera.coordinateSystem = CoordinateSystem.WebGL;
+  camera.updateCoordinateSystem();
+  camera.activeMipmapLevel = 2;
+  camera.layers.enable(3);
+  camera.children[0].add(new Object3D());
+  camera.add(new PerspectiveCamera(35, 2, 1, 200));
+  for (const recursive of [true, false]) {
+    const clone = camera.clone(recursive);
+    assert.equal(clone.constructor, CubeCamera);
+    assert.equal(clone.renderTarget, target);
+    assert.equal(clone.coordinateSystem, CoordinateSystem.WebGL);
+    assert.equal(clone.activeMipmapLevel, 2);
+    assert.equal(clone.children.length, recursive ? 7 : 6);
+    assert.notEqual(clone.layers, camera.layers);
+    for (let i = 0; i < 6; i++) {
+      const face = clone.children[i];
+      assert.equal(face.constructor, PerspectiveCamera);
+      assert.notEqual(face, camera.children[i]);
+      assert.equal(face.parent, clone);
+      assert.equal(face.layers, clone.layers);
+      assert.equal(face.near, 0.25);
+      assert.equal(face.far, 100);
+      assert.deepEqual(face.quaternion.toArray(), camera.children[i].quaternion.toArray());
+      assert.deepEqual(face.projectionMatrix, camera.children[i].projectionMatrix);
+    }
+    assert.equal(clone.children[0].children.length, recursive ? 1 : 0);
+    if (recursive) {
+      assert.notEqual(clone.children[0].children[0], camera.children[0].children[0]);
+      assert.notEqual(clone.children[6], camera.children[6]);
+      assert.equal(clone.children[6].fov, 35);
+    }
+    clone.layers.disable(3);
+    assert.equal(clone.children[0].layers.isEnabled(3), false);
+    assert.equal(camera.layers.isEnabled(3), true);
+  }
+  target.dispose();
+});
+
 test("LOD levels keep their immutable property descriptor and independent mutable arrays", () => {
   const lod = new LOD();
   const descriptor = Object.getOwnPropertyDescriptor(lod, "levels");
@@ -526,22 +596,33 @@ test("LOD levels keep their immutable property descriptor and independent mutabl
   assert.equal(lod.levels[0].object, object);
 });
 
-test("base clone methods preserve concrete camera and mesh subclass types", () => {
+test("inherited clones return declared camera and mesh classes instead of custom subclasses", () => {
   class CustomCamera extends PerspectiveCamera {
     label: string = "camera";
   }
-  class CustomMesh extends Mesh {
+  class CustomMesh extends Mesh<MeshBasicMaterial> {
     label: string = "mesh";
   }
   const camera = new CustomCamera();
-  const cameraClone: CustomCamera = camera.clone();
-  assert.ok(cameraClone instanceof CustomCamera);
-  assert.equal(cameraClone.label, "camera");
+  camera.fov = 70;
+  camera._reversedDepth = true;
+  camera.setViewOffset(800, 600, 200, 0, 400, 600);
+  camera.add(new Object3D());
+  const cameraClone: PerspectiveCamera = camera.clone();
+  assert.equal(cameraClone.constructor, PerspectiveCamera);
+  assert.equal("label" in cameraClone, false);
+  assert.equal(cameraClone.fov, 70);
+  assert.equal(cameraClone.reversedDepth, true);
+  assert.notEqual(cameraClone.view, camera.view);
+  assert.notEqual(cameraClone.children[0], camera.children[0]);
+  assert.equal(camera.clone(false).children.length, 0);
+  cameraClone.updateProjectionMatrix();
+  assert.deepEqual(cameraClone.projectionMatrix, camera.projectionMatrix);
   assert.notEqual(cameraClone.projectionMatrix, camera.projectionMatrix);
   const mesh = new CustomMesh(new BufferGeometry(), new MeshBasicMaterial());
-  const meshClone: CustomMesh = mesh.clone();
-  assert.ok(meshClone instanceof CustomMesh);
-  assert.equal(meshClone.label, "mesh");
+  const meshClone: Mesh<MeshBasicMaterial> = mesh.clone();
+  assert.equal(meshClone.constructor, Mesh);
+  assert.equal("label" in meshClone, false);
   assert.equal(meshClone.geometry, mesh.geometry);
   assert.equal(meshClone.material, mesh.material);
 });

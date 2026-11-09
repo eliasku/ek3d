@@ -51,4 +51,14 @@ export class ArrayCamera extends PerspectiveCamera {
      */
     this.perCameraFrustumCulled = false;
   }
+  copy(source: ArrayCamera, recursive?: boolean): this {
+    super.copy(source, recursive);
+    this.cameras = source.cameras.map((camera) => camera.clone(recursive));
+    this.isMultiViewCamera = source.isMultiViewCamera;
+    this.perCameraFrustumCulled = source.perCameraFrustumCulled;
+    return this;
+  }
+  clone(recursive?: boolean): ArrayCamera {
+    return new ArrayCamera().copy(this, recursive);
+  }
 }

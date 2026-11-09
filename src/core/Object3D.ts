@@ -1,6 +1,7 @@
 import type { AnimationClip } from "../animation/AnimationClip";
 import type { BufferGeometry } from "./BufferGeometry";
 import type { Camera } from "../cameras/Camera";
+import type { Light } from "../lights/Light";
 import type { Intersection } from "./Raycaster";
 import type { Material } from "../materials/Material";
 import type { Raycaster } from "./Raycaster";
@@ -62,7 +63,7 @@ const _childremovedEvent: any = { type: "childremoved", child: null };
  * properties and methods for manipulating objects in 3D space.
  *
  */
-export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends EventDispatcher {
+export class Object3D<TChild extends { clone(): TChild } & Object3D<any> = Object3D<any>> extends EventDispatcher {
   isObject3D: boolean;
   uuid: string;
   name: string;
@@ -425,10 +426,10 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
   applyMatrix4(matrix: Matrix4) {
     if (this.matrixAutoUpdate) this.updateMatrix();
     this.matrix.premultiply(matrix);
-    this.matrix.decompose((this as any).position, (this as any).quaternion, (this as any).scale);
+    this.matrix.decompose(this.position, this.quaternion, this.scale);
     if (this.pivot !== null) {
       // the matrix maps the pivot to position + pivot, see updateMatrix()
-      (this as any).position.copy(this.pivot).applyMatrix4(this.matrix).sub(this.pivot);
+      this.position.copy(this.pivot).applyMatrix4(this.matrix).sub(this.pivot);
     }
   }
   /**
@@ -438,7 +439,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    * @return A reference to this instance.
    */
   applyQuaternion(q: Quaternion): Object3D {
-    (this as any).quaternion.premultiply(q);
+    this.quaternion.premultiply(q);
     return this;
   }
   /**
@@ -449,7 +450,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    */
   setRotationFromAxisAngle(axis: Vector3, angle: number) {
     // assumes axis is normalized
-    (this as any).quaternion.setFromAxisAngle(axis, angle);
+    this.quaternion.setFromAxisAngle(axis, angle);
   }
   /**
    * Sets the given rotation represented as Euler angles to the 3D object.
@@ -457,7 +458,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    * @param euler - The Euler angles.
    */
   setRotationFromEuler(euler: Euler) {
-    (this as any).quaternion.setFromEuler(euler, true);
+    this.quaternion.setFromEuler(euler, true);
   }
   /**
    * Sets the given rotation represented as rotation matrix to the 3D object.
@@ -467,7 +468,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    */
   setRotationFromMatrix(m: Matrix4) {
     // assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
-    (this as any).quaternion.setFromRotationMatrix(m);
+    this.quaternion.setFromRotationMatrix(m);
   }
   /**
    * Sets the given rotation represented as a Quaternion to the 3D object.
@@ -476,7 +477,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    */
   setRotationFromQuaternion(q: Quaternion) {
     // assumes q is normalized
-    (this as any).quaternion.copy(q);
+    this.quaternion.copy(q);
   }
   /**
    * Rotates the 3D object along an axis in local space.
@@ -489,7 +490,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
     // rotate object on axis in object space
     // axis is assumed to be normalized
     _q1.setFromAxisAngle(axis, angle);
-    (this as any).quaternion.multiply(_q1);
+    this.quaternion.multiply(_q1);
     return this;
   }
   /**
@@ -504,7 +505,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
     // axis is assumed to be normalized
     // method assumes no rotated parent
     _q1.setFromAxisAngle(axis, angle);
-    (this as any).quaternion.premultiply(_q1);
+    this.quaternion.premultiply(_q1);
     return this;
   }
   /**
@@ -544,8 +545,8 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
   translateOnAxis(axis: Vector3, distance: number): Object3D {
     // translate object by distance along axis in object space
     // axis is assumed to be normalized
-    _v1.copy(axis).applyQuaternion((this as any).quaternion);
-    (this as any).position.add(_v1.multiplyScalar(distance));
+    _v1.copy(axis).applyQuaternion(this.quaternion);
+    this.position.add(_v1.multiplyScalar(distance));
     return this;
   }
   /**
@@ -614,7 +615,8 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
     const parent = this.parent;
     this.updateWorldMatrix(true, false);
     _position.setFromMatrixPosition(this.matrixWorld);
-    if ((this as any).isCamera || (this as any).isLight) {
+    const object = this as this & Partial<Pick<Camera, "isCamera"> & Pick<Light, "isLight">>;
+    if (object.isCamera || object.isLight) {
       _m1.lookAt(_position, _target, this.up);
     } else {
       _m1.lookAt(_target, _position, this.up);
@@ -913,7 +915,7 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    * position, rotation and scale values.
    */
   updateMatrix() {
-    this.matrix.compose((this as any).position, (this as any).quaternion, (this as any).scale);
+    this.matrix.compose(this.position, this.quaternion, this.scale);
     const pivot = this.pivot;
     if (pivot !== null) {
       const px = pivot.x,
@@ -1191,8 +1193,8 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
    * @param [recursive=true] - When set to `true`, descendants of the 3D object are also cloned.
    * @return A clone of this instance.
    */
-  clone(recursive?: boolean): this {
-    return new (this.constructor as any)().copy(this, recursive!);
+  clone(recursive?: boolean): Object3D<TChild> {
+    return new Object3D<TChild>().copy(this, recursive);
   }
   /**
    * Copies the values of the given 3D object to this instance.
@@ -1204,10 +1206,10 @@ export class Object3D<TChild extends Object3D<any> = Object3D<any>> extends Even
   copy(source: Object3D<TChild>, recursive: boolean = true): this {
     this.name = source.name;
     this.up.copy(source.up);
-    (this as any).position.copy((source as any).position);
-    (this as any).rotation.order = (source as any).rotation.order;
-    (this as any).quaternion.copy((source as any).quaternion);
-    (this as any).scale.copy((source as any).scale);
+    this.position.copy(source.position);
+    this.rotation.order = source.rotation.order;
+    this.quaternion.copy(source.quaternion);
+    this.scale.copy(source.scale);
     this.pivot = source.pivot !== null ? source.pivot.clone() : null;
     this.matrix.copy(source.matrix);
     this.matrixWorld.copy(source.matrixWorld);

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "vite-plus/test";
 import { MeshBVH } from "../src/addons/math/bvh/core/MeshBVH";
+import { ExtendedTriangle } from "../src/addons/math/bvh/math/ExtendedTriangle";
 import {
   acceleratedRaycast,
   type BVHGeometry,
@@ -13,6 +14,48 @@ import { BoxGeometry } from "../src/geometries/BoxGeometry";
 import { Side } from "../src/constants";
 import { Ray } from "../src/math/Ray";
 import { Vector3 } from "../src/math/Vector3";
+import { Triangle } from "../src/math/Triangle";
+import { Line3 } from "../src/math/Line3";
+
+test("extended triangle clones retain independent cached points and SAT intersections", () => {
+  const triangle = new ExtendedTriangle(new Vector3(1, 2, 3), new Vector3(4, 2, 3), new Vector3(1, 6, 3));
+  triangle.update();
+  Object.defineProperty(triangle, "constructor", {
+    get() {
+      throw new Error("Cloning must not access the instance constructor");
+    },
+  });
+  const clone = triangle.clone();
+  assert.equal(clone.constructor, ExtendedTriangle);
+  assert.equal(clone.needsUpdate, true);
+  assert.deepEqual(clone.points, [clone.a, clone.b, clone.c]);
+  for (let i = 0; i < 3; i++) {
+    assert.equal(clone.points[i], [clone.a, clone.b, clone.c][i]);
+    assert.notEqual(clone.points[i], triangle.points[i]);
+    assert.deepEqual(clone.points[i], triangle.points[i]);
+  }
+  assert.notEqual(clone.satAxes, triangle.satAxes);
+  assert.notEqual(clone.satBounds, triangle.satBounds);
+  assert.notEqual(clone.plane, triangle.plane);
+  const crossing = new Triangle(new Vector3(2, 3, 2), new Vector3(2, 3, 4), new Vector3(3, 3, 3));
+  const originalIntersection = new Line3();
+  const clonedIntersection = new Line3();
+  assert.equal(triangle.intersectsTriangle(crossing, originalIntersection), true);
+  assert.equal(clone.intersectsTriangle(crossing, clonedIntersection), true);
+  assert.deepEqual(clonedIntersection, originalIntersection);
+  assert.equal(clone.needsUpdate, false);
+  assert.deepEqual(clone.satAxes, triangle.satAxes);
+  assert.deepEqual(clone.satBounds, triangle.satBounds);
+  for (const point of clone.points) point.addScalar(10);
+  clone.needsUpdate = true;
+  assert.equal(clone.intersectsTriangle(crossing), false);
+  assert.deepEqual(triangle.a, new Vector3(1, 2, 3));
+
+  class CustomTriangle extends Triangle {}
+  class CustomExtendedTriangle extends ExtendedTriangle {}
+  assert.equal(new CustomTriangle().clone().constructor, Triangle);
+  assert.equal(new CustomExtendedTriangle().clone().constructor, ExtendedTriangle);
+});
 
 test("BVH raycasts and serialization preserve direct and indirect geometry", () => {
   for (const indirect of [false, true]) {

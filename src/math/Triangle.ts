@@ -284,7 +284,7 @@ export class Triangle {
    * @return A clone of this instance.
    */
   clone(): Triangle {
-    return new (this.constructor as any)().copy(this);
+    return new Triangle().copy(this);
   }
   /**
    * Copies the values of the given triangle to this instance.

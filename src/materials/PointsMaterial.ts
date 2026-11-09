@@ -120,6 +120,9 @@ export class PointsMaterial extends Material {
     this.fog = true;
     this.setValues(parameters);
   }
+  clone(): PointsMaterial {
+    return new PointsMaterial().copy(this);
+  }
   copy(source: PointsMaterial): this {
     super.copy(source);
     this.color.copy(source.color);

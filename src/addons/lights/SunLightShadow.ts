@@ -83,6 +83,10 @@ export class SunLightShadow extends LightShadow<OrthographicCamera> {
     while (this._viewports.length < _cascadeCount) this._viewports.push(new Vector4());
   }
 
+  override clone(_recursive?: boolean): SunLightShadow {
+    return new SunLightShadow().copy(this);
+  }
+
   override getCamera(cascadeIndex: number = 0): OrthographicCamera {
     return this._cameras[cascadeIndex];
   }

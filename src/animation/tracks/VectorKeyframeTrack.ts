@@ -29,6 +29,12 @@ export class VectorKeyframeTrack extends KeyframeTrack {
   ) {
     super(name, times, values, interpolation);
   }
+
+  override clone(): VectorKeyframeTrack {
+    const track = new VectorKeyframeTrack(this.name, this.times.slice(), this.values.slice());
+    this.copyInterpolationTo(track);
+    return track;
+  }
 }
 /**
  * The value type name.

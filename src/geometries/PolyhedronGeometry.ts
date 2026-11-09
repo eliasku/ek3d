@@ -192,6 +192,9 @@ export class PolyhedronGeometry extends BufferGeometry {
       return Math.atan2(-vector.y, Math.sqrt(vector.x * vector.x + vector.z * vector.z));
     }
   }
+  override clone(): PolyhedronGeometry {
+    return new PolyhedronGeometry().copy(this);
+  }
   copy(source: this) {
     super.copy(source);
     this.parameters = Object.assign({}, source.parameters);

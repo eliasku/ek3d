@@ -17,6 +17,9 @@ export class PositionalAudio extends Audio {
     this.panner.panningModel = "HRTF";
     this.panner.connect(this.gain);
   }
+  clone(recursive?: boolean): PositionalAudio {
+    return new PositionalAudio(this.listener).copy(this, recursive);
+  }
   connect(): this {
     super.connect();
     this.panner.connect(this.gain);

@@ -101,6 +101,9 @@ export class WireframeGeometry extends BufferGeometry {
       this.setAttribute("position", new Float32BufferAttribute(vertices, 3));
     }
   }
+  override clone(): WireframeGeometry {
+    return new WireframeGeometry().copy(this);
+  }
   copy(source: this) {
     super.copy(source);
     this.parameters = Object.assign({}, source.parameters);

@@ -67,6 +67,9 @@ export class LineDashedMaterial extends LineBasicMaterial {
     this.gapSize = 1;
     this.setValues(parameters);
   }
+  clone(): LineDashedMaterial {
+    return new LineDashedMaterial().copy(this);
+  }
   copy(source: LineDashedMaterial): this {
     super.copy(source);
     this.scale = source.scale;

@@ -80,7 +80,9 @@ export class Interpolant<B extends AnimationBuffer = NumericAnimationBuffer> {
      *
      */
     this.resultBuffer = (
-      resultBuffer !== undefined ? resultBuffer : new (sampleValues.constructor as any)(sampleSize)
+      resultBuffer !== undefined
+        ? resultBuffer
+        : new (sampleValues.constructor as new (length: number) => B)(sampleSize)
     ) as B;
     /**
      * The sample values.

@@ -92,7 +92,7 @@ export class PointLightHelper extends Mesh<MeshBasicMaterial> {
         }
         */
   }
-  clone(recursive: boolean = true): this {
-    return new (this.constructor as any)().copy(this, recursive);
+  clone(recursive: boolean = true): PointLightHelper {
+    return new PointLightHelper(this.light, undefined, this.color).copy(this, recursive);
   }
 }

@@ -37,6 +37,10 @@ export class WebGLArrayRenderTarget extends WebGLRenderTarget {
     this.texture.renderTarget = this;
   }
 
+  override clone(): WebGLArrayRenderTarget {
+    return new WebGLArrayRenderTarget().copy(this);
+  }
+
   override get texture(): DataArrayTexture {
     return super.texture as DataArrayTexture;
   }

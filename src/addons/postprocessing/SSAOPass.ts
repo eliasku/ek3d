@@ -20,6 +20,8 @@ import type { WebGLRenderTarget as RT } from "../../renderers/WebGLRenderTarget"
 import type { Line } from "../../objects/Line";
 import type { Points } from "../../objects/Points";
 import type { Material } from "../../materials/Material";
+import type { Matrix4 } from "../../math/Matrix4";
+import type { Vector2 } from "../../math/Vector2";
 
 /**
  * A pass for a basic SSAO effect.
@@ -211,9 +213,11 @@ export class SSAOPass extends Pass {
     this.ssaoMaterial.uniforms!["kernel"].value = this.kernel;
     this.ssaoMaterial.uniforms!["cameraNear"].value = this.camera.near;
     this.ssaoMaterial.uniforms!["cameraFar"].value = this.camera.far;
-    this.ssaoMaterial.uniforms!["resolution"].value.set(this.width, this.height);
-    this.ssaoMaterial.uniforms!["cameraProjectionMatrix"].value.copy(this.camera.projectionMatrix);
-    this.ssaoMaterial.uniforms!["cameraInverseProjectionMatrix"].value.copy(this.camera.projectionMatrixInverse);
+    (this.ssaoMaterial.uniforms!["resolution"].value as Vector2).set(this.width, this.height);
+    (this.ssaoMaterial.uniforms!["cameraProjectionMatrix"].value as Matrix4).copy(this.camera.projectionMatrix);
+    (this.ssaoMaterial.uniforms!["cameraInverseProjectionMatrix"].value as Matrix4).copy(
+      this.camera.projectionMatrixInverse,
+    );
 
     // normal material
 
@@ -228,7 +232,7 @@ export class SSAOPass extends Pass {
       fragmentShader: SSAOBlurShader.fragmentShader,
     } as never);
     this.blurMaterial.uniforms["tDiffuse"].value = this.ssaoRenderTarget.texture;
-    this.blurMaterial.uniforms["resolution"].value.set(this.width, this.height);
+    (this.blurMaterial.uniforms["resolution"].value as Vector2).set(this.width, this.height);
 
     // material for rendering the depth
 
@@ -372,11 +376,13 @@ export class SSAOPass extends Pass {
     this.normalRenderTarget.setSize(width, height);
     this.blurRenderTarget.setSize(width, height);
 
-    this.ssaoMaterial.uniforms!["resolution"].value.set(width, height);
-    this.ssaoMaterial.uniforms!["cameraProjectionMatrix"].value.copy(this.camera.projectionMatrix);
-    this.ssaoMaterial.uniforms!["cameraInverseProjectionMatrix"].value.copy(this.camera.projectionMatrixInverse);
+    (this.ssaoMaterial.uniforms!["resolution"].value as Vector2).set(width, height);
+    (this.ssaoMaterial.uniforms!["cameraProjectionMatrix"].value as Matrix4).copy(this.camera.projectionMatrix);
+    (this.ssaoMaterial.uniforms!["cameraInverseProjectionMatrix"].value as Matrix4).copy(
+      this.camera.projectionMatrixInverse,
+    );
 
-    this.blurMaterial.uniforms["resolution"].value.set(width, height);
+    (this.blurMaterial.uniforms["resolution"].value as Vector2).set(width, height);
   }
 
   // internals

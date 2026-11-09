@@ -97,7 +97,7 @@ export class SpotLightHelper extends Object3D {
     this.matrixWorldNeedsUpdate = true;
     const coneLength = this.light.distance ? this.light.distance : 1000;
     const coneWidth = coneLength * Math.tan(this.light.angle);
-    (this.cone as any).scale.set(coneWidth, coneWidth, coneLength);
+    this.cone.scale.set(coneWidth, coneWidth, coneLength);
     _vector.setFromMatrixPosition(this.light.target.matrixWorld);
     this.cone.lookAt(_vector);
     if (this.color !== undefined) {
@@ -105,5 +105,15 @@ export class SpotLightHelper extends Object3D {
     } else {
       this.cone.material.color.copy(this.light.color);
     }
+  }
+  clone(recursive: boolean = true): SpotLightHelper {
+    const helper = new SpotLightHelper(this.light, this.color).copy(this, false);
+    helper.cone.copy(this.cone);
+    if (recursive) {
+      for (const child of this.children) {
+        if (child !== this.cone) helper.add(child.clone());
+      }
+    }
+    return helper;
   }
 }

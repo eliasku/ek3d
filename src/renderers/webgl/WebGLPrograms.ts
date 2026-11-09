@@ -22,8 +22,8 @@ export function WebGLPrograms(
   const _programLayers = new Layers();
   const _customShaders = new WebGLShaderCache();
   const _activeChannels = new Set<any>();
-  const programs: any[] = [];
-  const programsMap = new Map<any, any>();
+  const programs: ReturnType<typeof WebGLProgram>[] = [];
+  const programsMap = new Map<string, ReturnType<typeof WebGLProgram>>();
   const logarithmicDepthBuffer = capabilities.logarithmicDepthBuffer;
   function getChannel(value?: any) {
     _activeChannels.add(value);
@@ -464,7 +464,9 @@ export function WebGLPrograms(
     if (program !== undefined) {
       ++program.usedTimes;
     } else {
-      program = new (WebGLProgram as any)(renderer, cacheKey, parameters, bindingStates);
+      program = new (WebGLProgram as typeof WebGLProgram & {
+        new (...args: Parameters<typeof WebGLProgram>): ReturnType<typeof WebGLProgram>;
+      })(renderer, cacheKey, parameters, bindingStates);
       programs.push(program);
       programsMap.set(cacheKey, program);
     }

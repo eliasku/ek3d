@@ -351,6 +351,9 @@ export class MeshLambertMaterial extends Material {
     this.fog = true;
     this.setValues(parameters);
   }
+  clone(): MeshLambertMaterial {
+    return new MeshLambertMaterial().copy(this);
+  }
   copy(source: MeshLambertMaterial): this {
     super.copy(source);
     this.color.copy(source.color);

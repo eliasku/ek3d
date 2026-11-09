@@ -93,6 +93,9 @@ export class LOD extends Object3D {
      */
     this.autoUpdate = true;
   }
+  clone(_recursive?: boolean): LOD {
+    return new LOD().copy(this);
+  }
   copy(source: LOD): this {
     super.copy(source, false);
     const levels = (source as any).levels;

@@ -51,6 +51,10 @@ export class WebGLCubeRenderTarget extends WebGLRenderTarget {
     this.texture.isRenderTargetTexture = true;
   }
 
+  override clone(): WebGLCubeRenderTarget {
+    return new WebGLCubeRenderTarget().copy(this);
+  }
+
   override get texture(): CubeTexture {
     return super.texture as CubeTexture;
   }

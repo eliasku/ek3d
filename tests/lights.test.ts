@@ -8,8 +8,10 @@ import { PointLight } from "../src/lights/PointLight";
 import { RectAreaLight } from "../src/lights/RectAreaLight";
 import { LightProbe } from "../src/lights/LightProbe";
 import { SunLight } from "../src/addons/lights/SunLight";
+import { SunLightShadow } from "../src/addons/lights/SunLightShadow";
 import { DirectionalLightShadow } from "../src/lights/DirectionalLightShadow";
 import { PointLightShadow } from "../src/lights/PointLightShadow";
+import { LightShadow } from "../src/lights/LightShadow";
 import { OrthographicCamera } from "../src/cameras/OrthographicCamera";
 import { PerspectiveCamera } from "../src/cameras/PerspectiveCamera";
 import { Object3D } from "../src/core/Object3D";
@@ -312,12 +314,63 @@ test("light and shadow specializations preserve inherited intensity and camera i
     label: string = "shadow";
   }
   const shadow = new CustomShadow();
-  const clone: CustomShadow = shadow.clone();
-  assert.ok(clone instanceof CustomShadow);
-  assert.equal(clone.label, "shadow");
+  Object.defineProperty(shadow, "constructor", {
+    get() {
+      throw new Error("Cloning must not access the instance constructor");
+    },
+  });
+  const clone: DirectionalLightShadow = shadow.clone();
+  assert.equal(clone.constructor, DirectionalLightShadow);
+  assert.equal(clone instanceof CustomShadow, false);
+  assert.equal("label" in clone, false);
   assert.ok(clone.camera instanceof OrthographicCamera);
   assert.notEqual(clone.camera, shadow.camera);
   assert.deepEqual(clone.camera.projectionMatrix.elements, shadow.camera.projectionMatrix.elements);
+});
+
+test("shadow clones retain concrete cameras, numeric settings and independent state", () => {
+  const base = new LightShadow<PerspectiveCamera>(new PerspectiveCamera(70, 2, 0.2, 750));
+  const directional = new DirectionalLightShadow();
+  directional.camera.left = -12;
+  directional.camera.right = 8;
+  const point = new PointLightShadow();
+  point.camera.fov = 82;
+  const spot = new SpotLightShadow();
+  spot.focus = 0.6;
+  spot.aspect = 1.75;
+
+  for (const shadow of [base, directional, point, spot]) {
+    shadow.camera.position.set(2, 3, 4);
+    shadow.camera.zoom = 1.25;
+    shadow.camera.updateProjectionMatrix();
+    shadow.intensity = 0.75;
+    shadow.bias = -0.002;
+    shadow.normalBias = 0.3;
+    shadow.radius = 2;
+    shadow.blurSamples = 5;
+    shadow.mapSize.set(512, 256);
+    shadow.autoUpdate = false;
+    shadow.needsUpdate = true;
+
+    const clone = shadow.clone(false);
+    assert.equal(clone.constructor, shadow.constructor);
+    assert.equal(clone.camera.constructor, shadow.camera.constructor);
+    assert.notEqual(clone.camera, shadow.camera);
+    assert.notEqual(clone.mapSize, shadow.mapSize);
+    assert.equal(clone.intensity, shadow.intensity);
+    assert.equal(clone.autoUpdate, shadow.autoUpdate);
+    assert.equal(clone.needsUpdate, shadow.needsUpdate);
+    assert.deepEqual(clone.camera.projectionMatrix.elements, shadow.camera.projectionMatrix.elements);
+    clone.camera.position.x = 99;
+    clone.mapSize.x = 1;
+    assert.equal(shadow.camera.position.x, 2);
+    assert.equal(shadow.mapSize.x, 512);
+  }
+  const spotClone = spot.clone();
+  assert.equal(spotClone.focus, 0.6);
+  assert.equal(spotClone.aspect, 1.75);
+  spotClone.updateMatrices(new SpotLight());
+  assert.ok(Number.isFinite(spotClone.camera.fov));
 });
 
 test("directional lights, probes, area and sun lights honor shallow copy and clone", () => {
@@ -346,4 +399,58 @@ test("directional lights, probes, area and sun lights honor shallow copy and clo
   assert.notEqual(copies[1].sh, probe.sh);
   assert.equal(copies[2].power, area.power);
   assert.notEqual(copies[3].shadow, sun.shadow);
+});
+
+test("sun clones and copies retain independent usable two-cascade shadows", () => {
+  const sun = new SunLight(0xffaa44, 3);
+  sun.position.set(200, 450, 500);
+  sun.add(new Object3D());
+  sun.updateMatrixWorld(true);
+  sun.shadow.camera.near = 0.25;
+  sun.shadow.camera.far = 2000;
+  sun.shadow.radius = 3;
+  sun.shadow.normalBias = 0.2;
+  sun.shadow.mapSize.set(512, 256);
+  const camera = new PerspectiveCamera(45, 1, 1, 4000);
+  camera.position.set(0, 150, 1300);
+  camera.updateMatrixWorld(true);
+  sun.shadow.updateMatrices(sun, camera);
+
+  const copy = new SunLight().copy(sun, false);
+  const clone = sun.clone();
+  assert.equal(clone.constructor, SunLight);
+  assert.equal(copy.children.length, 0);
+  assert.equal(clone.children.length, 1);
+  assert.notEqual(clone.children[0], sun.children[0]);
+  assert.deepEqual(clone.color, sun.color);
+  assert.equal(clone.intensity, sun.intensity);
+
+  for (const shadow of [sun.shadow.clone(), copy.shadow, clone.shadow]) {
+    assert.equal(shadow.constructor, SunLightShadow);
+    assert.notEqual(shadow, sun.shadow);
+    assert.ok(shadow.camera instanceof OrthographicCamera);
+    assert.notEqual(shadow.camera, sun.shadow.camera);
+    assert.equal(shadow.camera.near, 0.25);
+    assert.equal(shadow.camera.far, 2000);
+    assert.equal(shadow.normalBias, 0.2);
+    assert.equal(shadow.radius, 3);
+    assert.notEqual(shadow.mapSize, sun.shadow.mapSize);
+    assert.deepEqual(shadow.mapSize, sun.shadow.mapSize);
+    assert.equal(shadow.getViewportCount(), 2);
+    assert.deepEqual(shadow.getFrameExtents(), sun.shadow.getFrameExtents());
+    shadow.updateMatrices(sun, camera);
+    assert.notEqual(shadow._cascadeSplits, sun.shadow._cascadeSplits);
+    assert.deepEqual(shadow._cascadeSplits, sun.shadow._cascadeSplits);
+    for (let i = 0; i < shadow.getViewportCount(); i++) {
+      assert.notEqual(shadow.getCamera(i), sun.shadow.getCamera(i));
+      assert.notEqual(shadow.getMatrix(i), sun.shadow.getMatrix(i));
+      assert.notEqual(shadow.getFrustum(i), sun.shadow.getFrustum(i));
+      assert.notEqual(shadow._cascadeData[i], sun.shadow._cascadeData[i]);
+      assert.deepEqual(shadow.getMatrix(i), sun.shadow.getMatrix(i));
+      assert.deepEqual(shadow.getCamera(i).projectionMatrix, sun.shadow.getCamera(i).projectionMatrix);
+      assert.deepEqual(shadow.getFrustum(i), sun.shadow.getFrustum(i));
+      assert.deepEqual(shadow._cascadeData[i], sun.shadow._cascadeData[i]);
+      assert.deepEqual(shadow.getViewport(i), sun.shadow.getViewport(i));
+    }
+  }
 });

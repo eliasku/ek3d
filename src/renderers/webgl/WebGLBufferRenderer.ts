@@ -27,4 +27,10 @@ export function WebGLBufferRenderer(this: any, gl?: any, extensions?: any, info?
   this.render = render;
   this.renderInstances = renderInstances;
   this.renderMultiDraw = renderMultiDraw;
+  return this as {
+    setMode: typeof setMode;
+    render: typeof render;
+    renderInstances: typeof renderInstances;
+    renderMultiDraw: typeof renderMultiDraw;
+  };
 }

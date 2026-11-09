@@ -3,6 +3,7 @@ import { test } from "vite-plus/test";
 import { SceneOptimizer } from "../src/addons/utils/SceneOptimizer";
 import { BufferAttribute } from "../src/core/BufferAttribute";
 import { BoxGeometry } from "../src/geometries/BoxGeometry";
+import { Material } from "../src/materials/Material";
 import { MeshBasicMaterial } from "../src/materials/MeshBasicMaterial";
 import { Color } from "../src/math/Color";
 import { Matrix4 } from "../src/math/Matrix4";
@@ -71,4 +72,24 @@ test("batching leaves hidden-parent visibility and shared surviving resources in
   assert.equal(geometryDisposals, 0);
   assert.equal(materialDisposals, 0);
   assert(visible.children[0] instanceof BatchedMesh);
+});
+
+test("batching rejects color-losing clones before removing meshes or disposing resources", () => {
+  class ColoredMaterial extends Material {
+    color: Color = new Color(0xff0000);
+  }
+  const scene = new Scene();
+  const geometry = new BoxGeometry();
+  const material = new ColoredMaterial();
+  const first = new Mesh(geometry, material);
+  const second = new Mesh(geometry, material);
+  scene.add(first, second);
+  let disposals = 0;
+  geometry.addEventListener("dispose", () => disposals++);
+  material.addEventListener("dispose", () => disposals++);
+  assert.throws(() => new SceneOptimizer(scene).toBatchedMesh(), /material clones must retain their color/);
+  assert.deepEqual(scene.children, [first, second]);
+  assert.equal(disposals, 0);
+  geometry.dispose();
+  material.dispose();
 });

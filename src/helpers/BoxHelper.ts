@@ -135,7 +135,7 @@ export class BoxHelper extends LineSegments<LineBasicMaterial> {
     this.geometry.dispose();
     this.material.dispose();
   }
-  clone(recursive: boolean = true): this {
-    return new (this.constructor as any)().copy(this, recursive);
+  clone(recursive: boolean = true): BoxHelper {
+    return new BoxHelper().copy(this, recursive);
   }
 }

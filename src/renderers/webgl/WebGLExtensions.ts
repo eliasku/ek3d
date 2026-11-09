@@ -10,7 +10,7 @@ export function WebGLExtensions(gl?: any) {
     return extension;
   }
   return {
-    has: function (name?: any) {
+    has: function (this: void, name?: any) {
       return getExtension(name) !== null;
     },
     init: function () {

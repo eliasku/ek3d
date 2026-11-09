@@ -65,6 +65,9 @@ export class CubeTexture extends Texture {
      */
     this.flipY = false;
   }
+  clone(): CubeTexture {
+    return new CubeTexture().copy(this);
+  }
   /**
    * Alias for {@link CubeTexture#image}.
    *

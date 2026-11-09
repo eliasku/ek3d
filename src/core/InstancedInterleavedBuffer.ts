@@ -51,10 +51,10 @@ export class InstancedInterleavedBuffer extends InterleavedBuffer {
     this.meshPerAttribute = source.meshPerAttribute;
     return this;
   }
-  clone(data: InterleavedBufferCloneData): this {
-    const ib = super.clone(data);
-    (ib as any).meshPerAttribute = this.meshPerAttribute;
-    return ib;
+  override clone(data: InterleavedBufferCloneData): InstancedInterleavedBuffer {
+    const clone = new InstancedInterleavedBuffer(this._cloneArray(data), this.stride, this.meshPerAttribute);
+    clone.setUsage(this.usage);
+    return clone;
   }
   toJSON(data: InterleavedBufferSerializationData) {
     const json = super.toJSON(data);

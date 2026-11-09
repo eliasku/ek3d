@@ -74,8 +74,8 @@ export class Points extends Object3D {
     this.morphTargetInfluences = undefined;
     this.updateMorphTargets();
   }
-  clone(recursive: boolean = true): this {
-    return new (this.constructor as any)(this.geometry, this.material).copy(this, recursive);
+  clone(recursive: boolean = true): Points {
+    return new Points(this.geometry, this.material).copy(this, recursive);
   }
   copy(source: Points, recursive?: boolean): this {
     super.copy(source, recursive);

@@ -24,4 +24,8 @@ export class WebGLRenderTarget extends RenderTarget {
      */
     this.isWebGLRenderTarget = true;
   }
+
+  override clone(): WebGLRenderTarget {
+    return new WebGLRenderTarget().copy(this);
+  }
 }

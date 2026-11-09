@@ -24,7 +24,7 @@ import type { Sprite } from "../objects/Sprite";
 import type { Scene } from "../scenes/Scene";
 import type { Texture } from "../textures/Texture";
 import type { Vector2 } from "../math/Vector2";
-import type { WebGLBackground } from "./webgl/WebGLBackground";
+import type { WebGLBackground, WebGLBackgroundSystem } from "./webgl/WebGLBackground";
 import type { WebGLEnvironments } from "./webgl/WebGLEnvironments";
 import type { WebGLOutput } from "./webgl/WebGLOutput";
 import type { WebGLOutputEffect } from "./webgl/WebGLOutput";
@@ -277,12 +277,12 @@ export class WebGLRenderer {
   resetState: () => void;
   /** Assigned synchronously by initGLContext, including after context restoration. */
   capabilities!: WebGLCapabilitiesState;
-  extensions: any;
-  properties: any;
-  renderLists: any;
+  extensions!: ReturnType<typeof WebGLExtensions>;
+  properties!: ReturnType<typeof WebGLProperties>;
+  renderLists!: ReturnType<typeof WebGLRenderLists>;
   /** Assigned synchronously by initGLContext, including after context restoration. */
   shadowMap!: WebGLShadowMapSystem | null;
-  state: any;
+  state!: ReturnType<typeof WebGLState>;
   /** Assigned synchronously by initGLContext, including after context restoration. */
   info!: WebGLInfoState;
 
@@ -325,7 +325,7 @@ export class WebGLRenderer {
       _alpha = alpha;
     }
     const _outputBufferType = outputBufferType;
-    if (_outputBufferType !== TextureType.UnsignedByte && !(parameters as any).createOutput)
+    if (_outputBufferType !== TextureType.UnsignedByte && !parameters.createOutput)
       throw new Error("HDR output requires createOutput.");
     const INTEGER_FORMATS = new Set<any>([PixelFormat.RGBAInteger, PixelFormat.RGInteger, PixelFormat.RedInteger]);
     const UNSIGNED_TYPES = new Set<any>([
@@ -508,11 +508,30 @@ export class WebGLRenderer {
     function getContext(contextName: "webgl2", contextAttributes?: any) {
       return canvas.getContext(contextName, contextAttributes) as WebGL2RenderingContext | null;
     }
-    let extensions: any, capabilities: any, state: any, info: any;
-    let properties: any, textures: any, environments: any, attributes: any, geometries: any, objects: any;
-    let programCache: any, materials: any, renderLists: any, renderStates: any, clipping: any, shadowMap: any;
-    let background: any, morphtargets: any, bufferRenderer: any, indexedBufferRenderer: any;
-    let utils: any, bindingStates: any, uniformsGroups: any;
+    let extensions: ReturnType<typeof WebGLExtensions>;
+    let capabilities: WebGLCapabilitiesState;
+    let state: ReturnType<typeof WebGLState>;
+    let info: WebGLInfoState;
+    let properties: ReturnType<typeof WebGLProperties>;
+    let textures: ReturnType<typeof WebGLTextures>;
+    let environments: ReturnType<typeof WebGLEnvironments> | null;
+    let attributes: ReturnType<typeof WebGLAttributes>;
+    let geometries: ReturnType<typeof WebGLGeometries>;
+    let objects: ReturnType<typeof WebGLObjects>;
+    let programCache: ReturnType<typeof WebGLPrograms>;
+    let materials: ReturnType<typeof WebGLMaterials>;
+    let renderLists: ReturnType<typeof WebGLRenderLists>;
+    let renderStates: ReturnType<typeof WebGLRenderStates>;
+    let clipping: ReturnType<typeof WebGLClipping>;
+    let shadowMap: WebGLShadowMapSystem | null;
+    let background: Omit<WebGLBackgroundSystem, "addToRenderList" | "dispose"> &
+      Partial<Pick<WebGLBackgroundSystem, "addToRenderList" | "dispose">>;
+    let morphtargets: ReturnType<typeof WebGLMorphtargets>;
+    let bufferRenderer: ReturnType<typeof WebGLBufferRenderer>;
+    let indexedBufferRenderer: ReturnType<typeof WebGLIndexedBufferRenderer>;
+    let utils: ReturnType<typeof WebGLUtils>;
+    let bindingStates: ReturnType<typeof WebGLBindingStates>;
+    let uniformsGroups: ReturnType<typeof WebGLUniformsGroups>;
     try {
       const contextAttributes: any = {
         alpha: true,
@@ -550,11 +569,11 @@ export class WebGLRenderer {
       throw e;
     }
     function initGLContext() {
-      extensions = new (WebGLExtensions as any)(_gl);
+      extensions = WebGLExtensions(_gl);
       extensions.init();
-      utils = new (WebGLUtils as any)(_gl, extensions);
-      capabilities = new (WebGLCapabilities as any)(_gl, extensions, parameters, utils);
-      state = new (WebGLState as any)(_gl, extensions);
+      utils = WebGLUtils(_gl, extensions);
+      capabilities = WebGLCapabilities(_gl, extensions, parameters, utils);
+      state = WebGLState(_gl, extensions);
       if (capabilities.reversedDepthBuffer && reversedDepthBuffer) {
         state.buffers.depth.setReversed(true);
       }
@@ -562,28 +581,34 @@ export class WebGLRenderer {
       _srcFramebuffer = _gl!.createFramebuffer();
       _dstFramebuffer = _gl!.createFramebuffer();
       info = WebGLInfo();
-      properties = new (WebGLProperties as any)();
-      textures = new (WebGLTextures as any)(_gl, extensions, state, properties, capabilities, utils, info);
-      environments = (parameters as any).createEnvironments ? (parameters as any).createEnvironments(_this) : null;
-      attributes = new (WebGLAttributes as any)(_gl);
-      bindingStates = new (WebGLBindingStates as any)(_gl, attributes);
-      geometries = new (WebGLGeometries as any)(_gl, attributes, info, bindingStates);
-      objects = new (WebGLObjects as any)(_gl, geometries, attributes, bindingStates, info);
-      morphtargets = new (WebGLMorphtargets as any)(_gl, capabilities, textures);
-      clipping = new (WebGLClipping as any)(properties);
-      programCache = new (WebGLPrograms as any)(_this, environments, extensions, capabilities, bindingStates, clipping);
-      materials = new (WebGLMaterials as any)(_this, properties);
-      renderLists = new (WebGLRenderLists as any)();
-      renderStates = new (WebGLRenderStates as any)(extensions, (parameters as any).ltcTextures ?? null);
-      background = (parameters as any).createBackground
-        ? (parameters as any).createBackground(_this, environments, state, objects, _alpha, premultipliedAlpha)
-        : new (WebGLClearBackground as any)(_this, state, _alpha, premultipliedAlpha);
-      shadowMap = (parameters as any).createShadowMap
-        ? (parameters as any).createShadowMap(_this, objects, capabilities)
-        : null;
-      uniformsGroups = new (WebGLUniformsGroups as any)(_gl, info, capabilities, state);
-      bufferRenderer = new (WebGLBufferRenderer as any)(_gl, extensions, info);
-      indexedBufferRenderer = new (WebGLIndexedBufferRenderer as any)(_gl, extensions, info);
+      properties = WebGLProperties();
+      textures = new (WebGLTextures as typeof WebGLTextures & {
+        new (...args: Parameters<typeof WebGLTextures>): ReturnType<typeof WebGLTextures>;
+      })(_gl, extensions, state, properties, capabilities, utils, info);
+      environments = parameters.createEnvironments ? parameters.createEnvironments(_this) : null;
+      attributes = WebGLAttributes(_gl);
+      bindingStates = WebGLBindingStates(_gl, attributes);
+      geometries = WebGLGeometries(_gl, attributes, info, bindingStates);
+      objects = WebGLObjects(_gl, geometries, attributes, bindingStates, info);
+      morphtargets = WebGLMorphtargets(_gl, capabilities, textures);
+      clipping = new (WebGLClipping as typeof WebGLClipping & {
+        new (...args: Parameters<typeof WebGLClipping>): ReturnType<typeof WebGLClipping>;
+      })(properties);
+      programCache = WebGLPrograms(_this, environments, extensions, capabilities, bindingStates, clipping);
+      materials = WebGLMaterials(_this, properties);
+      renderLists = WebGLRenderLists();
+      renderStates = WebGLRenderStates(extensions, parameters.ltcTextures ?? null);
+      background = parameters.createBackground
+        ? parameters.createBackground(_this, environments, state, objects, _alpha, premultipliedAlpha)
+        : WebGLClearBackground(_this, state, _alpha, premultipliedAlpha);
+      shadowMap = parameters.createShadowMap ? parameters.createShadowMap(_this, objects, capabilities) : null;
+      uniformsGroups = WebGLUniformsGroups(_gl, info, capabilities, state);
+      bufferRenderer = new (WebGLBufferRenderer as typeof WebGLBufferRenderer & {
+        new (...args: Parameters<typeof WebGLBufferRenderer>): ReturnType<typeof WebGLBufferRenderer>;
+      })(_gl, extensions, info);
+      indexedBufferRenderer = new (WebGLIndexedBufferRenderer as typeof WebGLIndexedBufferRenderer & {
+        new (...args: Parameters<typeof WebGLIndexedBufferRenderer>): ReturnType<typeof WebGLIndexedBufferRenderer>;
+      })(_gl, extensions, info);
       info.programs = programCache.programs;
       /**
        * Holds details about the capabilities of the current rendering context.
@@ -591,7 +616,7 @@ export class WebGLRenderer {
        * @name WebGLRenderer#capabilities
        * ~Capabilities}
        */
-      (_this as any).capabilities = capabilities;
+      _this.capabilities = capabilities;
       /**
        * Provides methods for retrieving and testing WebGL extensions.
        *
@@ -601,32 +626,32 @@ export class WebGLRenderer {
        *
        * @name WebGLRenderer#extensions
        */
-      (_this as any).extensions = extensions;
+      _this.extensions = extensions;
       /**
        * Used to track properties of other objects like native WebGL objects.
        *
        * @name WebGLRenderer#properties
        */
-      (_this as any).properties = properties;
+      _this.properties = properties;
       /**
        * Manages the render lists of the renderer.
        *
        * @name WebGLRenderer#renderLists
        */
-      (_this as any).renderLists = renderLists;
+      _this.renderLists = renderLists;
       /**
        * Interface for managing shadows.
        *
        * @name WebGLRenderer#shadowMap
        * ~ShadowMap}
        */
-      (_this as any).shadowMap = shadowMap;
+      _this.shadowMap = shadowMap;
       /**
        * Interface for managing the WebGL state.
        *
        * @name WebGLRenderer#state
        */
-      (_this as any).state = state;
+      _this.state = state;
       /**
        * Holds a series of statistical information about the GPU memory
        * and the rendering process. Useful for debugging and monitoring.
@@ -647,18 +672,11 @@ export class WebGLRenderer {
        * @name WebGLRenderer#info
        * ~Info}
        */
-      (_this as any).info = info;
+      _this.info = info;
     }
     // initialize internal render target for non-UnsignedByteType color buffer
     if (_outputBufferType !== TextureType.UnsignedByte) {
-      output = (parameters as any).createOutput(
-        _outputBufferType,
-        canvas.width,
-        canvas.height,
-        antialias,
-        depth,
-        stencil,
-      );
+      output = parameters.createOutput!(_outputBufferType, canvas.width, canvas.height, antialias, depth, stencil);
     }
     /**
      * Returns the rendering context.
@@ -909,8 +927,8 @@ export class WebGLRenderer {
      * @param color - The clear color.
      * @param [alpha=1] - The clear alpha.
      */
-    this.setClearColor = function () {
-      background.setClearColor(...arguments);
+    this.setClearColor = function (color: Color | number | string, alpha?: number) {
+      background.setClearColor(color, alpha);
     };
     /**
      * Returns the clear alpha. Ranges within `[0,1]`.
@@ -925,8 +943,8 @@ export class WebGLRenderer {
      *
      * @param alpha - The clear alpha.
      */
-    this.setClearAlpha = function () {
-      background.setClearAlpha(...arguments);
+    this.setClearAlpha = function (alpha: number) {
+      background.setClearAlpha(alpha);
     };
     /**
      * Tells the renderer to clear its color, depth or stencil drawing buffer(s).
@@ -1056,10 +1074,11 @@ export class WebGLRenderer {
       initGLContext();
       info.autoReset = infoAutoReset;
       background.setClearColor(clearColor, clearAlpha);
-      if (shadowMap !== null) shadowMap.enabled = shadowMapEnabled;
-      if (shadowMap !== null) shadowMap.autoUpdate = shadowMapAutoUpdate;
-      if (shadowMap !== null) shadowMap.needsUpdate = shadowMapNeedsUpdate;
-      if (shadowMap !== null) shadowMap.type = shadowMapType;
+      // shortcut: shadow-map configuration stays fixed across restores; handle live feature changes when supported.
+      if (shadowMap !== null) shadowMap.enabled = shadowMapEnabled!;
+      if (shadowMap !== null) shadowMap.autoUpdate = shadowMapAutoUpdate!;
+      if (shadowMap !== null) shadowMap.needsUpdate = shadowMapNeedsUpdate!;
+      if (shadowMap !== null) shadowMap.type = shadowMapType!;
     }
     function onContextCreationError(event?: any) {
       error("WebGLRenderer: A WebGL context could not be created. Reason: ", event.statusMessage);
@@ -1131,7 +1150,7 @@ export class WebGLRenderer {
       if (index !== null) {
         attribute = attributes.get(index);
         renderer = indexedBufferRenderer;
-        renderer.setIndex(attribute);
+        indexedBufferRenderer.setIndex(attribute);
       }
       //
       if ((object as Mesh).isMesh) {
@@ -2087,9 +2106,8 @@ export class WebGLRenderer {
         m_uniforms.dfgLUT !== undefined &&
         (material.isMeshStandardMaterial || materialProperties.envMap?.isPMREMTexture)
       ) {
-        if (!(parameters as any).getDFGLUT)
-          throw new Error("Physically based environment lighting requires getDFGLUT.");
-        m_uniforms.dfgLUT.value = (parameters as any).getDFGLUT();
+        if (!parameters.getDFGLUT) throw new Error("Physically based environment lighting requires getDFGLUT.");
+        m_uniforms.dfgLUT.value = parameters.getDFGLUT();
       }
       if (refreshMaterial) {
         p_uniforms.setValue(_gl, "toneMappingExposure", _this.toneMappingExposure);

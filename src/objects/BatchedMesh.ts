@@ -157,7 +157,13 @@ function copyArrayContents(
   } else {
     // if the arrays use the same data layout we can use a fast block copy
     const len = Math.min(src.length, target.length);
-    target.set(new (src.constructor as any)(src.buffer, 0, len));
+    target.set(
+      new (src.constructor as new (
+        buffer: ArrayBufferLike,
+        byteOffset: number,
+        length: number,
+      ) => BufferAttribute["array"])(src.buffer, 0, len),
+    );
   }
 }
 /**
@@ -395,7 +401,9 @@ export class BatchedMesh extends Mesh {
       for (const attributeName in reference.attributes) {
         const srcAttribute = reference.getAttribute(attributeName) as BufferAttribute | InterleavedBufferAttribute;
         const { array, itemSize, normalized } = srcAttribute;
-        const dstArray = new (array.constructor as any)(maxVertexCount * itemSize);
+        const dstArray = new (array.constructor as new (length: number) => BufferAttribute["array"])(
+          maxVertexCount * itemSize,
+        );
         const dstAttribute = new BufferAttribute(dstArray, itemSize, normalized);
         geometry.setAttribute(attributeName, dstAttribute);
       }
@@ -901,13 +909,17 @@ export class BatchedMesh extends Mesh {
    * @param color - The color to set the instance to. Use a `Vector4` to also define alpha.
    * @return A reference to this batched mesh.
    */
-  setColorAt(instanceId: number, color: Color | Vector4): this;
-  setColorAt(instanceId: number, color?: any): this {
+  setColorAt(instanceId: number, color: Color | Vector4): this {
     this.validateInstanceId(instanceId);
     if (this._colorsTexture === null) {
       this._initColorsTexture();
     }
-    color.toArray(this._colorsTexture!.image.data!, instanceId * 4);
+    // shortcut: keep runtime tags structural until class crasher supports union dispatch.
+    if ("isVector4" in color && color.isVector4) {
+      (color as Vector4).toArray(this._colorsTexture!.image.data!, instanceId * 4);
+    } else {
+      (color as Color).toArray(this._colorsTexture!.image.data!, instanceId * 4);
+    }
     this._colorsTexture!.needsUpdate = true;
     return this;
   }
@@ -919,16 +931,18 @@ export class BatchedMesh extends Mesh {
    * @return The instance's color.  Use a `Vector4` to also retrieve alpha.
    */
   getColorAt<T extends Color | Vector4>(instanceId: number, color: T): T;
-  getColorAt(instanceId: number, color?: any): Color | Vector4 {
+  getColorAt(instanceId: number, color: Color | Vector4): Color | Vector4 {
     this.validateInstanceId(instanceId);
     if (this._colorsTexture === null) {
-      if (color.isVector4) {
-        return color.set(1, 1, 1, 1);
+      if ("isVector4" in color && color.isVector4) {
+        return (color as Vector4).set(1, 1, 1, 1);
       } else {
-        return color.setRGB(1, 1, 1);
+        return (color as Color).setRGB(1, 1, 1);
       }
     } else {
-      return color.fromArray(this._colorsTexture!.image.data!, instanceId * 4);
+      return "isVector4" in color && color.isVector4
+        ? (color as Vector4).fromArray(this._colorsTexture!.image.data!, instanceId * 4)
+        : (color as Color).fromArray(this._colorsTexture!.image.data!, instanceId * 4);
     }
   }
   /**
@@ -1151,8 +1165,8 @@ export class BatchedMesh extends Mesh {
       _mesh.geometry.setDrawRange(0, Infinity);
     }
   }
-  clone(recursive: boolean = true): this {
-    return new (this.constructor as any)(0, 0, 0, this.material).copy(this, recursive);
+  clone(recursive: boolean = true): BatchedMesh {
+    return new BatchedMesh(0, 0, 0, this.material).copy(this, recursive);
   }
   copy(source: BatchedMesh, recursive: boolean = true): this {
     this.geometry.dispose();
@@ -1260,14 +1274,14 @@ export class BatchedMesh extends Mesh {
     const perObjectFrustumCulled = this.perObjectFrustumCulled;
     const indirectTexture = this._indirectTexture!;
     const indirectArray = indirectTexture!.image.data!;
-    const frustum = (camera as any).isArrayCamera ? _frustumArray : _frustum;
+    const isArrayCamera = (camera as ArrayCamera).isArrayCamera;
     // prepare the frustum in the local frame
     if (perObjectFrustumCulled) {
-      if ((camera as any).isArrayCamera) {
-        (frustum as any).setFromArrayCamera(camera as ArrayCamera);
+      if (isArrayCamera) {
+        _frustumArray.setFromArrayCamera(camera as ArrayCamera);
       } else {
         _matrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse).multiply(this.matrixWorld);
-        (frustum as any).setFromProjectionMatrix(_matrix, camera.coordinateSystem, camera.reversedDepth);
+        _frustum.setFromProjectionMatrix(_matrix, camera.coordinateSystem, camera.reversedDepth);
       }
     }
     let multiDrawCount = 0;
@@ -1285,7 +1299,7 @@ export class BatchedMesh extends Mesh {
           // determine whether the batched geometry is within the frustum
           let culled = false;
           if (perObjectFrustumCulled) {
-            culled = !frustum.intersectsSphere(_sphere);
+            culled = isArrayCamera ? !_frustumArray.intersectsSphere(_sphere) : !_frustum.intersectsSphere(_sphere);
           }
           if (!culled) {
             // get the distance from camera used for sorting
@@ -1321,7 +1335,7 @@ export class BatchedMesh extends Mesh {
             // get the bounds in world space
             this.getMatrixAt(i, _matrix);
             this.getBoundingSphereAt(geometryId, _sphere)!.applyMatrix4(_matrix);
-            culled = !frustum.intersectsSphere(_sphere);
+            culled = isArrayCamera ? !_frustumArray.intersectsSphere(_sphere) : !_frustum.intersectsSphere(_sphere);
           }
           if (!culled) {
             const geometryInfo = geometryInfoList[geometryId];

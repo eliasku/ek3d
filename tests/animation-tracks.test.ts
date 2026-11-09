@@ -82,12 +82,70 @@ test("every track family preserves interpolation and non-monotonic boundary samp
     assert.deepEqual(KeyframeTrack.toJSON(actual), KeyframeTrack.toJSON(expected));
     const clone = actual.clone();
     assert.equal(clone.constructor, actual.constructor);
+    assert.equal(clone.ValueTypeName, actual.ValueTypeName);
+    assert.equal(clone.getInterpolation(), actual.getInterpolation());
     assert.notEqual(clone.times, actual.times);
     assert.notEqual(clone.values, actual.values);
     assert.deepEqual(samples(clone), samples(actual));
   }
   const quaternion = tracks[2][0].createInterpolant().evaluate(0.5);
   assert.ok(Math.abs(Math.hypot(...(Array.from(quaternion) as number[])) - 1) < 1e-6);
+});
+
+test("track and clip cloning uses declared classes and independently copies custom interpolant data", () => {
+  class CustomTrack extends NumberKeyframeTrack {
+    constructor(readonly label: string) {
+      super(".position[x]", [0, 1], [2, 4]);
+    }
+  }
+  class CustomClip extends AnimationClip {}
+
+  const track = new CustomTrack("custom");
+  track.createInterpolant = function (this: KeyframeTrack, result) {
+    return this.InterpolantFactoryMethodDiscrete(result);
+  };
+  track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline = true;
+  const settings = {
+    inTangents: new Float64Array([0, 2, 1, 4]),
+    outTangents: new Float32Array([0, 2, 1, 4]),
+  };
+  track.settings = settings;
+  const clip = new CustomClip("custom", 1, [track], AnimationBlendMode.Additive);
+  clip.userData = { nested: { value: 1 } };
+  for (const source of [track, clip]) {
+    Object.defineProperty(source, "constructor", {
+      get() {
+        throw new Error("Cloning must not access the instance constructor");
+      },
+    });
+  }
+
+  const clone = clip.clone();
+  assert.equal(clone.constructor, AnimationClip);
+  assert.equal(clone.name, clip.name);
+  assert.equal(clone.duration, clip.duration);
+  assert.equal(clone.blendMode, clip.blendMode);
+  assert.notEqual(clone.tracks, clip.tracks);
+  assert.notEqual(clone.userData, clip.userData);
+  assert.notEqual(clone.userData.nested, clip.userData.nested);
+  const clonedTrack = clone.tracks[0];
+  assert.equal(clonedTrack.constructor, NumberKeyframeTrack);
+  assert.equal("label" in clonedTrack, false);
+  assert.equal(clonedTrack.createInterpolant, track.createInterpolant);
+  assert.equal(clonedTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline, true);
+  assert.deepEqual(Array.from(clonedTrack.createInterpolant().evaluate(0.5)), [2]);
+  assert.notEqual(clonedTrack.times, track.times);
+  assert.notEqual(clonedTrack.values, track.values);
+  assert.notEqual(clonedTrack.settings, track.settings);
+  assert.notEqual(clonedTrack.settings!.inTangents, track.settings.inTangents);
+  assert.notEqual(clonedTrack.settings!.outTangents, track.settings.outTangents);
+  assert.deepEqual(clonedTrack.settings, track.settings);
+  clonedTrack.times[0] = -1;
+  clonedTrack.values[0] = 99;
+  clonedTrack.settings!.inTangents![0] = -1;
+  assert.equal(track.times[0], 0);
+  assert.equal(track.values[0], 2);
+  assert.equal(settings.inTangents[0], 0);
 });
 
 test("track defaults remain inherited and writable without hiding prototype factories", () => {

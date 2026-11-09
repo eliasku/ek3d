@@ -75,7 +75,7 @@ export class AxesHelper extends LineSegments<LineBasicMaterial> {
     this.geometry.dispose();
     this.material.dispose();
   }
-  clone(recursive: boolean = true): this {
-    return new (this.constructor as any)().copy(this, recursive);
+  clone(recursive: boolean = true): AxesHelper {
+    return new AxesHelper().copy(this, recursive);
   }
 }

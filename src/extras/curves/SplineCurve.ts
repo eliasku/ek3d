@@ -77,6 +77,9 @@ export class SplineCurve extends Curve<Vector2> {
     point.set(CatmullRom(weight, p0.x, p1.x, p2.x, p3.x), CatmullRom(weight, p0.y, p1.y, p2.y, p3.y));
     return point;
   }
+  override clone(): SplineCurve {
+    return new SplineCurve().copy(this);
+  }
   copy(source: this): this {
     super.copy(source);
     this.points = [];

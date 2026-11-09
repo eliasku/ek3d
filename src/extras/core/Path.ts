@@ -260,6 +260,9 @@ export class Path extends CurvePath<Vector2> {
     this.currentPoint.copy(lastPoint);
     return this;
   }
+  override clone(): Path {
+    return new Path().copy(this);
+  }
   copy(source: this): this {
     super.copy(source);
     this.currentPoint.copy(source.currentPoint);

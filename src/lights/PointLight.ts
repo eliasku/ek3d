@@ -93,6 +93,9 @@ export class PointLight extends Light {
     this.shadow = source.shadow.clone();
     return this;
   }
+  clone(recursive?: boolean): PointLight {
+    return new PointLight().copy(this, recursive);
+  }
   toJSON(meta?: any) {
     const data = super.toJSON(meta);
     data.object.distance = this.distance;

@@ -114,7 +114,7 @@ export class PMREMGenerator {
         renderer.autoClearStencil = true;
         if (background === null) sceneWithBackground.background = renderer.getClearColor(_clearColor);
         const cubeCamera = new CubeCamera(near, far, sourceTarget);
-        (cubeCamera.position as unknown as { copy(v: unknown): void }).copy(position);
+        cubeCamera.position.copy(position);
         cubeCamera.update(renderer, scene);
       } finally {
         renderer.autoClear = autoClear;

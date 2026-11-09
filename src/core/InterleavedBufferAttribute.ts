@@ -343,7 +343,11 @@ export class InterleavedBufferAttribute {
           array.push(this.data.array[index + j]);
         }
       }
-      return new BufferAttribute(new (this.array.constructor as any)(array), this.itemSize, this.normalized);
+      return new BufferAttribute(
+        new (this.array.constructor as new (array: ArrayLike<number>) => BufferAttribute["array"])(array),
+        this.itemSize,
+        this.normalized,
+      );
     } else {
       if (data.interleavedBuffers === undefined) {
         data.interleavedBuffers = {};

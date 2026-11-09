@@ -43,6 +43,9 @@ export class TetrahedronGeometry extends PolyhedronGeometry {
       detail: detail,
     };
   }
+  override clone(): TetrahedronGeometry {
+    return new TetrahedronGeometry().copy(this);
+  }
   /**
    * Factory method for creating an instance of this class from the given
    * JSON object.

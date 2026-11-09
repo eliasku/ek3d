@@ -56,6 +56,9 @@ export class SpotLightShadow extends LightShadow<PerspectiveCamera> {
     this.aspect = source.aspect;
     return this;
   }
+  override clone(_recursive?: boolean): SpotLightShadow {
+    return new SpotLightShadow().copy(this);
+  }
   /**
    * Serializes the light shadow into JSON.
    *

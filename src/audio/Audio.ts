@@ -245,8 +245,7 @@ export class Audio extends Object3D {
     this.filters = source.filters.slice();
     return this;
   }
-  clone(recursive?: boolean): this {
-    const AudioClass = this.constructor as new (listener: AudioListener) => this;
-    return new AudioClass(this.listener).copy(this, recursive);
+  clone(recursive?: boolean): Audio {
+    return new Audio(this.listener).copy(this, recursive);
   }
 }

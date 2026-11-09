@@ -203,6 +203,8 @@ export class SceneOptimizer {
         indices += stats.indices;
       }
       const material = group.materialProps.clone();
+      if (!("color" in material) || !(material.color instanceof Color))
+        throw new Error("SceneOptimizer: material clones must retain their color.");
       material.color.setRGB(1, 1, 1);
       const batchedMesh = new BatchedMesh(group.totalInstances, vertices, indices, material);
       const reference = group.meshes[0];

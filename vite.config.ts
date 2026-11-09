@@ -16,6 +16,7 @@ export default defineConfig(({ command }) => ({
       entrySourceFiles: [],
       tsconfigPath: "tsconfig.crasher.json",
       enabled: command === "build",
+      // shortcut: dynamic WebGL backend calls lose renamed properties; enable after removing their type erasure.
       useMangler: false,
     }) as Plugin,
   ],

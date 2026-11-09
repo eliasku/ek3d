@@ -16,7 +16,7 @@ const _lookTarget = /*@__PURE__*/ new Vector3();
  *
  * @abstract
  */
-export class LightShadow<TCamera extends Camera = Camera> {
+export class LightShadow<TCamera extends { clone(): TCamera } & Camera = Camera> {
   camera: TCamera;
   intensity: number;
   bias: number;
@@ -276,8 +276,8 @@ export class LightShadow<TCamera extends Camera = Camera> {
    * @param source - The light shadow to copy.
    * @return A reference to this light shadow instance.
    */
-  copy(source: LightShadow): this {
-    this.camera = source.camera.clone() as TCamera;
+  copy(source: LightShadow<TCamera>): this {
+    this.camera = source.camera.clone();
     this.intensity = source.intensity;
     this.bias = source.bias;
     this.radius = source.radius;
@@ -294,8 +294,8 @@ export class LightShadow<TCamera extends Camera = Camera> {
    *
    * @return A clone of this instance.
    */
-  clone(_recursive?: boolean): this {
-    return new (this.constructor as any)().copy(this);
+  clone(_recursive?: boolean): LightShadow<TCamera> {
+    return new LightShadow<TCamera>(this.camera).copy(this);
   }
   /**
    * Serializes the light shadow into JSON.

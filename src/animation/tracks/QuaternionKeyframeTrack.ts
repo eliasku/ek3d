@@ -31,6 +31,13 @@ export class QuaternionKeyframeTrack extends KeyframeTrack {
   ) {
     super(name, times, values, interpolation);
   }
+
+  override clone(): QuaternionKeyframeTrack {
+    const track = new QuaternionKeyframeTrack(this.name, this.times.slice(), this.values.slice());
+    this.copyInterpolationTo(track);
+    return track;
+  }
+
   /**
    * Overwritten so the method returns Quaternion based interpolant.
    *

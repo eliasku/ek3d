@@ -13,6 +13,8 @@
  * const timer = new Timer();
  * timer.connect( document ); // use Page Visibility API
  * ```
+ *
+ * @class-crasher-ignore Resource lists call dispose through a structural type.
  */
 export class Timer {
   _previousTime: number;

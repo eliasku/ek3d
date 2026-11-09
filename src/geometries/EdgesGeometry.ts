@@ -130,6 +130,9 @@ export class EdgesGeometry extends BufferGeometry {
       this.setAttribute("position", new Float32BufferAttribute(vertices, 3));
     }
   }
+  override clone(): EdgesGeometry {
+    return new EdgesGeometry().copy(this);
+  }
   copy(source: this) {
     super.copy(source);
     this.parameters = Object.assign({}, source.parameters);

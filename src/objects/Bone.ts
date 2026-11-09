@@ -31,4 +31,7 @@ export class Bone extends Object3D {
     this.isBone = true;
     this.type = "Bone";
   }
+  clone(recursive?: boolean): Bone {
+    return new Bone().copy(this, recursive);
+  }
 }

@@ -360,6 +360,9 @@ export class MeshToonMaterial extends Material {
     this.fog = true;
     this.setValues(parameters);
   }
+  clone(): MeshToonMaterial {
+    return new MeshToonMaterial().copy(this);
+  }
   copy(source: MeshToonMaterial): this {
     super.copy(source);
     this.color.copy(source.color);

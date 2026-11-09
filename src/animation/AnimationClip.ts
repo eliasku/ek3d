@@ -104,7 +104,7 @@ export class AnimationClip {
    * @param clip - The animation clip to serialize.
    * @return The JSON object.
    */
-  static toJSON(clip: AnimationClip) {
+  static toJSON(clip: AnimationClip): any {
     const tracks: any[] = [],
       clipTracks = clip.tracks;
     const json: any = {
@@ -291,7 +291,7 @@ export class AnimationClip {
     for (let i = 0; i < this.tracks.length; i++) {
       tracks.push(this.tracks[i].clone());
     }
-    const clip = new (this.constructor as any)(this.name, this.duration, tracks, this.blendMode);
+    const clip = new AnimationClip(this.name, this.duration, tracks, this.blendMode);
     clip.userData = JSON.parse(JSON.stringify(this.userData));
     return clip;
   }
@@ -300,8 +300,8 @@ export class AnimationClip {
    *
    * @return The JSON object.
    */
-  toJSON() {
-    return (this.constructor as any).toJSON(this);
+  toJSON(): any {
+    return AnimationClip.toJSON(this);
   }
 }
 function getTrackTypeForValueTypeName(typeName?: any) {

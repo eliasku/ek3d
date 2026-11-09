@@ -90,6 +90,9 @@ export class RectAreaLight extends Light {
     this.height = source.height;
     return this;
   }
+  clone(recursive?: boolean): RectAreaLight {
+    return new RectAreaLight().copy(this, recursive);
+  }
   toJSON(meta?: any) {
     const data = super.toJSON(meta);
     data.object.width = this.width;

@@ -88,6 +88,7 @@ export function verifyHelpers() {
     new PlaneHelper(new Plane(new Vector3(0, 0, 1), 0), 2),
     skeleton,
   ];
+  const clones: (typeof helpers)[number][] = [];
   const nativeBuffers = new Set<WebGLBuffer>();
   const coverage: Record<string, number> = {};
   const draw = (helper: (typeof helpers)[number]) => {
@@ -120,6 +121,13 @@ export function verifyHelpers() {
       check(count(draw(helper)) === 0, `${helper.type}: hidden helper still rendered`);
       helper.visible = true;
       check(count(draw(helper)) === coverage[helper.type], `${helper.type}: visibility did not restore rendering`);
+      const clone = helper.clone();
+      clones.push(clone);
+      const clonedFrame = draw(clone);
+      check(
+        frame.every((value, index) => value === clonedFrame[index]),
+        `${helper.type}: clone changed rendering`,
+      );
     }
     for (const [helper, change] of [
       [
@@ -180,7 +188,7 @@ export function verifyHelpers() {
     return { glError: 0, coverage, nativeBuffers: nativeBuffers.size, updates: 4 };
   } finally {
     scene.clear();
-    for (const helper of helpers) helper.dispose();
+    for (const helper of [...helpers, ...clones]) helper.dispose();
     target.geometry.dispose();
     targetMaterial.dispose();
     renderer.dispose();

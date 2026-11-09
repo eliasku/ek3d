@@ -3,7 +3,7 @@ import type { Vector3 } from "../../math/Vector3";
 import type { LTCTextures } from "../shaders/LTCTextures";
 import { WebGLLights } from "./WebGLLights";
 function WebGLRenderState(extensions?: any, ltcTextures: LTCTextures | null = null) {
-  const lights = new (WebGLLights as any)(extensions, ltcTextures);
+  const lights = WebGLLights(extensions, ltcTextures);
   const lightsArray: any[] = [];
   const shadowsArray: any[] = [];
   const lightProbeGridArray: any[] = [];
@@ -56,16 +56,16 @@ function WebGLRenderState(extensions?: any, ltcTextures: LTCTextures | null = nu
   };
 }
 export function WebGLRenderStates(extensions?: any, ltcTextures: LTCTextures | null = null) {
-  let renderStates = new WeakMap<any, any>();
+  let renderStates = new WeakMap<object, ReturnType<typeof WebGLRenderState>[]>();
   function get(scene?: any, renderCallDepth: number = 0) {
     const renderStateArray = renderStates.get(scene);
-    let renderState: any;
+    let renderState: ReturnType<typeof WebGLRenderState>;
     if (renderStateArray === undefined) {
-      renderState = new (WebGLRenderState as any)(extensions, ltcTextures);
+      renderState = WebGLRenderState(extensions, ltcTextures);
       renderStates.set(scene, [renderState]);
     } else {
       if (renderCallDepth >= renderStateArray.length) {
-        renderState = new (WebGLRenderState as any)(extensions, ltcTextures);
+        renderState = WebGLRenderState(extensions, ltcTextures);
         renderStateArray.push(renderState);
       } else {
         renderState = renderStateArray[renderCallDepth];

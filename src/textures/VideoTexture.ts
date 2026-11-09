@@ -77,8 +77,8 @@ export class VideoTexture extends Texture {
       this._requestVideoFrameCallbackId = video.requestVideoFrameCallback(updateVideo);
     }
   }
-  clone(): this {
-    return new (this.constructor as any)(this.image).copy(this);
+  clone(): VideoTexture {
+    return new VideoTexture(this.image).copy(this);
   }
   /**
    * This method is called automatically by the renderer and sets {@link Texture#needsUpdate}

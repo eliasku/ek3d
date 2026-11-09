@@ -31,6 +31,8 @@ const _identityMatrix = /*@__PURE__*/ new Matrix4();
  *
  * const armSkeleton = new Skeleton( bones );
  * ```
+ *
+ * @class-crasher-ignore Render and resource lists invoke skeleton methods through structural types.
  */
 export class Skeleton {
   uuid: string;

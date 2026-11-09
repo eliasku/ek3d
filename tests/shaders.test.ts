@@ -120,8 +120,8 @@ test("uniform cloning dispatches math values and preserves custom clone override
   }
 
   class CustomTexture extends DataTexture {
-    override clone(): this {
-      const result = super.clone();
+    override clone(): CustomTexture {
+      const result = new CustomTexture().copy(this);
       result.name = "custom clone";
       return result;
     }

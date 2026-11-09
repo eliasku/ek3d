@@ -59,6 +59,16 @@ export class CompressedArrayTexture extends CompressedTexture {
      */
     this.layerUpdates = new Set();
   }
+  clone(): CompressedArrayTexture {
+    return new CompressedArrayTexture(
+      this.mipmaps,
+      this.image.width,
+      this.image.height,
+      this.image.depth,
+      this.format,
+      this.type,
+    ).copy(this);
+  }
   /**
    * Copies the values of the given texture to this instance.
    *

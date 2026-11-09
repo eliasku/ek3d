@@ -42,4 +42,7 @@ export class Group extends Object3D {
     this.isGroup = true;
     this.type = "Group";
   }
+  clone(recursive?: boolean): Group {
+    return new Group().copy(this, recursive);
+  }
 }

@@ -175,9 +175,15 @@ export class TubeGeometry extends BufferGeometry {
       }
     }
   }
+  override clone(): TubeGeometry {
+    return new TubeGeometry().copy(this);
+  }
   copy(source: this) {
     super.copy(source);
     this.parameters = Object.assign({}, source.parameters);
+    this.tangents = source.tangents.map((tangent) => tangent.clone());
+    this.normals = source.normals.map((normal) => normal.clone());
+    this.binormals = source.binormals.map((binormal) => binormal.clone());
     return this;
   }
   toJSON(): TubeGeometryJSON {

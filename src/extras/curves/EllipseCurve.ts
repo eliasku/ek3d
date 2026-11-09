@@ -165,6 +165,9 @@ export class EllipseCurve extends Curve<Vector2> {
     }
     return point.set(x, y);
   }
+  override clone(): EllipseCurve {
+    return new EllipseCurve().copy(this);
+  }
   copy(source: this): this {
     super.copy(source);
     this.aX = source.aX;

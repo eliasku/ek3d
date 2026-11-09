@@ -59,7 +59,7 @@ export class ShapeUtils {
     return faces;
   }
 }
-function removeDupEndPts(points?: any) {
+function removeDupEndPts(points: Vector2[]): void {
   const l = points.length;
   if (l > 2 && points[l - 1].equals(points[0])) {
     points.pop();

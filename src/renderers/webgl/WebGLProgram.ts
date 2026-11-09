@@ -248,7 +248,13 @@ function generateEnvMapBlendingDefine(parameters?: any) {
   if (parameters.envMap === false) return "ENVMAP_BLENDING_NONE";
   return (envMapBlendingDefines as any)[parameters.combine] || "ENVMAP_BLENDING_NONE";
 }
-export function WebGLProgram(this: any, renderer?: any, cacheKey?: any, parameters?: any, bindingStates?: any) {
+export function WebGLProgram(
+  this: WebGLProgramInfo,
+  renderer?: any,
+  cacheKey?: any,
+  parameters?: any,
+  bindingStates?: any,
+) {
   // TODO Send this event to Three.js DevTools
   // log( 'WebGLProgram', cacheKey );
   const gl = renderer.getContext();

@@ -29,6 +29,12 @@ export class ColorKeyframeTrack extends KeyframeTrack {
   ) {
     super(name, times, values, interpolation);
   }
+
+  override clone(): ColorKeyframeTrack {
+    const track = new ColorKeyframeTrack(this.name, this.times.slice(), this.values.slice());
+    this.copyInterpolationTo(track);
+    return track;
+  }
 }
 /**
  * The value type name.

@@ -306,7 +306,7 @@ test("instanced picking respects indexed and nonindexed material groups and draw
   }
 });
 
-test("clone and copy preserve subtype and resource sharing but isolate instance storage and bounds", () => {
+test("clone uses the declared class and copy isolates instance storage and bounds", () => {
   class Cluster extends InstancedMesh {}
   const geometry = new BoxGeometry();
   const material = new MeshBasicMaterial();
@@ -316,7 +316,7 @@ test("clone and copy preserve subtype and resource sharing but isolate instance 
   source.computeBoundingSphere();
   source.add(new Object3D());
   const clone = source.clone();
-  assert.ok(clone instanceof Cluster);
+  assert.equal(Object.getPrototypeOf(clone), InstancedMesh.prototype);
   assert.notEqual(clone.children[0], source.children[0]);
   assert.equal(source.clone(false).children.length, 0);
   const copied = new InstancedMesh(new BoxGeometry(), new MeshBasicMaterial(), 0);

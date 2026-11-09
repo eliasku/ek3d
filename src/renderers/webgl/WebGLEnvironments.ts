@@ -7,7 +7,7 @@ import { WebGLCubeRenderTarget } from "../WebGLCubeRenderTarget";
 export function WebGLEnvironments(renderer: WebGLRenderer): WebGLEnvironmentProvider & { dispose(): void } {
   let cubeMaps = new WeakMap<any, any>();
   let pmremMaps = new WeakMap<any, any>();
-  let pmremGenerator: any = null;
+  let pmremGenerator: PMREMGenerator | null = null;
   const sources = new Set<any>();
   const sourceRefs = new WeakMap<any, any>();
   const registry = new FinalizationRegistry((ref?: any) => sources.delete(ref));

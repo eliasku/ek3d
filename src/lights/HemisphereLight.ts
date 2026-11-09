@@ -40,7 +40,7 @@ export class HemisphereLight extends Light {
      */
     this.isHemisphereLight = true;
     this.type = "HemisphereLight";
-    (this as any).position.copy(Object3D.DEFAULT_UP);
+    this.position.copy(Object3D.DEFAULT_UP);
     this.updateMatrix();
     /**
      * The light's ground color.
@@ -52,6 +52,9 @@ export class HemisphereLight extends Light {
     super.copy(source, recursive);
     this.groundColor.copy(source.groundColor);
     return this;
+  }
+  clone(recursive?: boolean): HemisphereLight {
+    return new HemisphereLight().copy(this, recursive);
   }
   toJSON(meta?: any) {
     const data = super.toJSON(meta);

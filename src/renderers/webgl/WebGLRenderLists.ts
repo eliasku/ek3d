@@ -122,16 +122,16 @@ export function WebGLRenderList() {
   };
 }
 export function WebGLRenderLists() {
-  let lists = new WeakMap<any, any>();
+  let lists = new WeakMap<object, ReturnType<typeof WebGLRenderList>[]>();
   function get(scene?: any, renderCallDepth?: any) {
     const listArray = lists.get(scene);
-    let list: any;
+    let list: ReturnType<typeof WebGLRenderList>;
     if (listArray === undefined) {
-      list = new (WebGLRenderList as any)();
+      list = WebGLRenderList();
       lists.set(scene, [list]);
     } else {
       if (renderCallDepth >= listArray.length) {
-        list = new (WebGLRenderList as any)();
+        list = WebGLRenderList();
         listArray.push(list);
       } else {
         list = listArray[renderCallDepth];

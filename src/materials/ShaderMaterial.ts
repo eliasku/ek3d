@@ -242,6 +242,9 @@ export class ShaderMaterial extends Material {
       this.setValues(parameters);
     }
   }
+  clone(): ShaderMaterial {
+    return new ShaderMaterial().copy(this);
+  }
   copy(source: ShaderMaterial): this {
     super.copy(source);
     this.fragmentShader = source.fragmentShader;

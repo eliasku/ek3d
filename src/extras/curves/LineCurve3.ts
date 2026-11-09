@@ -65,6 +65,9 @@ export class LineCurve3 extends Curve<Vector3> {
   getTangentAt(u: number, optionalTarget?: Vector3) {
     return this.getTangent(u, optionalTarget);
   }
+  override clone(): LineCurve3 {
+    return new LineCurve3().copy(this);
+  }
   copy(source: this): this {
     super.copy(source);
     this.v1.copy(source.v1);

@@ -96,6 +96,9 @@ export class LineBasicMaterial extends Material {
     this.fog = true;
     this.setValues(parameters);
   }
+  clone(): LineBasicMaterial {
+    return new LineBasicMaterial().copy(this);
+  }
   copy(source: LineBasicMaterial): this {
     super.copy(source);
     this.color.copy(source.color);

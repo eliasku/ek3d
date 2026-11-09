@@ -26,6 +26,12 @@ export class StringKeyframeTrack extends KeyframeTrack {
   constructor(name: string, times: NumericAnimationBuffer, values: string[]) {
     super(name, times, values);
   }
+
+  override clone(): StringKeyframeTrack {
+    const track = new StringKeyframeTrack(this.name, this.times.slice(), this.values.slice());
+    this.copyInterpolationTo(track);
+    return track;
+  }
 }
 /**
  * The value type name.

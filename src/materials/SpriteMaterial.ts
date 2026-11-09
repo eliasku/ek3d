@@ -113,6 +113,9 @@ export class SpriteMaterial extends Material {
     this.fog = true;
     this.setValues(parameters);
   }
+  clone(): SpriteMaterial {
+    return new SpriteMaterial().copy(this);
+  }
   copy(source: SpriteMaterial): this {
     super.copy(source);
     this.color.copy(source.color);

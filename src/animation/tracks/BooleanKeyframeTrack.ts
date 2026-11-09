@@ -26,6 +26,12 @@ export class BooleanKeyframeTrack extends KeyframeTrack {
   constructor(name: string, times: NumericAnimationBuffer, values: boolean[]) {
     super(name, times, values);
   }
+
+  override clone(): BooleanKeyframeTrack {
+    const track = new BooleanKeyframeTrack(this.name, this.times.slice(), this.values.slice());
+    this.copyInterpolationTo(track);
+    return track;
+  }
 }
 /**
  * The value type name.

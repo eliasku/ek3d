@@ -50,9 +50,9 @@ export class Box3Helper extends LineSegments<LineBasicMaterial> {
   updateMatrixWorld(force?: boolean) {
     const box = this.box;
     if (box.isEmpty()) return;
-    box.getCenter((this as any).position);
-    box.getSize((this as any).scale);
-    (this as any).scale.multiplyScalar(0.5);
+    box.getCenter(this.position);
+    box.getSize(this.scale);
+    this.scale.multiplyScalar(0.5);
     super.updateMatrixWorld(force);
   }
   /**
@@ -64,7 +64,7 @@ export class Box3Helper extends LineSegments<LineBasicMaterial> {
     this.geometry.dispose();
     this.material.dispose();
   }
-  clone(recursive: boolean = true): this {
-    return new (this.constructor as any)().copy(this, recursive);
+  clone(recursive: boolean = true): Box3Helper {
+    return new Box3Helper(this.box).copy(this, recursive);
   }
 }

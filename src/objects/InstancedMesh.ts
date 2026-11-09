@@ -136,8 +136,8 @@ export class InstancedMesh extends Mesh {
       this.boundingSphere!.union(_sphere);
     }
   }
-  clone(recursive: boolean = true): this {
-    return new (this.constructor as any)(this.geometry, this.material, 0).copy(this, recursive);
+  clone(recursive: boolean = true): InstancedMesh {
+    return new InstancedMesh(this.geometry, this.material, 0).copy(this, recursive);
   }
   copy(source: InstancedMesh, recursive?: boolean): this {
     super.copy(source, recursive);

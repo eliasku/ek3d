@@ -120,6 +120,9 @@ export class MeshDepthMaterial extends Material {
     this.wireframeLinewidth = 1;
     this.setValues(parameters);
   }
+  clone(): MeshDepthMaterial {
+    return new MeshDepthMaterial().copy(this);
+  }
   copy(source: MeshDepthMaterial): this {
     super.copy(source);
     this.depthPacking = source.depthPacking;

@@ -281,6 +281,9 @@ export class MeshMatcapMaterial extends Material {
     this.fog = true;
     this.setValues(parameters);
   }
+  clone(): MeshMatcapMaterial {
+    return new MeshMatcapMaterial().copy(this);
+  }
   copy(source: MeshMatcapMaterial): this {
     super.copy(source);
     this.defines = { MATCAP: "" };

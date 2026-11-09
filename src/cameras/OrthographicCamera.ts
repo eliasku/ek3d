@@ -134,6 +134,12 @@ export class OrthographicCamera extends Camera {
     this.view = source.view === null ? null : Object.assign({}, source.view);
     return this;
   }
+  clone(recursive?: boolean): OrthographicCamera {
+    return new OrthographicCamera(this.left, this.right, this.top, this.bottom, this.near, this.far).copy(
+      this,
+      recursive,
+    );
+  }
   /**
    * Sets an offset in a larger frustum. This is useful for multi-window or
    * multi-monitor/multi-machine setups.

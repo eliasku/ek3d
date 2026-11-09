@@ -65,6 +65,9 @@ export class QuadraticBezierCurve3 extends Curve<Vector3> {
     );
     return point;
   }
+  override clone(): QuadraticBezierCurve3 {
+    return new QuadraticBezierCurve3().copy(this);
+  }
   copy(source: this): this {
     super.copy(source);
     this.v0.copy(source.v0);

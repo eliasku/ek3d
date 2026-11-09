@@ -71,6 +71,7 @@ export class Camera extends Object3D {
     this.projectionMatrix.copy(source.projectionMatrix);
     this.projectionMatrixInverse.copy(source.projectionMatrixInverse);
     this.coordinateSystem = source.coordinateSystem;
+    this._reversedDepth = source._reversedDepth;
     return this;
   }
   /**
@@ -105,7 +106,7 @@ export class Camera extends Object3D {
       this.matrixWorldInverse.compose(_position, _quaternion, _scale.set(1, 1, 1)).invert();
     }
   }
-  clone(_recursive?: boolean): this {
-    return new (this.constructor as any)().copy(this);
+  clone(recursive?: boolean): Camera {
+    return new Camera().copy(this, recursive);
   }
 }

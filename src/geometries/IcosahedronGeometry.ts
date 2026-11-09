@@ -84,6 +84,9 @@ export class IcosahedronGeometry extends PolyhedronGeometry {
       detail: detail,
     };
   }
+  override clone(): IcosahedronGeometry {
+    return new IcosahedronGeometry().copy(this);
+  }
   /**
    * Factory method for creating an instance of this class from the given
    * JSON object.

@@ -100,6 +100,9 @@ export class CompressedTexture extends Texture<CompressedTextureMipmap> {
      */
     this.generateMipmaps = false;
   }
+  clone(): CompressedTexture {
+    return new CompressedTexture().copy(this);
+  }
 
   get image(): { width: number | undefined; height: number | undefined } | CompressedTextureFace[] {
     return this.source.data;

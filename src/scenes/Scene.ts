@@ -118,6 +118,9 @@ export class Scene extends Object3D {
     this.matrixAutoUpdate = source.matrixAutoUpdate;
     return this;
   }
+  clone(recursive?: boolean): Scene {
+    return new Scene().copy(this, recursive);
+  }
   toJSON(meta?: any) {
     const data = super.toJSON(meta);
     if (this.fog !== null) data.object.fog = this.fog.toJSON();

@@ -467,24 +467,22 @@ export class KeyframeTrack {
    *
    * @return A clone of this instance.
    */
-  clone(): this {
-    const times = this.times.slice();
-    const values = this.values.slice();
-    const TypedKeyframeTrack = this.constructor as new (
-      name: string,
-      times: NumericAnimationBuffer,
-      values: AnimationBuffer,
-    ) => this;
-    const track = new TypedKeyframeTrack(this.name, times, values);
+  clone(): KeyframeTrack {
+    const track = new KeyframeTrack(this.name, this.times.slice(), this.values.slice());
+    this.copyInterpolationTo(track);
+    return track;
+  }
+
+  protected copyInterpolationTo(track: KeyframeTrack): void {
     // Interpolant argument to constructor is not saved, so copy the factory method directly.
     track.createInterpolant = this.createInterpolant;
-    if (hasTangents((this as any).settings)) {
+    const settings = this.settings;
+    if (settings?.inTangents !== undefined && settings.outTangents !== undefined) {
       track.settings = {
-        inTangents: (this as any).settings.inTangents.slice(),
-        outTangents: (this as any).settings.outTangents.slice(),
+        inTangents: settings.inTangents.slice(),
+        outTangents: settings.outTangents.slice(),
       };
     }
-    return track;
   }
 }
 function shiftTangentTimes(tangents?: any, timeOffset?: any) {

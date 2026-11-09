@@ -33,4 +33,11 @@ export function WebGLIndexedBufferRenderer(this: any, gl?: any, extensions?: any
   this.render = render;
   this.renderInstances = renderInstances;
   this.renderMultiDraw = renderMultiDraw;
+  return this as {
+    setMode: typeof setMode;
+    setIndex: typeof setIndex;
+    render: typeof render;
+    renderInstances: typeof renderInstances;
+    renderMultiDraw: typeof renderMultiDraw;
+  };
 }

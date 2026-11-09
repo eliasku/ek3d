@@ -31,4 +31,7 @@ export class RawShaderMaterial extends ShaderMaterial {
     this.isRawShaderMaterial = true;
     this.type = "RawShaderMaterial";
   }
+  clone(): RawShaderMaterial {
+    return new RawShaderMaterial().copy(this);
+  }
 }

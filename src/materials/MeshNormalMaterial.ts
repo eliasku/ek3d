@@ -204,6 +204,9 @@ export class MeshNormalMaterial extends Material {
     this.flatShading = false;
     this.setValues(parameters);
   }
+  clone(): MeshNormalMaterial {
+    return new MeshNormalMaterial().copy(this);
+  }
   copy(source: MeshNormalMaterial): this {
     super.copy(source);
     this.bumpMap = source.bumpMap;

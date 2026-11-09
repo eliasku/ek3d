@@ -15,7 +15,7 @@ function CubicPoly() {
     - http://stackoverflow.com/questions/9489736/catmull-rom-curve-with-no-cusps-and-no-self-intersections/
     - http://ideone.com/NoEbVM
 
-    This CubicPoly class could be used for reusing some variables and calculations,
+    This CubicPoly helper could be used for reusing some variables and calculations,
     but for three.js curve use, it could be possible inlined and flatten into a single function call
     which can be placed in CurveUtils.
     */
@@ -60,9 +60,9 @@ function CubicPoly() {
 //
 const tmp = /*@__PURE__*/ new Vector3();
 const tmp2 = /*@__PURE__*/ new Vector3();
-const px = /*@__PURE__*/ new (CubicPoly as any)();
-const py = /*@__PURE__*/ new (CubicPoly as any)();
-const pz = /*@__PURE__*/ new (CubicPoly as any)();
+const px = /*@__PURE__*/ CubicPoly();
+const py = /*@__PURE__*/ CubicPoly();
+const pz = /*@__PURE__*/ CubicPoly();
 /**
  * A curve representing a Catmull-Rom spline.
  *
@@ -167,7 +167,7 @@ export class CatmullRomCurve3 extends Curve<Vector3> {
       intPoint = l - 2;
       weight = 1;
     }
-    let p0: any, p3: any; // 4 points (p1 & p2 defined below)
+    let p0: Vector3, p3: Vector3; // 4 points (p1 & p2 defined below)
     if (this.closed || intPoint > 0) {
       p0 = points[(intPoint - 1) % l];
     } else {
@@ -204,6 +204,9 @@ export class CatmullRomCurve3 extends Curve<Vector3> {
     }
     point.set(px.calc(weight), py.calc(weight), pz.calc(weight));
     return point;
+  }
+  override clone(): CatmullRomCurve3 {
+    return new CatmullRomCurve3().copy(this);
   }
   copy(source: this): this {
     super.copy(source);

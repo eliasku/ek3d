@@ -65,7 +65,7 @@ export class SpotLight extends Light {
      */
     this.isSpotLight = true;
     this.type = "SpotLight";
-    (this as any).position.copy(Object3D.DEFAULT_UP);
+    this.position.copy(Object3D.DEFAULT_UP);
     this.updateMatrix();
     /**
      * The spot light points from its position to the
@@ -147,6 +147,9 @@ export class SpotLight extends Light {
     this.map = source.map;
     this.shadow = source.shadow.clone();
     return this;
+  }
+  clone(recursive?: boolean): SpotLight {
+    return new SpotLight().copy(this, recursive);
   }
   toJSON(meta?: any) {
     const data = super.toJSON(meta);

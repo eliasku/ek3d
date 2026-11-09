@@ -1,5 +1,11 @@
 import { GL } from "../../GL";
 import { warn } from "../../utils";
+import type { Color } from "../../math/Color";
+import type { Vector2 } from "../../math/Vector2";
+import type { Vector3 } from "../../math/Vector3";
+import type { Vector4 } from "../../math/Vector4";
+import type { Matrix3 } from "../../math/Matrix3";
+import type { Matrix4 } from "../../math/Matrix4";
 export function WebGLUniformsGroups(gl?: any, info?: any, capabilities?: any, state?: any) {
   let buffers: any = {};
   let groups: any = {};
@@ -92,6 +98,16 @@ export function WebGLUniformsGroups(gl?: any, info?: any, capabilities?: any, st
     } else if (ArrayBuffer.isView(value)) {
       // copy the buffer data using "set"
       data.set((value as any).subarray(0, data.length - offset), offset);
+    } else if (value.isColor) {
+      (value as Color).toArray(data, offset);
+    } else if (value.isVector2) {
+      (value as Vector2).toArray(data, offset);
+    } else if (value.isVector3) {
+      (value as Vector3).toArray(data, offset);
+    } else if (value.isVector4) {
+      (value as Vector4).toArray(data, offset);
+    } else if (value.isMatrix4) {
+      (value as Matrix4).toArray(data, offset);
     } else {
       value.toArray(data, offset);
     }
@@ -118,6 +134,18 @@ export function WebGLUniformsGroups(gl?: any, info?: any, capabilities?: any, st
         cache[key] = value;
       } else if (ArrayBuffer.isView(value)) {
         cache[key] = (value as any).slice();
+      } else if (value.isColor) {
+        cache[key] = (value as Color).clone();
+      } else if (value.isVector2) {
+        cache[key] = (value as Vector2).clone();
+      } else if (value.isVector3) {
+        cache[key] = (value as Vector3).clone();
+      } else if (value.isVector4) {
+        cache[key] = (value as Vector4).clone();
+      } else if (value.isMatrix3) {
+        cache[key] = (value as Matrix3).clone();
+      } else if (value.isMatrix4) {
+        cache[key] = (value as Matrix4).clone();
       } else {
         cache[key] = value.clone();
       }
@@ -133,6 +161,36 @@ export function WebGLUniformsGroups(gl?: any, info?: any, capabilities?: any, st
       } else if (ArrayBuffer.isView(value)) {
         // always update the array buffers
         return true;
+      } else if (cachedObject.isColor) {
+        if ((cachedObject as Color).equals(value) === false) {
+          (cachedObject as Color).copy(value);
+          return true;
+        }
+      } else if (cachedObject.isVector2) {
+        if ((cachedObject as Vector2).equals(value) === false) {
+          (cachedObject as Vector2).copy(value);
+          return true;
+        }
+      } else if (cachedObject.isVector3) {
+        if ((cachedObject as Vector3).equals(value) === false) {
+          (cachedObject as Vector3).copy(value);
+          return true;
+        }
+      } else if (cachedObject.isVector4) {
+        if ((cachedObject as Vector4).equals(value) === false) {
+          (cachedObject as Vector4).copy(value);
+          return true;
+        }
+      } else if (cachedObject.isMatrix3) {
+        if ((cachedObject as Matrix3).equals(value) === false) {
+          (cachedObject as Matrix3).copy(value);
+          return true;
+        }
+      } else if (cachedObject.isMatrix4) {
+        if ((cachedObject as Matrix4).equals(value) === false) {
+          (cachedObject as Matrix4).copy(value);
+          return true;
+        }
       } else {
         if (cachedObject.equals(value) === false) {
           cachedObject.copy(value);

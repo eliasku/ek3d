@@ -78,6 +78,9 @@ export class CubicBezierCurve3 extends Curve<Vector3> {
     );
     return point;
   }
+  override clone(): CubicBezierCurve3 {
+    return new CubicBezierCurve3().copy(this);
+  }
   copy(source: this): this {
     super.copy(source);
     this.v0.copy(source.v0);

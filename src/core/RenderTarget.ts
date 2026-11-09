@@ -362,8 +362,8 @@ export class RenderTarget extends EventDispatcher {
    *
    * @return A clone of this instance.
    */
-  clone(): this {
-    return new (this.constructor as any)().copy(this);
+  clone(): RenderTarget {
+    return new RenderTarget().copy(this);
   }
   /**
    * Copies the settings of the given render target. This is a structural copy so
@@ -386,8 +386,10 @@ export class RenderTarget extends EventDispatcher {
       this.textures[i].isRenderTargetTexture = true;
       this.textures[i].renderTarget = this;
       // ensure image object is not shared, see #20328
-      const image = Object.assign({}, source.textures[i].image);
-      this.textures[i].source = new TextureSource(image);
+      const image = source.textures[i].image;
+      this.textures[i].source = new TextureSource(
+        Array.isArray(image) ? image.map((face) => Object.assign({}, face)) : Object.assign({}, image),
+      );
     }
     this.depthBuffer = source.depthBuffer;
     this.stencilBuffer = source.stencilBuffer;

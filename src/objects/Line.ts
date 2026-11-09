@@ -102,8 +102,8 @@ export class Line<TMaterial extends Material | Material[] = Material | Material[
     this.morphTargetInfluences = undefined;
     this.updateMorphTargets();
   }
-  clone(recursive: boolean = true): this {
-    return new (this.constructor as any)(this.geometry, this.material).copy(this, recursive);
+  clone(recursive: boolean = true): Line<TMaterial> {
+    return new Line<TMaterial>(this.geometry, this.material).copy(this, recursive);
   }
   copy(source: Line, recursive?: boolean): this {
     super.copy(source, recursive);

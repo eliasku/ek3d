@@ -122,6 +122,9 @@ export class ShapeGeometry extends BufferGeometry {
       }
     }
   }
+  override clone(): ShapeGeometry {
+    return new ShapeGeometry().copy(this);
+  }
   copy(source: this) {
     super.copy(source);
     this.parameters = Object.assign({}, source.parameters);

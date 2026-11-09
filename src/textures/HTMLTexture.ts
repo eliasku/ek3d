@@ -67,6 +67,10 @@ export class HTMLTexture extends Texture {
     }
   }
 
+  clone(): HTMLTexture {
+    return new HTMLTexture().copy(this);
+  }
+
   override dispose(): void {
     const parent = this.image ? (this.image as HTMLElement).parentNode : null;
 

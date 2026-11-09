@@ -104,6 +104,9 @@ export class Data3DTexture extends Texture {
      */
     this.unpackAlignment = 1;
   }
+  clone(): Data3DTexture {
+    return new Data3DTexture().copy(this);
+  }
   /**
    * Copies the values of the given texture to this instance.
    *

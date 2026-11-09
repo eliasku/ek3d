@@ -102,6 +102,6 @@ export class MaterialLoader extends Loader<Material> {
   createMaterialFromType(type: string): Material {
     if (!Object.hasOwn(this.constructors, type))
       throw new Error('MaterialLoader: Unknown material type "' + type + '".');
-    return new (this.constructors as any)[type]();
+    return new this.constructors[type]();
   }
 }

@@ -89,6 +89,9 @@ export class CircleGeometry extends BufferGeometry {
     this.setAttribute("normal", new Float32BufferAttribute(normals, 3));
     this.setAttribute("uv", new Float32BufferAttribute(uvs, 2));
   }
+  override clone(): CircleGeometry {
+    return new CircleGeometry().copy(this);
+  }
   copy(source: this) {
     super.copy(source);
     this.parameters = Object.assign({}, source.parameters);

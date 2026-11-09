@@ -102,6 +102,9 @@ export class DataArrayTexture extends Texture {
      */
     this.layerUpdates = new Set();
   }
+  clone(): DataArrayTexture {
+    return new DataArrayTexture().copy(this);
+  }
   /**
    * Copies the values of the given texture to this instance.
    *

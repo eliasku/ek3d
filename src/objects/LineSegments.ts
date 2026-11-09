@@ -32,6 +32,9 @@ export class LineSegments<TMaterial extends Material | Material[] = Material | M
     this.isLineSegments = true;
     this.type = "LineSegments";
   }
+  clone(recursive: boolean = true): LineSegments<TMaterial> {
+    return new LineSegments<TMaterial>(this.geometry, this.material).copy(this, recursive);
+  }
   computeLineDistances(): this {
     const geometry = this.geometry;
     // we assume non-indexed geometry

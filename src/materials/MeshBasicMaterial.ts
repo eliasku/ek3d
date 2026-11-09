@@ -214,6 +214,9 @@ export class MeshBasicMaterial extends Material {
     this.fog = true;
     this.setValues(parameters);
   }
+  clone(): MeshBasicMaterial {
+    return new MeshBasicMaterial().copy(this);
+  }
   copy(source: MeshBasicMaterial): this {
     super.copy(source);
     this.color.copy(source.color);

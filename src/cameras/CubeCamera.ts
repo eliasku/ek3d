@@ -102,6 +102,21 @@ export class CubeCamera extends Object3D<PerspectiveCamera> {
     cameraNZ.layers = this.layers;
     this.add(cameraNZ);
   }
+  copy(source: CubeCamera, recursive: boolean = true): this {
+    super.copy(source, false);
+    this.renderTarget = source.renderTarget;
+    this.coordinateSystem = source.coordinateSystem;
+    this.activeMipmapLevel = source.activeMipmapLevel;
+    for (let i = 0; i < 6; i++) this.children[i].copy(source.children[i], recursive);
+    if (recursive) {
+      for (let i = 6; i < source.children.length; i++) this.add(source.children[i].clone());
+    }
+    return this;
+  }
+  clone(recursive?: boolean): CubeCamera {
+    const camera = this.children[0];
+    return new CubeCamera(camera.near, camera.far, this.renderTarget).copy(this, recursive);
+  }
   /**
    * Must be called when the coordinate system of the cube camera is changed.
    */

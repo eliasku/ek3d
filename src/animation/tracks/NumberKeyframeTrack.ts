@@ -29,6 +29,12 @@ export class NumberKeyframeTrack extends KeyframeTrack {
   ) {
     super(name, times, values, interpolation);
   }
+
+  override clone(): NumberKeyframeTrack {
+    const track = new NumberKeyframeTrack(this.name, this.times.slice(), this.values.slice());
+    this.copyInterpolationTo(track);
+    return track;
+  }
 }
 /**
  * The value type name.

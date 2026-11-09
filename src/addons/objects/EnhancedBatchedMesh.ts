@@ -209,6 +209,9 @@ export class EnhancedBatchedMesh extends BatchedMesh {
     super.setGeometrySize(maxVertexCount, maxIndexCount);
     this.boundsTrees.fill(null);
   }
+  override clone(recursive = true): EnhancedBatchedMesh {
+    return new EnhancedBatchedMesh(0, 0, 0, this.material).copy(this, recursive);
+  }
   copy(source: BatchedMesh, recursive = true): this {
     if (source === this) return this;
     super.copy(source, recursive);

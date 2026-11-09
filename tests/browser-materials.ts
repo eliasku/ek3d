@@ -388,8 +388,7 @@ export async function verifyMaterialRendering() {
       premultipliedAlpha: false,
     });
     const originalHas = halfRenderer.extensions.has;
-    halfRenderer.extensions.has = (name: string) =>
-      name === "OES_texture_float_linear" ? false : originalHas.call(halfRenderer.extensions, name);
+    halfRenderer.extensions.has = (name: string) => (name === "OES_texture_float_linear" ? false : originalHas(name));
     try {
       halfRenderer.setSize(size, size, false);
       halfRenderer.outputColorSpace = ColorSpace.LinearSRGB;

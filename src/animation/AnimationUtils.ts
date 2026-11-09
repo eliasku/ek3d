@@ -58,10 +58,7 @@ export function getKeyframeOrder(times: ArrayLike<number>): number[] {
  */
 export function sortedArray<B extends AnimationBuffer>(values: B, stride: number, order: ArrayLike<number>): B {
   const nValues = values.length;
-  const result = new (values.constructor as {
-    new (values: never): AnimationBuffer;
-    BYTES_PER_ELEMENT?: number;
-  } as any)(nValues);
+  const result = new (values.constructor as new (length: number) => B)(nValues);
   for (let i = 0, dstOffset = 0; dstOffset !== nValues; ++i) {
     const srcOffset = order[i] * stride;
     for (let j = 0; j !== stride; ++j) {

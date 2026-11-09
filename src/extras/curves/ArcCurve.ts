@@ -34,4 +34,7 @@ export class ArcCurve extends EllipseCurve {
     this.isArcCurve = true;
     this.type = "ArcCurve";
   }
+  override clone(): ArcCurve {
+    return new ArcCurve().copy(this);
+  }
 }

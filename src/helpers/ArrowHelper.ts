@@ -64,7 +64,7 @@ export class ArrowHelper extends Object3D {
       _coneGeometry = new ConeGeometry(0.5, 1, 5, 1);
       _coneGeometry.translate(0, -0.5, 0);
     }
-    (this as any).position.copy(origin);
+    this.position.copy(origin);
     /**
      * The line part of the arrow helper.
      *
@@ -111,10 +111,10 @@ export class ArrowHelper extends Object3D {
    * @param [headWidth=headLength*0.2] - The width of the head of the arrow.
    */
   setLength(length: number, headLength: number = length * 0.2, headWidth: number = headLength * 0.2) {
-    (this.line as any).scale.set(1, Math.max(0.0001, length - headLength), 1); // see #17458
+    this.line.scale.set(1, Math.max(0.0001, length - headLength), 1); // see #17458
     this.line.updateMatrix();
-    (this.cone as any).scale.set(headWidth, headLength, headWidth);
-    (this.cone as any).position.y = length;
+    this.cone.scale.set(headWidth, headLength, headWidth);
+    this.cone.position.y = length;
     this.cone.updateMatrix();
   }
   /**
@@ -126,6 +126,9 @@ export class ArrowHelper extends Object3D {
   setColor(color?: Color | string | number) {
     this.line.material.color.set(color);
     this.cone.material.color.set(color);
+  }
+  clone(_recursive?: boolean): ArrowHelper {
+    return new ArrowHelper().copy(this);
   }
   copy(source: Object3D): this {
     super.copy(source, false);

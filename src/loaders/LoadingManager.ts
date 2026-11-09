@@ -259,8 +259,8 @@ export class LoadingManager {
      *
      * @return A reference to this loading manager.
      */
-    this.abort = function (this: any): LoadingManager {
-      (this as any).abortController.abort();
+    this.abort = function (this: LoadingManager): LoadingManager {
+      this.abortController.abort();
       this._abortController = null;
       return this;
     };

@@ -451,8 +451,8 @@ export class Texture<TMipmap = any> extends EventDispatcher {
    *
    * @return A clone of this instance.
    */
-  clone(): this {
-    return new (this.constructor as any)().copy(this);
+  clone(): Texture<TMipmap> {
+    return new Texture<TMipmap>().copy(this);
   }
   /**
    * Copies the values of the given texture to this instance.

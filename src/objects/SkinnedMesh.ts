@@ -131,6 +131,9 @@ export class SkinnedMesh extends Mesh {
     }
   }
 
+  clone(recursive: boolean = true): SkinnedMesh {
+    return new SkinnedMesh(this.geometry, this.material).copy(this, recursive);
+  }
   copy(source: SkinnedMesh, recursive?: boolean): this {
     super.copy(source, recursive);
     this.bindMode = source.bindMode;
@@ -226,8 +229,7 @@ export class SkinnedMesh extends Mesh {
    * @return The updated vertex attribute data.
    */
   applyBoneTransform<T extends Vector3 | Vector4>(index: number, target: T): T;
-  applyBoneTransform(index: number, target: Vector3 | Vector4): Vector3 | Vector4;
-  applyBoneTransform(index: number, target?: any): Vector3 | Vector4 {
+  applyBoneTransform(index: number, target: Vector3 | Vector4): Vector3 | Vector4 {
     const skeleton = this.skeleton;
     const geometry = this.geometry;
     _skinIndex.fromBufferAttribute(
@@ -238,12 +240,13 @@ export class SkinnedMesh extends Mesh {
       geometry.attributes.skinWeight as BufferAttribute | InterleavedBufferAttribute,
       index,
     );
-    if ((target as any).isVector4) {
-      _baseVector.copy(target);
-      target.set(0, 0, 0, 0);
+    const isVector4 = "isVector4" in target && target.isVector4;
+    if (isVector4) {
+      _baseVector.copy(target as Vector4);
+      (target as Vector4).set(0, 0, 0, 0);
     } else {
       _baseVector.set(target.x, target.y, target.z, 1);
-      target.set(0, 0, 0);
+      (target as Vector3).set(0, 0, 0);
     }
     _baseVector.applyMatrix4(this.bindMatrix);
     for (let i = 0; i < 4; i++) {
@@ -251,13 +254,19 @@ export class SkinnedMesh extends Mesh {
       if (weight !== 0) {
         const boneIndex = _skinIndex.getComponent(i);
         _matrix4.multiplyMatrices(skeleton.bones[boneIndex].matrixWorld, skeleton.boneInverses[boneIndex]);
-        target.addScaledVector(_vector4.copy(_baseVector).applyMatrix4(_matrix4), weight);
+        const transformed = _vector4.copy(_baseVector).applyMatrix4(_matrix4);
+        if (isVector4) {
+          (target as Vector4).addScaledVector(transformed, weight);
+        } else {
+          (target as Vector3).addScaledVector(transformed, weight);
+        }
       }
     }
-    if ((target as any).isVector4) {
+    if (isVector4) {
       // ensure the homogenous coordinate remains unchanged after vector operations
-      (target as any).w = _baseVector.w;
+      (target as Vector4).w = _baseVector.w;
+      return (target as Vector4).applyMatrix4(this.bindMatrixInverse);
     }
-    return target.applyMatrix4(this.bindMatrixInverse);
+    return (target as Vector3).applyMatrix4(this.bindMatrixInverse);
   }
 }

@@ -9,6 +9,10 @@ import { CompressedArrayTexture } from "../src/textures/CompressedArrayTexture";
 import { CompressedCubeTexture } from "../src/textures/CompressedCubeTexture";
 import { Texture } from "../src/textures/Texture";
 import { DataTexture } from "../src/textures/DataTexture";
+import { Data3DTexture } from "../src/textures/Data3DTexture";
+import { DataArrayTexture } from "../src/textures/DataArrayTexture";
+import { DepthTexture } from "../src/textures/DepthTexture";
+import { CubeDepthTexture } from "../src/textures/CubeDepthTexture";
 import { TextureSource } from "../src/textures/TextureSource";
 import { CanvasTexture as UpstreamCanvas } from "../upstream/three.js/src/textures/CanvasTexture.js";
 import { FramebufferTexture as UpstreamFramebuffer } from "../upstream/three.js/src/textures/FramebufferTexture.js";
@@ -20,13 +24,18 @@ import { Wrapping, Mapping, TextureFilter, PixelFormat, ColorSpace, TextureType 
 const mipmaps = () => [{ data: new Uint8Array(8), width: 4, height: 4 }];
 const faces = () => Array.from({ length: 6 }, () => ({ width: 4, height: 4, mipmaps: mipmaps() }));
 
-test("compressed cube preserves the upstream clone limitation and supports explicit copy", () => {
-  const texture = new CompressedCubeTexture(faces());
-  // Upstream JSDoc mislabels dimension/mipmap records as CompressedTexture instances.
-  const upstreamFaces = faces() as unknown as UpstreamCompressed[];
-  const upstream = new UpstreamCube(upstreamFaces);
-  assert.throws(() => texture.clone(), TypeError);
-  assert.throws(() => upstream.clone(), TypeError);
+test("compressed cube clones retain concrete markers and share caller-owned face mip data", () => {
+  const texture = new CompressedCubeTexture(faces(), PixelFormat.RGBA_S3TC_DXT1, TextureType.UnsignedByte);
+  const clone = texture.clone();
+  assert.equal(clone.constructor, CompressedCubeTexture);
+  assert.equal(clone.isCompressedCubeTexture, true);
+  assert.equal(clone.isCubeTexture, true);
+  assert.equal(clone.source, texture.source);
+  assert.equal(clone.image, texture.image);
+  assert.equal(clone.image[0].mipmaps[0].data, texture.image[0].mipmaps[0].data);
+  assert.notEqual(clone.mipmaps, texture.mipmaps);
+  assert.equal(clone.format, texture.format);
+  assert.equal(clone.type, texture.type);
   const copy = new CompressedCubeTexture(faces()).copy(texture);
   assert.equal(copy.source, texture.source);
   assert.equal(copy.image, texture.image);
@@ -83,6 +92,7 @@ test("canvas CPU backing is caller-owned while framebuffer copies have independe
   assert.equal(texture.image, canvas);
   assert.equal(texture.version, 1);
   const copy = texture.clone();
+  assert.equal(copy.constructor, CanvasTexture);
   assert.equal(copy.source, texture.source);
   let disposals = 0;
   texture.addEventListener("dispose", () => disposals++);
@@ -92,6 +102,7 @@ test("canvas CPU backing is caller-owned while framebuffer copies have independe
   assert.equal(copy.image, canvas);
   const framebuffer = new FramebufferTexture(8, 4);
   const framebufferCopy = framebuffer.clone();
+  assert.equal(framebufferCopy.constructor, FramebufferTexture);
   assert.notEqual(framebufferCopy.source, framebuffer.source);
   assert.notEqual(framebufferCopy.image, framebuffer.image);
   framebufferCopy.image.width = 16;
@@ -109,6 +120,7 @@ test("compressed array update sets are per texture and copy preserves wrapR", ()
   assert.deepEqual([...first.layerUpdates], [1]);
   assert.equal(first.version, 0, "marking a layer does not request an upload");
   const second = first.clone();
+  assert.equal(second.constructor, CompressedArrayTexture);
   assert.equal(second.wrapR, Wrapping.Repeat);
   assert.notEqual(second.layerUpdates, first.layerUpdates);
   assert.equal(second.layerUpdates.size, 0);
@@ -142,6 +154,7 @@ test("video callbacks reschedule and disposal cancels only the owned callback", 
   texture.update();
   assert.equal(texture.version, 1, "rVFC path must not also poll");
   const clone = texture.clone();
+  assert.equal(clone.constructor, VideoTexture);
   assert.equal(clone.image, video);
   assert.ok(callbacks.has(3));
   texture.dispose();
@@ -173,6 +186,7 @@ test("video fallback polls current data and frame textures never close caller-ow
   assert.equal(frames.image, frame);
   assert.equal(frames.version, 1);
   const clone = frames.clone();
+  assert.equal(clone.constructor, VideoFrameTexture);
   assert.equal(clone.source, frames.source);
   frames.setFrame({
     close() {
@@ -182,6 +196,52 @@ test("video fallback polls current data and frame textures never close caller-ow
   frames.dispose();
   clone.dispose();
   assert.equal(closes, 0);
+});
+
+test("data texture clones retain concrete image data and independent layer update registries", () => {
+  const data = new Uint8Array(16);
+  const texture = new DataTexture(data, 2, 2);
+  const volume = new Data3DTexture(data, 2, 2, 1);
+  const array = new DataArrayTexture(data, 2, 2, 1);
+  volume.wrapR = Wrapping.Repeat;
+  array.wrapR = Wrapping.MirroredRepeat;
+  array.addLayerUpdate(0);
+  for (const source of [texture, volume, array]) {
+    const clone = source.clone();
+    assert.equal(clone.constructor, source.constructor);
+    assert.equal(clone.source, source.source);
+    assert.equal(clone.image.data, data);
+  }
+  assert.equal(volume.clone().wrapR, Wrapping.Repeat);
+  const arrayClone = array.clone();
+  assert.equal(arrayClone.wrapR, Wrapping.MirroredRepeat);
+  assert.notEqual(arrayClone.layerUpdates, array.layerUpdates);
+  assert.equal(arrayClone.layerUpdates.size, 0);
+});
+
+test("depth texture clones keep concrete shapes and independently owned dimensions", () => {
+  const texture = new DepthTexture(8, 4);
+  const clone = texture.clone();
+  assert.equal(clone.constructor, DepthTexture);
+  assert.notEqual(clone.source, texture.source);
+  assert.notEqual(clone.image, texture.image);
+  assert.deepEqual(clone.image, texture.image);
+  assert.ok(!Array.isArray(clone.image));
+  clone.image.width = 16;
+  assert.equal(texture.width, 8);
+
+  const cube = new CubeDepthTexture(8);
+  const cubeClone = cube.clone();
+  assert.equal(cubeClone.constructor, CubeDepthTexture);
+  assert.equal(cubeClone.isCubeDepthTexture, true);
+  assert.equal(cubeClone.isCubeTexture, true);
+  assert.notEqual(cubeClone.source, cube.source);
+  assert.notEqual(cubeClone.images, cube.images);
+  assert.ok(Array.isArray(cubeClone.images));
+  assert.equal(cubeClone.images.length, 6);
+  assert.deepEqual(cubeClone.images, cube.images);
+  cubeClone.images[0].width = 16;
+  assert.equal(cube.images[0].width, 8);
 });
 
 test("texture fields retain source-backed image accessors and immutable hidden identifiers", () => {
@@ -211,20 +271,20 @@ test("texture fields retain source-backed image accessors and immutable hidden i
   }
 });
 
-test("texture clone and copy preserve further-derived types without clone declarations", () => {
+test("texture clones use declared classes while copies retain the existing subclass", () => {
   class CustomCanvasTexture extends CanvasTexture {
     label: string = "custom";
   }
   const canvas = { width: 4, height: 2 } as HTMLCanvasElement;
   const texture = new CustomCanvasTexture(canvas);
-  const cloned: CustomCanvasTexture = texture.clone();
+  const cloned: CanvasTexture = texture.clone();
   const target = new CustomCanvasTexture();
   target.label = "local";
   const copied: CustomCanvasTexture = target.copy(new CanvasTexture(canvas));
-  assert.ok(cloned instanceof CustomCanvasTexture);
+  assert.equal(cloned.constructor, CanvasTexture);
   assert.ok(copied instanceof CustomCanvasTexture);
   assert.equal(cloned.image, canvas);
   assert.equal(copied.image, canvas);
-  assert.equal(cloned.label, "custom");
+  assert.equal("label" in cloned, false);
   assert.equal(copied.label, "local", "copy only transfers texture payload, not subclass-only state");
 });

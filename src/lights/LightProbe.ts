@@ -48,6 +48,9 @@ export class LightProbe extends Light {
     this.sh.copy(source.sh);
     return this;
   }
+  clone(recursive?: boolean): LightProbe {
+    return new LightProbe().copy(this, recursive);
+  }
   toJSON(meta?: any) {
     const data = super.toJSON(meta);
     data.object.sh = this.sh.toArray();

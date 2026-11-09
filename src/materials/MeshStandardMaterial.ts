@@ -459,6 +459,9 @@ export class MeshStandardMaterial extends Material {
     this.fog = true;
     this.setValues(parameters);
   }
+  clone(): MeshStandardMaterial {
+    return new MeshStandardMaterial().copy(this);
+  }
   copy(source: MeshStandardMaterial): this {
     super.copy(source);
     this.defines = { STANDARD: "" };

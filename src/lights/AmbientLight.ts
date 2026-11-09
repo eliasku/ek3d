@@ -36,4 +36,7 @@ export class AmbientLight extends Light {
     this.isAmbientLight = true;
     this.type = "AmbientLight";
   }
+  clone(recursive?: boolean): AmbientLight {
+    return new AmbientLight().copy(this, recursive);
+  }
 }

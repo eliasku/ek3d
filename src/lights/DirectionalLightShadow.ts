@@ -20,4 +20,8 @@ export class DirectionalLightShadow extends LightShadow<OrthographicCamera> {
      */
     this.isDirectionalLightShadow = true;
   }
+
+  override clone(_recursive?: boolean): DirectionalLightShadow {
+    return new DirectionalLightShadow().copy(this);
+  }
 }

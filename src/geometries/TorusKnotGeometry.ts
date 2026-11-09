@@ -139,6 +139,9 @@ export class TorusKnotGeometry extends BufferGeometry {
       position.z = radius * Math.sin(quOverP) * 0.5;
     }
   }
+  override clone(): TorusKnotGeometry {
+    return new TorusKnotGeometry().copy(this);
+  }
   copy(source: this) {
     super.copy(source);
     this.parameters = Object.assign({}, source.parameters);

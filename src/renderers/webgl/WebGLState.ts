@@ -203,9 +203,9 @@ export function WebGLState(gl?: any, extensions?: any) {
     };
   }
   //
-  const colorBuffer = new (ColorBuffer as any)();
-  const depthBuffer = new (DepthBuffer as any)();
-  const stencilBuffer = new (StencilBuffer as any)();
+  const colorBuffer = ColorBuffer();
+  const depthBuffer = DepthBuffer();
+  const stencilBuffer = StencilBuffer();
   let uboBindings: any = {};
   const uboProgramMap = new WeakMap<any, any>();
   let enabledCapabilities: any = {};
@@ -468,7 +468,7 @@ export function WebGLState(gl?: any, extensions?: any) {
       currentBlendSrcAlpha = blendSrcAlpha;
       currentBlendDstAlpha = blendDstAlpha;
     }
-    if (blendColor.equals(currentBlendColor) === false || blendAlpha !== currentBlendAlpha) {
+    if ((blendColor as Color).equals(currentBlendColor) === false || blendAlpha !== currentBlendAlpha) {
       gl.blendColor(blendColor.r, blendColor.g, blendColor.b, blendAlpha);
       currentBlendColor.copy(blendColor);
       currentBlendAlpha = blendAlpha;

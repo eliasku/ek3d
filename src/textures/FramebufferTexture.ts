@@ -75,6 +75,9 @@ export class FramebufferTexture extends Texture {
     this.generateMipmaps = false;
     this.needsUpdate = true;
   }
+  clone(): FramebufferTexture {
+    return new FramebufferTexture().copy(this);
+  }
   copy(source: FramebufferTexture & Pick<this, "image" | "mipmaps">): this {
     super.copy(source);
     this.source = new TextureSource(Object.assign({}, source.image));

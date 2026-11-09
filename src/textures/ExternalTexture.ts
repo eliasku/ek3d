@@ -31,6 +31,9 @@ export class ExternalTexture extends Texture {
      */
     this.isExternalTexture = true;
   }
+  clone(): ExternalTexture {
+    return new ExternalTexture().copy(this);
+  }
   copy(source: ExternalTexture & Pick<this, "image" | "mipmaps">): this {
     super.copy(source);
     this.sourceTexture = source.sourceTexture;

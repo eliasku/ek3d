@@ -99,6 +99,9 @@ export class MeshDistanceMaterial extends Material {
     this.displacementBias = 0;
     this.setValues(parameters);
   }
+  clone(): MeshDistanceMaterial {
+    return new MeshDistanceMaterial().copy(this);
+  }
   copy(source: MeshDistanceMaterial): this {
     super.copy(source);
     this.map = source.map;

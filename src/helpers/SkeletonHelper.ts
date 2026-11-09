@@ -137,8 +137,8 @@ export class SkeletonHelper extends LineSegments<LineBasicMaterial> {
     this.geometry.dispose();
     this.material.dispose();
   }
-  clone(recursive: boolean = true): this {
-    return new (this.constructor as any)().copy(this, recursive);
+  clone(recursive: boolean = true): SkeletonHelper {
+    return new SkeletonHelper(this.root).copy(this, recursive);
   }
 }
 function getBoneList(object: Object3D) {

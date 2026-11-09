@@ -161,7 +161,9 @@ export class InterleavedBuffer {
    * @return A reference to this instance.
    */
   copy(source: InterleavedBuffer): this {
-    this.array = new (source.array.constructor as any)(source.array);
+    this.array = new (source.array.constructor as new (array: ArrayLike<number>) => InterleavedBuffer["array"])(
+      source.array,
+    );
     this.count = source.count;
     this.stride = source.stride;
     this.usage = source.usage;
@@ -202,7 +204,10 @@ export class InterleavedBuffer {
    * @param [data] - An object with shared array buffers that allows to retain shared structures.
    * @return A clone of this instance.
    */
-  clone(data: InterleavedBufferCloneData): this {
+  clone(data: InterleavedBufferCloneData): InterleavedBuffer {
+    return new InterleavedBuffer(this._cloneArray(data), this.stride).setUsage(this.usage);
+  }
+  protected _cloneArray(data: InterleavedBufferCloneData): InterleavedBuffer["array"] {
     if (data.arrayBuffers === undefined) {
       data.arrayBuffers = {};
     }
@@ -210,10 +215,9 @@ export class InterleavedBuffer {
     if (data.arrayBuffers[key] === undefined) {
       data.arrayBuffers[key] = this.array.slice(0).buffer;
     }
-    const array = new (this.array.constructor as any)(data.arrayBuffers[key]);
-    const ib = new (this.constructor as any)(array, this.stride);
-    ib.setUsage(this.usage);
-    return ib;
+    return new (this.array.constructor as new (buffer: ArrayBuffer) => InterleavedBuffer["array"])(
+      data.arrayBuffers[key],
+    );
   }
   /**
    * Sets the given callback function that is executed after the Renderer has transferred

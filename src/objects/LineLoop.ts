@@ -27,4 +27,7 @@ export class LineLoop<TMaterial extends Material | Material[] = Material | Mater
     this.isLineLoop = true;
     this.type = "LineLoop";
   }
+  clone(recursive: boolean = true): LineLoop<TMaterial> {
+    return new LineLoop<TMaterial>(this.geometry, this.material).copy(this, recursive);
+  }
 }

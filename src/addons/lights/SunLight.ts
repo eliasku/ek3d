@@ -27,6 +27,10 @@ export class SunLight extends Light {
     return this;
   }
 
+  override clone(recursive?: boolean): SunLight {
+    return new SunLight().copy(this, recursive);
+  }
+
   override toJSON(meta?: unknown) {
     const data = super.toJSON(meta);
     data.object.shadow = this.shadow.toJSON();

@@ -2,6 +2,7 @@ import { TextureType } from "../../constants";
 import { DataArrayTexture } from "../../textures/DataArrayTexture";
 import { Vector4 } from "../../math/Vector4";
 import { Vector2 } from "../../math/Vector2";
+import type { WebGLUniforms } from "./WebGLUniforms";
 export function WebGLMorphtargets(gl?: any, capabilities?: any, textures?: any) {
   const morphTextures = new WeakMap<any, any>();
   const morph = new Vector4();
@@ -80,19 +81,20 @@ export function WebGLMorphtargets(gl?: any, capabilities?: any, textures?: any) 
       geometry.addEventListener("dispose", disposeTexture);
     }
     //
+    const uniforms: WebGLUniforms = program.getUniforms();
     if (object.isInstancedMesh === true && object.morphTexture !== null) {
-      program.getUniforms().setValue(gl, "morphTexture", object.morphTexture, textures);
+      uniforms.setValue(gl, "morphTexture", object.morphTexture, textures);
     } else {
       let morphInfluencesSum = 0;
       for (let i = 0; i < objectInfluences.length; i++) {
         morphInfluencesSum += objectInfluences[i];
       }
       const morphBaseInfluence = geometry.morphTargetsRelative ? 1 : 1 - morphInfluencesSum;
-      program.getUniforms().setValue(gl, "morphTargetBaseInfluence", morphBaseInfluence);
-      program.getUniforms().setValue(gl, "morphTargetInfluences", objectInfluences);
+      uniforms.setValue(gl, "morphTargetBaseInfluence", morphBaseInfluence);
+      uniforms.setValue(gl, "morphTargetInfluences", objectInfluences);
     }
-    program.getUniforms().setValue(gl, "morphTargetsTexture", entry.texture, textures);
-    program.getUniforms().setValue(gl, "morphTargetsTextureSize", entry.size);
+    uniforms.setValue(gl, "morphTargetsTexture", entry.texture, textures);
+    uniforms.setValue(gl, "morphTargetsTextureSize", entry.size);
   }
   return {
     update: update,

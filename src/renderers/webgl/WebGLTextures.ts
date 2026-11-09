@@ -1987,4 +1987,22 @@ export function WebGLTextures(
   this.setupFrameBufferTexture = setupFrameBufferTexture;
   this.useMultisampledRTT = useMultisampledRTT;
   this.dispose = dispose;
+  return this as {
+    allocateTextureUnit: typeof allocateTextureUnit;
+    resetTextureUnits: typeof resetTextureUnits;
+    getTextureUnits: typeof getTextureUnits;
+    setTextureUnits: typeof setTextureUnits;
+    setTexture2D: typeof setTexture2D;
+    setTexture2DArray: typeof setTexture2DArray;
+    setTexture3D: typeof setTexture3D;
+    setTextureCube: typeof setTextureCube;
+    rebindTextures: typeof rebindTextures;
+    setupRenderTarget: typeof setupRenderTarget;
+    updateRenderTargetMipmap: typeof updateRenderTargetMipmap;
+    updateMultisampleRenderTarget: typeof updateMultisampleRenderTarget;
+    setupDepthRenderbuffer: typeof setupDepthRenderbuffer;
+    setupFrameBufferTexture: typeof setupFrameBufferTexture;
+    useMultisampledRTT: typeof useMultisampledRTT;
+    dispose: typeof dispose;
+  };
 }

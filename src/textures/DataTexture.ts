@@ -100,6 +100,9 @@ export class DataTexture extends Texture {
      */
     this.unpackAlignment = 1;
   }
+  clone(): DataTexture {
+    return new DataTexture().copy(this);
+  }
 
   get image(): DataTextureImage {
     return this.source.data;

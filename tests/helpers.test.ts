@@ -193,6 +193,15 @@ test("object bounds track transformed descendants and explicit bounds retain emp
   const explicit = new Box3Helper(box);
   const upstreamExplicit = new UpBox3(box) as unknown as Box3Helper;
   parity(explicit, upstreamExplicit);
+  const explicitClone = explicit.clone(false);
+  box.min.set(-4, -2, 2);
+  box.max.set(2, 6, 10);
+  explicitClone.updateMatrixWorld(true);
+  assert.deepEqual(explicitClone.position.toArray(), [-1, 2, 6]);
+  assert.deepEqual(explicitClone.scale.toArray(), [3, 4, 4]);
+  assert.equal(explicitClone.geometry, explicit.geometry);
+  assert.equal(explicitClone.material, explicit.material);
+  parity(explicit, upstreamExplicit);
   box.makeEmpty();
   parity(explicit, upstreamExplicit);
   assert.deepEqual(disposalEvents(actual), disposalEvents(expected));
@@ -236,6 +245,41 @@ test("camera helper follows perspective/orthographic projection, reversed depth 
   }
 });
 
+test("camera helper clones use the declared class and track live projection", () => {
+  class Frustum extends CameraHelper {
+    marker: boolean = true;
+  }
+  const camera = new PerspectiveCamera(90, 1, 1, 10);
+  const source = new Frustum(camera);
+  source.add(new Object3D());
+  const clone: CameraHelper = source.clone();
+  const shallow: CameraHelper = source.clone(false);
+  assert.equal(clone.children.length, 1);
+  assert.notEqual(clone.children[0], source.children[0]);
+  assert.equal(shallow.children.length, 0);
+  camera.aspect = 2;
+  camera.near = 2;
+  camera.far = 20;
+  camera.position.set(3, 4, 5);
+  camera.updateProjectionMatrix();
+  camera.updateMatrixWorld(true);
+  for (const helper of [clone, shallow]) {
+    assert.equal(Object.getPrototypeOf(helper), CameraHelper.prototype);
+    assert.equal(helper.camera, camera);
+    assert.equal(helper.geometry, source.geometry);
+    assert.equal(helper.material, source.material);
+    helper.update();
+    helper.updateMatrixWorld(true);
+    const positions = helper.geometry.getAttribute("position") as BufferAttribute;
+    const near = new Vector3().fromBufferAttribute(positions, helper.pointMap.n1[0]);
+    const far = new Vector3().fromBufferAttribute(positions, helper.pointMap.f4[0]);
+    assert.ok(near.distanceTo(new Vector3(-4, -2, -2)) < 1e-6);
+    assert.ok(far.distanceTo(new Vector3(40, 20, -20)) < 1e-5);
+    assert.deepEqual(helper.getWorldPosition(new Vector3()).toArray(), [3, 4, 5]);
+  }
+  source.dispose();
+});
+
 test("light helpers follow target, distance, source colors, overrides and parent transforms", () => {
   const directional = new DirectionalLight(0x8844cc);
   const point = new PointLight(0x3388ff);
@@ -273,16 +317,53 @@ test("light helpers follow target, distance, source colors, overrides and parent
   }
 });
 
+test("point light helper clones track the source light and retain optional color overrides", () => {
+  class Lamp extends PointLightHelper {
+    marker: boolean = true;
+  }
+  for (const color of [undefined, "red", 0x44cc88, new Color(0x8844cc)]) {
+    const light = new PointLight(0x3388ff);
+    const source = new Lamp(light, 0.5, color);
+    source.add(new Object3D());
+    const clone: PointLightHelper = source.clone();
+    const shallow: PointLightHelper = source.clone(false);
+    assert.equal(clone.children.length, 1);
+    assert.notEqual(clone.children[0], source.children[0]);
+    assert.equal(shallow.children.length, 0);
+    light.position.set(-2, 3, 4);
+    light.color.set("lime");
+    for (const helper of [clone, shallow]) {
+      assert.equal(Object.getPrototypeOf(helper), PointLightHelper.prototype);
+      assert.equal(helper.light, light);
+      assert.equal(helper.geometry, source.geometry);
+      assert.equal(helper.material, source.material);
+      helper.update();
+      helper.updateMatrixWorld(true);
+      assert.deepEqual(helper.getWorldPosition(new Vector3()).toArray(), [-2, 3, 4]);
+      assert.ok(helper.material.color.equals(new Color(color ?? "lime")));
+    }
+    source.dispose();
+  }
+});
+
 test("plane normal, constant and size update the translucent fill with upstream ownership", () => {
   const plane = new Plane(new Vector3(1, 2, -3).normalize(), -2);
   const actual = new PlaneHelper(plane, 3, 0x3366ff);
   const expected = new UpPlane(plane, 3, 0x3366ff) as unknown as PlaneHelper;
   parity(actual, expected);
+  const clone = actual.clone(false);
   plane.normal.set(0, 1, 0);
   plane.constant = 4;
   actual.size = expected.size = 6;
   parity(actual, expected);
+  clone.updateMatrixWorld(true);
+  assert.ok(Math.abs(plane.distanceToPoint(clone.position)) < 1e-6);
+  assert.deepEqual(clone.scale.toArray(), [1.5, 1.5, 1]);
+  assert.equal(clone.geometry, actual.geometry);
+  assert.equal(clone.material, actual.material);
+  assert.equal(clone.children.length, 1);
   assert.deepEqual(disposalEvents(actual), disposalEvents(expected));
+  clone.dispose();
 });
 
 test("skeleton helpers extract only bones and update animated endpoints in root coordinates", () => {
@@ -318,4 +399,39 @@ test("skeleton helpers extract only bones and update animated endpoints in root 
   const empty = new SkeletonHelper(new Object3D());
   assert.equal(empty.geometry.getAttribute("position")!.count, 0);
   empty.dispose();
+});
+
+test("skeleton helper clones use the declared class and retain live bone endpoints", () => {
+  class Rig extends SkeletonHelper {
+    marker: boolean = true;
+  }
+  const root = new Object3D();
+  const first = new Bone();
+  const second = new Bone();
+  root.add(first);
+  first.add(second);
+  second.position.y = 2;
+  root.updateMatrixWorld(true);
+  const source = new Rig(root);
+  source.add(new Object3D());
+  const clone: SkeletonHelper = source.clone();
+  const shallow: SkeletonHelper = source.clone(false);
+  assert.equal(clone.children.length, 1);
+  assert.notEqual(clone.children[0], source.children[0]);
+  assert.equal(shallow.children.length, 0);
+  root.position.set(5, 6, 7);
+  first.position.set(1, 2, 3);
+  second.position.set(2, 4, 6);
+  root.updateMatrixWorld(true);
+  for (const helper of [clone, shallow]) {
+    assert.equal(Object.getPrototypeOf(helper), SkeletonHelper.prototype);
+    assert.equal(helper.root, root);
+    assert.equal(helper.geometry, source.geometry);
+    assert.equal(helper.material, source.material);
+    helper.updateMatrixWorld(true);
+    const positions = helper.geometry.getAttribute("position") as BufferAttribute;
+    assert.deepEqual(Array.from(positions.array), [3, 6, 9, 1, 2, 3]);
+    assert.deepEqual(helper.getWorldPosition(new Vector3()).toArray(), [5, 6, 7]);
+  }
+  source.dispose();
 });

@@ -85,6 +85,9 @@ export class DirectionalLight extends Light {
     this.shadow = source.shadow.clone();
     return this;
   }
+  clone(recursive?: boolean): DirectionalLight {
+    return new DirectionalLight().copy(this, recursive);
+  }
   toJSON(meta?: any) {
     const data = super.toJSON(meta);
     data.object.shadow = this.shadow.toJSON();

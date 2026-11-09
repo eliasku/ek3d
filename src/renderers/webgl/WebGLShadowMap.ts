@@ -1,4 +1,5 @@
 import type { Camera } from "../../cameras/Camera";
+import type { PerspectiveCamera } from "../../cameras/PerspectiveCamera";
 import type { Light } from "../../lights/Light";
 import type { Object3D } from "../../core/Object3D";
 import type { WebGLRenderer } from "../WebGLRenderer";
@@ -243,8 +244,8 @@ export function WebGLShadowMap(
         for (let face = 0; face < faceCount; face++) {
           const shadowCamera = shadow.getCamera(face);
           if (light.isPointLight) {
-            const camera = shadow.camera;
-            const shadowMatrix = shadow.matrix;
+            const camera: PerspectiveCamera = shadow.camera;
+            const shadowMatrix: Matrix4 = shadow.matrix;
             const far = light.distance || camera.far;
             if (far !== camera.far) {
               camera.far = far;
@@ -259,7 +260,11 @@ export function WebGLShadowMap(
             camera.updateMatrixWorld();
             shadowMatrix.makeTranslation(-_lightPositionWorld.x, -_lightPositionWorld.y, -_lightPositionWorld.z);
             _projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-            shadow._frustum.setFromProjectionMatrix(_projScreenMatrix, camera.coordinateSystem, camera.reversedDepth);
+            (shadow._frustum as Frustum).setFromProjectionMatrix(
+              _projScreenMatrix,
+              camera.coordinateSystem,
+              camera.reversedDepth,
+            );
           }
           // For cube render targets, render to each face separately
           if (shadow.map.isWebGLCubeRenderTarget) {
@@ -388,13 +393,13 @@ export function WebGLShadowMap(
   }
   function renderObject(object?: any, camera?: any, shadowCamera?: any, light?: any, layers?: any, type?: any) {
     if (object.visible === false) return;
-    const visible = object.layers.test(layers);
+    const visible = (object as Object3D).layers.test(layers);
     if (visible && (object.isMesh || object.isLine || object.isPoints)) {
       if (
         (object.castShadow || (object.receiveShadow && type === ShadowMap.VSM)) &&
         (!object.frustumCulled || object.intersectsFrustum(_frustum))
       ) {
-        object.modelViewMatrix.multiplyMatrices(shadowCamera.matrixWorldInverse, object.matrixWorld);
+        (object as Object3D).modelViewMatrix.multiplyMatrices(shadowCamera.matrixWorldInverse, object.matrixWorld);
         const geometry = objects.update(object);
         const material = object.material;
         if (Array.isArray(material)) {

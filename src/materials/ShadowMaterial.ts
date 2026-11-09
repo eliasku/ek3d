@@ -131,6 +131,9 @@ export class ShadowMaterial extends Material {
     this.fog = true;
     this.setValues(parameters);
   }
+  clone(): ShadowMaterial {
+    return new ShadowMaterial().copy(this);
+  }
   copy(source: ShadowMaterial): this {
     super.copy(source);
     this.color.copy(source.color);

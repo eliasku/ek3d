@@ -213,7 +213,7 @@ export class ExtrudeGeometry extends BufferGeometry {
         const ahole = holes[h];
         vertices = vertices.concat(ahole);
       }
-      function scalePt2(pt: any, vec: any, size?: any) {
+      function scalePt2(pt: Vector2, vec: Vector2, size: number): Vector2 {
         if (!vec) error("ExtrudeGeometry: vec does not exist");
         return pt.clone().addScaledVector(vec, size);
       }
@@ -522,6 +522,9 @@ export class ExtrudeGeometry extends BufferGeometry {
         uvArray.push(vector2.y);
       }
     }
+  }
+  override clone(): ExtrudeGeometry {
+    return new ExtrudeGeometry().copy(this);
   }
   copy(source: this) {
     super.copy(source);

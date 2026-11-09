@@ -37,6 +37,10 @@ export class WebGL3DRenderTarget extends WebGLRenderTarget {
     this.texture.renderTarget = this;
   }
 
+  override clone(): WebGL3DRenderTarget {
+    return new WebGL3DRenderTarget().copy(this);
+  }
+
   override get texture(): Data3DTexture {
     return super.texture as Data3DTexture;
   }

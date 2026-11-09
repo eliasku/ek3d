@@ -81,7 +81,7 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 }
 
 /** Bends a cloned mesh along a sampled curve in a WebGL shader. */
-export class Flow<T extends Mesh = Mesh> {
+export class Flow<T extends { clone(): T } & Mesh = Mesh> {
   object3D: T;
   splineTexture: DataTexture;
   uniforms: FlowUniforms;

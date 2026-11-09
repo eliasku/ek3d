@@ -120,4 +120,15 @@ export class DirectionalLightHelper extends Object3D {
     this.targetLine.lookAt(_v2);
     (this.targetLine as any).scale.z = _v3.length();
   }
+  clone(recursive: boolean = true): DirectionalLightHelper {
+    const helper = new DirectionalLightHelper(this.light, undefined, this.color).copy(this, false);
+    helper.lightPlane.copy(this.lightPlane);
+    helper.targetLine.copy(this.targetLine);
+    if (recursive) {
+      for (const child of this.children) {
+        if (child !== this.lightPlane && child !== this.targetLine) helper.add(child.clone());
+      }
+    }
+    return helper;
+  }
 }

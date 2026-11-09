@@ -767,7 +767,7 @@ export class Vector4 {
    * @param [offset=0] - The offset into the array.
    * @return A reference to this vector.
    */
-  fromArray(array: number[], offset: number = 0): Vector4 {
+  fromArray(array: ArrayLike<number>, offset: number = 0): Vector4 {
     this.x = array[offset];
     this.y = array[offset + 1];
     this.z = array[offset + 2];
@@ -782,7 +782,34 @@ export class Vector4 {
    * @param [offset=0] - Index of the first element in the array.
    * @return The vector components.
    */
-  toArray(array: number[] = [], offset: number = 0): number[] {
+  toArray(array?: number[], offset?: number): number[];
+  toArray<
+    T extends
+      | number[]
+      | Int8Array
+      | Uint8Array
+      | Uint8ClampedArray
+      | Int16Array
+      | Uint16Array
+      | Int32Array
+      | Uint32Array
+      | Float32Array
+      | Float64Array,
+  >(array: T, offset?: number): T;
+  toArray(
+    array:
+      | number[]
+      | Int8Array
+      | Uint8Array
+      | Uint8ClampedArray
+      | Int16Array
+      | Uint16Array
+      | Int32Array
+      | Uint32Array
+      | Float32Array
+      | Float64Array = [],
+    offset: number = 0,
+  ) {
     array[offset] = this.x;
     array[offset + 1] = this.y;
     array[offset + 2] = this.z;

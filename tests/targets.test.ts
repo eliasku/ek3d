@@ -101,7 +101,7 @@ for (const [Target, Upstream] of pairs) {
   });
 }
 
-test("specialized WebGL targets keep attachment accessors and subtype-preserving clone methods", () => {
+test("specialized WebGL targets keep attachment accessors and concrete cloned textures", () => {
   const descriptor = Object.getOwnPropertyDescriptor(RenderTarget.prototype, "texture");
   assert.equal(typeof descriptor?.get, "function");
   assert.equal(typeof descriptor?.set, "function");
@@ -111,7 +111,6 @@ test("specialized WebGL targets keep attachment accessors and subtype-preserving
     assert.equal(typeof specialized?.set, "function");
     const target = new Target();
     assert.equal(Object.hasOwn(target, "texture"), false);
-    assert.equal(Object.hasOwn(Target.prototype, "clone"), false);
     const replacement = target.texture.clone();
     Reflect.set(target, "texture", replacement);
     assert.equal(target.texture, replacement);
@@ -120,6 +119,27 @@ test("specialized WebGL targets keep attachment accessors and subtype-preserving
     const cloned = target.clone();
     assert.ok(cloned instanceof Target);
     assert.equal(cloned.texture.constructor, target.texture.constructor);
+  }
+});
+
+test("cube target clones and copies retain independently mutable face descriptors", () => {
+  const target = new WebGLCubeRenderTarget(8);
+  for (const copy of [target.clone(), new WebGLCubeRenderTarget().copy(target)]) {
+    const faces = copy.texture.image;
+    assert.ok(Array.isArray(faces));
+    assert.equal(faces.length, 6);
+    assert.equal(copy.texture.images, faces);
+    assert.equal(copy.texture.renderTarget, copy);
+    assert.notEqual(faces, target.texture.image);
+    for (let i = 0; i < faces.length; i++) {
+      assert.deepEqual(faces[i], target.texture.image[i]);
+      assert.notEqual(faces[i], target.texture.image[i]);
+    }
+    faces[0].width = 2;
+    faces[1].height = 3;
+    assert.equal(target.texture.image[0].width, 8);
+    assert.equal(target.texture.image[1].height, 8);
+    assert.deepEqual(faces[2], { width: 8, height: 8, depth: 1 });
   }
 });
 

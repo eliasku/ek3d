@@ -1017,8 +1017,8 @@ export class Material extends EventDispatcher {
    *
    * @return A clone of this instance.
    */
-  clone(): this {
-    return new (this.constructor as any)().copy(this);
+  clone(): Material {
+    return new Material().copy(this);
   }
   /**
    * Copies the values of the given material to this instance.

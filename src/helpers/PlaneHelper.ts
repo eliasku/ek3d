@@ -65,8 +65,8 @@ export class PlaneHelper extends Line<LineBasicMaterial> {
     );
   }
   updateMatrixWorld(force?: boolean) {
-    (this as any).position.set(0, 0, 0);
-    (this as any).scale.set(0.5 * this.size, 0.5 * this.size, 1);
+    this.position.set(0, 0, 0);
+    this.scale.set(0.5 * this.size, 0.5 * this.size, 1);
     this.lookAt(this.plane.normal);
     this.translateZ(-this.plane.constant);
     super.updateMatrixWorld(force);
@@ -82,7 +82,12 @@ export class PlaneHelper extends Line<LineBasicMaterial> {
     (this.children[0] as Mesh & { material: MeshBasicMaterial } as any).geometry.dispose();
     (this.children[0] as Mesh & { material: MeshBasicMaterial } as any).material.dispose();
   }
-  clone(recursive: boolean = true): this {
-    return new (this.constructor as any)().copy(this, recursive);
+  clone(recursive: boolean = true): PlaneHelper {
+    const helper = new PlaneHelper(this.plane, this.size).copy(this, false);
+    (helper.children[0] as Mesh<MeshBasicMaterial>).copy(this.children[0] as Mesh<MeshBasicMaterial>);
+    if (recursive) {
+      for (let i = 1; i < this.children.length; i++) helper.add(this.children[i].clone());
+    }
+    return helper;
   }
 }

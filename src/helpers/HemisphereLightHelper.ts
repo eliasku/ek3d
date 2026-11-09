@@ -100,4 +100,13 @@ export class HemisphereLightHelper extends Object3D {
     this.light.updateWorldMatrix(true, false);
     mesh.lookAt(_vector.setFromMatrixPosition(this.light.matrixWorld).negate());
   }
+  clone(recursive: boolean = true): HemisphereLightHelper {
+    const helper = new HemisphereLightHelper(this.light, undefined, this.color).copy(this, false);
+    (helper.children[0] as Mesh<MeshBasicMaterial>).copy(this.children[0] as Mesh<MeshBasicMaterial>);
+    helper.material = this.material;
+    if (recursive) {
+      for (let i = 1; i < this.children.length; i++) helper.add(this.children[i].clone());
+    }
+    return helper;
+  }
 }

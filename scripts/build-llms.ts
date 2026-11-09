@@ -45,5 +45,7 @@ for (const name of files) {
 
 await mkdir(new URL("public/", root), { recursive: true });
 await writeFile(new URL("public/llms.txt", root), `${index.join("\n")}\n`);
-await writeFile(new URL("public/llms-full.txt", root), `${full.join("\n")}\n`);
-console.log(`Generated public/llms.txt and public/llms-full.txt for ${files.length} modules.`);
+// skip built llms-full to not spam repository
+// await writeFile(new URL("public/llms-full.txt", root), `${full.join("\n")}\n`);
+// console.log(`Generated public/llms.txt and public/llms-full.txt for ${files.length} modules.`);
+console.log(`Generated public/llms.txt for ${files.length} modules (skip llms-full.txt to not spam repo changes).`);

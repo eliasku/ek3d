@@ -55,8 +55,8 @@ export class VideoFrameTexture extends VideoTexture {
    * this type of texture is updated via `setFrame()`.
    */
   update() {}
-  clone(): this {
-    return new (this.constructor as any)().copy(this); // restoring Texture.clone()
+  clone(): VideoFrameTexture {
+    return new VideoFrameTexture().copy(this);
   }
   /**
    * Sets the current frame of the video. This will automatically update the texture

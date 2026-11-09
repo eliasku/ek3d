@@ -37,6 +37,9 @@ export class CompressedCubeTexture extends CompressedTexture {
     this.isCubeTexture = true;
     this.image = images;
   }
+  clone(): CompressedCubeTexture {
+    return new CompressedCubeTexture(this.image, this.format, this.type).copy(this);
+  }
 
   get image(): CompressedTextureFace[] {
     return this.source.data;

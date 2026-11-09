@@ -44,6 +44,9 @@ export class CanvasTexture extends Texture {
     this.isCanvasTexture = true;
     this.needsUpdate = true;
   }
+  clone(): CanvasTexture {
+    return new CanvasTexture().copy(this);
+  }
 
   get image(): HTMLCanvasElement | OffscreenCanvas | null {
     return this.source.data;

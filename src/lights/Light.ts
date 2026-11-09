@@ -46,6 +46,9 @@ export class Light extends Object3D {
     this.intensity = source.intensity;
     return this;
   }
+  clone(recursive?: boolean): Light {
+    return new Light().copy(this, recursive);
+  }
   toJSON(meta?: any) {
     const data = super.toJSON(meta);
     data.object.color = this.color.getHex();

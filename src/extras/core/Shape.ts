@@ -93,6 +93,9 @@ export class Shape extends Path {
       holes: this.getPointsHoles(divisions),
     };
   }
+  override clone(): Shape {
+    return new Shape().copy(this);
+  }
   copy(source: this): this {
     super.copy(source);
     this.holes = [];

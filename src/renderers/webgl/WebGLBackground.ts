@@ -106,8 +106,8 @@ export function WebGLBackground(
         );
         boxMesh.geometry.deleteAttribute("normal");
         boxMesh.geometry.deleteAttribute("uv");
-        boxMesh.onBeforeRender = function (mesh: Mesh, _renderer: WebGLRenderer, _scene: Object3D, camera: Camera) {
-          mesh.matrixWorld.copyPosition(camera.matrixWorld);
+        boxMesh.onBeforeRender = function (this: Mesh, _renderer: WebGLRenderer, _scene: Object3D, camera: Camera) {
+          this.matrixWorld.copyPosition(camera.matrixWorld);
         };
         // add "envMap" material property so the renderer can evaluate it like for built-in materials
         Object.defineProperty(boxMesh.material, "envMap", {

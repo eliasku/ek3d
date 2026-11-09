@@ -26,6 +26,9 @@ export class AudioListener extends Object3D {
     this.gain.connect(this.context.destination);
     this._timer = new Timer();
   }
+  clone(recursive?: boolean): AudioListener {
+    return new AudioListener().copy(this, recursive);
+  }
   getInput(): GainNode {
     return this.gain;
   }

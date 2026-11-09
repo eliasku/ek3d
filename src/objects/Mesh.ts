@@ -98,8 +98,8 @@ export class Mesh<TMaterial extends Material | Material[] = Material | Material[
     this.morphTargetInfluences = undefined;
     this.updateMorphTargets();
   }
-  clone(recursive: boolean = true): this {
-    return new (this.constructor as any)(this.geometry, this.material).copy(this, recursive);
+  clone(recursive: boolean = true): Mesh<TMaterial> {
+    return new Mesh<TMaterial>(this.geometry, this.material).copy(this, recursive);
   }
   copy(source: any, recursive?: any): this {
     super.copy(source, recursive);

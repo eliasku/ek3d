@@ -36,6 +36,10 @@ export class RenderTarget3D extends RenderTarget {
     this._setTextureOptions(options);
   }
 
+  override clone(): RenderTarget3D {
+    return new RenderTarget3D().copy(this);
+  }
+
   get texture(): Data3DTexture {
     // Construction replaces the base attachment with a 3D texture.
     return super.texture as Data3DTexture;

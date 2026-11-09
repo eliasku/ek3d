@@ -142,7 +142,11 @@ export class PerspectiveCamera extends Camera {
     this.view = source.view === null ? null : Object.assign({}, source.view);
     this.filmGauge = source.filmGauge;
     this.filmOffset = source.filmOffset;
+    if (source.viewport !== undefined) this.viewport = source.viewport.clone();
     return this;
+  }
+  clone(recursive?: boolean): PerspectiveCamera {
+    return new PerspectiveCamera(this.fov, this.aspect, this.near, this.far).copy(this, recursive);
   }
   /**
    * Sets the FOV by focal length in respect to the current {@link PerspectiveCamera#filmGauge}.

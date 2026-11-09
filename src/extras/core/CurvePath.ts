@@ -58,10 +58,14 @@ export class CurvePath<T extends Vector2 | Vector3 = Vector2 | Vector3> extends 
    */
   closePath(): CurvePath {
     // Add a line curve if start and end of lines are not connected
-    const startPoint = this.curves[0].getPoint(0);
+    const startPoint = this.curves[0].getPoint(0)!;
     const endPoint = this.curves[this.curves.length - 1].getPoint(1);
-    if (!startPoint!.equals(endPoint as Vector2 & Vector3)) {
-      const lineType = (startPoint as any).isVector2 === true ? LineCurve : LineCurve3;
+    const isVector2 = "isVector2" in startPoint && startPoint.isVector2 === true;
+    const connected = isVector2
+      ? (startPoint as Vector2).equals(endPoint as Vector2)
+      : (startPoint as Vector3).equals(endPoint as Vector3);
+    if (!connected) {
+      const lineType = isVector2 ? LineCurve : LineCurve3;
       this.curves.push(
         new (lineType as unknown as new (v1: T | null, v2: T | null) => Curve<T | null>)(endPoint, startPoint),
       );
@@ -148,8 +152,8 @@ export class CurvePath<T extends Vector2 | Vector3 = Vector2 | Vector3> extends 
     return points;
   }
   getPoints(divisions: number = 12): T[] {
-    const points: any[] = [];
-    let last: any;
+    const points: T[] = [];
+    let last: T | undefined;
     for (let i = 0, curves = this.curves; i < curves.length; i++) {
       const curve = curves[i];
       const resolution = (curve as any).isEllipseCurve
@@ -161,16 +165,19 @@ export class CurvePath<T extends Vector2 | Vector3 = Vector2 | Vector3> extends 
             : divisions;
       const pts = curve.getPoints(resolution);
       for (let j = 0; j < pts.length; j++) {
-        const point = pts[j];
-        if (last && last.equals(point)) continue; // ensures no consecutive points are duplicates
+        const point = pts[j]!;
+        if (last && pointsEqual(last, point)) continue; // ensures no consecutive points are duplicates
         points.push(point);
         last = point;
       }
     }
-    if (this.autoClose && points.length > 1 && !points[points.length - 1].equals(points[0])) {
+    if (this.autoClose && points.length > 1 && !pointsEqual(points[points.length - 1], points[0])) {
       points.push(points[0]);
     }
     return points;
+  }
+  override clone(): CurvePath<T> {
+    return new CurvePath<T>().copy(this);
   }
   copy(source: this): this {
     super.copy(source);
@@ -204,4 +211,10 @@ export class CurvePath<T extends Vector2 | Vector3 = Vector2 | Vector3> extends 
     this.cacheLengths = null;
     return this;
   }
+}
+
+function pointsEqual(a: Vector2 | Vector3, b: Vector2 | Vector3): boolean {
+  return "isVector2" in a && a.isVector2 === true
+    ? (a as Vector2).equals(b as Vector2)
+    : (a as Vector3).equals(b as Vector3);
 }

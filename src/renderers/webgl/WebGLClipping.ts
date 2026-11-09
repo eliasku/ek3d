@@ -11,7 +11,7 @@ export function WebGLClipping(this: any, properties?: any) {
   this.uniform = uniform;
   this.numPlanes = 0;
   this.numIntersection = 0;
-  this.init = function (planes?: any, enableLocalClipping?: any) {
+  const init = (this.init = function (planes?: any, enableLocalClipping?: any) {
     const enabled =
       planes.length !== 0 ||
       enableLocalClipping ||
@@ -22,18 +22,18 @@ export function WebGLClipping(this: any, properties?: any) {
     localClippingEnabled = enableLocalClipping;
     numGlobalPlanes = planes.length;
     return enabled;
-  };
-  this.beginShadows = function () {
+  });
+  const beginShadows = (this.beginShadows = function () {
     renderingShadows = true;
     projectPlanes(null);
-  };
-  this.endShadows = function () {
+  });
+  const endShadows = (this.endShadows = function () {
     renderingShadows = false;
-  };
-  this.setGlobalState = function (planes?: any, camera?: any) {
+  });
+  const setGlobalState = (this.setGlobalState = function (planes?: any, camera?: any) {
     globalState = projectPlanes(planes, camera, 0);
-  };
-  this.setState = function (this: any, material?: any, camera?: any, useCache?: any) {
+  });
+  const setState = (this.setState = function (this: any, material?: any, camera?: any, useCache?: any) {
     const planes = material.clippingPlanes,
       clipIntersection = material.clipIntersection,
       clipShadows = material.clipShadows;
@@ -59,7 +59,7 @@ export function WebGLClipping(this: any, properties?: any) {
       this.numIntersection = clipIntersection ? (this as any).numPlanes : 0;
       (this as any).numPlanes += nGlobal;
     }
-  };
+  });
   const resetGlobalState = () => {
     if (uniform.value !== globalState) {
       uniform.value = globalState;
@@ -92,5 +92,15 @@ export function WebGLClipping(this: any, properties?: any) {
     this.numPlanes = nPlanes;
     this.numIntersection = 0;
     return dstArray;
+  };
+  return this as {
+    uniform: typeof uniform;
+    numPlanes: number;
+    numIntersection: number;
+    init: typeof init;
+    beginShadows: typeof beginShadows;
+    endShadows: typeof endShadows;
+    setGlobalState: typeof setGlobalState;
+    setState: typeof setState;
   };
 }

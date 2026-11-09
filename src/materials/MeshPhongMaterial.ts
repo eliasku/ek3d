@@ -453,6 +453,9 @@ export class MeshPhongMaterial extends Material {
     this.fog = true;
     this.setValues(parameters);
   }
+  clone(): MeshPhongMaterial {
+    return new MeshPhongMaterial().copy(this);
+  }
   copy(source: MeshPhongMaterial): this {
     super.copy(source);
     this.color.copy(source.color);

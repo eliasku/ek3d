@@ -1492,7 +1492,9 @@ class TypedInstances extends InstancedMesh {
   label: string = "cluster";
 }
 const subtypeInstances = new TypedInstances(geometry, material, 2);
-const subtypeClone: TypedInstances = subtypeInstances.clone();
+const subtypeClone: InstancedMesh = subtypeInstances.clone();
+// @ts-expect-error Inherited clones do not retain custom subclass fields.
+void subtypeInstances.clone().label;
 const subtypeCopy: TypedInstances = subtypeInstances.copy(instances, false);
 const subtypeUpdate: TypedInstances = subtypeInstances.setMatrixAt(0, instanceTransform).setColorAt(0, instanceTint);
 const morphSource = Object.assign(new Mesh(geometry, material), { morphTargetInfluences: [0.25, 0.5] });
@@ -1634,7 +1636,7 @@ const clonedBatch: BatchedMesh = batch.clone(false).copy(batchArrayMaterial, fal
 class TypedBatch extends BatchedMesh {
   label: string = "batch";
 }
-const typedBatchClone: TypedBatch = new TypedBatch(1, 24, 36, material).clone();
+const typedBatchClone: BatchedMesh = new TypedBatch(1, 24, 36, material).clone();
 batch.onBeforeRender(renderer, scene, camera, geometry, material);
 batch.onBeforeShadow(renderer, mesh, camera, camera, geometry, material);
 const lod = new LOD().addLevel(mesh).addLevel(batch, 10, 0.1);
@@ -1652,7 +1654,7 @@ lod.raycast(raycaster, objectHits);
 class TypedLOD extends LOD {
   label: string = "detail";
 }
-const clonedLOD: TypedLOD = new TypedLOD().clone();
+const clonedLOD: LOD = new TypedLOD().clone();
 const copiedLOD: LOD = new LOD().copy(lod);
 void [
   batchRange,

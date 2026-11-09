@@ -153,6 +153,9 @@ export class LatheGeometry extends BufferGeometry {
     this.setAttribute("uv", new Float32BufferAttribute(uvs, 2));
     this.setAttribute("normal", new Float32BufferAttribute(normals, 3));
   }
+  override clone(): LatheGeometry {
+    return new LatheGeometry().copy(this);
+  }
   copy(source: this) {
     super.copy(source);
     this.parameters = Object.assign({}, source.parameters);

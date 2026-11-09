@@ -154,14 +154,16 @@ export class Curve<T extends Vector2 | Vector3 | null = Vector2 | Vector3> {
       return this.cacheArcLengths;
     }
     this.needsUpdate = false;
-    const cache: any[] = [];
-    let current: any,
-      last = this.getPoint(0)!;
+    const cache: number[] = [];
+    let last = this.getPoint(0)!;
     let sum = 0;
     cache.push(0);
     for (let p = 1; p <= divisions; p++) {
-      current = this.getPoint(p / divisions);
-      sum += current.distanceTo(last);
+      const current = this.getPoint(p / divisions)!;
+      sum +=
+        "isVector2" in current && current.isVector2 === true
+          ? (current as Vector2).distanceTo(last as Vector2)
+          : (current as Vector3).distanceTo(last as Vector3);
       cache.push(sum);
       last = current;
     }
@@ -248,11 +250,18 @@ export class Curve<T extends Vector2 | Vector3 | null = Vector2 | Vector3> {
     if (t2 > 1) t2 = 1;
     const pt1 = this.getPoint(t1)!;
     const pt2 = this.getPoint(t2)!;
-    const tangent = optionalTarget || ((pt1 as any).isVector2 ? new Vector2() : new Vector3());
-    tangent
-      .copy(pt2 as Vector2 & Vector3)
-      .sub(pt1 as Vector2 & Vector3)
-      .normalize();
+    const tangent = optionalTarget || ("isVector2" in pt1 && pt1.isVector2 ? new Vector2() : new Vector3());
+    if ("isVector2" in tangent && tangent.isVector2) {
+      (tangent as Vector2)
+        .copy(pt2 as Vector2)
+        .sub(pt1 as Vector2)
+        .normalize();
+    } else {
+      (tangent as Vector3)
+        .copy(pt2 as Vector3)
+        .sub(pt1 as Vector3)
+        .normalize();
+    }
     return tangent as NonNullable<T>;
   }
   /**
@@ -281,15 +290,15 @@ export class Curve<T extends Vector2 | Vector3 | null = Vector2 | Vector3> {
   ): { tangents: Vector3[]; normals: Vector3[]; binormals: Vector3[] } {
     // see http://www.cs.indiana.edu/pub/techreports/TR425.pdf
     const normal = new Vector3();
-    const tangents: any[] = [];
-    const normals: any[] = [];
-    const binormals: any[] = [];
+    const tangents: Vector3[] = [];
+    const normals: Vector3[] = [];
+    const binormals: Vector3[] = [];
     const vec = new Vector3();
     const mat = new Matrix4();
     // compute the tangent vectors for each segment on the curve
     for (let i = 0; i <= segments; i++) {
       const u = i / segments;
-      tangents[i] = this.getTangentAt(u, new Vector3() as unknown as NonNullable<T>);
+      tangents[i] = this.getTangentAt(u, new Vector3() as unknown as NonNullable<T>) as unknown as Vector3;
     }
     // select an initial normal vector perpendicular to the first tangent vector,
     // and in the direction of the minimum tangent xyz component
@@ -349,8 +358,8 @@ export class Curve<T extends Vector2 | Vector3 | null = Vector2 | Vector3> {
    *
    * @return A clone of this instance.
    */
-  clone(): this {
-    return new (this.constructor as any)().copy(this);
+  clone(): Curve<T> {
+    return new Curve<T>().copy(this);
   }
   /**
    * Copies the values of the given curve to this instance.

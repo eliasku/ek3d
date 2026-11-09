@@ -196,8 +196,13 @@ export class BufferAttribute extends EventDispatcher {
    * @return A reference to this instance.
    */
   copy(source: BufferAttribute): this {
+    this.array = new (source.array.constructor as new (array: ArrayLike<number>) => BufferAttribute["array"])(
+      source.array,
+    );
+    return this._copyMetadata(source);
+  }
+  protected _copyMetadata(source: BufferAttribute): this {
     this.name = source.name;
-    this.array = new (source.array.constructor as any)(source.array);
     this.itemSize = source.itemSize;
     this.count = source.count;
     this.normalized = source.normalized;
@@ -538,8 +543,8 @@ export class BufferAttribute extends EventDispatcher {
    *
    * @return A clone of this instance.
    */
-  clone(): this {
-    return new (this.constructor as any)(this.array, this.itemSize).copy(this);
+  clone(): BufferAttribute {
+    return new BufferAttribute(this.array, this.itemSize).copy(this);
   }
   /**
    * Serializes the buffer attribute into JSON.
@@ -594,6 +599,9 @@ export class Int8BufferAttribute extends BufferAttribute {
   constructor(array: any, itemSize: number, normalized?: boolean) {
     super(new Int8Array(array), itemSize, normalized);
   }
+  override clone(): Int8BufferAttribute {
+    return new Int8BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
+  }
 }
 /**
  * Convenient class that can be used when creating a `UInt8` buffer attribute with
@@ -612,6 +620,9 @@ export class Uint8BufferAttribute extends BufferAttribute {
   constructor(array: any, itemSize: number, normalized?: boolean) {
     super(new Uint8Array(array), itemSize, normalized);
   }
+  override clone(): Uint8BufferAttribute {
+    return new Uint8BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
+  }
 }
 /**
  * Convenient class that can be used when creating a `UInt8Clamped` buffer attribute with
@@ -628,6 +639,9 @@ export class Uint8ClampedBufferAttribute extends BufferAttribute {
    */
   constructor(array: any, itemSize: number, normalized?: boolean) {
     super(new Uint8ClampedArray(array), itemSize, normalized);
+  }
+  override clone(): Uint8ClampedBufferAttribute {
+    return new Uint8ClampedBufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
   }
 }
 /**
@@ -647,6 +661,9 @@ export class Int16BufferAttribute extends BufferAttribute {
   constructor(array: any, itemSize: number, normalized?: boolean) {
     super(new Int16Array(array), itemSize, normalized);
   }
+  override clone(): Int16BufferAttribute {
+    return new Int16BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
+  }
 }
 /**
  * Convenient class that can be used when creating a `UInt16` buffer attribute with
@@ -664,6 +681,9 @@ export class Uint16BufferAttribute extends BufferAttribute {
   constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean);
   constructor(array: any, itemSize: number, normalized?: boolean) {
     super(new Uint16Array(array), itemSize, normalized);
+  }
+  override clone(): Uint16BufferAttribute {
+    return new Uint16BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
   }
 }
 /**
@@ -683,6 +703,9 @@ export class Int32BufferAttribute extends BufferAttribute {
   constructor(array: any, itemSize: number, normalized?: boolean) {
     super(new Int32Array(array), itemSize, normalized);
   }
+  override clone(): Int32BufferAttribute {
+    return new Int32BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
+  }
 }
 /**
  * Convenient class that can be used when creating a `UInt32` buffer attribute with
@@ -700,6 +723,9 @@ export class Uint32BufferAttribute extends BufferAttribute {
   constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean);
   constructor(array: any, itemSize: number, normalized?: boolean) {
     super(new Uint32Array(array), itemSize, normalized);
+  }
+  override clone(): Uint32BufferAttribute {
+    return new Uint32BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
   }
 }
 /**
@@ -724,6 +750,9 @@ export class Float16BufferAttribute extends BufferAttribute {
   constructor(array: any, itemSize: number, normalized?: boolean) {
     super(new Uint16Array(array), itemSize, normalized);
     this.isFloat16BufferAttribute = true;
+  }
+  override clone(): Float16BufferAttribute {
+    return new Float16BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
   }
   getX(index: number) {
     let x = fromHalfFloat(this.array[index * this.itemSize]);
@@ -818,6 +847,9 @@ export class Float32BufferAttribute extends BufferAttribute {
   constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean);
   constructor(array: any, itemSize: number, normalized?: boolean) {
     super(new Float32Array(array), itemSize, normalized);
+  }
+  override clone(): Float32BufferAttribute {
+    return new Float32BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
   }
 }
 //

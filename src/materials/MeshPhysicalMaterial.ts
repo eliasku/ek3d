@@ -640,6 +640,9 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
     this.iridescenceThicknessMinimum = value[0];
     this.iridescenceThicknessMaximum = value[1];
   }
+  clone(): MeshPhysicalMaterial {
+    return new MeshPhysicalMaterial().copy(this);
+  }
   copy(source: MeshPhysicalMaterial): this {
     super.copy(source);
     this.defines = {

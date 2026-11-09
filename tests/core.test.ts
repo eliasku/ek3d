@@ -1,7 +1,7 @@
 import { test, vi } from "vite-plus/test";
 import assert from "node:assert/strict";
 import { BufferGeometry } from "../src/core/BufferGeometry";
-import { BufferAttribute } from "../src/core/BufferAttribute";
+import { BufferAttribute, Float16BufferAttribute, Uint8BufferAttribute } from "../src/core/BufferAttribute";
 import { InterleavedBuffer } from "../src/core/InterleavedBuffer";
 import type { InterleavedBufferCloneData, InterleavedBufferSerializationData } from "../src/core/InterleavedBuffer";
 import { InterleavedBufferAttribute } from "../src/core/InterleavedBufferAttribute";
@@ -127,7 +127,7 @@ test("value cloning uses the declared type instead of a subclass constructor", (
   assert.equal(source.min.x, -4);
 });
 
-test("base cloning preserves concrete subclass contracts", () => {
+test("base cloning uses declared classes instead of custom subclass constructors", () => {
   class CustomObject extends Object3D {
     marker: string = "object";
   }
@@ -137,15 +137,37 @@ test("base cloning preserves concrete subclass contracts", () => {
   class CustomAttribute extends BufferAttribute {
     marker: string = "attribute";
   }
-  const object: CustomObject = new CustomObject().clone();
-  const geometry: CustomGeometry = new CustomGeometry().clone();
-  const attribute: CustomAttribute = new CustomAttribute(new Float32Array([1, 2, 3]), 3).clone();
-  assert.equal(object.marker, "object");
-  assert.equal(geometry.marker, "geometry");
-  assert.equal(attribute.marker, "attribute");
-  assert.ok(object instanceof CustomObject);
-  assert.ok(geometry instanceof CustomGeometry);
-  assert.ok(attribute instanceof CustomAttribute);
+  const object: Object3D = new CustomObject().clone();
+  const geometry: BufferGeometry = new CustomGeometry().clone();
+  const source = new CustomAttribute(new Float32Array([1, 2, 3]), 3);
+  const attribute: BufferAttribute = source.clone();
+  assert.equal(Object.getPrototypeOf(object), Object3D.prototype);
+  assert.equal(Object.getPrototypeOf(geometry), BufferGeometry.prototype);
+  assert.equal(Object.getPrototypeOf(attribute), BufferAttribute.prototype);
+  attribute.array[0] = 9;
+  assert.equal(source.array[0], 1);
+});
+
+test("typed attribute clones retain half-float accessors, normalized scaling and independent storage", () => {
+  const half = new Float16BufferAttribute([0, 0], 2);
+  half.setXY(0, 1.5, -2.25);
+  half.name = "half";
+  half.setUsage(BufferUsage.DynamicDraw);
+  const halfClone = half.clone();
+  assert.equal(halfClone.isFloat16BufferAttribute, true);
+  assert.deepEqual([halfClone.getX(0), halfClone.getY(0)], [1.5, -2.25]);
+  assert.equal(halfClone.name, "half");
+  assert.equal(halfClone.usage, BufferUsage.DynamicDraw);
+  assert.notEqual(halfClone.array.buffer, half.array.buffer);
+  halfClone.setY(0, 3.5);
+  assert.equal(half.getY(0), -2.25);
+  const normalized = new Uint8BufferAttribute([255, 128], 2, true);
+  const normalizedClone = normalized.clone();
+  assert.equal(normalizedClone.normalized, true);
+  assert.equal(normalizedClone.getX(0), 1);
+  normalizedClone.setX(0, 0.5);
+  assert.equal(normalizedClone.array[0], 128);
+  assert.equal(normalized.array[0], 255);
 });
 
 test("normalized interleaved transforms preserve adjacent data and agree with upstream", () => {
@@ -212,13 +234,17 @@ test("geometry clone and serialization retain shared interleaved buffers without
 test("clone and serialization distinguish typed-array views while sharing identical ranges", () => {
   const storage = Float32Array.from({ length: 24 }, (_, i) => i + 1);
   const first = new InterleavedBuffer(new Float32Array(storage.buffer, 8, 6), 3);
-  const same = new InterleavedBuffer(new Float32Array(storage.buffer, 8, 6), 3);
+  const same = new InstancedInterleavedBuffer(new Float32Array(storage.buffer, 8, 6), 3, 2);
+  same.setUsage(BufferUsage.DynamicDraw);
   const other = new InterleavedBuffer(new Float32Array(storage.buffer, 32, 6), 3);
   const clones: InterleavedBufferCloneData = {};
   const a = first.clone(clones);
   const b = same.clone(clones);
   const c = other.clone(clones);
   assert.equal(a.array.buffer, b.array.buffer);
+  assert.equal(b.isInstancedInterleavedBuffer, true);
+  assert.equal(b.meshPerAttribute, 2);
+  assert.equal(b.usage, BufferUsage.DynamicDraw);
   assert.notEqual(a.array.buffer, c.array.buffer);
   assert.deepEqual(Array.from(a.array), [3, 4, 5, 6, 7, 8]);
   assert.deepEqual(Array.from(c.array), [9, 10, 11, 12, 13, 14]);

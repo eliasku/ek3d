@@ -2544,7 +2544,7 @@ export class GLTFParser {
   /**
    * Returns a reference to a shared resource, cloning it if necessary.
    */
-  _getNodeRef<T extends Object3D>(cache: Object3DCache, index: number, object: T): T {
+  _getNodeRef<T extends { clone(): T } & Object3D>(cache: Object3DCache, index: number, object: T): T {
     if (cache.refs[index] <= 1) return object;
 
     const ref = object.clone();

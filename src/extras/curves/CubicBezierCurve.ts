@@ -97,6 +97,9 @@ export class CubicBezierCurve extends Curve<Vector2> {
     point.set(CubicBezier(t, v0.x, v1.x, v2.x, v3.x), CubicBezier(t, v0.y, v1.y, v2.y, v3.y));
     return point;
   }
+  override clone(): CubicBezierCurve {
+    return new CubicBezierCurve().copy(this);
+  }
   copy(source: this): this {
     super.copy(source);
     this.v0.copy(source.v0);

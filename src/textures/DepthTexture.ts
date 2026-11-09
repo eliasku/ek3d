@@ -74,9 +74,29 @@ export class DepthTexture extends Texture {
      */
     this.compareFunction = null;
   }
+  clone(): DepthTexture {
+    const image = this.image;
+    const size = Array.isArray(image) ? image[0] : image;
+    return new DepthTexture(
+      size.width,
+      size.height,
+      this.type,
+      this.mapping,
+      this.wrapS,
+      this.wrapT,
+      this.magFilter,
+      this.minFilter,
+      this.anisotropy,
+      this.format,
+      size.depth,
+    ).copy(this);
+  }
   copy(source: DepthTexture & Pick<this, "image" | "mipmaps">): this {
     super.copy(source);
-    this.source = new TextureSource(Object.assign({}, source.image)); // see #30540
+    const image = source.image;
+    this.source = new TextureSource(
+      Array.isArray(image) ? image.map((face) => Object.assign({}, face)) : Object.assign({}, image),
+    ); // see #30540
     this.compareFunction = source.compareFunction;
     return this;
   }

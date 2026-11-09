@@ -776,7 +776,9 @@ export class BufferGeometry extends EventDispatcher {
       const array = attribute.array;
       const itemSize = attribute.itemSize;
       const normalized = attribute.normalized;
-      const array2 = new (array.constructor as any)(indices.length * itemSize);
+      const array2 = new (array.constructor as new (length: number) => BufferAttribute["array"])(
+        indices.length * itemSize,
+      );
       let index = 0,
         index2 = 0;
       for (let i = 0, l = indices.length; i < l; i++) {
@@ -900,8 +902,8 @@ export class BufferGeometry extends EventDispatcher {
    *
    * @return A clone of this instance.
    */
-  clone(): this {
-    return new (this.constructor as any)().copy(this);
+  clone(): BufferGeometry {
+    return new BufferGeometry().copy(this);
   }
   /**
    * Copies the values of the given geometry to this instance.

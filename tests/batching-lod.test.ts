@@ -238,7 +238,7 @@ test("batch per-geometry and aggregate bounds and picking match upstream across 
   }
 });
 
-test("batch clone isolates all owned storage, preserves subtype, sorting and recursive control", () => {
+test("batch clone uses the declared class and isolates storage, sorting and recursion", () => {
   class Cluster extends BatchedMesh {}
   const material = new MeshBasicMaterial();
   const source = new Cluster(2, 6, 6, material);
@@ -251,7 +251,7 @@ test("batch clone isolates all owned storage, preserves subtype, sorting and rec
   source.computeBoundingSphere();
   source.add(new Object3D());
   const clone = source.clone();
-  assert.ok(clone instanceof Cluster);
+  assert.equal(Object.getPrototypeOf(clone), BatchedMesh.prototype);
   assert.equal(clone.material, material);
   assert.equal(clone.customSort, source.customSort);
   assert.notEqual(clone.children[0], source.children[0]);
@@ -389,7 +389,7 @@ test("LOD cloning and serialization retain levels, hysteresis and autoUpdate", (
   lod.addLevel(new Mesh(triangle(), new MeshBasicMaterial()), 0);
   lod.addLevel(new Mesh(triangle(), new MeshBasicMaterial()), 10, 0.15);
   const clone = lod.clone();
-  assert.ok(clone instanceof Detail);
+  assert.equal(Object.getPrototypeOf(clone), LOD.prototype);
   assert.equal(clone.autoUpdate, false);
   assert.equal(clone.levels.length, 2);
   assert.equal(clone.children.length, 2);

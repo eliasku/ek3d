@@ -68,6 +68,9 @@ export class ConeGeometry extends CylinderGeometry {
       thetaLength: thetaLength,
     };
   }
+  override clone(): ConeGeometry {
+    return new ConeGeometry().copy(this);
+  }
   /**
    * Factory method for creating an instance of this class from the given
    * JSON object.

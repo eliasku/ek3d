@@ -7,6 +7,7 @@ import { Vector2 } from "../src/math/Vector2";
 import { Vector3 } from "../src/math/Vector3";
 import { Mesh } from "../src/objects/Mesh";
 import { MeshBasicMaterial } from "../src/materials/MeshBasicMaterial";
+import { BoxGeometry } from "../src/geometries/BoxGeometry";
 import { CapsuleGeometry } from "../src/geometries/CapsuleGeometry";
 import { CircleGeometry } from "../src/geometries/CircleGeometry";
 import { ConeGeometry } from "../src/geometries/ConeGeometry";
@@ -92,13 +93,13 @@ function assertGeometry(actual: BufferGeometry, expected: BufferGeometry | Upstr
   assert.deepEqual(snapshot(actual), snapshot(expected), actual.type);
 }
 
-function assertOwnership(source: BufferGeometry) {
+function assertOwnership(source: BufferGeometry, expectedClone: BufferGeometry = source) {
   const before = jsonValue(snapshot(source));
   const clone = source.clone();
-  assert.equal(clone.constructor, source.constructor);
+  assert.equal(clone.constructor, expectedClone.constructor);
   assert.notEqual(clone.uuid, source.uuid);
-  assertGeometry(clone, source);
-  assert.deepEqual(jsonValue(clone.toJSON()), jsonValue(source.toJSON()));
+  assertGeometry(clone, expectedClone);
+  assert.deepEqual(jsonValue(clone.toJSON()), jsonValue(expectedClone.toJSON()));
   if ("parameters" in source && "parameters" in clone) {
     assert.notEqual(clone.parameters, source.parameters);
   }
@@ -125,8 +126,8 @@ function assertOwnership(source: BufferGeometry) {
   assert.deepEqual(jsonValue(snapshot(source)), before);
 
   assert.equal(clone.copy(source), clone);
-  assertGeometry(clone, source);
-  assert.deepEqual(jsonValue(clone.toJSON()), jsonValue(source.toJSON()));
+  assertGeometry(clone, expectedClone);
+  assert.deepEqual(jsonValue(clone.toJSON()), jsonValue(expectedClone.toJSON()));
   for (const name of Object.keys(source.attributes)) {
     const attribute = clone.getAttribute(name);
     const original = source.getAttribute(name);
@@ -366,6 +367,29 @@ test("tubes preserve open and closed buffers, Frenet frames, ownership and expli
   );
 });
 
+test("tube clones and copies retain independently mutable source Frenet frames", () => {
+  const path = new LineCurve3(new Vector3(1, 2, 3), new Vector3(3, 2, 4));
+  const source = new TubeGeometry(path, 4, 0.2, 3);
+  const keys = ["tangents", "normals", "binormals"] as const;
+  for (const key of keys) source[key][0].set(2, 3, 4);
+  for (const copy of [source.clone(), new TubeGeometry().copy(source)]) {
+    for (const key of keys) {
+      const expected = source[key].map((frame) => frame.toArray());
+      assert.notEqual(copy[key], source[key]);
+      assert.deepEqual(
+        copy[key].map((frame) => frame.toArray()),
+        expected,
+      );
+      for (let i = 0; i < copy[key].length; i++) assert.notEqual(copy[key][i], source[key][i]);
+      copy[key][0].x += 10;
+      assert.deepEqual(
+        source[key].map((frame) => frame.toArray()),
+        expected,
+      );
+    }
+  }
+});
+
 test("shape triangulation and extrusion preserve holes, bevels, near-coincident contours, groups and JSON", () => {
   const shape = new Shape([
     new Vector2(0, 0),
@@ -548,7 +572,7 @@ test("rounded box matches upstream vertices, normals and UVs across rounding and
   }
   const restored = RoundedBoxGeometry.fromJSON(JSON.parse(JSON.stringify(cases[0][0].toJSON())));
   assertGeometry(restored, cases[0][1] as unknown as UpstreamBufferGeometry);
-  assertOwnership(cases[0][0]);
+  assertOwnership(cases[0][0], new BoxGeometry().copy(cases[0][0]));
 });
 
 test("degenerate UV tangents remain unit length and perpendicular to normals", () => {
