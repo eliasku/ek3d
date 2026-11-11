@@ -4,7 +4,7 @@ import { Vector3 } from "../math/Vector3";
 /**
  * A class for generating a sphere geometry.
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { SphereGeometry } from 'ek3d/geometries/SphereGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
@@ -72,17 +72,17 @@ export class SphereGeometry extends BufferGeometry {
     heightSegments = Math.max(2, Math.floor(heightSegments));
     const thetaEnd = Math.min(thetaStart + thetaLength, Math.PI);
     let index = 0;
-    const grid: any[] = [];
+    const grid: number[][] = [];
     const vertex = new Vector3();
     const normal = new Vector3();
     // buffers
-    const indices: any[] = [];
-    const vertices: any[] = [];
-    const normals: any[] = [];
-    const uvs: any[] = [];
+    const indices: number[] = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
     // generate vertices, normals and uvs
     for (let iy = 0; iy <= heightSegments; iy++) {
-      const verticesRow: any[] = [];
+      const verticesRow: number[] = [];
       const v = iy / heightSegments;
       const theta = thetaStart + v * thetaLength;
       const y = radius * Math.cos(theta);

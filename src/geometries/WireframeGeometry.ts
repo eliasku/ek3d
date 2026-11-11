@@ -1,10 +1,12 @@
+import type { BufferAttribute } from "../core/BufferAttribute";
+import type { InterleavedBufferAttribute } from "../core/InterleavedBufferAttribute";
 import { BufferGeometry } from "../core/BufferGeometry";
 import { Float32BufferAttribute } from "../core/BufferAttribute";
 import { Vector3 } from "../math/Vector3";
 /**
  * Can be used as a helper object to visualize a geometry as a wireframe.
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { SphereGeometry } from 'ek3d/geometries/SphereGeometry';
  * import { WireframeGeometry } from 'ek3d/geometries/WireframeGeometry';
@@ -48,14 +50,14 @@ export class WireframeGeometry extends BufferGeometry {
     };
     if (geometry !== null) {
       // buffer
-      const vertices: any[] = [];
-      const edges = new Set<any>();
+      const vertices: number[] = [];
+      const edges = new Set<string>();
       // helper variables
       const start = new Vector3();
       const end = new Vector3();
       if (geometry.index !== null) {
         // indexed BufferGeometry
-        const position = (geometry.attributes as any).position;
+        const position = geometry.attributes.position as BufferAttribute | InterleavedBufferAttribute;
         const indices = geometry.index;
         let groups = geometry.groups;
         if (groups.length === 0) {
@@ -81,7 +83,7 @@ export class WireframeGeometry extends BufferGeometry {
         }
       } else {
         // non-indexed BufferGeometry
-        const position = (geometry.attributes as any).position;
+        const position = geometry.attributes.position as BufferAttribute | InterleavedBufferAttribute;
         for (let i = 0, l = position.count / 3; i < l; i++) {
           for (let j = 0; j < 3; j++) {
             // three edges per triangle, an edge is represented as (index1, index2)
@@ -110,7 +112,7 @@ export class WireframeGeometry extends BufferGeometry {
     return this;
   }
 }
-function isUniqueEdge(start?: any, end?: any, edges?: any) {
+function isUniqueEdge(start: Vector3, end: Vector3, edges: Set<string>) {
   const hash1 = `${start.x},${start.y},${start.z}-${end.x},${end.y},${end.z}`;
   const hash2 = `${end.x},${end.y},${end.z}-${start.x},${start.y},${start.z}`; // coincident edge
   if (edges.has(hash1) === true || edges.has(hash2) === true) {

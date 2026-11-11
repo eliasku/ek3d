@@ -11,7 +11,7 @@ export type TubeGeometryJSON = Omit<Partial<TubeGeometry["parameters"]>, "path">
 /**
  * Creates a tube that extrudes along a 3D curve.
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { Curve } from 'ek3d/extras/core/Curve';
  * import { Vector3 } from 'ek3d/math/Vector3';
@@ -101,10 +101,10 @@ export class TubeGeometry extends BufferGeometry {
     const uv = new Vector2();
     let P = new Vector3();
     // buffer
-    const vertices: any[] = [];
-    const normals: any[] = [];
-    const uvs: any[] = [];
-    const indices: any[] = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
+    const indices: number[] = [];
     // create buffer data
     generateBufferData();
     // build geometry
@@ -128,7 +128,7 @@ export class TubeGeometry extends BufferGeometry {
       // finally create faces
       generateIndices();
     }
-    function generateSegment(i?: any) {
+    function generateSegment(i: number) {
       // we use getPointAt to sample evenly distributed points from the given path
       P = path.getPointAt(i / tubularSegments, P)!;
       // retrieve corresponding normal and binormal

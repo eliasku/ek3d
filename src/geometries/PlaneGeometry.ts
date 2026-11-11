@@ -3,7 +3,7 @@ import { Float32BufferAttribute } from "../core/BufferAttribute";
 /**
  * A geometry class for representing a plane.
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { PlaneGeometry } from 'ek3d/geometries/PlaneGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
@@ -55,10 +55,10 @@ export class PlaneGeometry extends BufferGeometry {
     const segment_width = width / gridX;
     const segment_height = height / gridY;
     //
-    const indices: any[] = [];
-    const vertices: any[] = [];
-    const normals: any[] = [];
-    const uvs: any[] = [];
+    const indices: number[] = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
     for (let iy = 0; iy < gridY1; iy++) {
       const y = iy * segment_height - height_half;
       for (let ix = 0; ix < gridX1; ix++) {

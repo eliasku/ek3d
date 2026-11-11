@@ -5,7 +5,7 @@ import { Vector2 } from "../math/Vector2";
 /**
  * A geometry class for representing a cylinder.
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { CylinderGeometry } from 'ek3d/geometries/CylinderGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
@@ -77,13 +77,13 @@ export class CylinderGeometry extends BufferGeometry {
     radialSegments = Math.floor(radialSegments);
     heightSegments = Math.floor(heightSegments);
     // buffers
-    const indices: any[] = [];
-    const vertices: any[] = [];
-    const normals: any[] = [];
-    const uvs: any[] = [];
+    const indices: number[] = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
     // helper variables
     let index = 0;
-    const indexArray: any[] = [];
+    const indexArray: number[][] = [];
     const halfHeight = height / 2;
     let groupStart = 0;
     const generateTorso = () => {
@@ -94,7 +94,7 @@ export class CylinderGeometry extends BufferGeometry {
       const slope = (radiusBottom - radiusTop) / height;
       // generate vertices, normals and uvs
       for (let y = 0; y <= heightSegments; y++) {
-        const indexRow: any[] = [];
+        const indexRow: number[] = [];
         const v = y / heightSegments;
         // calculate the radius of the current row
         const radius = v * (radiusBottom - radiusTop) + radiusTop;
@@ -143,7 +143,7 @@ export class CylinderGeometry extends BufferGeometry {
       // calculate new start value for groups
       groupStart += groupCount;
     };
-    const generateCap = (top?: any) => {
+    const generateCap = (top: boolean) => {
       // save the index of the first center vertex
       const centerIndexStart = index;
       const uv = new Vector2();

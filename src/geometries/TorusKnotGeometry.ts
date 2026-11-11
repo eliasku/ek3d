@@ -6,7 +6,7 @@ import { Vector3 } from "../math/Vector3";
  * of coprime integers, p and q. If p and q are not coprime, the result will
  * be a torus link.
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { TorusKnotGeometry } from 'ek3d/geometries/TorusKnotGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
@@ -62,10 +62,10 @@ export class TorusKnotGeometry extends BufferGeometry {
     tubularSegments = Math.floor(tubularSegments);
     radialSegments = Math.floor(radialSegments);
     // buffers
-    const indices: any[] = [];
-    const vertices: any[] = [];
-    const normals: any[] = [];
-    const uvs: any[] = [];
+    const indices: number[] = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
     // helper variables
     const vertex = new Vector3();
     const normal = new Vector3();
@@ -129,7 +129,7 @@ export class TorusKnotGeometry extends BufferGeometry {
     this.setAttribute("normal", new Float32BufferAttribute(normals, 3));
     this.setAttribute("uv", new Float32BufferAttribute(uvs, 2));
     // this function calculates the current position on the torus curve
-    function calculatePositionOnCurve(u: any, p: any, q: any, radius: any, position?: any) {
+    function calculatePositionOnCurve(u: number, p: number, q: number, radius: number, position: Vector3) {
       const cu = Math.cos(u);
       const su = Math.sin(u);
       const quOverP = (q / p) * u;

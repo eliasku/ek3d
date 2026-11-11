@@ -6,6 +6,9 @@ import { denormalize, normalize, getNormalizationScale } from "../math/MathUtils
 import { BufferUsage, TextureType } from "../constants";
 import { fromHalfFloat, toHalfFloat } from "../extras/DataUtils";
 import { EventDispatcher } from "./EventDispatcher";
+
+type TypedArrayConstructor<T> = new (array: number | ArrayLike<number>) => T;
+
 const _vector = /*@__PURE__*/ new Vector3();
 const _vector2 = /*@__PURE__*/ new Vector2();
 let _id = 0;
@@ -153,7 +156,7 @@ export class BufferAttribute extends EventDispatcher {
    * A callback function that is executed after the renderer has transferred the attribute
    * array data to the GPU.
    */
-  onUploadCallback() {}
+  onUploadCallback(this: this): void {}
   /**
    * Flag to indicate that this attribute has changed and should be re-sent to
    * the GPU. Set this to `true` when you modify the value of the array.
@@ -235,20 +238,7 @@ export class BufferAttribute extends EventDispatcher {
    * @param array - The array to copy.
    * @return A reference to this instance.
    */
-  copyArray(
-    array:
-      | Int8Array
-      | Uint8Array
-      | Uint8ClampedArray
-      | Int16Array
-      | Uint16Array
-      | Int32Array
-      | Uint32Array
-      | Float32Array
-      | Float64Array
-      | any[],
-  ): BufferAttribute;
-  copyArray(array?: any): BufferAttribute {
+  copyArray(array: ArrayLike<number>): BufferAttribute {
     this.array.set(array);
     return this;
   }
@@ -327,21 +317,7 @@ export class BufferAttribute extends EventDispatcher {
    * @param [offset=0] - The offset in this buffer attribute's array.
    * @return A reference to this instance.
    */
-  set(
-    value:
-      | Int8Array
-      | Uint8Array
-      | Uint8ClampedArray
-      | Int16Array
-      | Uint16Array
-      | Int32Array
-      | Uint32Array
-      | Float32Array
-      | Float64Array
-      | any[],
-    offset?: number,
-  ): BufferAttribute;
-  set(value?: any, offset: number = 0): BufferAttribute {
+  set(value: ArrayLike<number>, offset: number = 0): BufferAttribute {
     // Matching BufferAttribute constructor, do not normalize the array.
     this.array.set(value, offset);
     return this;
@@ -534,7 +510,7 @@ export class BufferAttribute extends EventDispatcher {
    * @param callback - The `onUpload()` callback.
    * @return A reference to this instance.
    */
-  onUpload(callback: (...args: any[]) => any): BufferAttribute {
+  onUpload(callback: (this: this) => void): BufferAttribute {
     this.onUploadCallback = callback;
     return this;
   }
@@ -552,15 +528,25 @@ export class BufferAttribute extends EventDispatcher {
    * @return A JSON object representing the serialized buffer attribute.
    */
   toJSON() {
-    const data: any = {
+    const data: {
+      itemSize: number;
+      type: string;
+      array: number[];
+      normalized: boolean;
+      name?: string;
+      usage?: BufferUsage;
+      gpuType?: TextureType;
+      meshPerAttribute?: number;
+      isInstancedBufferAttribute?: boolean;
+    } = {
       itemSize: this.itemSize,
       type: this.array.constructor.name,
       array: Array.from(this.array),
       normalized: this.normalized,
     };
-    (data as any).name = this.name;
-    (data as any).usage = this.usage;
-    (data as any).gpuType = this.gpuType;
+    data.name = this.name;
+    data.usage = this.usage;
+    data.gpuType = this.gpuType;
     return data;
   }
   /**
@@ -595,9 +581,8 @@ export class Int8BufferAttribute extends BufferAttribute {
    * @param itemSize - The item size.
    * @param [normalized=false] - Whether the data are normalized or not.
    */
-  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean);
-  constructor(array: any, itemSize: number, normalized?: boolean) {
-    super(new Int8Array(array), itemSize, normalized);
+  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean) {
+    super(new (Int8Array as TypedArrayConstructor<Int8Array>)(array), itemSize, normalized);
   }
   override clone(): Int8BufferAttribute {
     return new Int8BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
@@ -616,9 +601,8 @@ export class Uint8BufferAttribute extends BufferAttribute {
    * @param itemSize - The item size.
    * @param [normalized=false] - Whether the data are normalized or not.
    */
-  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean);
-  constructor(array: any, itemSize: number, normalized?: boolean) {
-    super(new Uint8Array(array), itemSize, normalized);
+  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean) {
+    super(new (Uint8Array as TypedArrayConstructor<Uint8Array>)(array), itemSize, normalized);
   }
   override clone(): Uint8BufferAttribute {
     return new Uint8BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
@@ -637,8 +621,8 @@ export class Uint8ClampedBufferAttribute extends BufferAttribute {
    * @param itemSize - The item size.
    * @param [normalized=false] - Whether the data are normalized or not.
    */
-  constructor(array: any, itemSize: number, normalized?: boolean) {
-    super(new Uint8ClampedArray(array), itemSize, normalized);
+  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean) {
+    super(new (Uint8ClampedArray as TypedArrayConstructor<Uint8ClampedArray>)(array), itemSize, normalized);
   }
   override clone(): Uint8ClampedBufferAttribute {
     return new Uint8ClampedBufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
@@ -657,9 +641,8 @@ export class Int16BufferAttribute extends BufferAttribute {
    * @param itemSize - The item size.
    * @param [normalized=false] - Whether the data are normalized or not.
    */
-  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean);
-  constructor(array: any, itemSize: number, normalized?: boolean) {
-    super(new Int16Array(array), itemSize, normalized);
+  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean) {
+    super(new (Int16Array as TypedArrayConstructor<Int16Array>)(array), itemSize, normalized);
   }
   override clone(): Int16BufferAttribute {
     return new Int16BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
@@ -678,9 +661,8 @@ export class Uint16BufferAttribute extends BufferAttribute {
    * @param itemSize - The item size.
    * @param [normalized=false] - Whether the data are normalized or not.
    */
-  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean);
-  constructor(array: any, itemSize: number, normalized?: boolean) {
-    super(new Uint16Array(array), itemSize, normalized);
+  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean) {
+    super(new (Uint16Array as TypedArrayConstructor<Uint16Array>)(array), itemSize, normalized);
   }
   override clone(): Uint16BufferAttribute {
     return new Uint16BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
@@ -699,9 +681,8 @@ export class Int32BufferAttribute extends BufferAttribute {
    * @param itemSize - The item size.
    * @param [normalized=false] - Whether the data are normalized or not.
    */
-  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean);
-  constructor(array: any, itemSize: number, normalized?: boolean) {
-    super(new Int32Array(array), itemSize, normalized);
+  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean) {
+    super(new (Int32Array as TypedArrayConstructor<Int32Array>)(array), itemSize, normalized);
   }
   override clone(): Int32BufferAttribute {
     return new Int32BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
@@ -720,9 +701,8 @@ export class Uint32BufferAttribute extends BufferAttribute {
    * @param itemSize - The item size.
    * @param [normalized=false] - Whether the data are normalized or not.
    */
-  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean);
-  constructor(array: any, itemSize: number, normalized?: boolean) {
-    super(new Uint32Array(array), itemSize, normalized);
+  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean) {
+    super(new (Uint32Array as TypedArrayConstructor<Uint32Array>)(array), itemSize, normalized);
   }
   override clone(): Uint32BufferAttribute {
     return new Uint32BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);
@@ -746,9 +726,8 @@ export class Float16BufferAttribute extends BufferAttribute {
    * @param itemSize - The item size.
    * @param [normalized=false] - Whether the data are normalized or not.
    */
-  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean);
-  constructor(array: any, itemSize: number, normalized?: boolean) {
-    super(new Uint16Array(array), itemSize, normalized);
+  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean) {
+    super(new (Uint16Array as TypedArrayConstructor<Uint16Array>)(array), itemSize, normalized);
     this.isFloat16BufferAttribute = true;
   }
   override clone(): Float16BufferAttribute {
@@ -844,9 +823,8 @@ export class Float32BufferAttribute extends BufferAttribute {
    * @param itemSize - The item size.
    * @param [normalized=false] - Whether the data are normalized or not.
    */
-  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean);
-  constructor(array: any, itemSize: number, normalized?: boolean) {
-    super(new Float32Array(array), itemSize, normalized);
+  constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean) {
+    super(new (Float32Array as TypedArrayConstructor<Float32Array>)(array), itemSize, normalized);
   }
   override clone(): Float32BufferAttribute {
     return new Float32BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);

@@ -11,7 +11,7 @@ export interface ShapeGeometryJSON {
 /**
  * Creates an one-sided polygonal geometry from one or more path shapes.
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { Shape } from 'ek3d/extras/core/Shape';
  * import { ShapeGeometry } from 'ek3d/geometries/ShapeGeometry';
@@ -59,10 +59,10 @@ export class ShapeGeometry extends BufferGeometry {
       curveSegments: curveSegments,
     };
     // buffers
-    const indices: any[] = [];
-    const vertices: any[] = [];
-    const normals: any[] = [];
-    const uvs: any[] = [];
+    const indices: number[] = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
     // helper variables
     let groupStart = 0;
     let groupCount = 0;
@@ -131,7 +131,7 @@ export class ShapeGeometry extends BufferGeometry {
     return this;
   }
   toJSON(): ShapeGeometryJSON {
-    const data = super.toJSON();
+    const data: ShapeGeometryJSON = super.toJSON();
     const shapes = this.parameters.shapes;
     return toJSON(shapes, data);
   }
@@ -144,7 +144,7 @@ export class ShapeGeometry extends BufferGeometry {
    * @return A new instance.
    */
   static fromJSON(data: ShapeGeometryJSON, shapes: Record<string, Shape>): ShapeGeometry {
-    const geometryShapes: any[] = [];
+    const geometryShapes: Shape[] = [];
     for (let j = 0, jl = data.shapes.length; j < jl; j++) {
       const shape = shapes[data.shapes[j]];
       geometryShapes.push(shape);
@@ -152,7 +152,7 @@ export class ShapeGeometry extends BufferGeometry {
     return new ShapeGeometry(geometryShapes, data.curveSegments);
   }
 }
-function toJSON(shapes?: any, data?: any) {
+function toJSON(shapes: Shape | Shape[], data: ShapeGeometryJSON): ShapeGeometryJSON {
   data.shapes = [];
   if (Array.isArray(shapes)) {
     for (let i = 0, l = shapes.length; i < l; i++) {

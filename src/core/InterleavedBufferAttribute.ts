@@ -336,7 +336,7 @@ export class InterleavedBufferAttribute {
       log(
         "InterleavedBufferAttribute.clone(): Cloning an interleaved buffer attribute will de-interleave buffer data.",
       );
-      const array: any[] = [];
+      const array: number[] = [];
       for (let i = 0; i < this.count; i++) {
         const index = i * this.data.stride + this.offset;
         for (let j = 0; j < this.itemSize; j++) {
@@ -376,7 +376,7 @@ export class InterleavedBufferAttribute {
       log(
         "InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will de-interleave buffer data.",
       );
-      const array: any[] = [];
+      const array: number[] = [];
       for (let i = 0; i < this.count; i++) {
         const index = i * this.data.stride + this.offset;
         for (let j = 0; j < this.itemSize; j++) {
@@ -412,7 +412,7 @@ export class InterleavedBufferAttribute {
    *
    * @private
    */
-  _denormalize(value?: any) {
+  _denormalize(value: number) {
     const scale = this._normalizationScale;
     return scale !== undefined ? Math.max(value / scale, -1.0) : denormalize(value, this.data.array);
   }
@@ -421,7 +421,7 @@ export class InterleavedBufferAttribute {
    *
    * @private
    */
-  _normalize(value?: any) {
+  _normalize(value: number) {
     const scale = this._normalizationScale;
     return scale !== undefined ? Math.round(value * scale) : normalize(value, this.data.array);
   }

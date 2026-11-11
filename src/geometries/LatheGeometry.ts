@@ -6,7 +6,7 @@ import { clamp } from "../math/MathUtils";
 /**
  * Creates meshes with axial symmetry like vases. The lathe rotates around the Y axis.
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { Vector2 } from 'ek3d/math/Vector2';
  * import { LatheGeometry } from 'ek3d/geometries/LatheGeometry';
@@ -64,11 +64,11 @@ export class LatheGeometry extends BufferGeometry {
     // clamp phiLength so it's in range of [ 0, 2PI ]
     phiLength = clamp(phiLength, 0, Math.PI * 2);
     // buffers
-    const indices: any[] = [];
-    const vertices: any[] = [];
-    const uvs: any[] = [];
-    const initNormals: any[] = [];
-    const normals: any[] = [];
+    const indices: number[] = [];
+    const vertices: number[] = [];
+    const uvs: number[] = [];
+    const initNormals: number[] = [];
+    const normals: number[] = [];
     // helper variables
     const inverseSegments = 1.0 / segments;
     const vertex = new Vector3();

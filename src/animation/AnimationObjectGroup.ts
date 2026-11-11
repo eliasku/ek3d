@@ -26,14 +26,17 @@ import { error } from "../utils";
 export class AnimationObjectGroup {
   isAnimationObjectGroup: boolean;
   uuid: string;
-  _objects: any[];
+  _objects: Object3D[];
   nCachedObjects_: number;
-  _indicesByUUID: any;
-  _paths: any[];
-  _parsedPaths: any[];
-  _bindings: any[];
-  _bindingsIndicesByPath: any;
-  stats: any;
+  _indicesByUUID: Record<string, number | undefined>;
+  _paths: string[];
+  _parsedPaths: ParsedTrackPath[];
+  _bindings: PropertyBinding[][];
+  _bindingsIndicesByPath: Record<string, number | undefined>;
+  stats: {
+    objects: { readonly total: number; readonly inUse: number };
+    readonly bindingsPerObject: number;
+  };
 
   /**
    * Constructs a new animation group.
@@ -59,15 +62,15 @@ export class AnimationObjectGroup {
     this._objects = Array.prototype.slice.call(arguments);
     this.nCachedObjects_ = 0; // threshold
     // note: read by PropertyBinding.Composite
-    const indices: any = {};
+    const indices: Record<string, number | undefined> = {};
     this._indicesByUUID = indices; // for bookkeeping
     for (let i = 0, n = arguments.length; i !== n; ++i) {
-      (indices as any)[(arguments as any)[i].uuid] = i;
+      indices[(arguments[i] as Object3D).uuid] = i;
     }
-    this._paths = []; // inside: string
-    this._parsedPaths = []; // inside: { we don't care, here }
-    this._bindings = []; // inside: Array< PropertyBinding >
-    this._bindingsIndicesByPath = {}; // inside: indices in these arrays
+    this._paths = [];
+    this._parsedPaths = [];
+    this._bindings = [];
+    this._bindingsIndicesByPath = {};
     // oxlint-disable-next-line typescript/no-this-alias -- Stats getters have their own receiver, distinct from the group.
     const scope = this;
     this.stats = {
@@ -97,17 +100,17 @@ export class AnimationObjectGroup {
       parsedPaths = this._parsedPaths,
       bindings = this._bindings,
       nBindings = bindings.length;
-    let knownObject = undefined,
+    let knownObject: Object3D | undefined = undefined,
       nObjects = objects.length,
       nCachedObjects = this.nCachedObjects_;
     for (let i = 0, n = arguments.length; i !== n; ++i) {
-      const object = (arguments as any)[i],
+      const object = arguments[i] as Object3D,
         uuid = object.uuid;
-      let index = (indicesByUUID as any)[uuid];
+      let index = indicesByUUID[uuid];
       if (index === undefined) {
         // unknown object -> add it to the ACTIVE region
         index = nObjects++;
-        (indicesByUUID as any)[uuid] = index;
+        indicesByUUID[uuid] = index;
         objects.push(object);
         // accounting is done, now do the same for all bindings
         for (let j = 0, m = nBindings; j !== m; ++j) {
@@ -118,9 +121,9 @@ export class AnimationObjectGroup {
         // move existing object to the ACTIVE region
         const firstActiveIndex = --nCachedObjects,
           lastCachedObject = objects[firstActiveIndex];
-        (indicesByUUID as any)[lastCachedObject.uuid] = index;
+        indicesByUUID[lastCachedObject.uuid] = index;
         objects[index] = lastCachedObject;
-        (indicesByUUID as any)[uuid] = firstActiveIndex;
+        indicesByUUID[uuid] = firstActiveIndex;
         objects[firstActiveIndex] = object;
         // accounting is done, now do the same for all bindings
         for (let j = 0, m = nBindings; j !== m; ++j) {
@@ -158,16 +161,16 @@ export class AnimationObjectGroup {
       nBindings = bindings.length;
     let nCachedObjects = this.nCachedObjects_;
     for (let i = 0, n = arguments.length; i !== n; ++i) {
-      const object = (arguments as any)[i],
+      const object = arguments[i] as Object3D,
         uuid = object.uuid,
-        index = (indicesByUUID as any)[uuid];
+        index = indicesByUUID[uuid];
       if (index !== undefined && index >= nCachedObjects) {
         // move existing object into the CACHED region
         const lastCachedIndex = nCachedObjects++,
           firstActiveObject = objects[lastCachedIndex];
-        (indicesByUUID as any)[firstActiveObject.uuid] = index;
+        indicesByUUID[firstActiveObject.uuid] = index;
         objects[index] = firstActiveObject;
-        (indicesByUUID as any)[uuid] = lastCachedIndex;
+        indicesByUUID[uuid] = lastCachedIndex;
         objects[lastCachedIndex] = object;
         // accounting is done, now do the same for all bindings
         for (let j = 0, m = nBindings; j !== m; ++j) {
@@ -195,11 +198,11 @@ export class AnimationObjectGroup {
     let nCachedObjects = this.nCachedObjects_,
       nObjects = objects.length;
     for (let i = 0, n = arguments.length; i !== n; ++i) {
-      const object = (arguments as any)[i],
+      const object = arguments[i] as Object3D,
         uuid = object.uuid,
-        index = (indicesByUUID as any)[uuid];
+        index = indicesByUUID[uuid];
       if (index !== undefined) {
-        delete (indicesByUUID as any)[uuid];
+        delete indicesByUUID[uuid];
         if (index < nCachedObjects) {
           // object is cached, shrink the CACHED region
           const firstActiveIndex = --nCachedObjects,
@@ -208,12 +211,12 @@ export class AnimationObjectGroup {
             lastObject = objects[lastIndex];
           if (index !== firstActiveIndex) {
             // last cached object takes this object's place
-            (indicesByUUID as any)[lastCachedObject.uuid] = index;
+            indicesByUUID[lastCachedObject.uuid] = index;
           }
           objects[index] = lastCachedObject;
           if (firstActiveIndex !== lastIndex) {
             // last object goes to the activated slot and pop
-            (indicesByUUID as any)[lastObject.uuid] = firstActiveIndex;
+            indicesByUUID[lastObject.uuid] = firstActiveIndex;
           }
           objects[firstActiveIndex] = lastObject;
           objects.pop();
@@ -231,7 +234,7 @@ export class AnimationObjectGroup {
           const lastIndex = --nObjects,
             lastObject = objects[lastIndex];
           if (index !== lastIndex) {
-            (indicesByUUID as any)[lastObject.uuid] = index;
+            indicesByUUID[lastObject.uuid] = index;
           }
           objects[index] = lastObject;
           objects.pop();
@@ -251,7 +254,7 @@ export class AnimationObjectGroup {
     // returns an array of bindings for the given path that is changed
     // according to the contained objects in the group
     const indicesByPath = this._bindingsIndicesByPath;
-    let index = (indicesByPath as any)[path];
+    let index = indicesByPath[path];
     const bindings = this._bindings;
     if (index !== undefined) return bindings[index];
     const paths = this._paths,
@@ -261,7 +264,7 @@ export class AnimationObjectGroup {
       nCachedObjects = this.nCachedObjects_,
       bindingsForPath = Array<PropertyBinding>(nObjects);
     index = bindings.length;
-    (indicesByPath as any)[path] = index;
+    indicesByPath[path] = index;
     paths.push(path);
     parsedPaths.push(parsedPath);
     bindings.push(bindingsForPath);
@@ -275,7 +278,7 @@ export class AnimationObjectGroup {
     // tells the group to forget about a property path and no longer
     // update the array previously obtained with 'subscribe_'
     const indicesByPath = this._bindingsIndicesByPath,
-      index = (indicesByPath as any)[path];
+      index = indicesByPath[path];
     if (index !== undefined) {
       const paths = this._paths,
         parsedPaths = this._parsedPaths,
@@ -283,7 +286,7 @@ export class AnimationObjectGroup {
         lastBindingsIndex = bindings.length - 1,
         lastBindings = bindings[lastBindingsIndex],
         lastBindingsPath = paths[lastBindingsIndex];
-      (indicesByPath as any)[lastBindingsPath] = index;
+      indicesByPath[lastBindingsPath] = index;
       bindings[index] = lastBindings;
       bindings.pop();
       parsedPaths[index] = parsedPaths[lastBindingsIndex];

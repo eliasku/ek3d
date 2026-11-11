@@ -75,7 +75,7 @@ import { WebGLOutput } from "ek3d/renderers/webgl/WebGLOutput";
 import type { WebGLOutputSystem, WebGLOutputEffect } from "ek3d/renderers/webgl/WebGLOutput";
 import { RawShaderMaterial } from "ek3d/materials/RawShaderMaterial";
 import { WebGLRenderTarget } from "ek3d/renderers/WebGLRenderTarget";
-import { BufferAttribute } from "ek3d/core/BufferAttribute";
+import { BufferAttribute, Float32BufferAttribute, Uint8ClampedBufferAttribute } from "ek3d/core/BufferAttribute";
 import { Light } from "ek3d/lights/Light";
 import { Group } from "ek3d/objects/Group";
 // @ts-expect-error The WebXR manager and its native type contracts are not published.
@@ -926,6 +926,20 @@ const deinterleaved: BufferAttribute = interleavedPosition.clone();
 const normalized: boolean = interleavedPosition.normalized;
 interleaved.toJSON(serializationData);
 interleavedPosition.toJSON(serializationData);
+const numericAttribute = new Float32BufferAttribute({ 0: 1, 1: 2, length: 2 }, 1);
+new Float32BufferAttribute(3, 1);
+new Uint8ClampedBufferAttribute(new Uint8Array([1, 2]), 1);
+numericAttribute.copyArray({ 0: 3, length: 1 }).set(new Uint16Array([2]), 1);
+numericAttribute.onUpload(function () {
+  this.count.toFixed();
+  // @ts-expect-error Upload callbacks retain the numeric attribute receiver.
+  this.count.toUpperCase();
+});
+interleaved.onUpload(function () {
+  this.stride.toFixed();
+});
+const serializedComponents: number[] = numericAttribute.toJSON().array;
+void serializedComponents;
 interleaved.addUpdateRange(0, 3);
 interleavedPosition.needsUpdate = true;
 new Vector3().fromBufferAttribute(interleavedPosition, 0);
@@ -984,6 +998,16 @@ new InstancedBufferAttribute([0, 1, 2], 3);
 new InterleavedBufferAttribute(interleaved, 3, 0, "yes");
 // @ts-expect-error Update ranges are numeric.
 interleaved.addUpdateRange("0", 3);
+// @ts-expect-error Clamped attributes require numeric components.
+new Uint8ClampedBufferAttribute(["1"], 1);
+// @ts-expect-error Attribute copies require numeric components.
+numericAttribute.copyArray(["1"]);
+// @ts-expect-error Attribute updates require numeric components.
+numericAttribute.set(["1"]);
+// @ts-expect-error Upload callbacks are invoked without arguments.
+numericAttribute.onUpload((_value: number) => {});
+// @ts-expect-error Serialized attribute components remain numeric.
+numericAttribute.toJSON().array.push("1");
 // @ts-expect-error Native VBOs are objects, not numeric handles.
 new GLBufferAttribute(1, 5126, 3, 4, 2);
 // @ts-expect-error Shared interleaved clones require a metadata owner.
@@ -1267,6 +1291,7 @@ const extrudeOptions: ExtrudeGeometryOptions = {
 const extrusion = new ExtrudeGeometry([shape], extrudeOptions);
 const extrusionCopy: ExtrudeGeometry = extrusion.clone().copy(extrusion);
 ExtrudeGeometry.fromJSON(extrusion.toJSON(), { [shape.uuid]: shape }, createCurve3D);
+ExtrudeGeometry.fromJSON({ shapes: [shape.uuid], options: {} }, { [shape.uuid]: shape });
 const shapeGeometry = new ShapeGeometry([shape], 8);
 const shapeGeometryCopy: ShapeGeometry = shapeGeometry.clone().copy(shapeGeometry);
 ShapeGeometry.fromJSON(shapeGeometry.toJSON(), { [shape.uuid]: shape });
@@ -1316,6 +1341,8 @@ new Path().fromJSON(shape.toJSON());
 TubeGeometry.fromJSON(tube.toJSON());
 // @ts-expect-error Tube factories must return a three-dimensional curve.
 TubeGeometry.fromJSON(tube.toJSON(), createCurve2D);
+// @ts-expect-error Extrusion factories must return a three-dimensional curve.
+ExtrudeGeometry.fromJSON(extrusion.toJSON(), { [shape.uuid]: shape }, createCurve2D);
 // @ts-expect-error Shape UUID lookup must contain shapes.
 ShapeGeometry.fromJSON(shapeGeometry.toJSON(), { invalid: new Path() });
 // @ts-expect-error Serialized shape references are UUIDs, not instances.
@@ -1941,6 +1968,9 @@ const groupedAnimation = new AnimationObjectGroup(new Object3D(), new Object3D()
 groupedAnimation.add(new Object3D());
 groupedAnimation.remove(new Object3D());
 groupedAnimation.uncache(new Object3D());
+groupedAnimation.stats.objects.total.toFixed();
+groupedAnimation.stats.objects.inUse.toFixed();
+groupedAnimation.stats.bindingsPerObject.toFixed();
 const stage4Mixer = new AnimationMixer(groupedAnimation);
 const stage4Action: AnimationAction | null = stage4Mixer.clipAction(heterogeneousClip);
 stage4Action?.setLoop(Loop.Repeat, 2).play().fadeIn(0.2).warp(1, 2, 0.5);
@@ -1981,6 +2011,10 @@ new LinearInterpolant([0, 1], ["a", "b"], 1);
 new CubicInterpolant([0, 1], [0, 1], new Float32Array(1));
 // @ts-expect-error An animation group contains Object3D instances.
 groupedAnimation.add("mesh");
+// @ts-expect-error Animation group statistics are numeric.
+groupedAnimation.stats.objects.total.toUpperCase();
+// @ts-expect-error Animation group statistics are read-only.
+groupedAnimation.stats.bindingsPerObject = 1;
 // @ts-expect-error Mixer roots must be scene objects or animation groups.
 new AnimationMixer({});
 // @ts-expect-error Clip tracks must be KeyframeTrack instances.

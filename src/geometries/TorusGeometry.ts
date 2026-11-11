@@ -4,7 +4,7 @@ import { Vector3 } from "../math/Vector3";
 /**
  * A geometry class for representing an torus.
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { TorusGeometry } from 'ek3d/geometries/TorusGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
@@ -71,10 +71,10 @@ export class TorusGeometry extends BufferGeometry {
     radialSegments = Math.floor(radialSegments);
     tubularSegments = Math.floor(tubularSegments);
     // buffers
-    const indices: any[] = [];
-    const vertices: any[] = [];
-    const normals: any[] = [];
-    const uvs: any[] = [];
+    const indices: number[] = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
     // helper variables
     const center = new Vector3();
     const vertex = new Vector3();

@@ -37,9 +37,9 @@ export class ShapeUtils {
    * @return An array that holds for each face definition an array with three indices.
    */
   static triangulateShape(contour: Vector2[], holes: Vector2[][]): number[][] {
-    const vertices: any[] = []; // flat array of vertices like [ x0,y0, x1,y1, x2,y2, ... ]
-    const holeIndices: any[] = []; // array of hole indices
-    const faces: any[] = []; // final array of vertex indices like [ [ a,b,d ], [ b,c,d ] ]
+    const vertices: number[] = []; // flat array of vertices like [ x0,y0, x1,y1, x2,y2, ... ]
+    const holeIndices: number[] = []; // array of hole indices
+    const faces: number[][] = []; // final array of vertex indices like [ [ a,b,d ], [ b,c,d ] ]
     removeDupEndPts(contour);
     addContour(vertices, contour);
     //
@@ -65,7 +65,7 @@ function removeDupEndPts(points: Vector2[]): void {
     points.pop();
   }
 }
-function addContour(vertices?: any, contour?: any) {
+function addContour(vertices: number[], contour: Vector2[]) {
   for (let i = 0; i < contour.length; i++) {
     vertices.push(contour[i].x);
     vertices.push(contour[i].y);

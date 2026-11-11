@@ -5,7 +5,7 @@ import { Vector3 } from "../math/Vector3";
 /**
  * A class for generating a two-dimensional ring geometry.
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { RingGeometry } from 'ek3d/geometries/RingGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
@@ -69,10 +69,10 @@ export class RingGeometry extends BufferGeometry {
     thetaSegments = Math.max(3, thetaSegments);
     phiSegments = Math.max(1, phiSegments);
     // buffers
-    const indices: any[] = [];
-    const vertices: any[] = [];
-    const normals: any[] = [];
-    const uvs: any[] = [];
+    const indices: number[] = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
     // some helper variables
     let radius = innerRadius;
     const radiusStep = (outerRadius - innerRadius) / phiSegments;

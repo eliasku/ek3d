@@ -4,7 +4,7 @@ import { Vector3 } from "../math/Vector3";
 /**
  * A geometry class for representing a capsule.
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { CapsuleGeometry } from 'ek3d/geometries/CapsuleGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
@@ -59,10 +59,10 @@ export class CapsuleGeometry extends BufferGeometry {
     radialSegments = Math.max(3, Math.floor(radialSegments));
     heightSegments = Math.max(1, Math.floor(heightSegments));
     // buffers
-    const indices: any[] = [];
-    const vertices: any[] = [];
-    const normals: any[] = [];
-    const uvs: any[] = [];
+    const indices: number[] = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
     // helper variables
     const halfHeight = height / 2;
     const capArcLength = (Math.PI / 2) * radius;

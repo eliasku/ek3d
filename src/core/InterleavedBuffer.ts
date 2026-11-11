@@ -118,7 +118,7 @@ export class InterleavedBuffer {
    * A callback function that is executed after the renderer has transferred the attribute array
    * data to the GPU.
    */
-  onUploadCallback() {}
+  onUploadCallback(this: this): void {}
   /**
    * Flag to indicate that this attribute has changed and should be re-sent to
    * the GPU. Set this to `true` when you modify the value of the array.
@@ -227,7 +227,7 @@ export class InterleavedBuffer {
    * @param callback - The `onUpload()` callback.
    * @return A reference to this instance.
    */
-  onUpload(callback: () => void): InterleavedBuffer {
+  onUpload(callback: (this: this) => void): InterleavedBuffer {
     this.onUploadCallback = callback;
     return this;
   }
@@ -246,20 +246,20 @@ export class InterleavedBuffer {
       data.arrayBuffers[key] = Array.from(new Uint32Array(this.array.slice(0).buffer));
     }
     //
-    const json: any = {
+    const json = {
       uuid: this.uuid,
       buffer: key,
       type: this.array.constructor.name,
       stride: this.stride,
-    };
-    (json as any).usage = this.usage;
+    } as NonNullable<InterleavedBufferSerializationData["interleavedBuffers"]>[string];
+    json.usage = this.usage;
     return json;
   }
 }
 // Returns the key under which the data of the given typed array is shared when cloning or serializing.
 // Interleaved buffers can be views at different offsets into the same array buffer (e.g. the interleaved
 // accessors of a glTF buffer view), so only views over the same range share their data.
-function getArrayKey(array?: any) {
+function getArrayKey(array: { buffer: ArrayBufferLike & { _uuid?: string }; byteOffset: number; byteLength: number }) {
   // generate UUID for array buffer if necessary
   if (array.buffer._uuid === undefined) {
     array.buffer._uuid = generateUUID();

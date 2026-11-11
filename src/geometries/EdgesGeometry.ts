@@ -12,7 +12,7 @@ const _triangle = /*@__PURE__*/ new Triangle();
 /**
  * Can be used as a helper object to view the edges of a geometry.
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { BoxGeometry } from 'ek3d/geometries/BoxGeometry';
  * import { EdgesGeometry } from 'ek3d/geometries/EdgesGeometry';
@@ -63,8 +63,8 @@ export class EdgesGeometry extends BufferGeometry {
       const indexArr = [0, 0, 0];
       const vertKeys: ("a" | "b" | "c")[] = ["a", "b", "c"];
       const hashes = Array<string>(3);
-      const edgeData = new Map<any, any>();
-      const vertices: any[] = [];
+      const edgeData = new Map<string, { index0: number; index1: number; normal: Vector3 } | null>();
+      const vertices: number[] = [];
       for (let i = 0; i < indexCount; i += 3) {
         if (indexAttr) {
           indexArr[0] = indexAttr.getX(i);
@@ -94,8 +94,8 @@ export class EdgesGeometry extends BufferGeometry {
           const jNext = (j + 1) % 3;
           const vecHash0 = hashes[j];
           const vecHash1 = hashes[jNext];
-          const v0 = (_triangle as any)[vertKeys[j]];
-          const v1 = (_triangle as any)[vertKeys[jNext]];
+          const v0 = _triangle[vertKeys[j]];
+          const v1 = _triangle[vertKeys[jNext]];
           const hash = `${vecHash0}_${vecHash1}`;
           const reverseHash = `${vecHash1}_${vecHash0}`;
           const sibling = edgeData.get(reverseHash);

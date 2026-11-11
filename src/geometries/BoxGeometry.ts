@@ -6,7 +6,7 @@ import { Vector3 } from "../math/Vector3";
  * On creation, the cuboid is centred on the origin, with each edge parallel to one
  * of the axes.
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { BoxGeometry } from 'ek3d/geometries/BoxGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
@@ -71,10 +71,10 @@ export class BoxGeometry extends BufferGeometry {
     heightSegments = Math.floor(heightSegments);
     depthSegments = Math.floor(depthSegments);
     // buffers
-    const indices: any[] = [];
-    const vertices: any[] = [];
-    const normals: any[] = [];
-    const uvs: any[] = [];
+    const indices: number[] = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
     // helper variables
     let numberOfVertices = 0;
     let groupStart = 0;
@@ -82,14 +82,14 @@ export class BoxGeometry extends BufferGeometry {
       u: "x" | "y" | "z",
       v: "x" | "y" | "z",
       w: "x" | "y" | "z",
-      udir: any,
-      vdir: any,
-      width: any,
-      height: any,
-      depth: any,
-      gridX: any,
-      gridY: any,
-      materialIndex?: any,
+      udir: number,
+      vdir: number,
+      width: number,
+      height: number,
+      depth: number,
+      gridX: number,
+      gridY: number,
+      materialIndex: number,
     ) => {
       const segmentWidth = width / gridX;
       const segmentHeight = height / gridY;
@@ -107,15 +107,15 @@ export class BoxGeometry extends BufferGeometry {
         for (let ix = 0; ix < gridX1; ix++) {
           const x = ix * segmentWidth - widthHalf;
           // set values to correct vector component
-          (vector as any)[u] = x * udir;
-          (vector as any)[v] = y * vdir;
-          (vector as any)[w] = depthHalf;
+          vector[u] = x * udir;
+          vector[v] = y * vdir;
+          vector[w] = depthHalf;
           // now apply vector to vertex buffer
           vertices.push(vector.x, vector.y, vector.z);
           // set values to correct vector component
-          (vector as any)[u] = 0;
-          (vector as any)[v] = 0;
-          (vector as any)[w] = depth > 0 ? 1 : -1;
+          vector[u] = 0;
+          vector[v] = 0;
+          vector[w] = depth > 0 ? 1 : -1;
           // now apply vector to normal buffer
           normals.push(vector.x, vector.y, vector.z);
           // uvs

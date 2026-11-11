@@ -10,7 +10,7 @@ import { Vector2 } from "../math/Vector2";
  * regular polygons, where the number of segments determines the number of
  * sides.
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { CircleGeometry } from 'ek3d/geometries/CircleGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';
@@ -55,10 +55,10 @@ export class CircleGeometry extends BufferGeometry {
     };
     segments = Math.max(3, segments);
     // buffers
-    const indices: any[] = [];
-    const vertices: any[] = [];
-    const normals: any[] = [];
-    const uvs: any[] = [];
+    const indices: number[] = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
     // helper variables
     const vertex = new Vector3();
     const uv = new Vector2();
