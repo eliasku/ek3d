@@ -291,7 +291,7 @@ export class Sphere {
    * @param json - The serialized json to set the sphere from.
    * @return A reference to this bounding sphere.
    */
-  fromJSON(json?: any): Sphere {
+  fromJSON(json: { radius: number; center: number[] }): Sphere {
     this.radius = json.radius;
     this.center.fromArray(json.center);
     return this;

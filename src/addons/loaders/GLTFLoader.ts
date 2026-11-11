@@ -1997,11 +1997,7 @@ class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
   override interpolate_(i1: number, t0: number, t: number, t1: number): Float32Array {
     const result = super.interpolate_(i1, t0, t, t1);
 
-    // The runtime accepts typed arrays here; only the declared signature is narrower.
-    _quaternion
-      .fromArray(result as unknown as number[])
-      .normalize()
-      .toArray(result as unknown as number[]);
+    _quaternion.fromArray(result).normalize().toArray(result);
 
     return result;
   }

@@ -11,7 +11,7 @@ import { warnOnce, ensureTypeFlag } from "../utils";
  * [row-major](https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order)
  * order, while internally they are stored in the {@link Matrix3#elements} array in column-major order.
  * This means that calling:
- * ```ts
+ * ```typescript
  * import { Matrix3 } from 'ek3d/math/Matrix3';
  *
  * const m = new Matrix3();
@@ -20,7 +20,7 @@ import { warnOnce, ensureTypeFlag } from "../utils";
  *        31, 32, 33 );
  * ```
  * will result in the elements array containing:
- * ```ts
+ * ```typescript
  * import { Matrix3 } from 'ek3d/math/Matrix3';
  *
  * const m = new Matrix3();
@@ -312,7 +312,7 @@ export class Matrix3 {
    * @return A reference to this matrix.
    */
   transpose(): Matrix3 {
-    let tmp: any;
+    let tmp: number;
     const m = this.elements;
     tmp = m[1];
     m[1] = m[3];
@@ -428,12 +428,13 @@ export class Matrix3 {
    * @param y - The amount to translate in the Y axis.
    * @return A reference to this matrix.
    */
+  makeTranslation(v: Vector2): Matrix3;
   makeTranslation(x: number | Vector2, y: number): Matrix3;
-  makeTranslation(x: any, y: number): Matrix3 {
-    if (x.isVector2) {
-      this.set(1, 0, x.x, 0, 1, x.y, 0, 0, 1);
+  makeTranslation(x: number | Vector2, y?: number): Matrix3 {
+    if ((x as Vector2).isVector2) {
+      this.set(1, 0, (x as Vector2).x, 0, 1, (x as Vector2).y, 0, 0, 1);
     } else {
-      this.set(1, 0, x, 0, 1, y, 0, 0, 1);
+      this.set(1, 0, x as number, 0, 1, y!, 0, 0, 1);
     }
     return this;
   }

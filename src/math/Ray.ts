@@ -157,7 +157,7 @@ export class Ray {
     const b1 = -_diff.dot(_segDir);
     const c = _diff.lengthSq();
     const det = Math.abs(1 - a01 * a01);
-    let s0: any, s1: any, sqrDist: any, extDet: any;
+    let s0: number, s1: number, sqrDist: number, extDet: number;
     if (det > 0) {
       // The ray and segment are not parallel.
       s0 = a01 * b1 - b0;
@@ -319,7 +319,7 @@ export class Ray {
    * @return The intersection point.
    */
   intersectBox(box: Box3, target: Vector3): Vector3 | null {
-    let tmin: any, tmax: any, tymin: any, tymax: any, tzmin: any, tzmax: any;
+    let tmin: number, tmax: number, tymin: number, tymax: number, tzmin: number, tzmax: number;
     const invdirx = 1 / this.direction.x,
       invdiry = 1 / this.direction.y,
       invdirz = 1 / this.direction.z;
@@ -401,8 +401,16 @@ export class Ray {
     const adx = Math.abs(dx),
       ady = Math.abs(dy),
       adz = Math.abs(dz);
-    let dkx: any, dky: any, dkz: any;
-    let akx: any, aky: any, akz: any, bkx: any, bky: any, bkz: any, ckx: any, cky: any, ckz: any;
+    let dkx: number, dky: number, dkz: number;
+    let akx: number,
+      aky: number,
+      akz: number,
+      bkx: number,
+      bky: number,
+      bkz: number,
+      ckx: number,
+      cky: number,
+      ckz: number;
     if (adx >= ady && adx >= adz) {
       dkz = dx;
       akz = aox;

@@ -119,7 +119,7 @@ export class Interpolant<B extends AnimationBuffer = NumericAnimationBuffer> {
       t0 = pp[i1 - 1];
     validate_interval: {
       seek: {
-        let right: any;
+        let right: number;
         linear_scan: {
           //- See http://jsperf.com/comparison-to-undefined/3
           //- slower code:

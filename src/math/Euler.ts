@@ -12,10 +12,9 @@ const _quaternion = /*@__PURE__*/ new Quaternion();
  * its various axes in specified amounts per axis, and a specified axis
  * order.
  *
- * Iterating through an instance will yield its components (x, y, z,
- * order) in the corresponding order.
+ * Use `toArray()` to read `(x, y, z, order)`.
  *
- * ```ts
+ * ```typescript
  * import { Euler } from 'ek3d/math/Euler';
  * import { Vector3 } from 'ek3d/math/Vector3';
  *
@@ -286,12 +285,11 @@ export class Euler {
    * @param array - An array holding the Euler component values.
    * @return A reference to this Euler instance.
    */
-  fromArray(array: (number | string)[]): Euler;
-  fromArray(array?: any): Euler {
-    this._x = array[0];
-    this._y = array[1];
-    this._z = array[2];
-    if (array[3] !== undefined) this._order = array[3];
+  fromArray(array: ArrayLike<number | string>): Euler {
+    this._x = array[0] as number;
+    this._y = array[1] as number;
+    this._z = array[2] as number;
+    if (array[3] !== undefined) this._order = array[3] as string;
     this._onChangeCallback();
     return this;
   }
@@ -303,15 +301,16 @@ export class Euler {
    * @param [offset=0] - Index of the first element in the array.
    * @return The Euler components.
    */
-  toArray(array?: (number | string)[], offset?: number): number[];
-  toArray(array: any = [], offset: number = 0): (number | string)[] {
+  toArray(): [number, number, number, string];
+  toArray(array?: (number | string)[], offset?: number): (number | string)[];
+  toArray(array: (number | string)[] = [], offset: number = 0): (number | string)[] {
     array[offset] = this._x;
     array[offset + 1] = this._y;
     array[offset + 2] = this._z;
     array[offset + 3] = this._order;
     return array;
   }
-  _onChange(callback?: any) {
+  _onChange(callback: () => void) {
     this._onChangeCallback = callback;
     return this;
   }

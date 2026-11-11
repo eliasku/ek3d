@@ -130,12 +130,12 @@ export class KeyframeTrack {
       };
       const interpolation = track.getInterpolation();
       if (interpolation !== track.DefaultInterpolation) {
-        (json as any).interpolation = interpolation;
+        json.interpolation = interpolation;
       }
-      if (hasTangents((track as any).settings)) {
-        (json as any).settings = {
-          inTangents: convertArray((track as any).settings.inTangents, Array),
-          outTangents: convertArray((track as any).settings.outTangents, Array),
+      if (hasTangents(track.settings)) {
+        json.settings = {
+          inTangents: convertArray(track.settings.inTangents, Array),
+          outTangents: convertArray(track.settings.outTangents, Array),
         };
       }
     }
@@ -201,9 +201,9 @@ export class KeyframeTrack {
       this.getValueSize(),
       result as NumericAnimationBuffer | null | undefined,
     );
-    if ((this as any).settings) {
-      (interpolant as any).inTangents = (this as any).settings.inTangents;
-      (interpolant as any).outTangents = (this as any).settings.outTangents;
+    if (this.settings) {
+      interpolant.inTangents = this.settings.inTangents;
+      interpolant.outTangents = this.settings.outTangents;
     }
     return interpolant;
   }
@@ -214,7 +214,7 @@ export class KeyframeTrack {
    * @return A reference to this keyframe track.
    */
   setInterpolation(interpolation: Interpolation): this {
-    let factoryMethod: any;
+    let factoryMethod: KeyframeTrack["createInterpolant"] | undefined;
     /* oxlint-disable typescript/unbound-method -- Store the original factory as this.createInterpolant, preserving its receiver and identity. */
     switch (interpolation) {
       case Interpolation.Discrete:
@@ -284,11 +284,11 @@ export class KeyframeTrack {
     if (timeOffset !== 0.0) {
       const times = this.times;
       for (let i = 0, n = times.length; i !== n; ++i) {
-        (times as any)[i] += timeOffset;
+        times[i] += timeOffset;
       }
-      if (hasTangents((this as any).settings)) {
-        shiftTangentTimes((this as any).settings.inTangents, timeOffset);
-        shiftTangentTimes((this as any).settings.outTangents, timeOffset);
+      if (hasTangents(this.settings)) {
+        shiftTangentTimes(this.settings.inTangents, timeOffset);
+        shiftTangentTimes(this.settings.outTangents, timeOffset);
       }
     }
     return this;
@@ -303,11 +303,11 @@ export class KeyframeTrack {
     if (timeScale !== 1.0) {
       const times = this.times;
       for (let i = 0, n = times.length; i !== n; ++i) {
-        (times as any)[i] *= timeScale;
+        times[i] *= timeScale;
       }
-      if (hasTangents((this as any).settings)) {
-        scaleTangentTimes((this as any).settings.inTangents, timeScale);
-        scaleTangentTimes((this as any).settings.outTangents, timeScale);
+      if (hasTangents(this.settings)) {
+        scaleTangentTimes(this.settings.inTangents, timeScale);
+        scaleTangentTimes(this.settings.outTangents, timeScale);
       }
     }
     return this;
@@ -327,10 +327,10 @@ export class KeyframeTrack {
       nKeys = times.length;
     let from = 0,
       to = nKeys - 1;
-    while (from !== nKeys && (times as any)[from] < startTime) {
+    while (from !== nKeys && times[from] < startTime) {
       ++from;
     }
-    while (to !== -1 && (times as any)[to] > endTime) {
+    while (to !== -1 && times[to] > endTime) {
       --to;
     }
     ++to; // inclusive -> exclusive bound
@@ -366,9 +366,9 @@ export class KeyframeTrack {
       error("KeyframeTrack: Track is empty.", this);
       valid = false;
     }
-    let prevTime: any = null;
+    let prevTime: number | null = null;
     for (let i = 0; i !== nKeys; i++) {
-      const currTime = (times as any)[i];
+      const currTime = times[i];
       if (typeof currTime === "number" && isNaN(currTime)) {
         error("KeyframeTrack: Time is not a valid number.", this, i, currTime);
         valid = false;
@@ -384,7 +384,7 @@ export class KeyframeTrack {
     if (values !== undefined) {
       if (isTypedArray(values)) {
         for (let i = 0, n = values.length; i !== n; ++i) {
-          const value = (values as any)[i];
+          const value = (values as NumericAnimationBuffer)[i];
           if (isNaN(value)) {
             error("KeyframeTrack: Value is not a valid number.", this, i, value);
             valid = false;
@@ -412,18 +412,18 @@ export class KeyframeTrack {
     let writeIndex = 1;
     for (let i = 1; i < lastIndex; ++i) {
       let keep = false;
-      const time = (times as any)[i];
-      const timeNext = (times as any)[i + 1];
+      const time = times[i];
+      const timeNext = times[i + 1];
       // remove adjacent keyframes scheduled at the same time
-      if (time !== timeNext && (i !== 1 || time !== (times as any)[0])) {
+      if (time !== timeNext && (i !== 1 || time !== times[0])) {
         if (!smoothInterpolation) {
           // remove unnecessary keyframes same as their neighbors
           const offset = i * stride,
             offsetP = offset - stride,
             offsetN = offset + stride;
           for (let j = 0; j !== stride; ++j) {
-            const value = (values as any)[offset + j];
-            if (value !== (values as any)[offsetP + j] || value !== (values as any)[offsetN + j]) {
+            const value = values[offset + j];
+            if (value !== values[offsetP + j] || value !== values[offsetN + j]) {
               keep = true;
               break;
             }
@@ -435,11 +435,11 @@ export class KeyframeTrack {
       // in-place compaction
       if (keep) {
         if (i !== writeIndex) {
-          (times as any)[writeIndex] = (times as any)[i];
+          times[writeIndex] = times[i];
           const readOffset = i * stride,
             writeOffset = writeIndex * stride;
           for (let j = 0; j !== stride; ++j) {
-            (values as any)[writeOffset + j] = (values as any)[readOffset + j];
+            values[writeOffset + j] = values[readOffset + j];
           }
         }
         ++writeIndex;
@@ -447,9 +447,9 @@ export class KeyframeTrack {
     }
     // flush last keyframe (compaction looks ahead)
     if (lastIndex > 0) {
-      (times as any)[writeIndex] = (times as any)[lastIndex];
+      times[writeIndex] = times[lastIndex];
       for (let readOffset = lastIndex * stride, writeOffset = writeIndex * stride, j = 0; j !== stride; ++j) {
-        (values as any)[writeOffset + j] = (values as any)[readOffset + j];
+        values[writeOffset + j] = values[readOffset + j];
       }
       ++writeIndex;
     }
@@ -485,13 +485,13 @@ export class KeyframeTrack {
     }
   }
 }
-function shiftTangentTimes(tangents?: any, timeOffset?: any) {
+function shiftTangentTimes(tangents: NumericAnimationBuffer, timeOffset: number): void {
   // tangents are [ time, value ] pairs, so only every second entry is a time
   for (let i = 0, n = tangents.length; i !== n; i += 2) {
     tangents[i] += timeOffset;
   }
 }
-function scaleTangentTimes(tangents?: any, timeScale?: any) {
+function scaleTangentTimes(tangents: NumericAnimationBuffer, timeScale: number): void {
   // tangents are [ time, value ] pairs, so only every second entry is a time
   for (let i = 0, n = tangents.length; i !== n; i += 2) {
     tangents[i] *= timeScale;

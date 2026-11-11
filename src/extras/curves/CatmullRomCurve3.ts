@@ -31,17 +31,25 @@ function CubicPoly() {
    *  and
    *   p'(0) = t0, p'(1) = t1.
    */
-  function init(x0?: any, x1?: any, t0?: any, t1?: any) {
+  function init(x0: number, x1: number, t0: number, t1: number): void {
     c0 = x0;
     c1 = t0;
     c2 = -3 * x0 + 3 * x1 - 2 * t0 - t1;
     c3 = 2 * x0 - 2 * x1 + t0 + t1;
   }
   return {
-    initCatmullRom: function (x0?: any, x1?: any, x2?: any, x3?: any, tension?: any) {
+    initCatmullRom: function (x0: number, x1: number, x2: number, x3: number, tension: number): void {
       init(x1, x2, tension * (x2 - x0), tension * (x3 - x1));
     },
-    initNonuniformCatmullRom: function (x0?: any, x1?: any, x2?: any, x3?: any, dt0?: any, dt1?: any, dt2?: any) {
+    initNonuniformCatmullRom: function (
+      x0: number,
+      x1: number,
+      x2: number,
+      x3: number,
+      dt0: number,
+      dt1: number,
+      dt2: number,
+    ): void {
       // compute tangents when parameterized in [t1,t2]
       let t1 = (x1 - x0) / dt0 - (x2 - x0) / (dt0 + dt1) + (x2 - x1) / dt1;
       let t2 = (x2 - x1) / dt1 - (x3 - x1) / (dt1 + dt2) + (x3 - x2) / dt2;
@@ -50,7 +58,7 @@ function CubicPoly() {
       t2 *= dt1;
       init(x1, x2, t1, t2);
     },
-    calc: function (t?: any) {
+    calc: function (t: number): number {
       const t2 = t * t;
       const t3 = t2 * t;
       return c0 + c1 * t + c2 * t2 + c3 * t3;

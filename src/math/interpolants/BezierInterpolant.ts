@@ -17,14 +17,28 @@ import { Interpolant } from "../Interpolant";
  *
  */
 export class BezierInterpolant extends Interpolant {
+  /** Tangent defaults remain inherited until assigned to this interpolant. */
+  get inTangents(): NumericAnimationBuffer | undefined {
+    return undefined;
+  }
+  set inTangents(value: NumericAnimationBuffer | undefined) {
+    Object.defineProperty(this, "inTangents", { value, writable: true, enumerable: true, configurable: true });
+  }
+  get outTangents(): NumericAnimationBuffer | undefined {
+    return undefined;
+  }
+  set outTangents(value: NumericAnimationBuffer | undefined) {
+    Object.defineProperty(this, "outTangents", { value, writable: true, enumerable: true, configurable: true });
+  }
+
   interpolate_(i1: number, t0: number, t: number, t1: number): NumericAnimationBuffer {
     const result = this.resultBuffer;
     const values = this.sampleValues;
     const stride = this.valueSize;
     const offset1 = i1 * stride;
     const offset0 = offset1 - stride;
-    const inTangents = (this as any).inTangents;
-    const outTangents = (this as any).outTangents;
+    const inTangents = this.inTangents;
+    const outTangents = this.outTangents;
     // If no tangent data, fall back to linear interpolation
     if (!inTangents || !outTangents) {
       const weight1 = (t - t0) / (t1 - t0);
@@ -54,16 +68,16 @@ export class BezierInterpolant extends Interpolant {
     return result;
   }
 }
-function cubicBezier(s?: any, p0?: any, p1?: any, p2?: any, p3?: any) {
+function cubicBezier(s: number, p0: number, p1: number, p2: number, p3: number): number {
   const k = 1 - s;
   return k * k * k * p0 + 3 * k * k * s * p1 + 3 * k * s * s * p2 + s * s * s * p3;
 }
-function cubicBezierSlope(s?: any, p0?: any, p1?: any, p2?: any, p3?: any) {
+function cubicBezierSlope(s: number, p0: number, p1: number, p2: number, p3: number): number {
   const k = 1 - s;
   return 3 * k * k * (p1 - p0) + 6 * k * s * (p2 - p1) + 3 * s * s * (p3 - p2);
 }
 // Solves cubicBezier( s, x0, x1, x2, x3 ) = x for s in [0,1] using Newton-Raphson
-function solveBezierParameter(x?: any, x0?: any, x1?: any, x2?: any, x3?: any) {
+function solveBezierParameter(x: number, x0: number, x1: number, x2: number, x3: number): number {
   let s = (x - x0) / (x3 - x0);
   for (let i = 0; i < 8; i++) {
     const error = cubicBezier(s, x0, x1, x2, x3) - x;

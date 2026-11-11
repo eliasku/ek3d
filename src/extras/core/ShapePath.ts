@@ -5,6 +5,19 @@ import { Path } from "./Path";
 import { Shape } from "./Shape";
 import { ShapeUtils } from "../ShapeUtils";
 import { warn } from "../../utils";
+
+interface ShapePathEntry {
+  subPath: Path;
+  points: Vector2[];
+  boundingBox: Box2;
+  interiorPoint: Vector2;
+  absArea: number;
+  winding: number;
+  container: ShapePathEntry | null;
+  exclude: boolean;
+  role: "outer" | "hole" | null;
+}
+
 /**
  * This class is used to convert a series of paths to an array of
  * shapes. It is specifically used in context of fonts and SVG.
@@ -119,7 +132,7 @@ export class ShapePath {
   toShapes(): Shape[] {
     // Point-in-polygon test using the even-odd ray-casting rule. Valid for
     // simple (non self-intersecting) polygons.
-    function pointInPolygon(p: any, polygon?: any) {
+    function pointInPolygon(p: Vector2, polygon: Vector2[]): boolean {
       let inside = false;
       const n = polygon.length;
       for (let i = 0, j = n - 1; i < n; j = i++) {
@@ -138,11 +151,11 @@ export class ShapePath {
     //
     // Port of paper.js' Path#getInteriorPoint()
     // https://github.com/paperjs/paper.js/blob/develop/src/path/PathItem.Boolean.js
-    function getInteriorPoint(polygon: any, boundingBox?: any) {
+    function getInteriorPoint(polygon: Vector2[], boundingBox: Box2): Vector2 {
       const point = boundingBox.getCenter(new Vector2());
       if (pointInPolygon(point, polygon)) return point;
       const y = point.y;
-      const intercepts: any[] = [];
+      const intercepts: number[] = [];
       const n = polygon.length;
       for (let i = 0; i < n; i++) {
         const a = polygon[i];
@@ -155,7 +168,7 @@ export class ShapePath {
         }
       }
       if (intercepts.length > 1) {
-        intercepts.sort((a: any, b?: any) => a - b);
+        intercepts.sort((a, b) => a - b);
         point.x = (intercepts[0] + intercepts[1]) / 2;
       }
       return point;
@@ -170,12 +183,12 @@ export class ShapePath {
     // region, per the SVG fill-rule spec. Works for negative windings too,
     // because JavaScript's bitwise AND preserves odd/even under two's
     // complement.
-    const isInside = fillRule === "nonzero" ? (w?: any) => w !== 0 : (w?: any) => (w & 1) !== 0;
+    const isInside = fillRule === "nonzero" ? (w: number) => w !== 0 : (w: number) => (w & 1) !== 0;
     // Build an entry per usable subpath. Self-winding follows the standard
     // convention used by ShapeUtils: counter-clockwise (signed area > 0)
     // contributes +1 to the winding number at an interior point,
     // clockwise contributes -1.
-    const entries: any[] = [];
+    const entries: ShapePathEntry[] = [];
     for (const subPath of this.subPaths) {
       const points = subPath.getPoints();
       if (points.length < 3) continue;
@@ -199,7 +212,7 @@ export class ShapePath {
     // contain `entries[i]` is located at a smaller index and has already
     // been processed when it's entries[i]'s turn. Port of paper.js'
     // reorientPaths() algorithm.
-    entries.sort((a: any, b?: any) => b.absArea - a.absArea);
+    entries.sort((a, b) => b.absArea - a.absArea);
     // Walk already-processed entries from closest-in-size to largest,
     // stopping at the innermost container. Accumulate the container's
     // cumulative winding into this entry's winding so that the final value
@@ -235,8 +248,8 @@ export class ShapePath {
     }
     // Build Shapes for outers first, then attach holes to their container's
     // Shape.
-    const shapes: any[] = [];
-    const shapeByEntry = new Map<any, any>();
+    const shapes: Shape[] = [];
+    const shapeByEntry = new Map<ShapePathEntry | null, Shape>();
     for (const entry of entries) {
       if (entry.exclude || entry.role !== "outer") continue;
       const shape = new Shape();

@@ -1,5 +1,6 @@
 import type { GLBufferAttribute } from "./GLBufferAttribute";
 import type { InterleavedBufferAttribute } from "./InterleavedBufferAttribute";
+import type { InterleavedBufferCloneData, InterleavedBufferSerializationData } from "./InterleavedBuffer";
 import type { Quaternion } from "../math/Quaternion";
 import { Vector3 } from "../math/Vector3";
 import { Vector2 } from "../math/Vector2";
@@ -17,6 +18,47 @@ import { Matrix4 } from "../math/Matrix4";
 import { Matrix3 } from "../math/Matrix3";
 import { generateUUID } from "../math/MathUtils";
 import { arrayNeedsUint32, warn, error } from "../utils";
+
+type Attribute = BufferAttribute | InterleavedBufferAttribute;
+type AttributeJSON =
+  | {
+      itemSize: number;
+      type: string;
+      array: number[];
+      normalized: boolean;
+      name?: string;
+      usage?: BufferAttribute["usage"];
+      gpuType?: BufferAttribute["gpuType"];
+      meshPerAttribute?: number;
+      isInstancedBufferAttribute?: boolean;
+    }
+  | {
+      isInterleavedBufferAttribute: boolean;
+      itemSize: number;
+      data: string;
+      offset: number;
+      normalized: boolean;
+    };
+interface GeometryData extends InterleavedBufferSerializationData {
+  attributes: Record<string, AttributeJSON>;
+  index?: { type: string; array: number[] };
+  morphAttributes?: Record<string, AttributeJSON[]>;
+  morphTargetsRelative?: boolean;
+  groups?: BufferGeometry["groups"];
+  boundingSphere?: { center: number[]; radius: number };
+}
+interface GeometryJSON {
+  metadata: { version: number; type: string; generator: string };
+  uuid?: string;
+  type?: string;
+  name?: string;
+  userData?: BufferGeometry["userData"];
+  data?: GeometryData;
+  [parameter: string]: unknown;
+}
+type ParameterizedGeometry = BufferGeometry & { parameters?: Record<string, unknown> };
+type Point = { x: number; y: number; z?: number };
+
 let _id = 0;
 const _m1 = /*@__PURE__*/ new Matrix4();
 const _obj = /*@__PURE__*/ new Object3D();
@@ -196,8 +238,7 @@ export class BufferGeometry extends EventDispatcher {
    * @param index - The index to set.
    * @return A reference to this instance.
    */
-  setIndex(index: number[] | BufferAttribute): BufferGeometry;
-  setIndex(index?: any): BufferGeometry {
+  setIndex(index: number[] | BufferAttribute | null): BufferGeometry {
     if (Array.isArray(index)) {
       this.index = new (arrayNeedsUint32(index) ? Uint32BufferAttribute : Uint16BufferAttribute)(index, 1);
     } else {
@@ -225,8 +266,7 @@ export class BufferGeometry extends EventDispatcher {
   setAttribute(
     name: string,
     attribute: BufferAttribute | InterleavedBufferAttribute | GLBufferAttribute,
-  ): BufferGeometry;
-  setAttribute(name: string, attribute?: any): BufferGeometry {
+  ): BufferGeometry {
     this.attributes[name] = attribute;
     return this;
   }
@@ -288,18 +328,18 @@ export class BufferGeometry extends EventDispatcher {
    * @return A reference to this instance.
    */
   applyMatrix4(matrix: Matrix4): BufferGeometry {
-    const position = (this.attributes as any).position;
+    const position = (this.attributes as Record<string, Attribute | undefined>).position;
     if (position !== undefined) {
       position.applyMatrix4(matrix);
       position.needsUpdate = true;
     }
-    const normal = (this.attributes as any).normal;
+    const normal = (this.attributes as Record<string, Attribute | undefined>).normal;
     if (normal !== undefined) {
       const normalMatrix = new Matrix3().getNormalMatrix(matrix);
       normal.applyNormalMatrix(normalMatrix);
       normal.needsUpdate = true;
     }
-    const tangent = (this.attributes as any).tangent;
+    const tangent = (this.attributes as Record<string, Attribute | undefined>).tangent;
     if (tangent !== undefined) {
       tangent.transformDirection(matrix);
       tangent.needsUpdate = true;
@@ -434,21 +474,20 @@ export class BufferGeometry extends EventDispatcher {
    * @param points - The points.
    * @return A reference to this instance.
    */
-  setFromPoints(points: Vector2[] | Vector3[]): BufferGeometry;
-  setFromPoints(points?: any): BufferGeometry {
+  setFromPoints(points: readonly Point[]): BufferGeometry {
     const positionAttribute = this.getAttribute("position") as BufferAttribute | InterleavedBufferAttribute | undefined;
     if (positionAttribute === undefined) {
-      const position: any[] = [];
+      const position: number[] = [];
       for (let i = 0, l = points.length; i < l; i++) {
-        const point = (points as any)[i];
-        position.push(point.x, point.y, (point as any).z || 0);
+        const point = points[i];
+        position.push(point.x, point.y, point.z || 0);
       }
       this.setAttribute("position", new Float32BufferAttribute(position, 3));
     } else {
       const l = Math.min(points.length, positionAttribute.count); // make sure data do not exceed buffer size
       for (let i = 0; i < l; i++) {
-        const point = (points as any)[i];
-        positionAttribute.setXYZ(i, point.x, point.y, (point as any).z || 0);
+        const point = points[i];
+        positionAttribute.setXYZ(i, point.x, point.y, point.z || 0);
       }
       if (points.length > positionAttribute.count) {
         warn("BufferGeometry: Buffer size too small for points data. Use .dispose() and create a new geometry.");
@@ -466,15 +505,15 @@ export class BufferGeometry extends EventDispatcher {
     if (this.boundingBox === null) {
       this.boundingBox = new Box3();
     }
-    const position = (this.attributes as any).position;
+    const position = this.attributes.position;
     const morphAttributesPosition = this.morphAttributes.position;
-    if (position && position.isGLBufferAttribute) {
+    if (position && (position as GLBufferAttribute).isGLBufferAttribute) {
       error("BufferGeometry.computeBoundingBox(): GLBufferAttribute requires a manual bounding box.", this);
       this.boundingBox.set(new Vector3(-Infinity, -Infinity, -Infinity), new Vector3(+Infinity, +Infinity, +Infinity));
       return;
     }
     if (position !== undefined) {
-      this.boundingBox.setFromBufferAttribute(position);
+      this.boundingBox.setFromBufferAttribute(position as Attribute);
       // process morph attributes if present
       if (morphAttributesPosition) {
         for (let i = 0, il = morphAttributesPosition.length; i < il; i++) {
@@ -510,9 +549,9 @@ export class BufferGeometry extends EventDispatcher {
     if (this.boundingSphere === null) {
       this.boundingSphere = new Sphere();
     }
-    const position = (this.attributes as any).position;
+    const position = this.attributes.position;
     const morphAttributesPosition = this.morphAttributes.position;
-    if (position && position.isGLBufferAttribute) {
+    if (position && (position as GLBufferAttribute).isGLBufferAttribute) {
       error("BufferGeometry.computeBoundingSphere(): GLBufferAttribute requires a manual bounding sphere.", this);
       this.boundingSphere.set(new Vector3(), Infinity);
       return;
@@ -520,7 +559,7 @@ export class BufferGeometry extends EventDispatcher {
     if (position) {
       // first, find the center of the bounding sphere
       const center = this.boundingSphere.center;
-      _box.setFromBufferAttribute(position);
+      _box.setFromBufferAttribute(position as Attribute);
       // process morph attributes if present
       if (morphAttributesPosition) {
         for (let i = 0, il = morphAttributesPosition.length; i < il; i++) {
@@ -542,7 +581,7 @@ export class BufferGeometry extends EventDispatcher {
       // boundingSphere of the boundingBox: sqrt(3) smaller in the best case
       let maxRadiusSq = 0;
       for (let i = 0, il = position.count; i < il; i++) {
-        _vector.fromBufferAttribute(position, i);
+        _vector.fromBufferAttribute(position as Attribute, i);
         maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(_vector));
       }
       // process morph attributes if present
@@ -553,7 +592,7 @@ export class BufferGeometry extends EventDispatcher {
           for (let j = 0, jl = morphAttribute.count; j < jl; j++) {
             _vector.fromBufferAttribute(morphAttribute, j);
             if (morphTargetsRelative) {
-              _offset.fromBufferAttribute(position, j);
+              _offset.fromBufferAttribute(position as Attribute, j);
               _vector.add(_offset);
             }
             maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(_vector));
@@ -578,21 +617,21 @@ export class BufferGeometry extends EventDispatcher {
    */
   computeTangents() {
     const index = this.index;
-    const attributes = this.attributes;
+    const attributes = this.attributes as Record<string, Attribute | undefined>;
     // based on http://www.terathon.com/code/tangent.html
     // (per vertex tangents)
     if (
       index === null ||
-      (attributes as any).position === undefined ||
-      (attributes as any).normal === undefined ||
-      (attributes as any).uv === undefined
+      attributes.position === undefined ||
+      attributes.normal === undefined ||
+      attributes.uv === undefined
     ) {
       error("BufferGeometry: .computeTangents() failed. Missing required attributes (index, position, normal or uv)");
       return;
     }
-    const positionAttribute = (attributes as any).position;
-    const normalAttribute = (attributes as any).normal;
-    const uvAttribute = (attributes as any).uv;
+    const positionAttribute = attributes.position;
+    const normalAttribute = attributes.normal;
+    const uvAttribute = attributes.uv;
     let tangentAttribute = this.getAttribute("tangent") as BufferAttribute | InterleavedBufferAttribute | undefined;
     if (tangentAttribute === undefined || tangentAttribute!.count !== positionAttribute.count) {
       tangentAttribute = new BufferAttribute(new Float32Array(4 * positionAttribute.count), 4);
@@ -758,7 +797,7 @@ export class BufferGeometry extends EventDispatcher {
    * correct lighting on the geometry surfaces.
    */
   normalizeNormals() {
-    const normals = (this.attributes as any).normal;
+    const normals = (this.attributes as Record<string, Attribute>).normal;
     for (let i = 0, il = normals.count; i < il; i++) {
       _vector.fromBufferAttribute(normals, i);
       _vector.normalize();
@@ -772,7 +811,7 @@ export class BufferGeometry extends EventDispatcher {
    * @return The non-indexed version of this indexed geometry.
    */
   toNonIndexed(): BufferGeometry {
-    function convertBufferAttribute(attribute: any, indices?: any) {
+    function convertBufferAttribute(attribute: Attribute, indices: ArrayLike<number>): BufferAttribute {
       const array = attribute.array;
       const itemSize = attribute.itemSize;
       const normalized = attribute.normalized;
@@ -782,8 +821,10 @@ export class BufferGeometry extends EventDispatcher {
       let index = 0,
         index2 = 0;
       for (let i = 0, l = indices.length; i < l; i++) {
-        if (attribute.isInterleavedBufferAttribute) {
-          index = indices[i] * attribute.data.stride + attribute.offset;
+        if ((attribute as InterleavedBufferAttribute).isInterleavedBufferAttribute) {
+          index =
+            indices[i] * (attribute as InterleavedBufferAttribute).data.stride +
+            (attribute as InterleavedBufferAttribute).offset;
         } else {
           index = indices[i] * itemSize;
         }
@@ -803,14 +844,14 @@ export class BufferGeometry extends EventDispatcher {
     const attributes = this.attributes;
     // attributes
     for (const name in attributes) {
-      const attribute = attributes[name];
+      const attribute = attributes[name] as Attribute;
       const newAttribute = convertBufferAttribute(attribute, indices);
       geometry2.setAttribute(name, newAttribute);
     }
     // morph attributes
     const morphAttributes = this.morphAttributes;
     for (const name in morphAttributes) {
-      const morphArray: any[] = [];
+      const morphArray: BufferAttribute[] = [];
       const morphAttribute = morphAttributes[name]; // morphAttribute: array of Float32BufferAttributes
       for (let i = 0, il = morphAttribute.length; i < il; i++) {
         const attribute = morphAttribute[i];
@@ -833,8 +874,8 @@ export class BufferGeometry extends EventDispatcher {
    *
    * @return A JSON object representing the serialized geometry.
    */
-  toJSON() {
-    const data: any = {
+  toJSON(): any {
+    const data: GeometryJSON = {
       metadata: {
         version: 4.7,
         type: "BufferGeometry",
@@ -842,58 +883,60 @@ export class BufferGeometry extends EventDispatcher {
       },
     };
     // standard BufferGeometry serialization
-    (data as any).uuid = this.uuid;
-    (data as any).type =
-      (this as any).parameters !== undefined && this._transformed === true ? "BufferGeometry" : this.type;
-    (data as any).name = this.name;
-    if (Object.keys(this.userData).length > 0) (data as any).userData = this.userData;
-    if ((this as any).parameters !== undefined && this._transformed !== true) {
-      const parameters = (this as any).parameters;
+    data.uuid = this.uuid;
+    data.type =
+      (this as ParameterizedGeometry).parameters !== undefined && this._transformed === true
+        ? "BufferGeometry"
+        : this.type;
+    data.name = this.name;
+    if (Object.keys(this.userData).length > 0) data.userData = this.userData;
+    if ((this as ParameterizedGeometry).parameters !== undefined && this._transformed !== true) {
+      const parameters = (this as ParameterizedGeometry).parameters!;
       for (const key in parameters) {
-        if (parameters[key] !== undefined) (data as any)[key] = parameters[key];
+        if (parameters[key] !== undefined) data[key] = parameters[key];
       }
       return data;
     }
     // for simplicity the code assumes attributes are not shared across geometries, see #15811
-    (data as any).data = { attributes: {} };
+    data.data = { attributes: {} };
     const index = this.index;
     if (index !== null) {
-      (data as any).data.index = {
+      data.data.index = {
         type: index.array.constructor.name,
-        array: Array.prototype.slice.call(index.array),
+        array: Array.prototype.slice.call(index.array) as number[],
       };
     }
     const attributes = this.attributes;
     for (const key in attributes) {
       // GPU-only attributes cannot be serialized.
       const attribute = attributes[key] as BufferAttribute | InterleavedBufferAttribute;
-      (data as any).data.attributes[key] = attribute.toJSON((data as any).data);
+      data.data.attributes[key] = attribute.toJSON(data.data);
     }
-    const morphAttributes: any = {};
+    const morphAttributes: Record<string, AttributeJSON[]> = {};
     let hasMorphAttributes = false;
     for (const key in this.morphAttributes) {
       const attributeArray = this.morphAttributes[key];
-      const array: any[] = [];
+      const array: AttributeJSON[] = [];
       for (let i = 0, il = attributeArray.length; i < il; i++) {
         const attribute = attributeArray[i];
-        array.push(attribute.toJSON((data as any).data));
+        array.push(attribute.toJSON(data.data));
       }
       if (array.length > 0) {
-        (morphAttributes as any)[key] = array;
+        morphAttributes[key] = array;
         hasMorphAttributes = true;
       }
     }
     if (hasMorphAttributes) {
-      (data as any).data.morphAttributes = morphAttributes;
-      (data as any).data.morphTargetsRelative = this.morphTargetsRelative;
+      data.data.morphAttributes = morphAttributes;
+      data.data.morphTargetsRelative = this.morphTargetsRelative;
     }
     const groups = this.groups;
     if (groups.length > 0) {
-      (data as any).data.groups = JSON.parse(JSON.stringify(groups));
+      data.data.groups = JSON.parse(JSON.stringify(groups)) as BufferGeometry["groups"];
     }
     const boundingSphere = this.boundingSphere;
     if (boundingSphere !== null) {
-      (data as any).data.boundingSphere = boundingSphere.toJSON();
+      data.data.boundingSphere = boundingSphere.toJSON();
     }
     return data;
   }
@@ -920,7 +963,7 @@ export class BufferGeometry extends EventDispatcher {
     this.boundingBox = null;
     this.boundingSphere = null;
     // used for storing cloned, shared data
-    const data: any = {};
+    const data: InterleavedBufferCloneData = {};
     // name
     this.name = source.name;
     // index

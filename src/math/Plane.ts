@@ -231,7 +231,7 @@ export class Plane {
    * Apply a 4x4 matrix to the plane. The matrix must be an affine, homogeneous transform.
    *
    * The optional normal matrix can be pre-computed like so:
-   * ```ts
+   * ```typescript
    * import { Matrix4 } from 'ek3d/math/Matrix4';
    * import { Matrix3 } from 'ek3d/math/Matrix3';
    *
@@ -295,7 +295,7 @@ export class Plane {
    * @param json - The serialized json to set the plane from.
    * @return A reference to this plane.
    */
-  fromJSON(json?: any): Plane {
+  fromJSON(json: { normal: number[]; constant: number }): Plane {
     this.normal.fromArray(json.normal);
     this.constant = json.constant;
     return this;

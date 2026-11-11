@@ -1,4 +1,4 @@
-import { ToneMapping, Transfer, ColorSpace } from "../../constants";
+import { ToneMapping, Transfer } from "../../constants";
 import { ColorManagement } from "../../math/ColorManagement";
 import { RawShaderMaterial } from "../../materials/RawShaderMaterial";
 import { cloneUniforms } from "../../renderers/shaders/UniformsUtils";
@@ -26,7 +26,7 @@ export class OutputPass extends Pass {
   uniforms: typeof OutputShader.uniforms;
   material: RawShaderMaterial;
   _fsQuad: FullScreenQuad;
-  _outputColorSpace: ColorSpace | null;
+  _outputColorSpace: string | null;
   _toneMapping: number | null;
 
   /**

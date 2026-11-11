@@ -1,11 +1,21 @@
 import type { BufferAttribute } from "../core/BufferAttribute";
 import type { InterleavedBufferAttribute } from "../core/InterleavedBufferAttribute";
+import type { BufferGeometry } from "../core/BufferGeometry";
 import type { Matrix4 } from "./Matrix4";
 import type { Object3D } from "../core/Object3D";
 import type { Plane } from "./Plane";
 import type { Sphere } from "./Sphere";
 import type { Triangle } from "./Triangle";
 import { Vector3 } from "./Vector3";
+type BoundingBoxObject = Object3D & {
+  geometry?: BufferGeometry;
+  isInstancedMesh?: boolean;
+  isBatchedMesh?: boolean;
+  isMesh?: boolean;
+  getVertexPosition?(index: number, target: Vector3): Vector3;
+  boundingBox?: Box3 | null;
+  computeBoundingBox?(): void;
+};
 /**
  * Represents an axis-aligned bounding box (AABB) in 3D space.
  */
@@ -76,8 +86,7 @@ export class Box3 {
    * @param attribute - A buffer attribute holding 3D position data.
    * @return A reference to this bounding box.
    */
-  setFromBufferAttribute(attribute: BufferAttribute | InterleavedBufferAttribute): Box3;
-  setFromBufferAttribute(attribute?: any): Box3 {
+  setFromBufferAttribute(attribute: BufferAttribute | InterleavedBufferAttribute): Box3 {
     this.makeEmpty();
     for (let i = 0, il = attribute.count; i < il; i++) {
       this.expandByPoint(_vector.fromBufferAttribute(attribute, i));
@@ -242,20 +251,23 @@ export class Box3 {
     // Computes the world-axis-aligned bounding box of an object (including its children),
     // accounting for both the object's, and children's, world transforms
     object.updateWorldMatrix(false, false);
-    const geometry = (object as any).geometry;
+    const geometry = (object as BoundingBoxObject).geometry;
     if (geometry !== undefined) {
-      const positionAttribute = geometry.getAttribute("position");
+      const positionAttribute = geometry.getAttribute("position") as
+        | BufferAttribute
+        | InterleavedBufferAttribute
+        | undefined;
       // precise AABB computation based on vertex data requires at least a position attribute.
       // instancing and batching aren't supported so far and use the normal (conservative) code path.
       if (
         precise === true &&
         positionAttribute !== undefined &&
-        (object as any).isInstancedMesh !== true &&
-        (object as any).isBatchedMesh !== true
+        (object as BoundingBoxObject).isInstancedMesh !== true &&
+        (object as BoundingBoxObject).isBatchedMesh !== true
       ) {
         for (let i = 0, l = positionAttribute.count; i < l; i++) {
-          if ((object as any).isMesh === true) {
-            (object as any).getVertexPosition(i, _vector);
+          if ((object as BoundingBoxObject).isMesh === true) {
+            (object as BoundingBoxObject).getVertexPosition!(i, _vector);
           } else {
             _vector.fromBufferAttribute(positionAttribute, i);
           }
@@ -263,18 +275,18 @@ export class Box3 {
           this.expandByPoint(_vector);
         }
       } else {
-        if ((object as any).boundingBox !== undefined) {
+        if ((object as BoundingBoxObject).boundingBox !== undefined) {
           // object-level bounding box
-          if ((object as any).boundingBox === null) {
-            (object as any).computeBoundingBox();
+          if ((object as BoundingBoxObject).boundingBox === null) {
+            (object as BoundingBoxObject).computeBoundingBox!();
           }
-          _box.copy((object as any).boundingBox);
+          _box.copy((object as BoundingBoxObject).boundingBox!);
         } else {
           // geometry-level bounding box
           if (geometry.boundingBox === null) {
             geometry.computeBoundingBox();
           }
-          _box.copy(geometry.boundingBox);
+          _box.copy(geometry.boundingBox!);
         }
         _box.applyMatrix4(object.matrixWorld);
         this.union(_box);
@@ -373,7 +385,7 @@ export class Box3 {
   intersectsPlane(plane: Plane): boolean {
     // We compute the minimum and maximum dot product values. If those values
     // are on the same side (back or front) of the plane, then there is no intersection.
-    let min: any, max: any;
+    let min: number, max: number;
     if (plane.normal.x > 0) {
       min = plane.normal.x * this.min.x;
       max = plane.normal.x * this.max.x;
@@ -587,7 +599,7 @@ export class Box3 {
    * @param json - The serialized json to set the box from.
    * @return A reference to this bounding box.
    */
-  fromJSON(json?: any): Box3 {
+  fromJSON(json: { min: number[]; max: number[] }): Box3 {
     this.min.fromArray(json.min);
     this.max.fromArray(json.max);
     return this;
@@ -617,7 +629,7 @@ const _center = /*@__PURE__*/ new Vector3();
 const _extents = /*@__PURE__*/ new Vector3();
 const _triangleNormal = /*@__PURE__*/ new Vector3();
 const _testAxis = /*@__PURE__*/ new Vector3();
-function satForAxes(axes?: any, v0?: any, v1?: any, v2?: any, extents?: any) {
+function satForAxes(axes: number[], v0: Vector3, v1: Vector3, v2: Vector3, extents: Vector3) {
   for (let i = 0, j = axes.length - 3; i <= j; i += 3) {
     _testAxis.fromArray(axes, i);
     // project the aabb onto the separating axis

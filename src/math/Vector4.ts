@@ -18,9 +18,8 @@ import { ensureTypeFlag } from "../utils";
  * There are other things a 4D vector can be used to represent, however these
  * are the most common uses in *three.js*.
  *
- * Iterating through a vector instance will yield its components `(x, y, z, w)` in
- * the corresponding order.
- * ```ts
+ * Use `toArray()` to read `(x, y, z, w)`.
+ * ```typescript
  * import { Vector4 } from 'ek3d/math/Vector4';
  *
  * const a = new Vector4( 0, 1, 0, 0 );
@@ -229,7 +228,7 @@ export class Vector4 {
    * @return A reference to this vector.
    */
   copy(v: Vector3 | Vector4): Vector4;
-  copy(v?: any): Vector4 {
+  copy(v: { x: number; y: number; z: number; w?: number }): Vector4 {
     this.x = v.x;
     this.y = v.y;
     this.z = v.z;
@@ -427,7 +426,7 @@ export class Vector4 {
    */
   setAxisAngleFromRotationMatrix(m: Matrix4): Vector4 {
     // assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
-    let angle: any, x: any, y: any, z: any; // variables for result
+    let angle: number, x: number, y: number, z: number; // variables for result
     const epsilon = 0.01, // margin to allow for rounding errors
       epsilon2 = 0.1, // margin to distinguish between 0 and 180 degrees
       te = m.elements,
@@ -823,8 +822,7 @@ export class Vector4 {
    * @param index - The index into the attribute.
    * @return A reference to this vector.
    */
-  fromBufferAttribute(attribute: BufferAttribute | InterleavedBufferAttribute, index: number): Vector4;
-  fromBufferAttribute(attribute: any, index: number): Vector4 {
+  fromBufferAttribute(attribute: BufferAttribute | InterleavedBufferAttribute, index: number): Vector4 {
     this.x = attribute.getX(index);
     this.y = attribute.getY(index);
     this.z = attribute.getZ(index);

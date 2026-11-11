@@ -277,8 +277,7 @@ export class SphericalHarmonics3 {
       | Uint32Array
       | Float32Array
       | Float64Array,
-  ): void;
-  static getBasisAt(normal: Vector3, shBasis?: any) {
+  ): void {
     // normal is assumed to be unit length
     const x = normal.x,
       y = normal.y,

@@ -88,7 +88,7 @@ export class Curve<T extends Vector2 | Vector3 | null = Vector2 | Vector3> {
    * @return The position on the curve. It can be a 2D or 3D vector depending on the curve definition.
    */
   getPoint(t: number, optionalTarget?: NonNullable<T>): T;
-  getPoint(/* t, optionalTarget */): any {
+  getPoint(/* t, optionalTarget */): T | void {
     warn("Curve: .getPoint() not implemented.");
   }
   /**
@@ -112,7 +112,7 @@ export class Curve<T extends Vector2 | Vector3 | null = Vector2 | Vector3> {
    * @return An array holding the sampled curve values. The number of points is `divisions + 1`.
    */
   getPoints(divisions: number = 5): T[] {
-    const points: any[] = [];
+    const points: T[] = [];
     for (let d = 0; d <= divisions; d++) {
       points.push(this.getPoint(d / divisions));
     }
@@ -128,7 +128,7 @@ export class Curve<T extends Vector2 | Vector3 | null = Vector2 | Vector3> {
    * @return An array holding the sampled curve values. The number of points is `divisions + 1`.
    */
   getSpacedPoints(divisions: number = 5): T[] {
-    const points: any[] = [];
+    const points: T[] = [];
     for (let d = 0; d <= divisions; d++) {
       points.push(this.getPointAt(d / divisions));
     }
@@ -176,7 +176,7 @@ export class Curve<T extends Vector2 | Vector3 | null = Vector2 | Vector3> {
    * composed curve like {@link CurvePath}, this method must be called on the
    * composed curve, too.
    */
-  updateArcLengths() {
+  updateArcLengths(): void {
     this.needsUpdate = true;
     this.getLengths();
   }
@@ -189,12 +189,11 @@ export class Curve<T extends Vector2 | Vector3 | null = Vector2 | Vector3> {
    * @param distance - An optional distance on the curve.
    * @return The updated interpolation factor.
    */
-  getUtoTmapping(u: number, distance?: number | null): number;
-  getUtoTmapping(u: number, distance: any = null): number {
+  getUtoTmapping(u: number, distance: number | null = null): number {
     const arcLengths = this.getLengths();
     let i = 0;
     const il = arcLengths.length;
-    let targetArcLength: any; // The targeted u distance value to get
+    let targetArcLength: number; // The targeted u distance value to get
     if (distance) {
       targetArcLength = distance;
     } else {
@@ -203,7 +202,7 @@ export class Curve<T extends Vector2 | Vector3 | null = Vector2 | Vector3> {
     // binary search for the index with largest value smaller than target u distance
     let low = 0,
       high = il - 1,
-      comparison: any;
+      comparison: number;
     while (low <= high) {
       i = Math.floor(low + (high - low) / 2); // less likely to overflow, though probably not issue here, JS doesn't really have integers, all numbers are floats
       comparison = arcLengths[i] - targetArcLength;
@@ -285,6 +284,7 @@ export class Curve<T extends Vector2 | Vector3 | null = Vector2 | Vector3> {
    * @return The Frenet Frames.
    */
   computeFrenetFrames(
+    this: Curve<Vector3 | null>,
     segments: number,
     closed: boolean = false,
   ): { tangents: Vector3[]; normals: Vector3[]; binormals: Vector3[] } {
@@ -298,7 +298,7 @@ export class Curve<T extends Vector2 | Vector3 | null = Vector2 | Vector3> {
     // compute the tangent vectors for each segment on the curve
     for (let i = 0; i <= segments; i++) {
       const u = i / segments;
-      tangents[i] = this.getTangentAt(u, new Vector3() as unknown as NonNullable<T>) as unknown as Vector3;
+      tangents[i] = this.getTangentAt(u, new Vector3());
     }
     // select an initial normal vector perpendicular to the first tangent vector,
     // and in the direction of the minimum tangent xyz component
@@ -307,7 +307,7 @@ export class Curve<T extends Vector2 | Vector3 | null = Vector2 | Vector3> {
     let min = Number.MAX_VALUE;
     const tx = Math.abs(tangents[0].x);
     const ty = Math.abs(tangents[0].y);
-    const tz = Math.abs((tangents[0] as any).z);
+    const tz = Math.abs(tangents[0].z);
     if (tx <= min) {
       min = tx;
       normal.set(1, 0, 0);
@@ -379,15 +379,15 @@ export class Curve<T extends Vector2 | Vector3 | null = Vector2 | Vector3> {
    * @see {@link ObjectLoader#parse}
    */
   toJSON(): CurveJSON {
-    const data: any = {
+    const data: CurveJSON = {
       metadata: {
         version: 4.7,
         type: "Curve",
         generator: "Curve.toJSON",
       },
+      arcLengthDivisions: this.arcLengthDivisions,
+      type: this.type,
     };
-    (data as any).arcLengthDivisions = this.arcLengthDivisions;
-    (data as any).type = this.type;
     return data;
   }
   /**

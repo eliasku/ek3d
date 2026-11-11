@@ -158,7 +158,7 @@ export function getByteLength(width: number, height: number, format: number, typ
   }
   throw new Error(`Unable to determine texture byte length for ${format} format.`);
 }
-function getTextureTypeByteLength(type?: any) {
+function getTextureTypeByteLength(type: number): { byteLength: number; components: number } {
   switch (type) {
     case TextureType.UnsignedByte:
     case TextureType.Byte:

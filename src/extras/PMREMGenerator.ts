@@ -46,7 +46,7 @@ const _clearColor = /*@__PURE__*/ new Color();
  * @see {@link https://jcgt.org/published/0007/04/01/ | Sampling the GGX Distribution of Visible Normals}
  */
 export class PMREMGenerator {
-  _renderer: any;
+  _renderer: WebGLRenderer;
   _cubeSize: number;
   _sourceTarget: WebGLCubeRenderTarget | null;
   _cubeCamera: CubeCamera;
@@ -129,7 +129,7 @@ export class PMREMGenerator {
         this._blur(pmremTarget, sigma);
       }
       this._applyPMREM(pmremTarget);
-    } catch (error: any) {
+    } catch (error) {
       pmremTarget.dispose();
       throw error;
     }
@@ -144,8 +144,10 @@ export class PMREMGenerator {
    * @param [renderTarget=null] - The render target to use.
    * @return The resulting PMREM.
    */
-  fromEquirectangular(equirectangular: Texture, renderTarget?: WebGLCubeRenderTarget | null): WebGLCubeRenderTarget;
-  fromEquirectangular(equirectangular: Texture, renderTarget: any = null): WebGLCubeRenderTarget {
+  fromEquirectangular(
+    equirectangular: Texture,
+    renderTarget: WebGLCubeRenderTarget | null = null,
+  ): WebGLCubeRenderTarget {
     return this._fromTexture(equirectangular, renderTarget);
   }
   /**
@@ -156,8 +158,7 @@ export class PMREMGenerator {
    * @param [renderTarget=null] - The render target to use.
    * @return The resulting PMREM.
    */
-  fromCubemap(cubemap: Texture, renderTarget?: WebGLCubeRenderTarget | null): WebGLCubeRenderTarget;
-  fromCubemap(cubemap: Texture, renderTarget: any = null): WebGLCubeRenderTarget {
+  fromCubemap(cubemap: Texture, renderTarget: WebGLCubeRenderTarget | null = null): WebGLCubeRenderTarget {
     return this._fromTexture(cubemap, renderTarget);
   }
   /**
@@ -205,10 +206,10 @@ export class PMREMGenerator {
     return maxLod > 0 ? 1 - Math.sqrt(1 - lod / maxLod) : 0;
   }
   // private interface
-  _setSize(cubeSize?: any) {
+  _setSize(cubeSize: number) {
     this._cubeSize = Math.max(MIN_SIZE, floorPowerOfTwo(cubeSize));
   }
-  _fromTexture(texture: any, renderTarget?: any) {
+  _fromTexture(texture: Texture, renderTarget?: WebGLCubeRenderTarget | null): WebGLCubeRenderTarget {
     if (texture.mapping === Mapping.CubeReflection || texture.mapping === Mapping.CubeRefraction) {
       this._setSize(texture.image.length === 0 ? MIN_SIZE : texture.image[0].width || texture.image[0].image.width);
     } else {
@@ -219,7 +220,7 @@ export class PMREMGenerator {
     try {
       this._textureToCubemap(texture);
       this._applyPMREM(pmremTarget);
-    } catch (error: any) {
+    } catch (error) {
       if (!renderTarget) pmremTarget.dispose();
       throw error;
     }
@@ -246,7 +247,7 @@ export class PMREMGenerator {
     }
     return this._sourceTarget!;
   }
-  _compileMaterial(material?: any) {
+  _compileMaterial(material: Material) {
     this._boxMesh.material = material;
     this._renderer.compile(this._boxMesh, this._cubeCamera.children[0]);
   }
@@ -272,8 +273,8 @@ export class PMREMGenerator {
       target.viewport.set(0, 0, target.width, target.height);
     }
   }
-  _textureToCubemap(texture?: any) {
-    let material: any;
+  _textureToCubemap(texture: Texture) {
+    let material: ShaderMaterial;
     if (texture.mapping === Mapping.CubeReflection || texture.mapping === Mapping.CubeRefraction) {
       if (this._cubemapMaterial === null) {
         this._cubemapMaterial = _getCubemapMaterial();
@@ -351,7 +352,7 @@ export class PMREMGenerator {
     this._renderCube(sourceTarget, 0, material);
   }
 }
-function _createRenderTarget(size?: any, generateMipmaps?: any, depthBuffer?: any) {
+function _createRenderTarget(size: number, generateMipmaps: boolean, depthBuffer: boolean): WebGLCubeRenderTarget {
   return new WebGLCubeRenderTarget(size, {
     minFilter: TextureFilter.LinearMipmapLinear,
     generateMipmaps: generateMipmaps,
@@ -360,7 +361,11 @@ function _createRenderTarget(size?: any, generateMipmaps?: any, depthBuffer?: an
     depthBuffer: depthBuffer,
   });
 }
-function _getMaterial(name?: any, uniforms?: any, fragmentShader?: any) {
+function _getMaterial(
+  name: string,
+  uniforms: Record<string, { value: Texture | number | null }>,
+  fragmentShader: string,
+): ShaderMaterial {
   return new ShaderMaterial({
     name: name,
     uniforms: uniforms,

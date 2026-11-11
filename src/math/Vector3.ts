@@ -25,9 +25,8 @@ import { ensureTypeFlag } from "../utils";
  * momentum vectors and so on, however these are the most
  * common uses in three.js.
  *
- * Iterating through a vector instance will yield its components `(x, y, z)` in
- * the corresponding order.
- * ```ts
+ * Use `toArray()` to read `(x, y, z)`.
+ * ```typescript
  * import { Vector3 } from 'ek3d/math/Vector3';
  *
  * const a = new Vector3( 0, 1, 0 );
@@ -239,8 +238,7 @@ export class Vector3 {
    * @param s - The factor that scales `v`.
    * @return A reference to this vector.
    */
-  addScaledVector(v: Vector3 | Vector4, s: number): Vector3;
-  addScaledVector(v: any, s: number): Vector3 {
+  addScaledVector(v: Vector3 | Vector4, s: number): Vector3 {
     this.x += v.x * s;
     this.y += v.y * s;
     this.z += v.z * s;
@@ -991,8 +989,7 @@ export class Vector3 {
    * @param index - The index into the attribute.
    * @return A reference to this vector.
    */
-  fromBufferAttribute(attribute: BufferAttribute | InterleavedBufferAttribute, index: number): Vector3;
-  fromBufferAttribute(attribute: any, index: number): Vector3 {
+  fromBufferAttribute(attribute: BufferAttribute | InterleavedBufferAttribute, index: number): Vector3 {
     this.x = attribute.getX(index);
     this.y = attribute.getY(index);
     this.z = attribute.getZ(index);

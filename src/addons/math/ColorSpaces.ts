@@ -1,4 +1,4 @@
-import { ColorManagement } from "../../math/ColorManagement";
+import { ColorManagement, type ColorSpaceDefinition } from "../../math/ColorManagement";
 import { ColorSpace, Transfer } from "../../constants";
 import { Matrix3 } from "../../math/Matrix3";
 
@@ -9,17 +9,6 @@ const P3_LUMINANCE_COEFFICIENTS = [0.2289, 0.6917, 0.0793];
 const REC2020_PRIMARIES = [0.708, 0.292, 0.17, 0.797, 0.131, 0.046];
 const REC2020_LUMINANCE_COEFFICIENTS = [0.2627, 0.678, 0.0593];
 const D65 = [0.3127, 0.329];
-
-interface ColorSpaceImpl {
-  primaries: number[];
-  whitePoint: number[];
-  transfer: string;
-  toXYZ: Matrix3;
-  fromXYZ: Matrix3;
-  luminanceCoefficients: number[];
-  workingColorSpaceConfig?: { unpackColorSpace: string };
-  outputColorSpaceConfig?: { drawingBufferColorSpace: string; toneMappingMode?: string };
-}
 
 /******************************************************************************
  * Display P3 definitions
@@ -62,7 +51,7 @@ export const LinearDisplayP3ColorSpace = "display-p3-linear";
 /**
  * Implementation object for the Display-P3 color space.
  */
-export const DisplayP3ColorSpaceImpl: ColorSpaceImpl = {
+export const DisplayP3ColorSpaceImpl: ColorSpaceDefinition = {
   primaries: P3_PRIMARIES,
   whitePoint: D65,
   transfer: Transfer.SRGB,
@@ -75,7 +64,7 @@ export const DisplayP3ColorSpaceImpl: ColorSpaceImpl = {
 /**
  * Implementation object for the Display-P3-Linear color space.
  */
-export const LinearDisplayP3ColorSpaceImpl: ColorSpaceImpl = {
+export const LinearDisplayP3ColorSpaceImpl: ColorSpaceDefinition = {
   primaries: P3_PRIMARIES,
   whitePoint: D65,
   transfer: Transfer.Linear,
@@ -122,7 +111,7 @@ export const LinearRec2020ColorSpace = "rec2020-linear";
 /**
  * Implementation object for the Rec2020-Linear color space.
  */
-export const LinearRec2020ColorSpaceImpl: ColorSpaceImpl = {
+export const LinearRec2020ColorSpaceImpl: ColorSpaceDefinition = {
   primaries: REC2020_PRIMARIES,
   whitePoint: D65,
   transfer: Transfer.Linear,
@@ -139,8 +128,8 @@ export const ExtendedSRGBColorSpace = "extended-srgb";
 /**
  * Implementation object for the Extended-sRGB color space.
  */
-export const ExtendedSRGBColorSpaceImpl: ColorSpaceImpl = {
-  ...(ColorManagement.spaces as Record<string, ColorSpaceImpl>)[ColorSpace.SRGB],
+export const ExtendedSRGBColorSpaceImpl: ColorSpaceDefinition = {
+  ...ColorManagement.spaces[ColorSpace.SRGB],
   outputColorSpaceConfig: { drawingBufferColorSpace: ColorSpace.SRGB, toneMappingMode: "extended" },
 };
 
@@ -148,7 +137,7 @@ ColorManagement.define({
   [DisplayP3ColorSpace]: DisplayP3ColorSpaceImpl,
   [LinearDisplayP3ColorSpace]: LinearDisplayP3ColorSpaceImpl,
   [LinearRec2020ColorSpace]: LinearRec2020ColorSpaceImpl,
-}) as void;
+});
 
 void ColorSpace.LinearSRGB;
 void Transfer.Linear;

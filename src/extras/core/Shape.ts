@@ -73,7 +73,7 @@ export class Shape extends Path {
    * @return The holes as a series of 2D points.
    */
   getPointsHoles(divisions: number): Vector2[][] {
-    const holesPts: any[] = [];
+    const holesPts: Vector2[][] = [];
     for (let i = 0, l = this.holes.length; i < l; i++) {
       holesPts[i] = this.holes[i].getPoints(divisions);
     }
@@ -87,7 +87,7 @@ export class Shape extends Path {
    * @param divisions - The fineness of the result.
    * @return An object with contour data.
    */
-  extractPoints(divisions: number) {
+  extractPoints(divisions: number): { shape: Vector2[]; holes: Vector2[][] } {
     return {
       shape: this.getPoints(divisions),
       holes: this.getPointsHoles(divisions),

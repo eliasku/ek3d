@@ -523,7 +523,7 @@ export function floorPowerOfTwo(value: number): number {
  * @param c - The rotation applied to the third axis, in radians.
  * @param order - A string specifying the axes order.
  */
-export function setQuaternionFromProperEuler(q: Quaternion, a: number, b: number, c: number, order?: any) {
+export function setQuaternionFromProperEuler(q: Quaternion, a: number, b: number, c: number, order: string) {
   const cos = Math.cos;
   const sin = Math.sin;
   const c2 = cos(b / 2);

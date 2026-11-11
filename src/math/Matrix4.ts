@@ -21,7 +21,7 @@ import { ensureTypeFlag } from "../utils";
  * [row-major](https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order)
  * order, while internally they are stored in the {@link Matrix3#elements} array in column-major order.
  * This means that calling:
- * ```ts
+ * ```typescript
  * import { Matrix4 } from 'ek3d/math/Matrix4';
  *
  * const m = new Matrix4();
@@ -31,7 +31,7 @@ import { ensureTypeFlag } from "../utils";
  *        41, 42, 43, 44 );
  * ```
  * will result in the elements array containing:
- * ```ts
+ * ```typescript
  * import { Matrix4 } from 'ek3d/math/Matrix4';
  *
  * const m = new Matrix4();
@@ -648,7 +648,7 @@ export class Matrix4 {
    */
   transpose(): Matrix4 {
     const te = this.elements;
-    let tmp: any;
+    let tmp: number;
     tmp = te[1];
     te[1] = te[4];
     te[4] = tmp;
@@ -797,12 +797,13 @@ export class Matrix4 {
    * @param z - The amount to translate in the z axis.
    * @return A reference to this matrix.
    */
+  makeTranslation(v: Vector3): Matrix4;
   makeTranslation(x: number | Vector3, y: number, z: number): Matrix4;
-  makeTranslation(x: any, y: number, z: number): Matrix4 {
-    if ((x as any).isVector3) {
-      this.set(1, 0, 0, (x as any).x, 0, 1, 0, (x as any).y, 0, 0, 1, (x as any).z, 0, 0, 0, 1);
+  makeTranslation(x: number | Vector3, y?: number, z?: number): Matrix4 {
+    if ((x as Vector3).isVector3) {
+      this.set(1, 0, 0, (x as Vector3).x, 0, 1, 0, (x as Vector3).y, 0, 0, 1, (x as Vector3).z, 0, 0, 0, 1);
     } else {
-      this.set(1, 0, 0, x, 0, 1, 0, y, 0, 0, 1, z, 0, 0, 0, 1);
+      this.set(1, 0, 0, x as number, 0, 1, 0, y!, 0, 0, 1, z!, 0, 0, 0, 1);
     }
     return this;
   }
@@ -1035,7 +1036,7 @@ export class Matrix4 {
     const y = (2 * near) / (top - bottom);
     const a = (right + left) / (right - left);
     const b = (top + bottom) / (top - bottom);
-    let c: any, d: any;
+    let c: number, d: number;
     if (reversedDepth) {
       c = near / (far - near);
       d = (far * near) / (far - near);
@@ -1094,7 +1095,7 @@ export class Matrix4 {
     const y = 2 / (top - bottom);
     const a = -(right + left) / (right - left);
     const b = -(top + bottom) / (top - bottom);
-    let c: any, d: any;
+    let c: number, d: number;
     if (reversedDepth) {
       c = 1 / (far - near);
       d = far / (far - near);

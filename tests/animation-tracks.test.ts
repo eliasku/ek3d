@@ -18,6 +18,7 @@ import {
   makeClipAdditive,
 } from "../src/animation/AnimationUtils";
 import { Interpolant } from "../src/math/Interpolant";
+import { BezierInterpolant } from "../src/math/interpolants/BezierInterpolant";
 import { Quaternion } from "../src/math/Quaternion";
 import { GLTFParser } from "../src/addons/loaders/GLTFLoader";
 import { Interpolation, AnimationBlendMode } from "../src/constants";
@@ -204,6 +205,21 @@ test("base track conversion cannot promise an arbitrary generic value array", ()
     assert.equal(Object.hasOwn(track, "_values"), false);
   }
   assert.deepEqual(JSON.parse(JSON.stringify(stringTrack)).values, ["new", "value"]);
+});
+
+test("Bezier sampling preserves inherited tangents, independent overrides and linear fallback", () => {
+  class InheritedBezier extends BezierInterpolant {}
+  InheritedBezier.prototype.inTangents = [0, 0, 2 / 3, 0];
+  InheritedBezier.prototype.outTangents = [1 / 3, 0, 1, 1];
+  const first = new InheritedBezier([0, 1], [0, 1], 1);
+  const second = new InheritedBezier([0, 1], [0, 1], 1);
+  const fallback = new BezierInterpolant([0, 1], [0, 1], 1);
+  assert.equal(fallback.evaluate(0.5)[0], 0.5);
+  assert.equal(first.evaluate(0.5)[0], 0.125);
+  first.inTangents = [0, 0, 2 / 3, 1];
+  first.outTangents = [1 / 3, 1, 1, 1];
+  assert.equal(first.evaluate(0.5)[0], 0.875);
+  assert.equal(second.evaluate(0.5)[0], 0.125);
 });
 
 test("Bezier tangent interpolation, time transforms, cloning and serialization match upstream", () => {

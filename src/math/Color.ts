@@ -158,13 +158,13 @@ const _colorKeywords = {
 };
 const _hslA = { h: 0, s: 0, l: 0 };
 const _hslB = { h: 0, s: 0, l: 0 };
-function hue2rgb(p?: any, q?: any, t?: any) {
-  if (t < 0) t += 1;
-  if (t > 1) t -= 1;
-  if (t < 1 / 6) return p + (q - p) * 6 * t;
-  if (t < 1 / 2) return q;
-  if (t < 2 / 3) return p + (q - p) * 6 * (2 / 3 - t);
-  return p;
+function hue2rgb(p?: number, q?: number, t?: number): number {
+  if (t! < 0) t! += 1;
+  if (t! > 1) t! -= 1;
+  if (t! < 1 / 6) return p! + (q! - p!) * 6 * t!;
+  if (t! < 1 / 2) return q!;
+  if (t! < 2 / 3) return p! + (q! - p!) * 6 * (2 / 3 - t!);
+  return p!;
 }
 /**
  * A Color instance is represented by RGB components in the linear <i>working
@@ -172,7 +172,7 @@ function hue2rgb(p?: any, q?: any, t?: any) {
  * conventionally using `ColorSpace.SRGB` (such as hexadecimals and CSS
  * strings) are converted to the working color space automatically.
  *
- * ```ts
+ * ```typescript
  * import { Color } from 'ek3d/math/Color';
  * import { ColorSpace } from 'ek3d/constants';
  *
@@ -180,7 +180,7 @@ function hue2rgb(p?: any, q?: any, t?: any) {
  * const color = new Color().setHex( 0x112233 );
  * ```
  * Source color spaces may be specified explicitly, to ensure correct conversions.
- * ```ts
+ * ```typescript
  * import { Color } from 'ek3d/math/Color';
  * import { ColorSpace } from 'ek3d/constants';
  *
@@ -190,11 +190,10 @@ function hue2rgb(p?: any, q?: any, t?: any) {
  * // converted explicitly from ColorSpace.SRGB to ColorSpace.LinearSRGB
  * const srgbColor = new Color().setRGB( 0.5, 0.5, 0.5, ColorSpace.SRGB );
  * ```
- * If THREE.ColorManagement is disabled, no conversions occur. For details,
- * see <i>Color management</i>. Iterating through a Color instance will yield
- * its components (r, g, b) in the corresponding order. A Color can be initialised
- * in any of the following ways:
- * ```ts
+ * If `ColorManagement` is disabled, no conversions occur. For details,
+ * see <i>Color management</i>. Use `toArray()` to read `(r, g, b)`.
+ * A color can be initialized in any of the following ways:
+ * ```typescript
  * import { Color } from 'ek3d/math/Color';
  *
  * //empty constructor - will default white
@@ -229,7 +228,7 @@ export class Color {
    *
    * @static
    */
-  static NAMES: any = _colorKeywords;
+  static NAMES: typeof _colorKeywords = _colorKeywords;
 
   /**
    * Constructs a new color.
@@ -279,20 +278,19 @@ export class Color {
    * @param [b] - The blue component.
    * @return A reference to this color.
    */
-  set(r?: number | string | Color, g?: number, b?: number): Color;
-  set(r?: any, g?: number, b?: number): Color {
+  set(r?: number | string | Color, g?: number, b?: number): Color {
     if (g! === undefined && b! === undefined) {
       // r is THREE.Color, hex or string
       const value = r;
-      if (value && (value as any).isColor) {
-        this.copy(value);
+      if (value && (value as Color).isColor) {
+        this.copy(value as Color);
       } else if (typeof value === "number") {
         this.setHex(value);
       } else if (typeof value === "string") {
         this.setStyle(value);
       }
     } else {
-      this.setRGB(r, g!, b!);
+      this.setRGB(r as number, g!, b!);
     }
     return this;
   }
@@ -376,28 +374,28 @@ export class Color {
    * @return A reference to this color.
    */
   setStyle(style: string, colorSpace: string = ColorSpace.SRGB): Color {
-    function handleAlpha(string?: any) {
+    function handleAlpha(string?: string): void {
       if (string === undefined) return;
       if (parseFloat(string) < 1) {
         warn("Color: Alpha component of " + style + " will be ignored.");
       }
     }
-    let m: any;
+    let m: RegExpExecArray | null;
     if ((m = /^(\w+)\(([^)]*)\)/.exec(style))) {
       // rgb / hsl
-      let color: any;
-      const name = (m as any)[1];
-      const components = (m as any)[2];
+      let color: RegExpExecArray | null;
+      const name = m[1];
+      const components = m[2];
       switch (name) {
         case "rgb":
         case "rgba":
           if ((color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d+(?:\.\d+)?|\.\d+)\s*)?$/.exec(components))) {
             // rgb(255,0,0) rgba(255,0,0,0.5)
-            handleAlpha((color as any)[4]);
+            handleAlpha(color[4]);
             return this.setRGB(
-              Math.min(255, parseInt((color as any)[1], 10)) / 255,
-              Math.min(255, parseInt((color as any)[2], 10)) / 255,
-              Math.min(255, parseInt((color as any)[3], 10)) / 255,
+              Math.min(255, parseInt(color[1], 10)) / 255,
+              Math.min(255, parseInt(color[2], 10)) / 255,
+              Math.min(255, parseInt(color[3], 10)) / 255,
               colorSpace,
             );
           }
@@ -408,11 +406,11 @@ export class Color {
               ))
           ) {
             // rgb(100%,0%,0%) rgba(100%,0%,0%,0.5) rgb(50.5%,0%,0%)
-            handleAlpha((color as any)[4]);
+            handleAlpha(color[4]);
             return this.setRGB(
-              Math.min(100, parseFloat((color as any)[1])) / 100,
-              Math.min(100, parseFloat((color as any)[2])) / 100,
-              Math.min(100, parseFloat((color as any)[3])) / 100,
+              Math.min(100, parseFloat(color[1])) / 100,
+              Math.min(100, parseFloat(color[2])) / 100,
+              Math.min(100, parseFloat(color[3])) / 100,
               colorSpace,
             );
           }
@@ -426,11 +424,11 @@ export class Color {
               ))
           ) {
             // hsl(120,50%,50%) hsla(120,50%,50%,0.5) hsl(-120,50%,50%)
-            handleAlpha((color as any)[4]);
+            handleAlpha(color[4]);
             return this.setHSL(
-              parseFloat((color as any)[1]) / 360,
-              parseFloat((color as any)[2]) / 100,
-              parseFloat((color as any)[3]) / 100,
+              parseFloat(color[1]) / 360,
+              parseFloat(color[2]) / 100,
+              parseFloat(color[3]) / 100,
               colorSpace,
             );
           }
@@ -440,7 +438,7 @@ export class Color {
       }
     } else if ((m = /^#([A-Fa-f\d]+)$/.exec(style))) {
       // hex color
-      const hex = (m as any)[1];
+      const hex = m[1];
       const size = hex.length;
       if (size === 3) {
         // #ff0
@@ -466,7 +464,7 @@ export class Color {
    * you don't need the other CSS-style formats.
    *
    * For convenience, the list of names is exposed in `Color.NAMES` as a hash.
-   * ```ts
+   * ```typescript
    * import { Color } from 'ek3d/math/Color';
    *
    * Color.NAMES.aliceblue // returns 0xF0F8FF
@@ -478,7 +476,7 @@ export class Color {
    */
   setColorName(style: string, colorSpace: string = ColorSpace.SRGB): Color {
     // color keywords
-    const hex = (_colorKeywords as any)[style.toLowerCase()];
+    const hex = (_colorKeywords as Record<string, number | undefined>)[style.toLowerCase()];
     if (hex !== undefined) {
       // red
       this.setHex(hex, colorSpace);
@@ -583,7 +581,10 @@ export class Color {
    * @param [colorSpace=ColorManagement.workingColorSpace] - The color space.
    * @return The HSL representation of this color.
    */
-  getHSL(target?: any, colorSpace: string = ColorManagement.workingColorSpace) {
+  getHSL<T extends { h: number; s: number; l: number }>(
+    target?: T,
+    colorSpace: string = ColorManagement.workingColorSpace,
+  ): T {
     // h,s,l ranges are in 0.0 - 1.0
     ColorManagement.workingToColorSpace(_color.copy(this), colorSpace);
     const r = _color.r,
@@ -591,7 +592,7 @@ export class Color {
       b = _color.b;
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
-    let hue: any, saturation: any;
+    let hue!: number, saturation: number;
     const lightness = (min + max) / 2.0;
     if (min === max) {
       hue = 0;
@@ -612,10 +613,10 @@ export class Color {
       }
       hue /= 6;
     }
-    target.h = hue;
-    target.s = saturation;
-    target.l = lightness;
-    return target;
+    target!.h = hue;
+    target!.s = saturation;
+    target!.l = lightness;
+    return target!;
   }
   /**
    * Returns the RGB values of this color and stores them into the given target object.
@@ -894,8 +895,7 @@ export class Color {
    * @param index - The index into the attribute.
    * @return A reference to this color.
    */
-  fromBufferAttribute(attribute: BufferAttribute | InterleavedBufferAttribute, index: number): Color;
-  fromBufferAttribute(attribute: any, index: number): Color {
+  fromBufferAttribute(attribute: BufferAttribute | InterleavedBufferAttribute, index: number): Color {
     this.r = attribute.getX(index);
     this.g = attribute.getY(index);
     this.b = attribute.getZ(index);

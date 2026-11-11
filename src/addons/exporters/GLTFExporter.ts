@@ -2509,7 +2509,7 @@ export class GLTFMeshGpuInstancing {
       matrix.decompose(position, quaternion, scale);
 
       position.toArray(translationAttr, i * 3);
-      quaternion.toArray(rotationAttr as unknown as number[], i * 4);
+      quaternion.toArray(rotationAttr, i * 4);
       scale.toArray(scaleAttr, i * 3);
     }
 

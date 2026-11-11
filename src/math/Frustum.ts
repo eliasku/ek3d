@@ -2,11 +2,17 @@ import type { Box3 } from "./Box3";
 import type { Matrix4 } from "./Matrix4";
 import type { Object3D } from "../core/Object3D";
 import type { Sprite } from "../objects/Sprite";
+import type { BufferGeometry } from "../core/BufferGeometry";
 import { CoordinateSystem } from "../constants";
 import { Vector2 } from "./Vector2";
 import { Vector3 } from "./Vector3";
 import { Sphere } from "./Sphere";
 import { Plane } from "./Plane";
+type BoundingSphereObject = Object3D & {
+  geometry?: BufferGeometry;
+  boundingSphere?: Sphere | null;
+  computeBoundingSphere?(): void;
+};
 const _sphere = /*@__PURE__*/ new Sphere();
 const _defaultSpriteCenter = /*@__PURE__*/ new Vector2(0.5, 0.5);
 const _vector = /*@__PURE__*/ new Vector3();
@@ -135,13 +141,14 @@ export class Frustum {
    * @return Whether the 3D object's bounding sphere is intersecting this frustum or not.
    */
   intersectsObject(object: Object3D): boolean {
-    if ((object as any).boundingSphere !== undefined) {
-      if ((object as any).boundingSphere === null) (object as any).computeBoundingSphere();
-      _sphere.copy((object as any).boundingSphere).applyMatrix4(object.matrixWorld);
+    if ((object as BoundingSphereObject).boundingSphere !== undefined) {
+      if ((object as BoundingSphereObject).boundingSphere === null)
+        (object as BoundingSphereObject).computeBoundingSphere!();
+      _sphere.copy((object as BoundingSphereObject).boundingSphere!).applyMatrix4(object.matrixWorld);
     } else {
-      const geometry = (object as any).geometry;
+      const geometry = (object as BoundingSphereObject).geometry!;
       if (geometry.boundingSphere === null) geometry.computeBoundingSphere();
-      _sphere.copy(geometry.boundingSphere).applyMatrix4(object.matrixWorld);
+      _sphere.copy(geometry.boundingSphere!).applyMatrix4(object.matrixWorld);
     }
     return this.intersectsSphere(_sphere);
   }

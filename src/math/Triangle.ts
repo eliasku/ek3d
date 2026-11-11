@@ -5,6 +5,14 @@ import type { Plane } from "./Plane";
 import type { Vector2 } from "./Vector2";
 import { Vector3 } from "./Vector3";
 import { Vector4 } from "./Vector4";
+type InterpolationTarget = {
+  x: number;
+  y: number;
+  z?: number;
+  w?: number;
+  setScalar(scalar: number): void;
+  addScaledVector(vector: Vector2 | Vector3 | Vector4, scalar: number): void;
+};
 const _v0 = /*@__PURE__*/ new Vector3();
 const _v1 = /*@__PURE__*/ new Vector3();
 const _v2 = /*@__PURE__*/ new Vector3();
@@ -148,11 +156,11 @@ export class Triangle {
     p1: Vector3,
     p2: Vector3,
     p3: Vector3,
-    v1: any,
-    v2: any,
-    v3: any,
-    target?: any,
-  ): Vector2 | Vector3 | Vector4 | null {
+    v1: Vector2 | Vector3 | Vector4,
+    v2: Vector2 | Vector3 | Vector4,
+    v3: Vector2 | Vector3 | Vector4,
+    target: InterpolationTarget,
+  ): InterpolationTarget | null {
     if (this.getBarycoord(point, p1, p2, p3, _v3) === null) {
       target.x = 0;
       target.y = 0;
@@ -177,14 +185,6 @@ export class Triangle {
    * @param target - The target vector that is used to store the method's result.
    * @return The interpolated attribute value.
    */
-  static getInterpolatedAttribute(
-    attr: BufferAttribute | InterleavedBufferAttribute,
-    i1: number,
-    i2: number,
-    i3: number,
-    barycoord: Vector3,
-    target: any,
-  ): any;
   static getInterpolatedAttribute<T extends Vector2 | Vector3 | Vector4>(
     attr: BufferAttribute | InterleavedBufferAttribute,
     i1: number,
@@ -194,13 +194,13 @@ export class Triangle {
     target: T,
   ): T;
   static getInterpolatedAttribute(
-    attr: any,
+    attr: BufferAttribute | InterleavedBufferAttribute,
     i1: number,
     i2: number,
     i3: number,
     barycoord: Vector3,
-    target?: any,
-  ): any {
+    target: InterpolationTarget,
+  ): InterpolationTarget {
     _v40.setScalar(0);
     _v41.setScalar(0);
     _v42.setScalar(0);
@@ -271,8 +271,7 @@ export class Triangle {
     i0: number,
     i1: number,
     i2: number,
-  ): Triangle;
-  setFromAttributeAndIndices(attribute: any, i0: number, i1: number, i2: number): Triangle {
+  ): Triangle {
     this.a.fromBufferAttribute(attribute, i0);
     this.b.fromBufferAttribute(attribute, i1);
     this.c.fromBufferAttribute(attribute, i2);
@@ -360,8 +359,7 @@ export class Triangle {
    * @param target - The target vector that is used to store the method's result.
    * @return The interpolated value.
    */
-  getInterpolation<T extends Vector2 | Vector3 | Vector4>(point: Vector3, v1: T, v2: T, v3: T, target: T): T | null;
-  getInterpolation(point: Vector3, v1: any, v2: any, v3: any, target?: any): Vector2 | Vector3 | Vector4 | null {
+  getInterpolation<T extends Vector2 | Vector3 | Vector4>(point: Vector3, v1: T, v2: T, v3: T, target: T): T | null {
     return Triangle.getInterpolation(point, this.a, this.b, this.c, v1, v2, v3, target);
   }
   /**
@@ -404,7 +402,7 @@ export class Triangle {
     const a = this.a,
       b = this.b,
       c = this.c;
-    let v: any, w: any;
+    let v: number, w: number;
     // algorithm thanks to Real-Time Collision Detection by Christer Ericson,
     // published by Morgan Kaufmann Publishers, (c) 2005 Elsevier Inc.,
     // under the accompanying license; see chapter 5.1.5 for detailed explanation.

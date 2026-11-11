@@ -9,11 +9,10 @@ import { warn } from "../utils";
 /**
  * Class for representing a Quaternion. Quaternions are used in three.js to represent rotations.
  *
- * Iterating through a vector instance will yield its components `(x, y, z, w)` in
- * the corresponding order.
+ * Use `toArray()` to read `(x, y, z, w)`.
  *
  * Note that three.js expects Quaternions to be normalized.
- * ```ts
+ * ```typescript
  * import { Quaternion } from 'ek3d/math/Quaternion';
  * import { Vector3 } from 'ek3d/math/Vector3';
  *
@@ -642,7 +641,7 @@ export class Quaternion {
    * @param [offset=0] - The offset into the array.
    * @return A reference to this quaternion.
    */
-  fromArray(array: number[], offset: number = 0): Quaternion {
+  fromArray(array: ArrayLike<number>, offset: number = 0): Quaternion {
     this._x = array[offset];
     this._y = array[offset + 1];
     this._z = array[offset + 2];
@@ -658,7 +657,9 @@ export class Quaternion {
    * @param [offset=0] - Index of the first element in the array.
    * @return The quaternion components.
    */
-  toArray(array: number[] = [], offset: number = 0): number[] {
+  toArray(array?: number[], offset?: number): number[];
+  toArray<T extends NumericAnimationBuffer>(array: T, offset?: number): T;
+  toArray(array: NumericAnimationBuffer = [], offset: number = 0): NumericAnimationBuffer {
     array[offset] = this._x;
     array[offset + 1] = this._y;
     array[offset + 2] = this._z;
@@ -672,8 +673,7 @@ export class Quaternion {
    * @param index - The index into the attribute.
    * @return A reference to this quaternion.
    */
-  fromBufferAttribute(attribute: BufferAttribute | InterleavedBufferAttribute, index: number): Quaternion;
-  fromBufferAttribute(attribute: any, index: number): Quaternion {
+  fromBufferAttribute(attribute: BufferAttribute | InterleavedBufferAttribute, index: number): Quaternion {
     this._x = attribute.getX(index);
     this._y = attribute.getY(index);
     this._z = attribute.getZ(index);
@@ -690,7 +690,7 @@ export class Quaternion {
   toJSON(): number[] {
     return this.toArray();
   }
-  _onChange(callback?: any) {
+  _onChange(callback: () => void) {
     this._onChangeCallback = callback;
     return this;
   }

@@ -145,7 +145,7 @@ export class Line3 {
     // S2(t)=P2+t*(Q2-P2), returning s and t. Function result is squared
     // distance between between S1(s) and S2(t)
     const EPSILON = 1e-8 * 1e-8; // must be squared since we compare squared length
-    let s: any, t: any;
+    let s: number, t: number;
     const p1 = this.start;
     const p2 = line.start;
     const q1 = this.end;

@@ -2925,10 +2925,10 @@ export class WebGLRenderer {
    *
    * @default SRGBColorSpace
    */
-  get outputColorSpace() {
+  get outputColorSpace(): string {
     return this._outputColorSpace;
   }
-  set outputColorSpace(colorSpace: any) {
+  set outputColorSpace(colorSpace: string) {
     this._outputColorSpace = colorSpace;
     const gl = this.getContext();
     gl.drawingBufferColorSpace = ColorManagement._getDrawingBufferColorSpace(colorSpace);

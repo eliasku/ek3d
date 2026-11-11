@@ -3,7 +3,9 @@ import type { BatchedMeshGeometryRange, BatchedMeshDrawRange, BatchedMeshSortFun
 import { LOD } from "ek3d/objects/LOD";
 import type { LODLevel } from "ek3d/objects/LOD";
 import { Vector3 } from "ek3d/math/Vector3";
+import { Quaternion } from "ek3d/math/Quaternion";
 import { Matrix4 } from "ek3d/math/Matrix4";
+import { Matrix3 } from "ek3d/math/Matrix3";
 import { Triangle } from "ek3d/math/Triangle";
 import { PerspectiveCamera } from "ek3d/cameras/PerspectiveCamera";
 import { Scene } from "ek3d/scenes/Scene";
@@ -22,6 +24,7 @@ import { MeshLambertMaterial } from "ek3d/materials/MeshLambertMaterial";
 import { HemisphereLight } from "ek3d/lights/HemisphereLight";
 import { lambertShader } from "ek3d/renderers/shaders/LambertShader";
 import { Color } from "ek3d/math/Color";
+import { ColorManagement, type ColorSpaceDefinition, LinearToSRGB, SRGBToLinear } from "ek3d/math/ColorManagement";
 import { Euler } from "ek3d/math/Euler";
 import { ShaderMaterial } from "ek3d/materials/ShaderMaterial";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
@@ -212,7 +215,14 @@ import { LinearInterpolant } from "ek3d/math/interpolants/LinearInterpolant";
 import { CubicInterpolant } from "ek3d/math/interpolants/CubicInterpolant";
 import { DiscreteInterpolant } from "ek3d/math/interpolants/DiscreteInterpolant";
 import { QuaternionLinearInterpolant } from "ek3d/math/interpolants/QuaternionLinearInterpolant";
-import { convertArray, getKeyframeOrder, sortedArray, subclip, makeClipAdditive } from "ek3d/animation/AnimationUtils";
+import {
+  convertArray,
+  getKeyframeOrder,
+  sortedArray,
+  subclip,
+  makeClipAdditive,
+  hasTangents,
+} from "ek3d/animation/AnimationUtils";
 import type { NumericAnimationBuffer } from "ek3d/math/Interpolant";
 import { Bone } from "ek3d/objects/Bone";
 import { Skeleton } from "ek3d/objects/Skeleton";
@@ -1255,9 +1265,11 @@ const maybePoint: Vector3 | null = curvePath.getPoint(0.5);
 const shapePath = new ShapePath().moveTo(0, 0).lineTo(0, 1).lineTo(1, 0).lineTo(0, 0);
 const shapesFromPaths: Shape[] = shapePath.toShapes();
 const shape = new Shape([new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 0)]);
-shape.holes.push(new Path());
+shape.closePath().holes.push(new Path());
 const shapeCopy: Shape = shape.clone().copy(shape);
 const contourPoints: Vector2[] = shape.extractPoints(12).shape;
+// @ts-expect-error Fluent closing preserves two-dimensional path holes.
+shape.closePath().holes.push(new CurvePath<Vector3>());
 const createCurve2D: CurveFactory<Vector2> = (json) => {
   if (json.type === "LineCurve") return new LineCurve().fromJSON(json);
   if (json.type === "Path") return new Path().fromJSON(json, createCurve2D);
@@ -1316,6 +1328,8 @@ void [
 curves2D[0].getPoint(0.5, new Vector3());
 // @ts-expect-error Three-dimensional curve targets cannot be two-dimensional.
 curves3D[0].getPoint(0.5, new Vector2());
+// @ts-expect-error Frenet frames require a three-dimensional curve.
+curves2D[0].computeFrenetFrames(12);
 // @ts-expect-error A path can return null when empty or sampled out of range.
 const requiredPoint: Vector3 = curvePath.getPoint(0.5);
 void requiredPoint;
@@ -1955,6 +1969,35 @@ const heterogeneousClip = new AnimationClip("all", -1, [
 ]);
 const trackBase: KeyframeTrack = booleanTrack;
 const convertedTimes: Float32Array = convertArray(animationTimes, Float32Array);
+const convertedNumericArray = convertArray(animationTimes, Array);
+convertedNumericArray[0].toFixed();
+convertArray(stringTrack.values, Array)[0].toUpperCase();
+// @ts-expect-error Array conversion preserves numeric element types.
+convertedNumericArray[0].toUpperCase();
+const tangentSettings: NonNullable<KeyframeTrack["settings"]> = {
+  inTangents: new Float64Array([0, 0, 1, 1]),
+  outTangents: [0, 0, 1, 1],
+};
+if (hasTangents(tangentSettings)) {
+  tangentSettings.inTangents[0].toFixed();
+  // @ts-expect-error Tangent values are numbers after narrowing.
+  tangentSettings.outTangents[0].toUpperCase();
+}
+const bezierInterpolant = numericTrack.InterpolantFactoryMethodBezier();
+bezierInterpolant.inTangents = tangentSettings.inTangents;
+bezierInterpolant.outTangents = tangentSettings.outTangents;
+// @ts-expect-error Bezier control points are numeric.
+bezierInterpolant.inTangents = ["not a number"];
+const quaternionBuffer = new Float64Array([0, 0, 0, 1]);
+new Quaternion().fromArray(quaternionBuffer).toArray(quaternionBuffer).subarray(0);
+new Quaternion()
+  .fromArray([0, 0, 0, 1] as const)
+  .toArray()
+  .push(0);
+// @ts-expect-error Quaternion input components are numeric.
+new Quaternion().fromArray(["0", "0", "0", "1"]);
+// @ts-expect-error Quaternion destinations must store numeric components.
+new Quaternion().toArray(["0", "0", "0", "1"]);
 const sortedTimes: Float64Array = sortedArray(animationTimes, 1, getKeyframeOrder(animationTimes));
 const sortedStrings: string[] = sortedArray(["b", "a"], 1, [1, 0]);
 const numericSample: NumericAnimationBuffer = new LinearInterpolant(animationTimes, [0, 1], 1).evaluate(0.5);
@@ -2109,3 +2152,75 @@ typedGeometry.groups.push({ start: 0, count: 3 });
 // @ts-expect-error Morph targets are attributes, not vectors.
 typedGeometry.morphAttributes.position = [new Vector3()];
 void [clonedTexture, clonedArrayTexture, clonedMixed, requiredTexture];
+
+const eulerComponents: [number, number, number, string] = new Euler().toArray();
+const eulerDestination: (number | string)[] = new Euler().toArray([], 2);
+new Euler().fromArray(eulerComponents).fromArray(eulerDestination).fromArray(new Float32Array(3));
+new Matrix3().makeTranslation(new Vector2(1, 2));
+new Matrix4().makeTranslation(new Vector3(1, 2, 3));
+const barycentricTarget = Object.assign(new Vector3(), { label: "interpolated" });
+const barycentricResult = Triangle.getInterpolatedAttribute(
+  numericAttribute,
+  0,
+  0,
+  0,
+  new Vector3(1, 0, 0),
+  barycentricTarget,
+);
+barycentricResult.label.toUpperCase();
+typedGeometry.setIndex(null).setFromPoints([new Vector2(), new Vector3()] as const);
+new Sphere().fromJSON({ center: [0, 0, 0], radius: 1 });
+
+const customColorSpace: ColorSpaceDefinition = {
+  ...ColorManagement.spaces[ColorSpace.LinearSRGB],
+  outputColorSpaceConfig: { drawingBufferColorSpace: "display-p3", toneMappingMode: "extended" },
+};
+ColorManagement.define({ "custom-linear": customColorSpace });
+const taggedColor = Object.assign(new Color(), { tag: 1 });
+const convertedTaggedColor = ColorManagement.convert(taggedColor, "custom-linear", ColorSpace.SRGB);
+convertedTaggedColor.tag.toFixed();
+const hslWithAlpha = new Color().getHSL({ h: 0, s: 0, l: 0, alpha: 1 });
+hslWithAlpha.alpha.toFixed();
+LinearToSRGB(SRGBToLinear(0.5));
+const unboundColorConversion = ColorManagement.convert;
+
+// @ts-expect-error Euler serialization includes a string order, not only numbers.
+const incorrectEulerOutput: number[] = new Euler().toArray();
+// @ts-expect-error Numeric translation requires all three components.
+new Matrix4().makeTranslation(1, 2);
+// @ts-expect-error Interpolation requires a vector target.
+Triangle.getInterpolatedAttribute(numericAttribute, 0, 0, 0, new Vector3(), {});
+// @ts-expect-error Interpolation preserves the target's string property type.
+barycentricResult.label.toFixed();
+// @ts-expect-error CPU math cannot read components from a native GPU buffer.
+new Vector3().fromBufferAttribute(nativeAttribute, 0);
+// @ts-expect-error Serialized sphere radii are numeric.
+new Sphere().fromJSON({ center: [0, 0, 0], radius: "1" });
+// @ts-expect-error Setting an attribute requires its storage.
+typedGeometry.setAttribute("position");
+// @ts-expect-error Geometry points require numeric coordinates.
+typedGeometry.setFromPoints([{ x: 0, y: "0" }]);
+// @ts-expect-error Custom color spaces require complete conversion definitions.
+ColorManagement.define({ incomplete: { transfer: customColorSpace.transfer } });
+// @ts-expect-error Browser output color spaces are constrained by the platform.
+ColorManagement.spaces["custom-linear"].outputColorSpaceConfig!.drawingBufferColorSpace = "rec2020";
+// @ts-expect-error Output color modes are standard or extended.
+ColorManagement.spaces["custom-linear"].outputColorSpaceConfig!.toneMappingMode = "unknown";
+// @ts-expect-error Transfer functions require numeric components.
+SRGBToLinear("0.5");
+// @ts-expect-error HSL target components are numeric.
+new Color().getHSL({ h: "0", s: 0, l: 0 });
+// @ts-expect-error Conversion preserves the tagged color's numeric property.
+convertedTaggedColor.tag.toUpperCase();
+// @ts-expect-error Color conversion requires its management state as the receiver.
+unboundColorConversion(new Color(), ColorSpace.SRGB, ColorSpace.LinearSRGB);
+// @ts-expect-error Named colors contain numeric hex values.
+Color.NAMES.red.toUpperCase();
+void incorrectEulerOutput;
+
+renderer.outputColorSpace = "custom-linear";
+renderer.outputColorSpace.toUpperCase();
+// @ts-expect-error Renderer output color-space identifiers are strings.
+renderer.outputColorSpace = 1;
+// @ts-expect-error Reading the output color space must not erase its string type.
+renderer.outputColorSpace.toFixed();

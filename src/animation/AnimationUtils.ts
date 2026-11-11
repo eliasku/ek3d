@@ -1,4 +1,4 @@
-import type { AnimationBuffer } from "../math/Interpolant";
+import type { AnimationBuffer, InterpolantSettings } from "../math/Interpolant";
 import type { AnimationBufferConstructor } from "../math/Interpolant";
 import type { AnimationClip } from "./AnimationClip";
 import type { NumericAnimationBuffer } from "../math/Interpolant";
@@ -11,6 +11,7 @@ import { AnimationBlendMode } from "../constants";
  * @param type - The constructor of a typed array that defines the new type.
  * @return The converted array.
  */
+export function convertArray<B extends AnimationBuffer>(array: B, type: ArrayConstructor): B[number][];
 export function convertArray<B extends AnimationBuffer>(
   array: AnimationBuffer,
   type: { new (values: never): B; BYTES_PER_ELEMENT?: number },
@@ -29,7 +30,9 @@ export function convertArray(array: AnimationBuffer, type: AnimationBufferConstr
  * @param settings - The settings of a keyframe track.
  * @return Whether both tangent arrays are defined or not.
  */
-export function hasTangents(settings?: any): boolean {
+export function hasTangents(
+  settings?: InterpolantSettings,
+): settings is InterpolantSettings & { inTangents: NumericAnimationBuffer; outTangents: NumericAnimationBuffer } {
   return settings !== undefined && settings.inTangents !== undefined && settings.outTangents !== undefined;
 }
 /**
@@ -139,12 +142,12 @@ export function subclip(
 ): AnimationClip {
   const clip = sourceClip.clone();
   clip.name = name;
-  const tracks: any[] = [];
+  const tracks: AnimationClip["tracks"] = [];
   for (let i = 0; i < clip.tracks.length; ++i) {
     const track = clip.tracks[i];
     const valueSize = track.getValueSize();
-    const times: any[] = [];
-    const values: any[] = [];
+    const times: number[] = [];
+    const values: AnimationBuffer[number][] = [];
     for (let j = 0; j < track.times.length; ++j) {
       const frame = track.times[j] * fps;
       if (frame < startFrame || frame >= endFrame) continue;
@@ -204,7 +207,7 @@ export function makeClipAdditive(
     // Skip this track if it's non-numeric
     if (referenceTrackType === "bool" || referenceTrackType === "string") continue;
     // Find the track in the target clip whose name and type matches the reference track
-    const targetTrack = targetClip.tracks.find(function (track?: any) {
+    const targetTrack = targetClip.tracks.find(function (track) {
       return track.name === referenceTrack.name && track.ValueTypeName === referenceTrackType;
     });
     if (targetTrack === undefined) continue;
@@ -220,23 +223,23 @@ export function makeClipAdditive(
       targetOffset = targetValueSize / 3;
     }
     const lastIndex = referenceTrack.times.length - 1;
-    let referenceValue: any;
+    let referenceValue: NumericAnimationBuffer;
     // Find the value to subtract out of the track
     if (referenceTime <= referenceTrack.times[0]) {
       // Reference frame is earlier than the first keyframe, so just use the first keyframe
       const startIndex = referenceOffset;
       const endIndex = referenceValueSize - referenceOffset;
-      referenceValue = referenceTrack.values.slice(startIndex, endIndex);
+      referenceValue = (referenceTrack.values as NumericAnimationBuffer).slice(startIndex, endIndex);
     } else if (referenceTime >= referenceTrack.times[lastIndex]) {
       // Reference frame is after the last keyframe, so just use the last keyframe
       const startIndex = lastIndex * referenceValueSize + referenceOffset;
       const endIndex = startIndex + referenceValueSize - referenceOffset;
-      referenceValue = referenceTrack.values.slice(startIndex, endIndex);
+      referenceValue = (referenceTrack.values as NumericAnimationBuffer).slice(startIndex, endIndex);
     } else {
       // Interpolate to the reference value
       const interpolant = referenceTrack.createInterpolant();
       interpolant.evaluate(referenceTime);
-      referenceValue = interpolant.resultBuffer.slice();
+      referenceValue = (interpolant.resultBuffer as NumericAnimationBuffer).slice();
     }
     // Conjugate the quaternion
     if (referenceTrackType === "quaternion") {

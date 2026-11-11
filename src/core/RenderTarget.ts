@@ -146,7 +146,7 @@ export class RenderTarget extends EventDispatcher {
      *
      * @default 1
      */
-    this.depth = (options as any).depth;
+    this.depth = options.depth!;
     /**
      * A rectangular area inside the render target's viewport. Fragments that are
      * outside the area will be discarded.
@@ -173,7 +173,7 @@ export class RenderTarget extends EventDispatcher {
      *
      */
     this.textures = [];
-    const count = (options as any).count;
+    const count = options.count!;
     for (let i = 0; i < count; i++) {
       this.textures[i] = new Texture({ width: width, height: height, depth: this.depth });
       this.textures[i].isRenderTargetTexture = true;
@@ -185,13 +185,13 @@ export class RenderTarget extends EventDispatcher {
      *
      * @default true
      */
-    this.depthBuffer = (options as any).depthBuffer;
+    this.depthBuffer = options.depthBuffer!;
     /**
      * Whether to allocate a stencil buffer or not.
      *
      * @default false
      */
-    this.stencilBuffer = (options as any).stencilBuffer;
+    this.stencilBuffer = options.stencilBuffer!;
     /**
      * Whether to resolve the color buffer or not. When set to `false`, the color
      * attachments do not receive the resolved (single-sampled) output of a render
@@ -202,7 +202,7 @@ export class RenderTarget extends EventDispatcher {
      *
      * @default true
      */
-    this.resolveColorBuffer = (options as any).resolveColorBuffer;
+    this.resolveColorBuffer = options.resolveColorBuffer!;
     /**
      * Whether to resolve the depth buffer or not. When set to `false`, the depth
      * texture does not receive the resolved depth output of a render pass which
@@ -213,14 +213,14 @@ export class RenderTarget extends EventDispatcher {
      *
      * @default true
      */
-    this.resolveDepthBuffer = (options as any).resolveDepthBuffer;
+    this.resolveDepthBuffer = options.resolveDepthBuffer!;
     /**
      * Whether to resolve the stencil buffer or not. Analogous to
      * {@link RenderTarget#resolveDepthBuffer} but for the stencil aspect.
      *
      * @default true
      */
-    this.resolveStencilBuffer = (options as any).resolveStencilBuffer;
+    this.resolveStencilBuffer = options.resolveStencilBuffer!;
     /**
      * Whether to store the multisampled color buffer or not. When set to `false`,
      * the multisampled data are discarded at the end of a render pass, right after
@@ -235,7 +235,7 @@ export class RenderTarget extends EventDispatcher {
      *
      * @default true
      */
-    this.storeMultisampledColorBuffer = (options as any).storeMultisampledColorBuffer;
+    this.storeMultisampledColorBuffer = options.storeMultisampledColorBuffer!;
     /**
      * Whether to store the multisampled depth buffer or not. When set to `false`,
      * the multisampled depth data are discarded at the end of a render pass which
@@ -243,16 +243,16 @@ export class RenderTarget extends EventDispatcher {
      *
      * @default true
      */
-    this.storeMultisampledDepthBuffer = (options as any).storeMultisampledDepthBuffer;
+    this.storeMultisampledDepthBuffer = options.storeMultisampledDepthBuffer!;
     /**
      * Whether to store the multisampled stencil buffer or not. Analogous to
      * {@link RenderTarget#storeMultisampledDepthBuffer} but for the stencil aspect.
      *
      * @default true
      */
-    this.storeMultisampledStencilBuffer = (options as any).storeMultisampledStencilBuffer;
+    this.storeMultisampledStencilBuffer = options.storeMultisampledStencilBuffer!;
     this._depthTexture = null;
-    this.depthTexture = (options as any).depthTexture;
+    this.depthTexture = options.depthTexture as DepthTexture | null;
     /**
      * The number of MSAA samples.
      *
@@ -260,13 +260,13 @@ export class RenderTarget extends EventDispatcher {
      *
      * @default 0
      */
-    this.samples = (options as any).samples;
+    this.samples = options.samples!;
     /**
      * Whether to this target is used in multiview rendering.
      *
      * @default false
      */
-    this.multiview = (options as any).multiview;
+    this.multiview = options.multiview!;
     /**
      * Whether to create the depth texture as an array texture for per-layer depth testing.
      * This is separate from multiview so layered render targets can use array depth without
@@ -274,30 +274,29 @@ export class RenderTarget extends EventDispatcher {
      *
      * @default false
      */
-    this.useArrayDepthTexture = (options as any).useArrayDepthTexture;
+    this.useArrayDepthTexture = options.useArrayDepthTexture!;
   }
-  _setTextureOptions(options: any = {}) {
-    const values: any = {
+  _setTextureOptions(options: RenderTargetOptions = {}) {
+    const values: RenderTargetOptions = {
       minFilter: TextureFilter.Linear,
       generateMipmaps: false,
       flipY: false,
       internalFormat: null,
     };
-    if ((options as any).mapping !== undefined) (values as any).mapping = (options as any).mapping;
-    if ((options as any).wrapS !== undefined) (values as any).wrapS = (options as any).wrapS;
-    if ((options as any).wrapT !== undefined) (values as any).wrapT = (options as any).wrapT;
-    if ((options as any).wrapR !== undefined) (values as any).wrapR = (options as any).wrapR;
-    if ((options as any).magFilter !== undefined) (values as any).magFilter = (options as any).magFilter;
-    if ((options as any).minFilter !== undefined) values.minFilter = (options as any).minFilter;
-    if ((options as any).format !== undefined) (values as any).format = (options as any).format;
-    if ((options as any).type !== undefined) (values as any).type = (options as any).type;
-    if ((options as any).anisotropy !== undefined) (values as any).anisotropy = (options as any).anisotropy;
-    if ((options as any).colorSpace !== undefined) (values as any).colorSpace = (options as any).colorSpace;
-    if ((options as any).flipY !== undefined) values.flipY = (options as any).flipY;
-    if ((options as any).generateMipmaps !== undefined) values.generateMipmaps = (options as any).generateMipmaps;
-    if ((options as any).mipmapsAutoUpdate !== undefined)
-      (values as any).mipmapsAutoUpdate = (options as any).mipmapsAutoUpdate;
-    if ((options as any).internalFormat !== undefined) values.internalFormat = (options as any).internalFormat;
+    if (options.mapping !== undefined) values.mapping = options.mapping;
+    if (options.wrapS !== undefined) values.wrapS = options.wrapS;
+    if (options.wrapT !== undefined) values.wrapT = options.wrapT;
+    if (options.wrapR !== undefined) values.wrapR = options.wrapR;
+    if (options.magFilter !== undefined) values.magFilter = options.magFilter;
+    if (options.minFilter !== undefined) values.minFilter = options.minFilter;
+    if (options.format !== undefined) values.format = options.format;
+    if (options.type !== undefined) values.type = options.type;
+    if (options.anisotropy !== undefined) values.anisotropy = options.anisotropy;
+    if (options.colorSpace !== undefined) values.colorSpace = options.colorSpace;
+    if (options.flipY !== undefined) values.flipY = options.flipY;
+    if (options.generateMipmaps !== undefined) values.generateMipmaps = options.generateMipmaps;
+    if (options.mipmapsAutoUpdate !== undefined) values.mipmapsAutoUpdate = options.mipmapsAutoUpdate;
+    if (options.internalFormat !== undefined) values.internalFormat = options.internalFormat;
     for (let i = 0; i < this.textures.length; i++) {
       const texture = this.textures[i];
       texture.setValues(values);
@@ -344,7 +343,7 @@ export class RenderTarget extends EventDispatcher {
         this.textures[i].image.width = width;
         this.textures[i].image.height = height;
         this.textures[i].image.depth = depth;
-        if ((this.textures[i] as any).isData3DTexture !== true) {
+        if ((this.textures[i] as Texture & { isData3DTexture?: boolean }).isData3DTexture !== true) {
           // Fix for #31693
           // TODO: Reconsider setting isArrayTexture flag here and in the ctor of Texture.
           // Maybe a method `isArrayTexture()` or just a getter could replace a flag since
