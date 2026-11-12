@@ -42,18 +42,23 @@ export function readMtlxArchive(
   return { text: decoder.decode(files.get(mtlxPath)), mtlxPath, files };
 }
 
-export function createArchiveResolver(files: Map<string, Uint8Array>): {
-  resolve(uri: string): string | null;
-  dispose(): void;
-} {
-  const cache = new Map<string, string>();
-  function resolve(uri: string): string | null {
-    const cached = cache.get(uri);
+export class ArchiveResolver {
+  private files: Map<string, Uint8Array>;
+  private cache: Map<string, string> = new Map();
+
+  constructor(files: Map<string, Uint8Array>) {
+    this.files = files;
+    this.resolve = this.resolve.bind(this);
+    this.dispose = this.dispose.bind(this);
+  }
+
+  resolve(uri: string): string | null {
+    const cached = this.cache.get(uri);
     if (cached !== undefined) return cached;
     const normalized = normalizePath(decodeURI(uri));
-    let bytes = files.get(normalized);
+    let bytes = this.files.get(normalized);
     if (!bytes) {
-      for (const [path, data] of files) {
+      for (const [path, data] of this.files) {
         if (path.endsWith(normalized)) {
           bytes = data;
           break;
@@ -62,14 +67,11 @@ export function createArchiveResolver(files: Map<string, Uint8Array>): {
     }
     if (!bytes) return null;
     const url = URL.createObjectURL(new Blob([Uint8Array.from(bytes)], { type: "application/octet-stream" }));
-    cache.set(uri, url);
+    this.cache.set(uri, url);
     return url;
   }
-  return {
-    resolve,
-    dispose() {
-      for (const url of cache.values()) URL.revokeObjectURL(url);
-      cache.clear();
-    },
-  };
+  dispose(): void {
+    for (const url of this.cache.values()) URL.revokeObjectURL(url);
+    this.cache.clear();
+  }
 }

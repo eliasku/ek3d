@@ -46,7 +46,7 @@ async function init(): Promise<void> {
   canvas.dataset.state = "loading";
   const runtime = await loadRapier();
   if (disposed) return;
-  const physics = RapierPhysics(runtime);
+  const physics = new RapierPhysics(runtime);
   cleanup.push(() => physics.dispose());
   const scene = new Scene();
   scene.background = new Color(0xbfd1e5);

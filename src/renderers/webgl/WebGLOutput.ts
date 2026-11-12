@@ -36,7 +36,7 @@ export interface WebGLOutputSystem {
   restore(renderer: WebGLRenderer): void;
   dispose(): void;
 }
-const toneMappingMap = {
+const toneMappingMap: Partial<Record<ToneMapping, string>> = {
   [ToneMapping.Linear]: "LINEAR_TONE_MAPPING",
   [ToneMapping.Reinhard]: "REINHARD_TONE_MAPPING",
   [ToneMapping.Cineon]: "CINEON_TONE_MAPPING",
@@ -45,40 +45,57 @@ const toneMappingMap = {
   [ToneMapping.Neutral]: "NEUTRAL_TONE_MAPPING",
   [ToneMapping.Custom]: "CUSTOM_TONE_MAPPING",
 };
-export function WebGLOutput(
-  type: TextureType,
-  width: number,
-  height: number,
-  antialias: boolean,
-  depth: boolean,
-  stencil: boolean,
-): WebGLOutputSystem {
-  // render target for the scene pass (potentially multisampled)
-  const targetScene = new WebGLRenderTarget(width, height, {
-    type: type,
-    depthBuffer: depth,
-    stencilBuffer: stencil,
-    samples: antialias ? 4 : 0,
-    storeMultisampledDepthBuffer: false,
-    storeMultisampledStencilBuffer: false,
-    resolveDepthBuffer: false,
-    resolveStencilBuffer: false,
-  });
-  // single-sampled ping-pong buffers for post-processing effects, allocated on demand
-  let targetA: any = null;
-  let targetB: any = null;
-  // scene depth for effects with needsDepthTexture set to true, allocated on demand
-  let depthTexture: any = null;
-  // create fullscreen triangle geometry
-  const geometry = new BufferGeometry();
-  geometry.setAttribute("position", new Float32BufferAttribute([-1, 3, 0, -1, -1, 0, 3, -1, 0], 3));
-  geometry.setAttribute("uv", new Float32BufferAttribute([0, 2, 0, 0, 2, 0], 2));
-  // create output material with tone mapping support
-  const material = new RawShaderMaterial({
-    uniforms: {
-      tDiffuse: { value: null },
-    },
-    vertexShader: /* glsl */ `
+export class WebGLOutput implements WebGLOutputSystem {
+  private readonly depth: boolean;
+  private readonly stencil: boolean;
+  private readonly targetScene: WebGLRenderTarget;
+  private targetA: WebGLRenderTarget | null;
+  private targetB: WebGLRenderTarget | null;
+  private depthTexture: DepthTexture | null;
+  private readonly geometry: BufferGeometry;
+  private readonly material: RawShaderMaterial;
+  private readonly mesh: Mesh<RawShaderMaterial>;
+  private readonly camera: OrthographicCamera;
+  private _outputColorSpace: string | null;
+  private _outputToneMapping: ToneMapping | null;
+  private _isCompositing: boolean;
+  private _savedToneMapping: ToneMapping | undefined;
+  private _savedRenderTarget: WebGLRenderTarget | null;
+  private _savedActiveCubeFace: number;
+  private _savedActiveMipmapLevel: number;
+  private _isActive: boolean;
+  private _effects: WebGLOutputEffect[];
+  private _hasRenderPass: boolean;
+
+  constructor(type: TextureType, width: number, height: number, antialias: boolean, depth: boolean, stencil: boolean) {
+    this.depth = depth;
+    this.stencil = stencil;
+    // render target for the scene pass (potentially multisampled)
+    this.targetScene = new WebGLRenderTarget(width, height, {
+      type: type,
+      depthBuffer: depth,
+      stencilBuffer: stencil,
+      samples: antialias ? 4 : 0,
+      storeMultisampledDepthBuffer: false,
+      storeMultisampledStencilBuffer: false,
+      resolveDepthBuffer: false,
+      resolveStencilBuffer: false,
+    });
+    // single-sampled ping-pong buffers for post-processing effects, allocated on demand
+    this.targetA = null;
+    this.targetB = null;
+    // scene depth for effects with needsDepthTexture set to true, allocated on demand
+    this.depthTexture = null;
+    // create fullscreen triangle geometry
+    this.geometry = new BufferGeometry();
+    this.geometry.setAttribute("position", new Float32BufferAttribute([-1, 3, 0, -1, -1, 0, 3, -1, 0], 3));
+    this.geometry.setAttribute("uv", new Float32BufferAttribute([0, 2, 0, 0, 2, 0], 2));
+    // create output material with tone mapping support
+    this.material = new RawShaderMaterial({
+      uniforms: {
+        tDiffuse: { value: null },
+      },
+      vertexShader: /* glsl */ `
 			precision highp float;
 
 			uniform mat4 modelViewMatrix;
@@ -93,48 +110,59 @@ export function WebGLOutput(
 				vUv = uv;
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 			}`,
-    fragmentShader:
-      /* glsl */ "\n\t\t\tprecision highp float;\n\n\t\t\tuniform sampler2D tDiffuse;\n\n\t\t\tvarying vec2 vUv;\n\n" +
-      chunk_tonemapping_pars_fragment_chunk.get() +
-      "\n" +
-      chunk_colorspace_pars_fragment +
-      "\n\n\t\t\tvoid main() {\n\t\t\t\tgl_FragColor = texture2D( tDiffuse, vUv );\n\n\t\t\t\t#ifdef LINEAR_TONE_MAPPING\n\t\t\t\t\tgl_FragColor.rgb = LinearToneMapping( gl_FragColor.rgb );\n\t\t\t\t#elif defined( REINHARD_TONE_MAPPING )\n\t\t\t\t\tgl_FragColor.rgb = ReinhardToneMapping( gl_FragColor.rgb );\n\t\t\t\t#elif defined( CINEON_TONE_MAPPING )\n\t\t\t\t\tgl_FragColor.rgb = CineonToneMapping( gl_FragColor.rgb );\n\t\t\t\t#elif defined( ACES_FILMIC_TONE_MAPPING )\n\t\t\t\t\tgl_FragColor.rgb = ACESFilmicToneMapping( gl_FragColor.rgb );\n\t\t\t\t#elif defined( AGX_TONE_MAPPING )\n\t\t\t\t\tgl_FragColor.rgb = AgXToneMapping( gl_FragColor.rgb );\n\t\t\t\t#elif defined( NEUTRAL_TONE_MAPPING )\n\t\t\t\t\tgl_FragColor.rgb = NeutralToneMapping( gl_FragColor.rgb );\n\t\t\t\t#elif defined( CUSTOM_TONE_MAPPING )\n\t\t\t\t\tgl_FragColor.rgb = CustomToneMapping( gl_FragColor.rgb );\n\t\t\t\t#endif\n\n\t\t\t\t#ifdef SRGB_TRANSFER\n\t\t\t\t\tgl_FragColor = sRGBTransferOETF( gl_FragColor );\n\t\t\t\t#endif\n\t\t\t}",
-    depthTest: false,
-    depthWrite: false,
-  });
-  const mesh = new Mesh(geometry, material);
-  const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  let _outputColorSpace: any = null;
-  let _outputToneMapping: any = null;
-  let _isCompositing = false;
-  let _savedToneMapping: any;
-  let _savedRenderTarget: any = null;
-  let _savedActiveCubeFace = 0;
-  let _savedActiveMipmapLevel = 0;
-  let _isActive = false;
-  let _effects: WebGLOutputEffect[] = [];
-  let _hasRenderPass = false;
-  function setSize(width: number, height: number): void {
-    targetScene.setSize(width, height);
-    if (targetA !== null) targetA.setSize(width, height);
-    if (targetB !== null) targetB.setSize(width, height);
-    for (let i = 0; i < _effects.length; i++) {
-      const effect = _effects[i];
+      fragmentShader:
+        /* glsl */ "\n\t\t\tprecision highp float;\n\n\t\t\tuniform sampler2D tDiffuse;\n\n\t\t\tvarying vec2 vUv;\n\n" +
+        chunk_tonemapping_pars_fragment_chunk.get() +
+        "\n" +
+        chunk_colorspace_pars_fragment +
+        "\n\n\t\t\tvoid main() {\n\t\t\t\tgl_FragColor = texture2D( tDiffuse, vUv );\n\n\t\t\t\t#ifdef LINEAR_TONE_MAPPING\n\t\t\t\t\tgl_FragColor.rgb = LinearToneMapping( gl_FragColor.rgb );\n\t\t\t\t#elif defined( REINHARD_TONE_MAPPING )\n\t\t\t\t\tgl_FragColor.rgb = ReinhardToneMapping( gl_FragColor.rgb );\n\t\t\t\t#elif defined( CINEON_TONE_MAPPING )\n\t\t\t\t\tgl_FragColor.rgb = CineonToneMapping( gl_FragColor.rgb );\n\t\t\t\t#elif defined( ACES_FILMIC_TONE_MAPPING )\n\t\t\t\t\tgl_FragColor.rgb = ACESFilmicToneMapping( gl_FragColor.rgb );\n\t\t\t\t#elif defined( AGX_TONE_MAPPING )\n\t\t\t\t\tgl_FragColor.rgb = AgXToneMapping( gl_FragColor.rgb );\n\t\t\t\t#elif defined( NEUTRAL_TONE_MAPPING )\n\t\t\t\t\tgl_FragColor.rgb = NeutralToneMapping( gl_FragColor.rgb );\n\t\t\t\t#elif defined( CUSTOM_TONE_MAPPING )\n\t\t\t\t\tgl_FragColor.rgb = CustomToneMapping( gl_FragColor.rgb );\n\t\t\t\t#endif\n\n\t\t\t\t#ifdef SRGB_TRANSFER\n\t\t\t\t\tgl_FragColor = sRGBTransferOETF( gl_FragColor );\n\t\t\t\t#endif\n\t\t\t}",
+      depthTest: false,
+      depthWrite: false,
+    });
+    this.mesh = new Mesh(this.geometry, this.material);
+    this.camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    this._outputColorSpace = null;
+    this._outputToneMapping = null;
+    this._isCompositing = false;
+    this._savedToneMapping = undefined;
+    this._savedRenderTarget = null;
+    this._savedActiveCubeFace = 0;
+    this._savedActiveMipmapLevel = 0;
+    this._isActive = false;
+    this._effects = [];
+    this._hasRenderPass = false;
+    this.setSize = this.setSize.bind(this);
+    this.setEffects = this.setEffects.bind(this);
+    this.begin = this.begin.bind(this);
+    this.hasRenderPass = this.hasRenderPass.bind(this);
+    this.end = this.end.bind(this);
+    this.isCompositing = this.isCompositing.bind(this);
+    this.restore = this.restore.bind(this);
+    this.dispose = this.dispose.bind(this);
+  }
+
+  setSize(width: number, height: number): void {
+    this.targetScene.setSize(width, height);
+    if (this.targetA !== null) this.targetA.setSize(width, height);
+    if (this.targetB !== null) this.targetB.setSize(width, height);
+    for (let i = 0; i < this._effects.length; i++) {
+      const effect = this._effects[i];
       if (effect.setSize) effect.setSize(width, height);
     }
   }
-  function setEffects(effects: WebGLOutputEffect[]): void {
-    _effects = effects;
-    _hasRenderPass = _effects.length > 0 && _effects[0].isRenderPass === true;
-    const width = targetScene.width;
-    const height = targetScene.height;
-    if (_effects.length > 0 && targetA === null) {
-      targetA = new WebGLRenderTarget(width, height, {
+
+  setEffects(effects: WebGLOutputEffect[]): void {
+    this._effects = effects;
+    this._hasRenderPass = this._effects.length > 0 && this._effects[0].isRenderPass === true;
+    const width = this.targetScene.width;
+    const height = this.targetScene.height;
+    if (this._effects.length > 0 && this.targetA === null) {
+      this.targetA = new WebGLRenderTarget(width, height, {
         type: TextureType.HalfFloat,
         depthBuffer: false,
         stencilBuffer: false,
       });
-      targetB = new WebGLRenderTarget(width, height, {
+      this.targetB = new WebGLRenderTarget(width, height, {
         type: TextureType.HalfFloat,
         depthBuffer: false,
         stencilBuffer: false,
@@ -142,115 +170,121 @@ export function WebGLOutput(
     }
     // only store and resolve the scene depth if an effect reads it
     const needsDepthTexture =
-      depth === true && _effects.some((effect: WebGLOutputEffect) => effect.needsDepthTexture === true);
-    if (needsDepthTexture !== (targetScene.depthTexture !== null)) {
-      if (needsDepthTexture === true && depthTexture === null) {
-        depthTexture = new DepthTexture(width, height);
-        if (stencil === true) {
-          depthTexture.format = PixelFormat.DepthStencil;
-          depthTexture.type = TextureType.UnsignedInt248;
+      this.depth === true && this._effects.some((effect: WebGLOutputEffect) => effect.needsDepthTexture === true);
+    if (needsDepthTexture !== (this.targetScene.depthTexture !== null)) {
+      if (needsDepthTexture === true && this.depthTexture === null) {
+        this.depthTexture = new DepthTexture(width, height);
+        if (this.stencil === true) {
+          this.depthTexture.format = PixelFormat.DepthStencil;
+          this.depthTexture.type = TextureType.UnsignedInt248;
         }
       }
       // release GPU resources so the scene target is rebuilt with the new depth setup
-      targetScene.dispose();
-      targetScene.depthTexture = needsDepthTexture ? depthTexture : null;
-      targetScene.resolveDepthBuffer = needsDepthTexture;
-      targetScene.storeMultisampledDepthBuffer = needsDepthTexture;
+      this.targetScene.dispose();
+      this.targetScene.depthTexture = needsDepthTexture ? this.depthTexture : null;
+      this.targetScene.resolveDepthBuffer = needsDepthTexture;
+      this.targetScene.storeMultisampledDepthBuffer = needsDepthTexture;
     }
-    for (let i = 0; i < _effects.length; i++) {
-      const effect = _effects[i];
+    for (let i = 0; i < this._effects.length; i++) {
+      const effect = this._effects[i];
       if (effect.setSize) effect.setSize(width, height);
       if (needsDepthTexture && effect.needsDepthTexture === true && effect.setDepthTexture)
-        effect.setDepthTexture(depthTexture);
+        effect.setDepthTexture(this.depthTexture!);
     }
   }
-  function begin(renderer: WebGLRenderer, renderTarget: WebGLRenderTarget | null) {
+
+  begin(renderer: WebGLRenderer, renderTarget: WebGLRenderTarget | null): boolean {
     // Don't begin during compositing phase (post-processing effects call render())
-    if (_isActive) return false;
-    if (renderer.toneMapping === ToneMapping.No && _effects.length === 0) return false;
+    if (this._isActive) return false;
+    if (renderer.toneMapping === ToneMapping.No && this._effects.length === 0) return false;
     try {
-      _savedRenderTarget = renderTarget;
-      _savedToneMapping = renderer.toneMapping;
-      _savedActiveCubeFace = renderer.getActiveCubeFace();
-      _savedActiveMipmapLevel = renderer.getActiveMipmapLevel();
-      _isActive = true;
+      this._savedRenderTarget = renderTarget;
+      this._savedToneMapping = renderer.toneMapping;
+      this._savedActiveCubeFace = renderer.getActiveCubeFace();
+      this._savedActiveMipmapLevel = renderer.getActiveMipmapLevel();
+      this._isActive = true;
       // resize internal buffers to match render target
       if (renderTarget !== null) {
         const width = renderTarget.width;
         const height = renderTarget.height;
-        if (targetScene.width !== width || targetScene.height !== height) {
-          setSize(width, height);
+        if (this.targetScene.width !== width || this.targetScene.height !== height) {
+          this.setSize(width, height);
         }
       }
       // if the first effect is a RenderPass, it renders the scene itself (see end())
-      if (_hasRenderPass === false) {
-        renderer.setRenderTarget(targetScene);
+      if (this._hasRenderPass === false) {
+        renderer.setRenderTarget(this.targetScene);
       }
       // disable tone mapping during render - it will be applied in end()
       renderer.toneMapping = ToneMapping.No;
       return true;
-    } catch (error: any) {
-      restore(renderer);
+    } catch (error: unknown) {
+      this.restore(renderer);
       throw error;
     }
   }
-  function hasRenderPass() {
-    return _hasRenderPass;
+
+  hasRenderPass(): boolean {
+    return this._hasRenderPass;
   }
-  function end(renderer: WebGLRenderer, deltaTime?: number): void {
+
+  end(renderer: WebGLRenderer, deltaTime?: number): void {
     try {
       // restore tone mapping
-      renderer.toneMapping = _savedToneMapping;
-      _isCompositing = true;
+      renderer.toneMapping = this._savedToneMapping!;
+      this._isCompositing = true;
       // run post-processing effects - the scene lives in the multisampled targetScene,
       // effects ping-pong between the single-sampled targetA and targetB
-      let readBuffer = targetScene;
-      let writeBuffer = targetA;
-      for (let i = 0; i < _effects.length; i++) {
-        const effect = _effects[i];
+      let readBuffer = this.targetScene;
+      let writeBuffer = this.targetA;
+      for (let i = 0; i < this._effects.length; i++) {
+        const effect = this._effects[i];
         if (effect.enabled === false) continue;
-        effect.render(renderer, writeBuffer, readBuffer, deltaTime);
+        effect.render(renderer, writeBuffer!, readBuffer, deltaTime);
         if (effect.needsSwap !== false) {
           // keep targetScene out of the rotation so only the scene pass is multisampled
-          readBuffer = writeBuffer;
-          writeBuffer = writeBuffer === targetA ? targetB : targetA;
+          readBuffer = writeBuffer!;
+          writeBuffer = writeBuffer === this.targetA ? this.targetB : this.targetA;
         }
       }
       // update output material defines if settings changed
-      if (_outputColorSpace !== renderer.outputColorSpace || _outputToneMapping !== renderer.toneMapping) {
-        _outputColorSpace = renderer.outputColorSpace;
-        _outputToneMapping = renderer.toneMapping;
-        material.defines = {};
-        if (ColorManagement.getTransfer(_outputColorSpace) === Transfer.SRGB) material.defines.SRGB_TRANSFER = "";
-        const toneMapping = (toneMappingMap as any)[_outputToneMapping];
-        if (toneMapping) material.defines[toneMapping] = "";
-        material.needsUpdate = true;
+      if (this._outputColorSpace !== renderer.outputColorSpace || this._outputToneMapping !== renderer.toneMapping) {
+        this._outputColorSpace = renderer.outputColorSpace;
+        this._outputToneMapping = renderer.toneMapping;
+        this.material.defines = {};
+        if (ColorManagement.getTransfer(this._outputColorSpace) === Transfer.SRGB)
+          this.material.defines.SRGB_TRANSFER = "";
+        const toneMapping = toneMappingMap[this._outputToneMapping];
+        if (toneMapping) this.material.defines[toneMapping] = "";
+        this.material.needsUpdate = true;
       }
       // final output to canvas or render target
-      material.uniforms.tDiffuse.value = readBuffer.texture;
-      renderer.setRenderTarget(_savedRenderTarget, _savedActiveCubeFace, _savedActiveMipmapLevel);
-      renderer.render(mesh, camera);
+      this.material.uniforms.tDiffuse.value = readBuffer.texture;
+      renderer.setRenderTarget(this._savedRenderTarget, this._savedActiveCubeFace, this._savedActiveMipmapLevel);
+      renderer.render(this.mesh, this.camera);
     } finally {
-      restore(renderer);
+      this.restore(renderer);
     }
   }
-  function isCompositing() {
-    return _isCompositing;
+
+  isCompositing(): boolean {
+    return this._isCompositing;
   }
-  function dispose(): void {
-    targetScene.dispose();
-    if (targetA !== null) targetA.dispose();
-    if (targetB !== null) targetB.dispose();
-    geometry.dispose();
-    material.dispose();
+
+  dispose(): void {
+    this.targetScene.dispose();
+    if (this.targetA !== null) this.targetA.dispose();
+    if (this.targetB !== null) this.targetB.dispose();
+    this.geometry.dispose();
+    this.material.dispose();
   }
-  function restore(renderer: WebGLRenderer): void {
-    if (!_isActive) return;
-    renderer.toneMapping = _savedToneMapping;
-    _isCompositing = false;
-    _isActive = false;
-    renderer.setRenderTarget(_savedRenderTarget, _savedActiveCubeFace, _savedActiveMipmapLevel);
-    _savedRenderTarget = null;
+
+  restore(renderer: WebGLRenderer): void {
+    if (!this._isActive) return;
+    renderer.toneMapping = this._savedToneMapping!;
+    this._isCompositing = false;
+    this._isActive = false;
+    renderer.setRenderTarget(this._savedRenderTarget, this._savedActiveCubeFace, this._savedActiveMipmapLevel);
+    this._savedRenderTarget = null;
   }
-  return { setSize, setEffects, begin, hasRenderPass, end, isCompositing, restore, dispose };
 }

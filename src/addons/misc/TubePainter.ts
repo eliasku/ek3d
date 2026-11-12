@@ -17,36 +17,96 @@ export interface TubePainterInstance {
   update(): void;
 }
 
-export const TubePainter = function (): TubePainterInstance {
-  const BUFFER_SIZE = 1000000 * 3;
+export class TubePainter implements TubePainterInstance {
+  mesh: Mesh<MeshStandardMaterial>;
+  private positions: BufferAttribute;
+  private normals: BufferAttribute;
+  private colors: BufferAttribute;
+  private geometry: BufferGeometry;
+  private normalMatrix: Matrix3;
+  private normalMatrix1: Matrix3;
+  private normalMatrix2: Matrix3;
+  private vector: Vector3;
+  private vector1: Vector3;
+  private vector2: Vector3;
+  private vector3: Vector3;
+  private vector4: Vector3;
+  private color1: Color;
+  private color2: Color;
+  private size1: number;
+  private size2: number;
+  private direction: Vector3;
+  private normal: Vector3;
+  private side: Vector3;
+  private point1: Vector3;
+  private point2: Vector3;
+  private matrix1: Matrix4;
+  private matrix2: Matrix4;
+  private lastNormal: Vector3;
+  private prevDirection: Vector3;
+  private rotationAxis: Vector3;
+  private isFirstSegment: boolean;
+  private endCapStartIndex: number | null;
+  private endCapVertexCount: number;
+  private count: number;
 
-  const positions = new BufferAttribute(new Float32Array(BUFFER_SIZE), 3);
-  positions.usage = BufferUsage.DynamicDraw;
+  constructor() {
+    const BUFFER_SIZE = 1000000 * 3;
 
-  const normals = new BufferAttribute(new Float32Array(BUFFER_SIZE), 3);
-  normals.usage = BufferUsage.DynamicDraw;
+    this.positions = new BufferAttribute(new Float32Array(BUFFER_SIZE), 3);
+    this.positions.usage = BufferUsage.DynamicDraw;
 
-  const colors = new BufferAttribute(new Float32Array(BUFFER_SIZE), 3);
-  colors.usage = BufferUsage.DynamicDraw;
+    this.normals = new BufferAttribute(new Float32Array(BUFFER_SIZE), 3);
+    this.normals.usage = BufferUsage.DynamicDraw;
 
-  const geometry = new BufferGeometry();
-  geometry.setAttribute("position", positions);
-  geometry.setAttribute("normal", normals);
-  geometry.setAttribute("color", colors);
-  geometry.drawRange.count = 0;
+    this.colors = new BufferAttribute(new Float32Array(BUFFER_SIZE), 3);
+    this.colors.usage = BufferUsage.DynamicDraw;
 
-  const material = new MeshStandardMaterial({ vertexColors: true });
+    this.geometry = new BufferGeometry();
+    this.geometry.setAttribute("position", this.positions);
+    this.geometry.setAttribute("normal", this.normals);
+    this.geometry.setAttribute("color", this.colors);
+    this.geometry.drawRange.count = 0;
 
-  const mesh = new Mesh<MeshStandardMaterial>(geometry, material);
-  mesh.frustumCulled = false;
+    const material = new MeshStandardMaterial({ vertexColors: true });
+    this.mesh = new Mesh<MeshStandardMaterial>(this.geometry, material);
+    this.mesh.frustumCulled = false;
 
-  const normalMatrix = new Matrix3();
-  const normalMatrix1 = new Matrix3();
-  const normalMatrix2 = new Matrix3();
+    this.normalMatrix = new Matrix3();
+    this.normalMatrix1 = new Matrix3();
+    this.normalMatrix2 = new Matrix3();
+    this.vector = new Vector3();
+    this.vector1 = new Vector3();
+    this.vector2 = new Vector3();
+    this.vector3 = new Vector3();
+    this.vector4 = new Vector3();
+    this.color1 = new Color(0xffffff);
+    this.color2 = new Color(0xffffff);
+    this.size1 = 1;
+    this.size2 = 1;
+    this.direction = new Vector3();
+    this.normal = new Vector3();
+    this.side = new Vector3();
+    this.point1 = new Vector3();
+    this.point2 = new Vector3();
+    this.matrix1 = new Matrix4();
+    this.matrix2 = new Matrix4();
+    this.lastNormal = new Vector3();
+    this.prevDirection = new Vector3();
+    this.rotationAxis = new Vector3();
+    this.isFirstSegment = true;
+    this.endCapStartIndex = null;
+    this.endCapVertexCount = 0;
+    this.count = 0;
 
-  //
+    this.moveTo = this.moveTo.bind(this);
+    this.lineTo = this.lineTo.bind(this);
+    this.setSize = this.setSize.bind(this);
+    this.setColor = this.setColor.bind(this);
+    this.update = this.update.bind(this);
+  }
 
-  function getPoints(size: number) {
+  private getPoints(size: number): Vector3[] {
     const PI2 = Math.PI * 2;
 
     const sides = 15;
@@ -61,31 +121,16 @@ export const TubePainter = function (): TubePainterInstance {
     return array;
   }
 
-  //
+  private addCap(position: Vector3, matrix: Matrix4, isEndCap: boolean, capSize: number): void {
+    let count = this.geometry.drawRange.count;
 
-  const vector = new Vector3();
-
-  const vector1 = new Vector3();
-  const vector2 = new Vector3();
-  const vector3 = new Vector3();
-  const vector4 = new Vector3();
-
-  const color1 = new Color(0xffffff);
-  const color2 = new Color(0xffffff);
-
-  let size1 = 1;
-  let size2 = 1;
-
-  function addCap(position: Vector3, matrix: Matrix4, isEndCap: boolean, capSize: number) {
-    let count = geometry.drawRange.count;
-
-    const points = getPoints(capSize);
+    const points = this.getPoints(capSize);
     const sides = points.length;
     const radius = 0.01 * capSize;
     const latSegments = 4;
     const directionSign = isEndCap ? -1 : 1;
 
-    normalMatrix.getNormalMatrix(matrix);
+    this.normalMatrix.getNormalMatrix(matrix);
 
     for (let lat = 0; lat < latSegments; lat++) {
       const phi1 = (lat / latSegments) * Math.PI * 0.5;
@@ -116,87 +161,87 @@ export const TubePainter = function (): TubePainterInstance {
         const y4 = Math.cos(theta2) * r2;
 
         // Transform to world space
-        vector1.set(x1, y1, z1).applyMatrix4(matrix).add(position);
-        vector2.set(x2, y2, z1).applyMatrix4(matrix).add(position);
-        vector3.set(x3, y3, z2).applyMatrix4(matrix).add(position);
-        vector4.set(x4, y4, z2).applyMatrix4(matrix).add(position);
+        this.vector1.set(x1, y1, z1).applyMatrix4(matrix).add(position);
+        this.vector2.set(x2, y2, z1).applyMatrix4(matrix).add(position);
+        this.vector3.set(x3, y3, z2).applyMatrix4(matrix).add(position);
+        this.vector4.set(x4, y4, z2).applyMatrix4(matrix).add(position);
 
         // First triangle
-        normal.set(x1, y1, z1).applyNormalMatrix(normalMatrix);
-        vector.set(x2, y2, z1).applyNormalMatrix(normalMatrix);
-        side.set(x3, y3, z2).applyNormalMatrix(normalMatrix);
+        this.normal.set(x1, y1, z1).applyNormalMatrix(this.normalMatrix);
+        this.vector.set(x2, y2, z1).applyNormalMatrix(this.normalMatrix);
+        this.side.set(x3, y3, z2).applyNormalMatrix(this.normalMatrix);
 
         if (isEndCap) {
-          vector1.toArray(positions.array, count * 3);
-          vector2.toArray(positions.array, (count + 1) * 3);
-          vector3.toArray(positions.array, (count + 2) * 3);
+          this.vector1.toArray(this.positions.array, count * 3);
+          this.vector2.toArray(this.positions.array, (count + 1) * 3);
+          this.vector3.toArray(this.positions.array, (count + 2) * 3);
 
-          normal.toArray(normals.array, count * 3);
-          vector.toArray(normals.array, (count + 1) * 3);
-          side.toArray(normals.array, (count + 2) * 3);
+          this.normal.toArray(this.normals.array, count * 3);
+          this.vector.toArray(this.normals.array, (count + 1) * 3);
+          this.side.toArray(this.normals.array, (count + 2) * 3);
         } else {
-          vector1.toArray(positions.array, count * 3);
-          vector3.toArray(positions.array, (count + 1) * 3);
-          vector2.toArray(positions.array, (count + 2) * 3);
+          this.vector1.toArray(this.positions.array, count * 3);
+          this.vector3.toArray(this.positions.array, (count + 1) * 3);
+          this.vector2.toArray(this.positions.array, (count + 2) * 3);
 
-          normal.toArray(normals.array, count * 3);
-          side.toArray(normals.array, (count + 1) * 3);
-          vector.toArray(normals.array, (count + 2) * 3);
+          this.normal.toArray(this.normals.array, count * 3);
+          this.side.toArray(this.normals.array, (count + 1) * 3);
+          this.vector.toArray(this.normals.array, (count + 2) * 3);
         }
 
-        color1.toArray(colors.array, count * 3);
-        color1.toArray(colors.array, (count + 1) * 3);
-        color1.toArray(colors.array, (count + 2) * 3);
+        this.color1.toArray(this.colors.array, count * 3);
+        this.color1.toArray(this.colors.array, (count + 1) * 3);
+        this.color1.toArray(this.colors.array, (count + 2) * 3);
 
         count += 3;
 
         // Second triangle
         if (r2 > 0.001) {
-          normal.set(x2, y2, z1).applyNormalMatrix(normalMatrix);
-          vector.set(x4, y4, z2).applyNormalMatrix(normalMatrix);
-          side.set(x3, y3, z2).applyNormalMatrix(normalMatrix);
+          this.normal.set(x2, y2, z1).applyNormalMatrix(this.normalMatrix);
+          this.vector.set(x4, y4, z2).applyNormalMatrix(this.normalMatrix);
+          this.side.set(x3, y3, z2).applyNormalMatrix(this.normalMatrix);
 
           if (isEndCap) {
-            vector2.toArray(positions.array, count * 3);
-            vector4.toArray(positions.array, (count + 1) * 3);
-            vector3.toArray(positions.array, (count + 2) * 3);
+            this.vector2.toArray(this.positions.array, count * 3);
+            this.vector4.toArray(this.positions.array, (count + 1) * 3);
+            this.vector3.toArray(this.positions.array, (count + 2) * 3);
 
-            normal.toArray(normals.array, count * 3);
-            vector.toArray(normals.array, (count + 1) * 3);
-            side.toArray(normals.array, (count + 2) * 3);
+            this.normal.toArray(this.normals.array, count * 3);
+            this.vector.toArray(this.normals.array, (count + 1) * 3);
+            this.side.toArray(this.normals.array, (count + 2) * 3);
           } else {
-            vector3.toArray(positions.array, count * 3);
-            vector4.toArray(positions.array, (count + 1) * 3);
-            vector2.toArray(positions.array, (count + 2) * 3);
+            this.vector3.toArray(this.positions.array, count * 3);
+            this.vector4.toArray(this.positions.array, (count + 1) * 3);
+            this.vector2.toArray(this.positions.array, (count + 2) * 3);
 
-            side.toArray(normals.array, count * 3);
-            vector.toArray(normals.array, (count + 1) * 3);
-            normal.toArray(normals.array, (count + 2) * 3);
+            this.side.toArray(this.normals.array, count * 3);
+            this.vector.toArray(this.normals.array, (count + 1) * 3);
+            this.normal.toArray(this.normals.array, (count + 2) * 3);
           }
 
-          color1.toArray(colors.array, count * 3);
-          color1.toArray(colors.array, (count + 1) * 3);
-          color1.toArray(colors.array, (count + 2) * 3);
+          this.color1.toArray(this.colors.array, count * 3);
+          this.color1.toArray(this.colors.array, (count + 1) * 3);
+          this.color1.toArray(this.colors.array, (count + 2) * 3);
 
           count += 3;
         }
       }
     }
 
-    geometry.drawRange.count = count;
+    this.geometry.drawRange.count = count;
   }
 
-  function updateEndCap(position: Vector3, matrix: Matrix4, capSize: number) {
-    if (endCapStartIndex === null) return;
+  private updateEndCap(position: Vector3, matrix: Matrix4, capSize: number): void {
+    if (this.endCapStartIndex === null) return;
 
-    const points = getPoints(capSize);
+    const points = this.getPoints(capSize);
     const sides = points.length;
     const radius = 0.01 * capSize;
     const latSegments = 4;
 
-    normalMatrix.getNormalMatrix(matrix);
+    this.normalMatrix.getNormalMatrix(matrix);
 
-    let count = endCapStartIndex;
+    let count = this.endCapStartIndex;
 
     for (let lat = 0; lat < latSegments; lat++) {
       const phi1 = (lat / latSegments) * Math.PI * 0.5;
@@ -227,76 +272,76 @@ export const TubePainter = function (): TubePainterInstance {
         const y4 = Math.cos(theta2) * r2;
 
         // Transform positions to world space
-        vector1.set(x1, y1, z1).applyMatrix4(matrix).add(position);
-        vector2.set(x2, y2, z1).applyMatrix4(matrix).add(position);
-        vector3.set(x3, y3, z2).applyMatrix4(matrix).add(position);
-        vector4.set(x4, y4, z2).applyMatrix4(matrix).add(position);
+        this.vector1.set(x1, y1, z1).applyMatrix4(matrix).add(position);
+        this.vector2.set(x2, y2, z1).applyMatrix4(matrix).add(position);
+        this.vector3.set(x3, y3, z2).applyMatrix4(matrix).add(position);
+        this.vector4.set(x4, y4, z2).applyMatrix4(matrix).add(position);
 
         // Transform normals to world space
-        normal.set(x1, y1, z1).applyNormalMatrix(normalMatrix);
-        vector.set(x2, y2, z1).applyNormalMatrix(normalMatrix);
-        side.set(x3, y3, z2).applyNormalMatrix(normalMatrix);
+        this.normal.set(x1, y1, z1).applyNormalMatrix(this.normalMatrix);
+        this.vector.set(x2, y2, z1).applyNormalMatrix(this.normalMatrix);
+        this.side.set(x3, y3, z2).applyNormalMatrix(this.normalMatrix);
 
         // First triangle
-        vector1.toArray(positions.array, count * 3);
-        vector2.toArray(positions.array, (count + 1) * 3);
-        vector3.toArray(positions.array, (count + 2) * 3);
+        this.vector1.toArray(this.positions.array, count * 3);
+        this.vector2.toArray(this.positions.array, (count + 1) * 3);
+        this.vector3.toArray(this.positions.array, (count + 2) * 3);
 
-        normal.toArray(normals.array, count * 3);
-        vector.toArray(normals.array, (count + 1) * 3);
-        side.toArray(normals.array, (count + 2) * 3);
+        this.normal.toArray(this.normals.array, count * 3);
+        this.vector.toArray(this.normals.array, (count + 1) * 3);
+        this.side.toArray(this.normals.array, (count + 2) * 3);
 
-        color1.toArray(colors.array, count * 3);
-        color1.toArray(colors.array, (count + 1) * 3);
-        color1.toArray(colors.array, (count + 2) * 3);
+        this.color1.toArray(this.colors.array, count * 3);
+        this.color1.toArray(this.colors.array, (count + 1) * 3);
+        this.color1.toArray(this.colors.array, (count + 2) * 3);
 
         count += 3;
 
         // Second triangle
         if (r2 > 0.001) {
-          normal.set(x2, y2, z1).applyNormalMatrix(normalMatrix);
-          vector.set(x4, y4, z2).applyNormalMatrix(normalMatrix);
-          side.set(x3, y3, z2).applyNormalMatrix(normalMatrix);
+          this.normal.set(x2, y2, z1).applyNormalMatrix(this.normalMatrix);
+          this.vector.set(x4, y4, z2).applyNormalMatrix(this.normalMatrix);
+          this.side.set(x3, y3, z2).applyNormalMatrix(this.normalMatrix);
 
-          vector2.toArray(positions.array, count * 3);
-          vector4.toArray(positions.array, (count + 1) * 3);
-          vector3.toArray(positions.array, (count + 2) * 3);
+          this.vector2.toArray(this.positions.array, count * 3);
+          this.vector4.toArray(this.positions.array, (count + 1) * 3);
+          this.vector3.toArray(this.positions.array, (count + 2) * 3);
 
-          normal.toArray(normals.array, count * 3);
-          vector.toArray(normals.array, (count + 1) * 3);
-          side.toArray(normals.array, (count + 2) * 3);
+          this.normal.toArray(this.normals.array, count * 3);
+          this.vector.toArray(this.normals.array, (count + 1) * 3);
+          this.side.toArray(this.normals.array, (count + 2) * 3);
 
-          color1.toArray(colors.array, count * 3);
-          color1.toArray(colors.array, (count + 1) * 3);
-          color1.toArray(colors.array, (count + 2) * 3);
+          this.color1.toArray(this.colors.array, count * 3);
+          this.color1.toArray(this.colors.array, (count + 1) * 3);
+          this.color1.toArray(this.colors.array, (count + 2) * 3);
 
           count += 3;
         }
       }
     }
 
-    positions.addUpdateRange(endCapStartIndex * 3, endCapVertexCount * 3);
-    normals.addUpdateRange(endCapStartIndex * 3, endCapVertexCount * 3);
-    colors.addUpdateRange(endCapStartIndex * 3, endCapVertexCount * 3);
+    this.positions.addUpdateRange(this.endCapStartIndex * 3, this.endCapVertexCount * 3);
+    this.normals.addUpdateRange(this.endCapStartIndex * 3, this.endCapVertexCount * 3);
+    this.colors.addUpdateRange(this.endCapStartIndex * 3, this.endCapVertexCount * 3);
   }
 
-  function stroke(
+  private stroke(
     position1: Vector3,
     position2: Vector3,
     matrix1: Matrix4,
     matrix2: Matrix4,
     size1: number,
     size2: number,
-  ) {
+  ): void {
     if (position1.distanceToSquared(position2) === 0) return;
 
-    let count = geometry.drawRange.count;
+    let count = this.geometry.drawRange.count;
 
-    const points1 = getPoints(size1);
-    const points2 = getPoints(size2);
+    const points1 = this.getPoints(size1);
+    const points2 = this.getPoints(size2);
 
-    normalMatrix1.getNormalMatrix(matrix1);
-    normalMatrix2.getNormalMatrix(matrix2);
+    this.normalMatrix1.getNormalMatrix(matrix1);
+    this.normalMatrix2.getNormalMatrix(matrix2);
 
     for (let i = 0, il = points2.length; i < il; i++) {
       const vertex1_2 = points2[i];
@@ -304,201 +349,164 @@ export const TubePainter = function (): TubePainterInstance {
       const vertex1_1 = points1[i];
       const vertex2_1 = points1[(i + 1) % il];
 
-      vector1.copy(vertex1_2).applyMatrix4(matrix2).add(position2);
-      vector2.copy(vertex2_2).applyMatrix4(matrix2).add(position2);
-      vector3.copy(vertex2_1).applyMatrix4(matrix1).add(position1);
-      vector4.copy(vertex1_1).applyMatrix4(matrix1).add(position1);
+      this.vector1.copy(vertex1_2).applyMatrix4(matrix2).add(position2);
+      this.vector2.copy(vertex2_2).applyMatrix4(matrix2).add(position2);
+      this.vector3.copy(vertex2_1).applyMatrix4(matrix1).add(position1);
+      this.vector4.copy(vertex1_1).applyMatrix4(matrix1).add(position1);
 
-      vector1.toArray(positions.array, (count + 0) * 3);
-      vector2.toArray(positions.array, (count + 1) * 3);
-      vector4.toArray(positions.array, (count + 2) * 3);
+      this.vector1.toArray(this.positions.array, (count + 0) * 3);
+      this.vector2.toArray(this.positions.array, (count + 1) * 3);
+      this.vector4.toArray(this.positions.array, (count + 2) * 3);
 
-      vector2.toArray(positions.array, (count + 3) * 3);
-      vector3.toArray(positions.array, (count + 4) * 3);
-      vector4.toArray(positions.array, (count + 5) * 3);
+      this.vector2.toArray(this.positions.array, (count + 3) * 3);
+      this.vector3.toArray(this.positions.array, (count + 4) * 3);
+      this.vector4.toArray(this.positions.array, (count + 5) * 3);
 
-      vector1.copy(vertex1_2).applyNormalMatrix(normalMatrix2);
-      vector2.copy(vertex2_2).applyNormalMatrix(normalMatrix2);
-      vector3.copy(vertex2_1).applyNormalMatrix(normalMatrix1);
-      vector4.copy(vertex1_1).applyNormalMatrix(normalMatrix1);
+      this.vector1.copy(vertex1_2).applyNormalMatrix(this.normalMatrix2);
+      this.vector2.copy(vertex2_2).applyNormalMatrix(this.normalMatrix2);
+      this.vector3.copy(vertex2_1).applyNormalMatrix(this.normalMatrix1);
+      this.vector4.copy(vertex1_1).applyNormalMatrix(this.normalMatrix1);
 
-      vector1.toArray(normals.array, (count + 0) * 3);
-      vector2.toArray(normals.array, (count + 1) * 3);
-      vector4.toArray(normals.array, (count + 2) * 3);
+      this.vector1.toArray(this.normals.array, (count + 0) * 3);
+      this.vector2.toArray(this.normals.array, (count + 1) * 3);
+      this.vector4.toArray(this.normals.array, (count + 2) * 3);
 
-      vector2.toArray(normals.array, (count + 3) * 3);
-      vector3.toArray(normals.array, (count + 4) * 3);
-      vector4.toArray(normals.array, (count + 5) * 3);
+      this.vector2.toArray(this.normals.array, (count + 3) * 3);
+      this.vector3.toArray(this.normals.array, (count + 4) * 3);
+      this.vector4.toArray(this.normals.array, (count + 5) * 3);
 
-      color2.toArray(colors.array, (count + 0) * 3);
-      color2.toArray(colors.array, (count + 1) * 3);
-      color1.toArray(colors.array, (count + 2) * 3);
+      this.color2.toArray(this.colors.array, (count + 0) * 3);
+      this.color2.toArray(this.colors.array, (count + 1) * 3);
+      this.color1.toArray(this.colors.array, (count + 2) * 3);
 
-      color2.toArray(colors.array, (count + 3) * 3);
-      color1.toArray(colors.array, (count + 4) * 3);
-      color1.toArray(colors.array, (count + 5) * 3);
+      this.color2.toArray(this.colors.array, (count + 3) * 3);
+      this.color1.toArray(this.colors.array, (count + 4) * 3);
+      this.color1.toArray(this.colors.array, (count + 5) * 3);
 
       count += 6;
     }
 
-    geometry.drawRange.count = count;
+    this.geometry.drawRange.count = count;
   }
 
-  //
-
-  const direction = new Vector3();
-  const normal = new Vector3();
-  const side = new Vector3();
-
-  const point1 = new Vector3();
-  const point2 = new Vector3();
-
-  const matrix1 = new Matrix4();
-  const matrix2 = new Matrix4();
-
-  const lastNormal = new Vector3();
-  const prevDirection = new Vector3();
-  const rotationAxis = new Vector3();
-
-  let isFirstSegment = true;
-
-  let endCapStartIndex: number | null = null;
-  let endCapVertexCount = 0;
-
-  function calculateRMF() {
-    if (isFirstSegment === true) {
-      if (Math.abs(direction.y) < 0.99) {
-        vector.copy(direction).multiplyScalar(direction.y);
-        normal.set(0, 1, 0).sub(vector).normalize();
+  private calculateRMF(): void {
+    if (this.isFirstSegment === true) {
+      if (Math.abs(this.direction.y) < 0.99) {
+        this.vector.copy(this.direction).multiplyScalar(this.direction.y);
+        this.normal.set(0, 1, 0).sub(this.vector).normalize();
       } else {
-        vector.copy(direction).multiplyScalar(direction.x);
-        normal.set(1, 0, 0).sub(vector).normalize();
+        this.vector.copy(this.direction).multiplyScalar(this.direction.x);
+        this.normal.set(1, 0, 0).sub(this.vector).normalize();
       }
     } else {
-      rotationAxis.crossVectors(prevDirection, direction);
+      this.rotationAxis.crossVectors(this.prevDirection, this.direction);
 
-      const rotAxisLength = rotationAxis.length();
+      const rotAxisLength = this.rotationAxis.length();
 
       if (rotAxisLength > 0.0001) {
-        rotationAxis.divideScalar(rotAxisLength);
-        vector.addVectors(prevDirection, direction);
-        const c1 = -2.0 / (1.0 + prevDirection.dot(direction));
-        const dot = lastNormal.dot(vector);
-        normal.copy(lastNormal).addScaledVector(vector, c1 * dot);
+        this.rotationAxis.divideScalar(rotAxisLength);
+        this.vector.addVectors(this.prevDirection, this.direction);
+        const c1 = -2.0 / (1.0 + this.prevDirection.dot(this.direction));
+        const dot = this.lastNormal.dot(this.vector);
+        this.normal.copy(this.lastNormal).addScaledVector(this.vector, c1 * dot);
       } else {
-        normal.copy(lastNormal);
+        this.normal.copy(this.lastNormal);
       }
     }
 
-    side.crossVectors(direction, normal).normalize();
-    normal.crossVectors(side, direction).normalize();
+    this.side.crossVectors(this.direction, this.normal).normalize();
+    this.normal.crossVectors(this.side, this.direction).normalize();
 
-    if (isFirstSegment === false) {
+    if (this.isFirstSegment === false) {
       const smoothFactor = 0.3;
 
-      normal.lerp(lastNormal, smoothFactor).normalize();
-      side.crossVectors(direction, normal).normalize();
-      normal.crossVectors(side, direction).normalize();
+      this.normal.lerp(this.lastNormal, smoothFactor).normalize();
+      this.side.crossVectors(this.direction, this.normal).normalize();
+      this.normal.crossVectors(this.side, this.direction).normalize();
     }
 
-    lastNormal.copy(normal);
-    prevDirection.copy(direction);
+    this.lastNormal.copy(this.normal);
+    this.prevDirection.copy(this.direction);
 
-    matrix1.makeBasis(side, normal, vector.copy(direction).negate());
+    this.matrix1.makeBasis(this.side, this.normal, this.vector.copy(this.direction).negate());
   }
 
-  function moveTo(position: Vector3) {
-    point2.copy(position);
+  moveTo(position: Vector3): void {
+    this.point2.copy(position);
 
-    lastNormal.set(0, 1, 0);
+    this.lastNormal.set(0, 1, 0);
 
-    isFirstSegment = true;
+    this.isFirstSegment = true;
 
-    endCapStartIndex = null;
-    endCapVertexCount = 0;
+    this.endCapStartIndex = null;
+    this.endCapVertexCount = 0;
   }
 
-  function lineTo(position: Vector3) {
-    point1.copy(position);
+  lineTo(position: Vector3): void {
+    this.point1.copy(position);
 
-    direction.subVectors(point1, point2);
+    this.direction.subVectors(this.point1, this.point2);
 
-    const length = direction.length();
+    const length = this.direction.length();
 
     if (length === 0) return;
 
-    direction.normalize();
+    this.direction.normalize();
 
-    calculateRMF();
+    this.calculateRMF();
 
-    if (isFirstSegment === true) {
-      color2.copy(color1);
-      size2 = size1;
+    if (this.isFirstSegment === true) {
+      this.color2.copy(this.color1);
+      this.size2 = this.size1;
 
-      matrix2.copy(matrix1);
+      this.matrix2.copy(this.matrix1);
 
-      addCap(point2, matrix2, false, size2);
+      this.addCap(this.point2, this.matrix2, false, this.size2);
 
       // End cap is added immediately after start cap and updated in-place
-      endCapStartIndex = geometry.drawRange.count;
-      addCap(point1, matrix1, true, size1);
-      endCapVertexCount = geometry.drawRange.count - endCapStartIndex;
+      this.endCapStartIndex = this.geometry.drawRange.count;
+      this.addCap(this.point1, this.matrix1, true, this.size1);
+      this.endCapVertexCount = this.geometry.drawRange.count - this.endCapStartIndex;
     }
 
-    stroke(point1, point2, matrix1, matrix2, size1, size2);
+    this.stroke(this.point1, this.point2, this.matrix1, this.matrix2, this.size1, this.size2);
 
-    updateEndCap(point1, matrix1, size1);
+    this.updateEndCap(this.point1, this.matrix1, this.size1);
 
-    point2.copy(point1);
-    matrix2.copy(matrix1);
+    this.point2.copy(this.point1);
+    this.matrix2.copy(this.matrix1);
 
-    color2.copy(color1);
-    size2 = size1;
+    this.color2.copy(this.color1);
+    this.size2 = this.size1;
 
-    isFirstSegment = false;
+    this.isFirstSegment = false;
   }
 
-  function setSize(value: number) {
-    size1 = value;
+  setSize(value: number): void {
+    this.size1 = value;
   }
 
-  function setColor(value: Color) {
-    color1.copy(value);
+  setColor(value: Color): void {
+    this.color1.copy(value);
   }
 
   //
 
-  let count = 0;
-
-  function update() {
-    const start = count;
-    const end = geometry.drawRange.count;
+  update(): void {
+    const start = this.count;
+    const end = this.geometry.drawRange.count;
 
     if (start === end) return;
 
-    positions.addUpdateRange(start * 3, (end - start) * 3);
-    positions.needsUpdate = true;
+    this.positions.addUpdateRange(start * 3, (end - start) * 3);
+    this.positions.needsUpdate = true;
 
-    normals.addUpdateRange(start * 3, (end - start) * 3);
-    normals.needsUpdate = true;
+    this.normals.addUpdateRange(start * 3, (end - start) * 3);
+    this.normals.needsUpdate = true;
 
-    colors.addUpdateRange(start * 3, (end - start) * 3);
-    colors.needsUpdate = true;
+    this.colors.addUpdateRange(start * 3, (end - start) * 3);
+    this.colors.needsUpdate = true;
 
-    count = end;
+    this.count = end;
   }
-
-  return {
-    mesh: mesh,
-
-    moveTo: moveTo,
-
-    lineTo: lineTo,
-
-    setSize: setSize,
-
-    setColor: setColor,
-
-    update: update,
-  };
-} as { (): TubePainterInstance; new (): TubePainterInstance };
+}

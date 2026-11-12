@@ -1,21 +1,45 @@
 import { GL } from "../../GL";
-export function WebGLAttributes(gl?: any) {
-  const buffers = new WeakMap<any, any>();
-  function createBuffer(attribute?: any, bufferType?: any) {
+import type { BufferAttribute, Float16BufferAttribute } from "../../core/BufferAttribute";
+import type { GLBufferAttribute } from "../../core/GLBufferAttribute";
+import type { InterleavedBuffer } from "../../core/InterleavedBuffer";
+import type { InterleavedBufferAttribute } from "../../core/InterleavedBufferAttribute";
+
+type Attribute = BufferAttribute | GLBufferAttribute | InterleavedBuffer | InterleavedBufferAttribute;
+
+export interface AttributeBuffer {
+  buffer: WebGLBuffer | null;
+  type: number;
+  bytesPerElement: number;
+  version: number;
+  size?: number;
+}
+export class WebGLAttributes {
+  private gl: WebGL2RenderingContext;
+  private buffers: WeakMap<Attribute, AttributeBuffer>;
+
+  constructor(gl: WebGL2RenderingContext) {
+    this.gl = gl;
+    this.buffers = new WeakMap();
+    this.get = this.get.bind(this);
+    this.remove = this.remove.bind(this);
+    this.update = this.update.bind(this);
+  }
+  private createBuffer(attribute: BufferAttribute | InterleavedBuffer, bufferType: number): AttributeBuffer {
     const array = attribute.array;
     const usage = attribute.usage;
     const size = array.byteLength;
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(bufferType, buffer);
-    gl.bufferData(bufferType, array, usage);
-    attribute.onUploadCallback();
-    let type: any;
+    const buffer = this.gl.createBuffer();
+    this.gl.bindBuffer(bufferType, buffer);
+    this.gl.bufferData(bufferType, array, usage);
+    const uploadable: { onUploadCallback(): void } = attribute;
+    uploadable.onUploadCallback();
+    let type: number;
     if (array instanceof Float32Array) {
       type = GL.FLOAT;
     } else if (typeof Float16Array !== "undefined" && array instanceof Float16Array) {
       type = GL.HALF_FLOAT;
     } else if (array instanceof Uint16Array) {
-      if (attribute.isFloat16BufferAttribute) {
+      if ((attribute as Float16BufferAttribute).isFloat16BufferAttribute) {
         type = GL.HALF_FLOAT;
       } else {
         type = GL.UNSIGNED_SHORT;
@@ -43,13 +67,17 @@ export function WebGLAttributes(gl?: any) {
       size: size,
     };
   }
-  function updateBuffer(buffer?: any, attribute?: any, bufferType?: any) {
+  private updateBuffer(
+    buffer: WebGLBuffer | null,
+    attribute: BufferAttribute | InterleavedBuffer,
+    bufferType: number,
+  ): void {
     const array = attribute.array;
     const updateRanges = attribute.updateRanges;
-    gl.bindBuffer(bufferType, buffer);
+    this.gl.bindBuffer(bufferType, buffer);
     if (updateRanges.length === 0) {
       // Not using update ranges
-      gl.bufferSubData(bufferType, 0, array);
+      this.gl.bufferSubData(bufferType, 0, array);
     } else {
       // Before applying update ranges, we merge any adjacent / overlapping
       // ranges to reduce load on `gl.bufferSubData`. Empirically, this has led
@@ -59,7 +87,7 @@ export function WebGLAttributes(gl?: any) {
       // Note that to reduce garbage collection between frames, we merge the
       // update ranges in-place. This is safe because this method will clear the
       // update ranges once updated.
-      updateRanges.sort((a?: any, b?: any) => a.start - b.start);
+      updateRanges.sort((a, b) => a.start - b.start);
       // To merge the update ranges in-place, we work from left to right in the
       // existing updateRanges array, merging ranges. This may result in a final
       // array which is smaller than the original. This index tracks the last
@@ -82,55 +110,55 @@ export function WebGLAttributes(gl?: any) {
       updateRanges.length = mergeIndex + 1;
       for (let i = 0, l = updateRanges.length; i < l; i++) {
         const range = updateRanges[i];
-        gl.bufferSubData(bufferType, range.start * array.BYTES_PER_ELEMENT, array, range.start, range.count);
+        this.gl.bufferSubData(bufferType, range.start * array.BYTES_PER_ELEMENT, array, range.start, range.count);
       }
       attribute.clearUpdateRanges();
     }
-    attribute.onUploadCallback();
+    const uploadable: { onUploadCallback(): void } = attribute;
+    uploadable.onUploadCallback();
   }
-  //
-  function get(attribute?: any) {
-    if (attribute.isInterleavedBufferAttribute) attribute = attribute.data;
-    return buffers.get(attribute);
+  get(attribute: Attribute): AttributeBuffer | undefined {
+    if ((attribute as InterleavedBufferAttribute).isInterleavedBufferAttribute)
+      attribute = (attribute as InterleavedBufferAttribute).data;
+    return this.buffers.get(attribute);
   }
-  function remove(attribute?: any) {
-    if (attribute.isInterleavedBufferAttribute) attribute = attribute.data;
-    const data = buffers.get(attribute);
+  remove(attribute: Attribute): void {
+    if ((attribute as InterleavedBufferAttribute).isInterleavedBufferAttribute)
+      attribute = (attribute as InterleavedBufferAttribute).data;
+    const data = this.buffers.get(attribute);
     if (data) {
-      gl.deleteBuffer(data.buffer);
-      buffers.delete(attribute);
+      this.gl.deleteBuffer(data.buffer);
+      this.buffers.delete(attribute);
     }
   }
-  function update(attribute?: any, bufferType?: any) {
-    if (attribute.isInterleavedBufferAttribute) attribute = attribute.data;
-    if (attribute.isGLBufferAttribute) {
-      const cached = buffers.get(attribute);
-      if (!cached || cached.version < attribute.version) {
-        buffers.set(attribute, {
-          buffer: attribute.buffer,
-          type: attribute.type,
-          bytesPerElement: attribute.elementSize,
-          version: attribute.version,
+  update(attribute: Attribute, bufferType: number): void {
+    if ((attribute as InterleavedBufferAttribute).isInterleavedBufferAttribute)
+      attribute = (attribute as InterleavedBufferAttribute).data;
+    if ((attribute as GLBufferAttribute).isGLBufferAttribute) {
+      const glAttribute = attribute as GLBufferAttribute;
+      const cached = this.buffers.get(attribute);
+      if (!cached || cached.version < glAttribute.version) {
+        this.buffers.set(attribute, {
+          buffer: glAttribute.buffer,
+          type: glAttribute.type,
+          bytesPerElement: glAttribute.elementSize,
+          version: glAttribute.version,
         });
       }
       return;
     }
-    const data = buffers.get(attribute);
+    const bufferAttribute = attribute as BufferAttribute | InterleavedBuffer;
+    const data = this.buffers.get(attribute);
     if (data === undefined) {
-      buffers.set(attribute, createBuffer(attribute, bufferType));
-    } else if (data.version < attribute.version) {
-      if (data.size !== attribute.array.byteLength) {
+      this.buffers.set(attribute, this.createBuffer(bufferAttribute, bufferType));
+    } else if (data.version < bufferAttribute.version) {
+      if (data.size !== bufferAttribute.array.byteLength) {
         throw new Error(
           "THREE.WebGLAttributes: The size of the buffer attribute's array buffer does not match the original size. Resizing buffer attributes is not supported.",
         );
       }
-      updateBuffer(data.buffer, attribute, bufferType);
-      data.version = attribute.version;
+      this.updateBuffer(data.buffer, bufferAttribute, bufferType);
+      data.version = bufferAttribute.version;
     }
   }
-  return {
-    get: get,
-    remove: remove,
-    update: update,
-  };
 }

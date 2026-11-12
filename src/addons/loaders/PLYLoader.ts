@@ -84,9 +84,66 @@ interface PlyBuffer {
 
 type PlyElementValues = Record<string, number | number[]>;
 
-interface BinaryReader {
-  read(at: number): number;
+class BinaryReader {
   size: number;
+  private body: DataView;
+  private littleEndian: boolean;
+  private getter: (at: number, littleEndian?: boolean) => number;
+
+  constructor(type: PlyScalarType, body: DataView, littleEndian: boolean) {
+    this.body = body;
+    this.littleEndian = littleEndian;
+    switch (type) {
+      // correspondences for non-specific length types here match rply:
+      case "int8":
+      case "char":
+        this.getter = body.getInt8;
+        this.size = 1;
+        break;
+      case "uint8":
+      case "uchar":
+        this.getter = body.getUint8;
+        this.size = 1;
+        break;
+      case "int16":
+      case "short":
+        this.getter = body.getInt16;
+        this.size = 2;
+        break;
+      case "uint16":
+      case "ushort":
+        this.getter = body.getUint16;
+        this.size = 2;
+        break;
+      case "int32":
+      case "int":
+        this.getter = body.getInt32;
+        this.size = 4;
+        break;
+      case "uint32":
+      case "uint":
+        this.getter = body.getUint32;
+        this.size = 4;
+        break;
+      case "float32":
+      case "float":
+        this.getter = body.getFloat32;
+        this.size = 4;
+        break;
+      case "float64":
+      case "double":
+        this.getter = body.getFloat64;
+        this.size = 8;
+        break;
+      default:
+        throw new TypeError(`PLYLoader: Unsupported binary type "${String(type)}".`);
+    }
+    this.read = this.read.bind(this);
+  }
+
+  read(at: number): number {
+    return this.getter.call(this.body, at, this.littleEndian);
+  }
 }
 
 interface BinaryPropertyReaders {
@@ -813,42 +870,13 @@ export class PLYLoader extends Loader<BufferGeometry, string> {
       body: DataView,
       littleEndian: boolean,
     ): BinaryPropertyReaders[] {
-      function getBinaryReader(type: PlyScalarType): BinaryReader {
-        switch (type) {
-          // correspondences for non-specific length types here match rply:
-          case "int8":
-          case "char":
-            return { read: (at: number) => body.getInt8(at), size: 1 };
-          case "uint8":
-          case "uchar":
-            return { read: (at: number) => body.getUint8(at), size: 1 };
-          case "int16":
-          case "short":
-            return { read: (at: number) => body.getInt16(at, littleEndian), size: 2 };
-          case "uint16":
-          case "ushort":
-            return { read: (at: number) => body.getUint16(at, littleEndian), size: 2 };
-          case "int32":
-          case "int":
-            return { read: (at: number) => body.getInt32(at, littleEndian), size: 4 };
-          case "uint32":
-          case "uint":
-            return { read: (at: number) => body.getUint32(at, littleEndian), size: 4 };
-          case "float32":
-          case "float":
-            return { read: (at: number) => body.getFloat32(at, littleEndian), size: 4 };
-          case "float64":
-          case "double":
-            return { read: (at: number) => body.getFloat64(at, littleEndian), size: 8 };
-          default:
-            throw new TypeError(`PLYLoader: Unsupported binary type "${String(type)}".`);
-        }
-      }
-
       return properties.map((property) =>
         property.type === "list"
-          ? { count: getBinaryReader(property.countType), value: getBinaryReader(property.itemType) }
-          : { value: getBinaryReader(property.type) },
+          ? {
+              count: new BinaryReader(property.countType, body, littleEndian),
+              value: new BinaryReader(property.itemType, body, littleEndian),
+            }
+          : { value: new BinaryReader(property.type, body, littleEndian) },
       );
     }
 

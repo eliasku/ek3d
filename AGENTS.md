@@ -16,3 +16,5 @@ Apply these rules to project-owned TypeScript, including directly maintained `sr
 5. Keep useful JSDoc examples current with this package's API and canonical imports. Convert JavaScript examples to valid TypeScript and use the `typescript` fence instead of `js` or `javascript`; changing the fence alone is not sufficient when the example needs code changes.
 
 `src/` is the maintained implementation, not generated output. Apply changes directly there, using diffs against the pinned upstream commit to evaluate updates. There is no repeat-conversion workflow or ownership lock. Keep upstream read-only for provenance and differential tests. Keep formatting, type, behavior, package-graph and standard-browser checks; a formatter alone cannot validate field semantics or example correctness.
+
+- Use classes with initialized private instance fields and prototype methods instead of stateful closure factories returning method objects; migrate construction sites to `new` and preserve behavior, including detached callbacks.

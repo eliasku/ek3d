@@ -84,7 +84,7 @@ function runtime(): RapierRuntime {
 test("Rapier preserves instance rotation and scale and removes all bodies without disposing meshes", () => {
   vi.useFakeTimers();
   try {
-    const physics = RapierPhysics(runtime());
+    const physics = new RapierPhysics(runtime());
     const world = physics.world as unknown as World;
     const geometry = new BoxGeometry();
     const material = new MeshBasicMaterial();
@@ -122,7 +122,7 @@ test("Rapier preserves instance rotation and scale and removes all bodies withou
 test("Rapier tracks fixed meshes and heightfields for removal and disposal", () => {
   vi.useFakeTimers();
   try {
-    const physics = RapierPhysics(runtime());
+    const physics = new RapierPhysics(runtime());
     const world = physics.world as unknown as World;
     const mesh = new Mesh(new BoxGeometry(), new MeshBasicMaterial());
     const terrain = new Mesh(new BoxGeometry(), new MeshBasicMaterial());

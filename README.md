@@ -56,7 +56,8 @@ Classes that need runtime prototypes can opt out with class-level `@class-crashe
 Extracted math method calls need concrete receiver types in implementations, not just overloads.
 Narrow math unions with runtime tag guards before concrete calls; do not cast tag probes to a class.
 Keep native property descriptors when restoring those types.
-Call object-returning factories directly; keep typed construct signatures for genuine constructors.
+Construct stateful subsystem and physics classes with `new`; renderer `create*` options take constructors.
+Plain-data factories remain callable functions.
 Use concrete constructors and return types in clone methods, without constructor or result assertions.
 The class-crashed build still needs the full example/browser/device matrix.
 

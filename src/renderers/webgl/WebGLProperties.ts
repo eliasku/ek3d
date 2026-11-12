@@ -1,30 +1,36 @@
-export function WebGLProperties() {
-  let properties = new WeakMap<any, any>();
-  function has(object?: any) {
-    return properties.has(object);
+export class WebGLProperties {
+  private properties: WeakMap<object, Record<string, any>> = new WeakMap();
+
+  constructor() {
+    this.has = this.has.bind(this);
+    this.get = this.get.bind(this);
+    this.remove = this.remove.bind(this);
+    this.update = this.update.bind(this);
+    this.dispose = this.dispose.bind(this);
   }
-  function get(object?: any) {
-    let map = properties.get(object);
+
+  has(object: object): boolean {
+    return this.properties.has(object);
+  }
+
+  get<T extends object = Record<string, any>>(object: object): T {
+    let map = this.properties.get(object);
     if (map === undefined) {
       map = {};
-      properties.set(object, map);
+      this.properties.set(object, map);
     }
-    return map;
+    return map as T;
   }
-  function remove(object?: any) {
-    properties.delete(object);
+
+  remove(object: object): void {
+    this.properties.delete(object);
   }
-  function update(object?: any, key?: any, value?: any) {
-    properties.get(object)[key] = value;
+
+  update(object: object, key: string, value: unknown): void {
+    this.properties.get(object)![key] = value;
   }
-  function dispose() {
-    properties = new WeakMap();
+
+  dispose(): void {
+    this.properties = new WeakMap();
   }
-  return {
-    has: has,
-    get: get,
-    remove: remove,
-    update: update,
-    dispose: dispose,
-  };
 }

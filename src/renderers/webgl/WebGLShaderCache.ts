@@ -1,13 +1,16 @@
+import type { Material } from "../../materials/Material";
+import type { ShaderMaterial } from "../../materials/ShaderMaterial";
+
 let _id = 0;
 export class WebGLShaderCache {
-  shaderCache: any;
-  materialCache: any;
+  shaderCache: Map<string, WebGLShaderStage>;
+  materialCache: Map<Material, Set<WebGLShaderStage>>;
 
   constructor() {
     this.shaderCache = new Map();
     this.materialCache = new Map();
   }
-  update(material: any, vertexShaderStage: any, fragmentShaderStage?: any) {
+  update(material: Material, vertexShaderStage: WebGLShaderStage, fragmentShaderStage: WebGLShaderStage) {
     const materialShaders = this._getShaderCacheForMaterial(material);
     if (materialShaders.has(vertexShaderStage) === false) {
       materialShaders.add(vertexShaderStage);
@@ -19,8 +22,8 @@ export class WebGLShaderCache {
     }
     return this;
   }
-  remove(material?: any) {
-    const materialShaders = this.materialCache.get(material);
+  remove(material: Material) {
+    const materialShaders = this.materialCache.get(material)!;
     for (const shaderStage of materialShaders) {
       shaderStage.usedTimes--;
       if (shaderStage.usedTimes === 0) this.shaderCache.delete(shaderStage.code);
@@ -28,17 +31,17 @@ export class WebGLShaderCache {
     this.materialCache.delete(material);
     return this;
   }
-  getVertexShaderStage(material?: any) {
+  getVertexShaderStage(material: Pick<ShaderMaterial, "vertexShader">) {
     return this._getShaderStage(material.vertexShader);
   }
-  getFragmentShaderStage(material?: any) {
+  getFragmentShaderStage(material: Pick<ShaderMaterial, "fragmentShader">) {
     return this._getShaderStage(material.fragmentShader);
   }
   dispose() {
     this.shaderCache.clear();
     this.materialCache.clear();
   }
-  _getShaderCacheForMaterial(material?: any) {
+  _getShaderCacheForMaterial(material: Material) {
     const cache = this.materialCache;
     let set = cache.get(material);
     if (set === undefined) {
@@ -47,7 +50,7 @@ export class WebGLShaderCache {
     }
     return set;
   }
-  _getShaderStage(code?: any) {
+  _getShaderStage(code: string) {
     const cache = this.shaderCache;
     let stage = cache.get(code);
     if (stage === undefined) {
@@ -59,10 +62,10 @@ export class WebGLShaderCache {
 }
 class WebGLShaderStage {
   id: number;
-  code: any;
+  code: string;
   usedTimes: number;
 
-  constructor(code?: any) {
+  constructor(code: string) {
     this.id = _id++;
     this.code = code;
     this.usedTimes = 0;

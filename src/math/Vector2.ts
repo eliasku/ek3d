@@ -611,7 +611,9 @@ export class Vector2 {
    * @param [offset=0] - Index of the first element in the array.
    * @return The vector components.
    */
-  toArray(array: number[] = [], offset: number = 0): number[] {
+  toArray(array?: number[], offset?: number): number[];
+  toArray<T extends number[] | BufferAttribute["array"]>(array: T, offset?: number): T;
+  toArray(array: number[] | BufferAttribute["array"] = [], offset: number = 0): number[] | BufferAttribute["array"] {
     array[offset] = this.x;
     array[offset + 1] = this.y;
     return array;

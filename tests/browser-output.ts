@@ -51,23 +51,23 @@ export async function verifyOutputLifecycle() {
   const capturedTargets = new Set<WebGLRenderTarget>();
   let sceneTarget: WebGLRenderTarget | null = null;
   let beginCount = 0;
-  const createOutput: typeof WebGLOutput = (...args) => {
-    const system = WebGLOutput(...args);
-    const begin = system.begin.bind(system);
-    system.begin = (owner, target) => {
-      const active = begin(owner, target);
+  class CapturedOutput extends WebGLOutput {
+    constructor(...args: ConstructorParameters<typeof WebGLOutput>) {
+      super(...args);
+      outputs.push(this);
+    }
+    override begin(owner: WebGLRenderer, target: WebGLRenderTarget | null): boolean {
+      const active = super.begin(owner, target);
       if (active) {
         beginCount++;
-        if (!system.hasRenderPass()) sceneTarget = owner.getRenderTarget();
+        if (!this.hasRenderPass()) sceneTarget = owner.getRenderTarget();
       }
       return active;
-    };
-    outputs.push(system);
-    return system;
-  };
+    }
+  }
   const renderer = new WebGLRenderer({
     shaders,
-    createOutput,
+    createOutput: CapturedOutput,
     outputBufferType: TextureType.Float,
     antialias: false,
     depth: true,
@@ -255,7 +255,7 @@ export async function verifyOutputLifecycle() {
     );
     check(
       currentSceneTarget().depthTexture !== null &&
-        gl.isTexture(renderer.properties.get(currentSceneTarget().depthTexture).__webglTexture),
+        gl.isTexture(renderer.properties.get(currentSceneTarget().depthTexture!).__webglTexture),
       "Depth effect has no GPU depth texture",
     );
     const effectBuffers = [first.read, first.write, second.write];

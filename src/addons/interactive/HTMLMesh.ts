@@ -45,48 +45,54 @@ interface TextStyle {
 /** Canvases are reused between renders because a resized canvas allocation is expensive. */
 const canvases = new WeakMap<HTMLElement, HTMLCanvasElement>();
 
-function createClipper(context: CanvasRenderingContext2D): { add(clip: Clip): void; remove(): void } {
-  const clips: Clip[] = [];
-  let isClipping = false;
+class Clipper {
+  private context: CanvasRenderingContext2D;
+  private clips: Clip[] = [];
+  private isClipping: boolean = false;
 
-  function doClip(): void {
-    if (isClipping) {
-      isClipping = false;
-      context.restore();
+  constructor(context: CanvasRenderingContext2D) {
+    this.context = context;
+    this.add = this.add.bind(this);
+    this.remove = this.remove.bind(this);
+  }
+
+  private doClip(): void {
+    if (this.isClipping) {
+      this.isClipping = false;
+      this.context.restore();
     }
 
-    if (clips.length === 0) return;
+    if (this.clips.length === 0) return;
 
     let minX = -Infinity,
       minY = -Infinity;
     let maxX = Infinity,
       maxY = Infinity;
 
-    for (const clip of clips) {
+    for (const clip of this.clips) {
       minX = Math.max(minX, clip.x);
       minY = Math.max(minY, clip.y);
       maxX = Math.min(maxX, clip.x + clip.width);
       maxY = Math.min(maxY, clip.y + clip.height);
     }
 
-    context.save();
-    context.beginPath();
-    context.rect(minX, minY, maxX - minX, maxY - minY);
-    context.clip();
+    this.context.save();
+    this.context.beginPath();
+    this.context.rect(minX, minY, maxX - minX, maxY - minY);
+    this.context.clip();
 
-    isClipping = true;
+    this.isClipping = true;
   }
 
-  return {
-    add(clip: Clip): void {
-      clips.push(clip);
-      doClip();
-    },
-    remove(): void {
-      clips.pop();
-      doClip();
-    },
-  };
+  add(clip: Clip): void {
+    this.clips.push(clip);
+    this.doClip();
+  }
+
+  remove(): void {
+    this.clips.pop();
+    this.doClip();
+  }
 }
 
 /**
@@ -400,7 +406,7 @@ function html2canvas(element: HTMLElement): HTMLCanvasElement {
   if (contextOrNull === null) throw new Error("HTMLMesh requires a 2D canvas context to rasterize the DOM element.");
   const context: CanvasRenderingContext2D = contextOrNull;
 
-  const clipper = createClipper(context);
+  const clipper = new Clipper(context);
 
   context.clearRect(0, 0, canvas.width, canvas.height);
 

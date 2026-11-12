@@ -1,52 +1,83 @@
 import { GL } from "../../GL";
-export function WebGLObjects(gl?: any, geometries?: any, attributes?: any, bindingStates?: any, info?: any) {
-  let updateMap = new WeakMap<any, any>();
-  const instancedMeshes = new Set<any>();
-  function update(object?: any) {
-    const frame = info.render.frame;
+import type { BufferGeometry } from "../../core/BufferGeometry";
+import type { InstancedMesh } from "../../objects/InstancedMesh";
+import type { Skeleton } from "../../objects/Skeleton";
+import type { SkinnedMesh } from "../../objects/SkinnedMesh";
+import type { WebGLInfoState } from "./WebGLInfo";
+import type { WebGLAttributes } from "./WebGLAttributes";
+import type { WebGLBindingStates } from "./WebGLBindingStates";
+import type { WebGLGeometries } from "./WebGLGeometries";
+
+export class WebGLObjects {
+  private geometries: WebGLGeometries;
+  private attributes: WebGLAttributes;
+  private bindingStates: WebGLBindingStates;
+  private info: WebGLInfoState;
+  private updateMap: WeakMap<BufferGeometry | InstancedMesh | Skeleton, number>;
+  private instancedMeshes: Set<InstancedMesh>;
+
+  constructor(
+    gl: WebGL2RenderingContext,
+    geometries: WebGLGeometries,
+    attributes: WebGLAttributes,
+    bindingStates: WebGLBindingStates,
+    info: WebGLInfoState,
+  ) {
+    this.geometries = geometries;
+    this.attributes = attributes;
+    this.bindingStates = bindingStates;
+    this.info = info;
+    this.updateMap = new WeakMap();
+    this.instancedMeshes = new Set();
+    this.update = this.update.bind(this);
+    this.dispose = this.dispose.bind(this);
+    this.onInstancedMeshDispose = this.onInstancedMeshDispose.bind(this);
+  }
+  update(object: { geometry: BufferGeometry; isInstancedMesh?: boolean; isSkinnedMesh?: boolean }): BufferGeometry {
+    const frame = this.info.render.frame;
     const geometry = object.geometry;
-    const buffergeometry = geometries.get(object, geometry);
+    const buffergeometry = this.geometries.get(object, geometry);
     // Update once per frame
-    if (updateMap.get(buffergeometry) !== frame) {
-      geometries.update(buffergeometry);
-      updateMap.set(buffergeometry, frame);
+    if (this.updateMap.get(buffergeometry) !== frame) {
+      this.geometries.update(buffergeometry);
+      this.updateMap.set(buffergeometry, frame);
     }
     if (object.isInstancedMesh) {
-      if (object.hasEventListener("dispose", onInstancedMeshDispose) === false) {
-        object.addEventListener("dispose", onInstancedMeshDispose);
-        instancedMeshes.add(object);
+      const instancedMesh = object as InstancedMesh;
+      if (instancedMesh.hasEventListener("dispose", this.onInstancedMeshDispose) === false) {
+        instancedMesh.addEventListener("dispose", this.onInstancedMeshDispose);
+        this.instancedMeshes.add(instancedMesh);
       }
-      if (updateMap.get(object) !== frame) {
-        attributes.update(object.instanceMatrix, GL.ARRAY_BUFFER);
-        if (object.instanceColor !== null) {
-          attributes.update(object.instanceColor, GL.ARRAY_BUFFER);
+      if (this.updateMap.get(instancedMesh) !== frame) {
+        this.attributes.update(instancedMesh.instanceMatrix, GL.ARRAY_BUFFER);
+        if (instancedMesh.instanceColor !== null) {
+          this.attributes.update(instancedMesh.instanceColor, GL.ARRAY_BUFFER);
         }
-        updateMap.set(object, frame);
+        this.updateMap.set(instancedMesh, frame);
       }
     }
     if (object.isSkinnedMesh) {
-      const skeleton = object.skeleton;
-      if (updateMap.get(skeleton) !== frame) {
+      const skeleton = (object as SkinnedMesh).skeleton;
+      if (this.updateMap.get(skeleton) !== frame) {
         skeleton.update();
-        updateMap.set(skeleton, frame);
+        this.updateMap.set(skeleton, frame);
       }
     }
     return buffergeometry;
   }
-  function dispose() {
-    for (const object of instancedMeshes) onInstancedMeshDispose.call(object);
-    updateMap = new WeakMap();
+  dispose(): void {
+    for (const object of this.instancedMeshes) this.disposeInstancedMesh(object);
+    this.updateMap = new WeakMap();
   }
-  function onInstancedMeshDispose(this: any) {
-    instancedMeshes.delete(this);
-    updateMap.delete(this);
-    this.removeEventListener("dispose", onInstancedMeshDispose);
-    bindingStates.releaseStatesOfObject(this);
-    attributes.remove(this.instanceMatrix);
-    if (this.instanceColor !== null) attributes.remove(this.instanceColor);
+  private onInstancedMeshDispose(event: { target: InstancedMesh }): void {
+    this.disposeInstancedMesh(event.target);
   }
-  return {
-    update: update,
-    dispose: dispose,
-  };
+  private disposeInstancedMesh(object: InstancedMesh): void {
+    this.instancedMeshes.delete(object);
+    this.updateMap.delete(object);
+    object.removeEventListener("dispose", this.onInstancedMeshDispose);
+    this.bindingStates.releaseStatesOfObject(object);
+    this.attributes.remove(object.instanceMatrix);
+    if (object.instanceColor !== null) this.attributes.remove(object.instanceColor);
+  }
 }

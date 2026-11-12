@@ -1,71 +1,117 @@
 import type { Texture } from "../../textures/Texture";
 import type { Vector3 } from "../../math/Vector3";
 import type { LTCTextures } from "../shaders/LTCTextures";
+import type { WebGLExtensions } from "./WebGLExtensions";
+import type { Camera } from "../../cameras/Camera";
+import type { Object3D } from "../../core/Object3D";
+import type { Light } from "../../lights/Light";
+import type { LightProbeGridWebGL } from "../../addons/lighting/LightProbeGridWebGL";
+import type { WebGLRenderTarget } from "../WebGLRenderTarget";
 import { WebGLLights } from "./WebGLLights";
-function WebGLRenderState(extensions?: any, ltcTextures: LTCTextures | null = null) {
-  const lights = WebGLLights(extensions, ltcTextures);
-  const lightsArray: any[] = [];
-  const shadowsArray: any[] = [];
-  const lightProbeGridArray: any[] = [];
-  const lightProbeGridUniforms = {
-    textures: [] as Texture[],
-    min: [] as Vector3[],
-    max: [] as Vector3[],
-    resolution: [] as Vector3[],
+
+export interface WebGLRenderStateData {
+  lightsArray: Light[];
+  shadowsArray: Light[];
+  lightProbeGridArray: LightProbeGridWebGL[];
+  lightProbeGridUniforms: {
+    textures: Texture[];
+    min: Vector3[];
+    max: Vector3[];
+    resolution: Vector3[];
   };
-  function init(camera?: any) {
-    state.camera = camera;
-    lightsArray.length = 0;
-    shadowsArray.length = 0;
-    lightProbeGridArray.length = 0;
+  camera: Camera | null;
+  lights: WebGLLights;
+  transmissionRenderTarget: Record<number, WebGLRenderTarget | undefined>;
+  textureUnits: number;
+}
+
+class WebGLRenderState {
+  private readonly lights: WebGLLights;
+  private readonly lightsArray: Light[];
+  private readonly shadowsArray: Light[];
+  private readonly lightProbeGridArray: LightProbeGridWebGL[];
+  private readonly lightProbeGridUniforms: WebGLRenderStateData["lightProbeGridUniforms"];
+  private readonly capturedState: WebGLRenderStateData;
+  state: WebGLRenderStateData;
+
+  constructor(extensions: WebGLExtensions, ltcTextures: LTCTextures | null = null) {
+    this.lights = new WebGLLights(extensions, ltcTextures);
+    this.lightsArray = [];
+    this.shadowsArray = [];
+    this.lightProbeGridArray = [];
+    this.lightProbeGridUniforms = {
+      textures: [],
+      min: [],
+      max: [],
+      resolution: [],
+    };
+    this.capturedState = {
+      lightsArray: this.lightsArray,
+      shadowsArray: this.shadowsArray,
+      lightProbeGridArray: this.lightProbeGridArray,
+      lightProbeGridUniforms: this.lightProbeGridUniforms,
+      camera: null,
+      lights: this.lights,
+      transmissionRenderTarget: {},
+      textureUnits: 0,
+    };
+    this.state = this.capturedState;
+    this.init = this.init.bind(this);
+    this.setupLights = this.setupLights.bind(this);
+    this.setupLightsView = this.setupLightsView.bind(this);
+    this.pushLight = this.pushLight.bind(this);
+    this.pushShadow = this.pushShadow.bind(this);
   }
-  function pushLight(light?: any) {
-    if (light.isLightProbeGrid) {
-      lightProbeGridArray.push(light);
+
+  init(camera: Camera) {
+    this.capturedState.camera = camera;
+    this.lightsArray.length = 0;
+    this.shadowsArray.length = 0;
+    this.lightProbeGridArray.length = 0;
+  }
+
+  pushLight(light: Light) {
+    if ((light as LightProbeGridWebGL).isLightProbeGrid) {
+      this.lightProbeGridArray.push(light as LightProbeGridWebGL);
     } else {
-      lightsArray.push(light);
+      this.lightsArray.push(light);
     }
   }
-  function pushShadow(shadowLight?: any) {
-    shadowsArray.push(shadowLight);
+
+  pushShadow(shadowLight: Light) {
+    this.shadowsArray.push(shadowLight);
   }
-  function setupLights() {
-    lights.setup(lightsArray);
-    lightProbeGridArray.sort((a, b) => a.priority - b.priority || a.id - b.id);
+
+  setupLights() {
+    this.lights.setup(this.lightsArray);
+    this.lightProbeGridArray.sort((a, b) => a.priority - b.priority || a.id - b.id);
   }
-  function setupLightsView(camera?: any) {
-    lights.setupView(lightsArray, camera);
+
+  setupLightsView(camera: Camera) {
+    this.lights.setupView(this.lightsArray, camera);
   }
-  const state: any = {
-    lightsArray: lightsArray,
-    shadowsArray: shadowsArray,
-    lightProbeGridArray: lightProbeGridArray,
-    lightProbeGridUniforms: lightProbeGridUniforms,
-    camera: null,
-    lights: lights,
-    transmissionRenderTarget: {},
-    textureUnits: 0,
-  };
-  return {
-    init: init,
-    state: state,
-    setupLights: setupLights,
-    setupLightsView: setupLightsView,
-    pushLight: pushLight,
-    pushShadow: pushShadow,
-  };
 }
-export function WebGLRenderStates(extensions?: any, ltcTextures: LTCTextures | null = null) {
-  let renderStates = new WeakMap<object, ReturnType<typeof WebGLRenderState>[]>();
-  function get(scene?: any, renderCallDepth: number = 0) {
-    const renderStateArray = renderStates.get(scene);
-    let renderState: ReturnType<typeof WebGLRenderState>;
+export class WebGLRenderStates {
+  private readonly extensions: WebGLExtensions;
+  private readonly ltcTextures: LTCTextures | null;
+  private renderStates: WeakMap<object, WebGLRenderState[]> = new WeakMap();
+
+  constructor(extensions: WebGLExtensions, ltcTextures: LTCTextures | null = null) {
+    this.extensions = extensions;
+    this.ltcTextures = ltcTextures;
+    this.get = this.get.bind(this);
+    this.dispose = this.dispose.bind(this);
+  }
+
+  get(scene: Object3D, renderCallDepth: number = 0) {
+    const renderStateArray = this.renderStates.get(scene);
+    let renderState: WebGLRenderState;
     if (renderStateArray === undefined) {
-      renderState = WebGLRenderState(extensions, ltcTextures);
-      renderStates.set(scene, [renderState]);
+      renderState = new WebGLRenderState(this.extensions, this.ltcTextures);
+      this.renderStates.set(scene, [renderState]);
     } else {
       if (renderCallDepth >= renderStateArray.length) {
-        renderState = WebGLRenderState(extensions, ltcTextures);
+        renderState = new WebGLRenderState(this.extensions, this.ltcTextures);
         renderStateArray.push(renderState);
       } else {
         renderState = renderStateArray[renderCallDepth];
@@ -73,11 +119,8 @@ export function WebGLRenderStates(extensions?: any, ltcTextures: LTCTextures | n
     }
     return renderState;
   }
-  function dispose() {
-    renderStates = new WeakMap();
+
+  dispose() {
+    this.renderStates = new WeakMap();
   }
-  return {
-    get: get,
-    dispose: dispose,
-  };
 }

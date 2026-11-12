@@ -1,7 +1,7 @@
 import type { CurveJSON } from "../core/Curve";
 import { Vector3 } from "../../math/Vector3";
 import { Curve } from "../core/Curve";
-function CubicPoly() {
+class CubicPoly {
   /**
    * Centripetal CatmullRom Curve - which is useful for avoiding
    * cusps and self-intersections in non-uniform catmull rom curves.
@@ -19,10 +19,16 @@ function CubicPoly() {
     but for three.js curve use, it could be possible inlined and flatten into a single function call
     which can be placed in CurveUtils.
     */
-  let c0 = 0,
-    c1 = 0,
-    c2 = 0,
-    c3 = 0;
+  private c0: number = 0;
+  private c1: number = 0;
+  private c2: number = 0;
+  private c3: number = 0;
+
+  constructor() {
+    this.initCatmullRom = this.initCatmullRom.bind(this);
+    this.initNonuniformCatmullRom = this.initNonuniformCatmullRom.bind(this);
+    this.calc = this.calc.bind(this);
+  }
   /*
    * Compute coefficients for a cubic polynomial
    *   p(s) = c0 + c1*s + c2*s^2 + c3*s^3
@@ -31,46 +37,47 @@ function CubicPoly() {
    *  and
    *   p'(0) = t0, p'(1) = t1.
    */
-  function init(x0: number, x1: number, t0: number, t1: number): void {
-    c0 = x0;
-    c1 = t0;
-    c2 = -3 * x0 + 3 * x1 - 2 * t0 - t1;
-    c3 = 2 * x0 - 2 * x1 + t0 + t1;
+  private init(x0: number, x1: number, t0: number, t1: number): void {
+    this.c0 = x0;
+    this.c1 = t0;
+    this.c2 = -3 * x0 + 3 * x1 - 2 * t0 - t1;
+    this.c3 = 2 * x0 - 2 * x1 + t0 + t1;
   }
-  return {
-    initCatmullRom: function (x0: number, x1: number, x2: number, x3: number, tension: number): void {
-      init(x1, x2, tension * (x2 - x0), tension * (x3 - x1));
-    },
-    initNonuniformCatmullRom: function (
-      x0: number,
-      x1: number,
-      x2: number,
-      x3: number,
-      dt0: number,
-      dt1: number,
-      dt2: number,
-    ): void {
-      // compute tangents when parameterized in [t1,t2]
-      let t1 = (x1 - x0) / dt0 - (x2 - x0) / (dt0 + dt1) + (x2 - x1) / dt1;
-      let t2 = (x2 - x1) / dt1 - (x3 - x1) / (dt1 + dt2) + (x3 - x2) / dt2;
-      // rescale tangents for parametrization in [0,1]
-      t1 *= dt1;
-      t2 *= dt1;
-      init(x1, x2, t1, t2);
-    },
-    calc: function (t: number): number {
-      const t2 = t * t;
-      const t3 = t2 * t;
-      return c0 + c1 * t + c2 * t2 + c3 * t3;
-    },
-  };
+
+  initCatmullRom(x0: number, x1: number, x2: number, x3: number, tension: number): void {
+    this.init(x1, x2, tension * (x2 - x0), tension * (x3 - x1));
+  }
+
+  initNonuniformCatmullRom(
+    x0: number,
+    x1: number,
+    x2: number,
+    x3: number,
+    dt0: number,
+    dt1: number,
+    dt2: number,
+  ): void {
+    // compute tangents when parameterized in [t1,t2]
+    let t1 = (x1 - x0) / dt0 - (x2 - x0) / (dt0 + dt1) + (x2 - x1) / dt1;
+    let t2 = (x2 - x1) / dt1 - (x3 - x1) / (dt1 + dt2) + (x3 - x2) / dt2;
+    // rescale tangents for parametrization in [0,1]
+    t1 *= dt1;
+    t2 *= dt1;
+    this.init(x1, x2, t1, t2);
+  }
+
+  calc(t: number): number {
+    const t2 = t * t;
+    const t3 = t2 * t;
+    return this.c0 + this.c1 * t + this.c2 * t2 + this.c3 * t3;
+  }
 }
 //
 const tmp = /*@__PURE__*/ new Vector3();
 const tmp2 = /*@__PURE__*/ new Vector3();
-const px = /*@__PURE__*/ CubicPoly();
-const py = /*@__PURE__*/ CubicPoly();
-const pz = /*@__PURE__*/ CubicPoly();
+const px = /*@__PURE__*/ new CubicPoly();
+const py = /*@__PURE__*/ new CubicPoly();
+const pz = /*@__PURE__*/ new CubicPoly();
 /**
  * A curve representing a Catmull-Rom spline.
  *

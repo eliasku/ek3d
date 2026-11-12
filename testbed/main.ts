@@ -24,11 +24,11 @@ import type { SpotLight } from "ek3d/lights/SpotLight";
 import { ToneMapping } from "ek3d/constants";
 import { createRenderer } from "./renderer";
 import { createScene } from "./scene";
-import { createHud } from "./hud";
-import { createAssets } from "./assets";
-import { setupHelpers } from "./helpers";
-import { createCustomShaders } from "./custom-shaders";
-import { createLayerTargets } from "./layer-targets";
+import { Hud } from "./hud";
+import { Assets } from "./assets";
+import { SceneHelpers } from "./helpers";
+import { CustomShaders } from "./custom-shaders";
+import { LayerTargets } from "./layer-targets";
 
 const canvas = document.querySelector<HTMLCanvasElement>("#scene")!;
 const overlay = document.querySelector<HTMLCanvasElement>("#overlay")!;
@@ -191,20 +191,20 @@ try {
       stage.remove(...animationSet);
     },
   });
-  const assets = createAssets(canvas, texturedMaterial, () => {
+  const assets = new Assets(canvas, texturedMaterial, () => {
     draw();
     drawHud();
   });
   resources.push(assets);
   let fogIndex = 0;
-  const help = createHud(overlay);
+  const help = new Hud(overlay);
   const timer = new Timer();
   timer.connect(document);
   resources.push(timer);
   const perspective = new PerspectiveCamera(50, 1, 0.1, 100);
   const orthographic = new OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
   let camera: PerspectiveCamera | OrthographicCamera = perspective;
-  const helpers = setupHelpers(scene, {
+  const helpers = new SceneHelpers(scene, {
     object: reflected,
     camera: perspective,
     directional,
@@ -214,11 +214,11 @@ try {
   });
   resources.push(helpers);
   let helpersVisible = false;
-  const customShaders = createCustomShaders();
+  const customShaders = new CustomShaders();
   scene.add(customShaders.mesh);
   resources.push(customShaders);
   let shaderTime = 0;
-  const layerTargets = createLayerTargets(renderer);
+  const layerTargets = new LayerTargets(renderer);
   scene.add(layerTargets.object);
   resources.push(layerTargets);
   let targetMode = "off";

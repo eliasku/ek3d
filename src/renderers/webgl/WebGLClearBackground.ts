@@ -1,49 +1,71 @@
+import type { Object3D } from "../../core/Object3D";
+import type { Scene } from "../../scenes/Scene";
+import type { WebGLRenderer } from "../WebGLRenderer";
+import type { WebGLBackgroundState } from "./WebGLBackground";
 import { Color } from "../../math/Color";
 import { getUnlitUniformColorSpace } from "../shaders/UniformsUtils";
 const _rgb = { r: 0, g: 0, b: 0 };
 // The color-clear path is independent of textured-background geometry and materials.
-export function WebGLClearBackground(renderer?: any, state?: any, alpha?: any, premultipliedAlpha?: any) {
-  const clearColor = new Color(0x000000);
-  let clearAlpha = alpha === true ? 0 : 1;
-  function render(scene?: any) {
+export class WebGLClearBackground {
+  private readonly renderer: WebGLRenderer;
+  private readonly state: WebGLBackgroundState;
+  private readonly premultipliedAlpha: boolean;
+  private readonly clearColor: Color = new Color(0x000000);
+  private clearAlpha: number;
+
+  constructor(renderer: WebGLRenderer, state: WebGLBackgroundState, alpha: boolean, premultipliedAlpha: boolean) {
+    this.renderer = renderer;
+    this.state = state;
+    this.premultipliedAlpha = premultipliedAlpha;
+    this.clearAlpha = alpha === true ? 0 : 1;
+    this.getClearColor = this.getClearColor.bind(this);
+    this.setClearColor = this.setClearColor.bind(this);
+    this.getClearAlpha = this.getClearAlpha.bind(this);
+    this.setClearAlpha = this.setClearAlpha.bind(this);
+    this.render = this.render.bind(this);
+  }
+
+  render(scene: Object3D): void {
     let forceClear = false;
-    const background = scene.isScene === true ? scene.background : null;
-    if (background !== null && background.isColor !== true)
+    const background = (scene as Scene).isScene === true ? (scene as Scene).background : null;
+    if (background !== null && (background as Color).isColor !== true)
       throw new Error("Textured backgrounds require createBackground.");
     if (background === null) {
-      setClear(clearColor, clearAlpha);
-    } else if (background && background.isColor) {
-      setClear(background, 1);
+      this.setClear(this.clearColor, this.clearAlpha);
+    } else if (background && (background as Color).isColor) {
+      this.setClear(background as Color, 1);
       forceClear = true;
     }
-    if (renderer.autoClear || forceClear) {
+    if (this.renderer.autoClear || forceClear) {
       // buffers might not be writable which is required to ensure a correct clear
-      state.buffers.depth.setTest(true);
-      state.buffers.depth.setMask(true);
-      state.buffers.color.setMask(true);
-      renderer.clear(renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil);
+      this.state.buffers.depth.setTest(true);
+      this.state.buffers.depth.setMask(true);
+      this.state.buffers.color.setMask(true);
+      this.renderer.clear(this.renderer.autoClearColor, this.renderer.autoClearDepth, this.renderer.autoClearStencil);
     }
   }
-  function setClear(color: Color, alpha: number) {
-    color.getRGB(_rgb, getUnlitUniformColorSpace(renderer));
-    state.buffers.color.setClear(_rgb.r, _rgb.g, _rgb.b, alpha, premultipliedAlpha);
+
+  private setClear(color: Color, alpha: number): void {
+    color.getRGB(_rgb, getUnlitUniformColorSpace(this.renderer));
+    this.state.buffers.color.setClear(_rgb.r, _rgb.g, _rgb.b, alpha, this.premultipliedAlpha);
   }
-  return {
-    getClearColor: function () {
-      return clearColor;
-    },
-    setClearColor: function (color?: any, alpha: number = 1) {
-      clearColor.set(color);
-      clearAlpha = alpha;
-      setClear(clearColor, clearAlpha);
-    },
-    getClearAlpha: function () {
-      return clearAlpha;
-    },
-    setClearAlpha: function (alpha?: any) {
-      clearAlpha = alpha;
-      setClear(clearColor, clearAlpha);
-    },
-    render: render,
-  };
+
+  getClearColor(): Color {
+    return this.clearColor;
+  }
+
+  setClearColor(color?: Color | number | string, alpha: number = 1): void {
+    this.clearColor.set(color);
+    this.clearAlpha = alpha;
+    this.setClear(this.clearColor, this.clearAlpha);
+  }
+
+  getClearAlpha(): number {
+    return this.clearAlpha;
+  }
+
+  setClearAlpha(alpha: number): void {
+    this.clearAlpha = alpha;
+    this.setClear(this.clearColor, this.clearAlpha);
+  }
 }

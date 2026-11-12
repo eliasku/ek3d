@@ -165,9 +165,11 @@ export async function verifyShadowLifecycle() {
     antialias: false,
     preserveDrawingBuffer: true,
     shaders,
-    createShadowMap: (owner, objects, capabilities) => {
-      factoryCalls++;
-      return WebGLShadowMap(owner, objects, capabilities);
+    createShadowMap: class extends WebGLShadowMap {
+      constructor(...args: ConstructorParameters<typeof WebGLShadowMap>) {
+        factoryCalls++;
+        super(...args);
+      }
     },
   });
   const f = fixture(renderer);

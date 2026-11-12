@@ -1,34 +1,44 @@
-export function createHud(overlay: HTMLCanvasElement) {
-  const context = overlay.getContext("2d")!;
-  let expanded = false;
+export class Hud {
+  private overlay: HTMLCanvasElement;
+  private context: CanvasRenderingContext2D;
+  private expanded: boolean;
 
-  function width() {
-    return Math.max(0, Math.min(expanded ? 740 : 570, overlay.width - 24));
+  constructor(overlay: HTMLCanvasElement) {
+    this.overlay = overlay;
+    this.context = overlay.getContext("2d")!;
+    this.expanded = false;
+    this.toggle = this.toggle.bind(this);
+    this.hitTitle = this.hitTitle.bind(this);
+    this.draw = this.draw.bind(this);
   }
 
-  return {
-    toggle() {
-      expanded = !expanded;
-    },
-    hitTitle(clientX: number, clientY: number) {
-      const rect = overlay.getBoundingClientRect();
-      const x = ((clientX - rect.left) * overlay.width) / rect.width;
-      const y = ((clientY - rect.top) * overlay.height) / rect.height;
-      return x >= 12 && x <= 12 + width() && y >= 12 && y < 38;
-    },
-    draw(details: string[], status: string, assets: string) {
-      const title = `ek3d · Help [${expanded ? "−" : "+"}] · click here / ?`;
-      const lines = expanded
-        ? [title, ...details]
-        : [title, "Drag: orbit · Wheel: zoom · Space: pause · P: materials", status, assets];
-      context.clearRect(0, 0, overlay.width, overlay.height);
-      context.fillStyle = "#101b2be8";
-      context.fillRect(12, 12, width(), lines.length * 18 + 16);
-      context.fillStyle = "#edf5ff";
-      context.font = "12px monospace";
-      for (let i = 0; i < lines.length; i++) {
-        context.fillText(lines[i], 24, 32 + i * 18, Math.max(1, width() - 24));
-      }
-    },
-  };
+  private width() {
+    return Math.max(0, Math.min(this.expanded ? 740 : 570, this.overlay.width - 24));
+  }
+
+  toggle() {
+    this.expanded = !this.expanded;
+  }
+
+  hitTitle(clientX: number, clientY: number) {
+    const rect = this.overlay.getBoundingClientRect();
+    const x = ((clientX - rect.left) * this.overlay.width) / rect.width;
+    const y = ((clientY - rect.top) * this.overlay.height) / rect.height;
+    return x >= 12 && x <= 12 + this.width() && y >= 12 && y < 38;
+  }
+
+  draw(details: string[], status: string, assets: string) {
+    const title = `ek3d · Help [${this.expanded ? "−" : "+"}] · click here / ?`;
+    const lines = this.expanded
+      ? [title, ...details]
+      : [title, "Drag: orbit · Wheel: zoom · Space: pause · P: materials", status, assets];
+    this.context.clearRect(0, 0, this.overlay.width, this.overlay.height);
+    this.context.fillStyle = "#101b2be8";
+    this.context.fillRect(12, 12, this.width(), lines.length * 18 + 16);
+    this.context.fillStyle = "#edf5ff";
+    this.context.font = "12px monospace";
+    for (let i = 0; i < lines.length; i++) {
+      this.context.fillText(lines[i], 24, 32 + i * 18, Math.max(1, this.width() - 24));
+    }
+  }
 }

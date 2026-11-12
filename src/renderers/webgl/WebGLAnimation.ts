@@ -1,29 +1,41 @@
-export function WebGLAnimation() {
-  let context: any = null;
-  let isAnimating = false;
-  let animationLoop: any = null;
-  let requestId: any = null;
-  function onAnimationFrame(time?: any) {
-    requestId = context.requestAnimationFrame(onAnimationFrame);
+export class WebGLAnimation {
+  private context: AnimationFrameProvider | null = null;
+  private isAnimating: boolean = false;
+  private animationLoop: FrameRequestCallback | null = null;
+  private requestId: number | null = null;
+
+  constructor() {
+    this.onAnimationFrame = this.onAnimationFrame.bind(this);
+    this.start = this.start.bind(this);
+    this.stop = this.stop.bind(this);
+    this.setAnimationLoop = this.setAnimationLoop.bind(this);
+    this.setContext = this.setContext.bind(this);
+  }
+
+  private onAnimationFrame(time: number): void {
+    this.requestId = this.context!.requestAnimationFrame(this.onAnimationFrame);
+    const animationLoop = this.animationLoop!;
     animationLoop(time);
   }
-  return {
-    start: function () {
-      if (isAnimating === true) return;
-      if (animationLoop === null) return;
-      if (context === null) return;
-      requestId = context.requestAnimationFrame(onAnimationFrame);
-      isAnimating = true;
-    },
-    stop: function () {
-      if (context !== null) context.cancelAnimationFrame(requestId);
-      isAnimating = false;
-    },
-    setAnimationLoop: function (callback?: any) {
-      animationLoop = callback;
-    },
-    setContext: function (value?: any) {
-      context = value;
-    },
-  };
+
+  start(): void {
+    if (this.isAnimating === true) return;
+    if (this.animationLoop === null) return;
+    if (this.context === null) return;
+    this.requestId = this.context.requestAnimationFrame(this.onAnimationFrame);
+    this.isAnimating = true;
+  }
+
+  stop(): void {
+    if (this.context !== null) this.context.cancelAnimationFrame(this.requestId!);
+    this.isAnimating = false;
+  }
+
+  setAnimationLoop(callback: FrameRequestCallback | null): void {
+    this.animationLoop = callback;
+  }
+
+  setContext(value: AnimationFrameProvider | null): void {
+    this.context = value;
+  }
 }

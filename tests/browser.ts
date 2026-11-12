@@ -484,9 +484,13 @@ export async function verifyBackgroundLifecycle() {
     alpha: true,
     preserveDrawingBuffer: true,
     shaders: { MeshBasicMaterial: basicShader },
-    createBackground: (...args) => {
-      factoryCalls++;
-      return (background = WebGLBackground(...args));
+    createBackground: class extends WebGLBackground {
+      constructor(...args: ConstructorParameters<typeof WebGLBackground>) {
+        factoryCalls++;
+        super(...args);
+        // oxlint-disable-next-line typescript/no-this-alias -- Capture the constructed subsystem for lifecycle checks.
+        background = this;
+      }
     },
   });
   const scene = new Scene();
@@ -787,9 +791,13 @@ export async function verifyEnvironmentLifecycle() {
     preserveDrawingBuffer: true,
     shaders: { MeshBasicMaterial: basicShader },
     createBackground: WebGLBackground,
-    createEnvironments: (renderer) => {
-      factoryCalls++;
-      return (environments = WebGLEnvironments(renderer));
+    createEnvironments: class extends WebGLEnvironments {
+      constructor(...args: ConstructorParameters<typeof WebGLEnvironments>) {
+        factoryCalls++;
+        super(...args);
+        // oxlint-disable-next-line typescript/no-this-alias -- Capture the constructed subsystem for lifecycle checks.
+        environments = this;
+      }
     },
   });
   const scene = new Scene();

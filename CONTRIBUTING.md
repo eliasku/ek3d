@@ -30,10 +30,23 @@ types, JSDoc and implementation. Internal declarations are included as source, n
 Generation uses only local package metadata, the README and maintained source. It does not
 read the upstream checkout, generated HTML docs or TSL guides, and makes no network requests.
 
+Stateful renderer, physics and utility factories are now classes at the same module paths.
+Class names describe their instances: `Assets`, `CustomShaders`, `ArchiveResolver` and `MatcapScene`.
+Construct them with `new`, including `new AmmoPhysics(runtime)` and `new ArchiveResolver(files)`.
+Plain-data factories remain functions.
+Renderer `createBackground`, `createEnvironments`, `createShadowMap` and `createOutput` options
+take constructors; custom implementations must be constructible. Detached-safe methods and
+lifecycle callbacks retain their bindings. No callable compatibility wrappers remain.
+
 Scene traversal callbacks receive `Object3D`, including non-renderable groups. Narrow to a
 renderable type before accessing its material or geometry. Morph animation sequence inputs
 require string names. Buffer usage accepts `BufferUsage`; half-float attribute indices and
 components are numeric. These contracts preserve the existing runtime behavior.
+
+WebGL helpers use numeric counts and slots, boolean flags and native WebGL handle types.
+Extension and attribute lookups expose their existing nullable or missing results.
+Uniform/property values and texture image payloads remain explicitly dynamic where their schema is open.
+`Vector2.toArray()` and `Matrix3.toArray()` preserve numeric target arrays, including typed upload buffers.
 
 Geometry groups contain numeric `start`, `count` and `materialIndex`; `addGroup()` defaults
 the material index to zero. Morph attributes are arrays of CPU-backed buffer attributes,
@@ -784,7 +797,7 @@ New material parameter types select actual constructor/accessor fields, accept c
 
 ## Textured backgrounds
 
-Add the factory to the renderer options; keep choosing foreground material shaders explicitly. Using the scene, camera and sRGB `map` from the examples above:
+Add the subsystem constructor to the renderer options; keep choosing foreground material shaders explicitly. Using the scene, camera and sRGB `map` from the examples above:
 
 ```ts
 import { WebGLBackground } from "ek3d/renderers/webgl/WebGLBackground";
@@ -798,9 +811,9 @@ scene.backgroundIntensity = 0.5;
 renderer.render(scene, camera);
 ```
 
-`WebGLBackground` includes the full upstream 2D/cube implementation, `PlaneGeometry`, `ShaderMaterial` and direct background shader descriptors. The renderer imports none of them at runtime unless the consumer selects the factory. Its six arguments and `WebGLBackgroundSystem` result have concrete contracts; missing lifecycle methods and invalid arguments are rejected by consumer type checks.
+`WebGLBackground` includes the full upstream 2D/cube implementation, `PlaneGeometry`, `ShaderMaterial` and direct background shader descriptors. The renderer imports none of them at runtime unless the consumer selects the constructor. Its six constructor arguments and `WebGLBackgroundSystem` interface have concrete contracts; missing lifecycle methods and invalid arguments are rejected by consumer type checks.
 
-2D backgrounds use the texture's UV matrix, including `matrixAutoUpdate`; intensity does not affect foreground materials. Native `CubeTexture` backgrounds need no converter and use `scene.backgroundRotation`. Equirectangular conversion and blurred cube backgrounds require the explicitly supplied `WebGLEnvironments` factory below. Blurriness on a UV-mapped 2D texture has no effect, matching upstream. No loader, network asset or global shader registration is needed.
+2D backgrounds use the texture's UV matrix, including `matrixAutoUpdate`; intensity does not affect foreground materials. Native `CubeTexture` backgrounds need no converter and use `scene.backgroundRotation`. Equirectangular conversion and blurred cube backgrounds require the explicitly supplied `WebGLEnvironments` constructor below. Blurriness on a UV-mapped 2D texture has no effect, matching upstream. No loader, network asset or global shader registration is needed.
 
 Set `scene.background = null` before releasing its texture, then call `texture.dispose()`; renderer disposal releases background-owned geometry/materials and GPU caches. Context loss clears the old background, texture and geometry caches before rebuilding them, without discarding CPU image/geometry data. This fixes a reproduced upstream 0.186.0 issue where stale disposal listeners caused `GL_INVALID_OPERATION` after context restoration.
 
@@ -831,7 +844,7 @@ scene.backgroundBlurriness = 0.65;
 renderer.render(scene, camera);
 ```
 
-The full dependency closure adds `WebGLEnvironments`, `WebGLCubeRenderTarget`, `CubeCamera` and `PMREMGenerator`. The factory takes a concrete `WebGLRenderer` and returns `get(texture, usePMREM?)` plus `dispose()`. `get` accepts `Texture | null | undefined` and returns `Texture | null`; incomplete source images return `null` until ready. Native textures and prepared PMREMs pass through where conversion is unnecessary. Reflection/refraction mappings share the cube cache.
+The full dependency closure adds `WebGLEnvironments`, `WebGLCubeRenderTarget`, `CubeCamera` and `PMREMGenerator`. Construct `new WebGLEnvironments(renderer)` for direct use; the instance exposes `get(texture, usePMREM?)` and `dispose()`. `get` accepts `Texture | null | undefined` and returns `Texture | null`; incomplete source images return `null` until ready. Native textures and prepared PMREMs pass through where conversion is unnecessary. Reflection/refraction mappings share the cube cache.
 
 The basic material uses an unfiltered converted cube; background blur selects a separate GGX-prefiltered PMREM. No DFG is needed for either path. Physical lighting, including Lambert `scene.environment` with PMREM, still requires an explicitly supplied DFG provider and is not claimed as supported here.
 
@@ -1089,7 +1102,7 @@ the same external fflate runtime as the other archive examples.
 External tilt files remain unsupported. `JXLLoader` requires native JPEG XL decoding and HDR
 Canvas2D support (`srgb-linear`, float16 storage/readback and `globalHDRHeadroom`); it has no LDR fallback.
 
-`AmmoPhysics` takes an initialized consumer-provided Ammo runtime. Its `dispose()` stops simulation
+`new AmmoPhysics(initializedRuntime)` takes an initialized consumer-provided Ammo runtime. Its `dispose()` stops simulation
 and releases owned Bullet objects, not mesh geometry or materials. Six Ammo pages use the local
 licensed JS/WASM runtime.
 
@@ -1163,7 +1176,7 @@ call `computeBoundsTree()` again to restore acceleration. `SimplifyGeometryLOD`
 functions take a consumer-provided meshoptimizer simplifier; the example serves
 the licensed 1.1.1 runtime locally and retains 500,000 instances and five LODs.
 
-`JoltPhysics(initializedRuntime)` lives at `ek3d/addons/physics/JoltPhysics`.
+`new JoltPhysics(initializedRuntime)` lives at `ek3d/addons/physics/JoltPhysics`.
 It supports boxes, spheres and icosahedra, scene physics metadata and instanced meshes.
 Positive mass selects a dynamic body, as upstream; the magnitude does not override
 Jolt's shape-derived mass. Position resets clear velocity and rotation without
@@ -1173,7 +1186,7 @@ geometry, materials or the caller's runtime.
 
 ## Rapier physics
 
-`RapierPhysics(initializedRuntime)` lives at `ek3d/addons/physics/RapierPhysics`.
+`new RapierPhysics(initializedRuntime)` lives at `ek3d/addons/physics/RapierPhysics`.
 Supply an initialized Rapier 0.21.0-compatible runtime; the package never downloads it.
 The adapter supports primitive and triangle-mesh colliders, heightfields, instanced meshes,
 scene physics metadata, velocity changes and impulses. Instance synchronization preserves

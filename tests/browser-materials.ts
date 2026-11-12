@@ -387,6 +387,7 @@ export async function verifyMaterialRendering() {
       alpha: true,
       premultipliedAlpha: false,
     });
+    // oxlint-disable-next-line typescript/unbound-method -- The constructor binds has for detached calls.
     const originalHas = halfRenderer.extensions.has;
     halfRenderer.extensions.has = (name: string) => (name === "OES_texture_float_linear" ? false : originalHas(name));
     try {

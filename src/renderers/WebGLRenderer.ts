@@ -27,12 +27,13 @@ import type { Vector2 } from "../math/Vector2";
 import type { WebGLBackground, WebGLBackgroundSystem } from "./webgl/WebGLBackground";
 import type { WebGLEnvironments } from "./webgl/WebGLEnvironments";
 import type { WebGLOutput } from "./webgl/WebGLOutput";
-import type { WebGLOutputEffect } from "./webgl/WebGLOutput";
+import type { WebGLOutputEffect, WebGLOutputSystem } from "./webgl/WebGLOutput";
 import type { WebGLShadowMap } from "./webgl/WebGLShadowMap";
 import type { WebGLShadowMapSystem } from "./webgl/WebGLShadowMap";
 import type { Material, MaterialProperties } from "../materials/Material";
 import type { WebGLCapabilitiesState } from "./webgl/WebGLCapabilities";
 import type { WebGLInfoState } from "./webgl/WebGLInfo";
+import type { WebGLEnvironmentProvider } from "./webgl/WebGLEnvironmentAccess";
 import type { WebGLProgramInfo } from "./webgl/WebGLProgram";
 import { WebGLClearBackground } from "./webgl/WebGLClearBackground";
 import { getEnvironment } from "./webgl/WebGLEnvironmentAccess";
@@ -132,14 +133,16 @@ export interface WebGLRendererOptions {
   shaders?: Record<string, WebGLShaderDescriptor>;
   /** Additional shader include chunks, keyed by chunk name. */
   shaderChunks?: Record<string, string>;
-  /** Installs environment-map processing. */
-  createEnvironments?: typeof WebGLEnvironments;
+  /** Installs environment-map processing with a subsystem constructor. */
+  createEnvironments?: new (
+    ...args: ConstructorParameters<typeof WebGLEnvironments>
+  ) => WebGLEnvironmentProvider & { dispose(): void };
   /** Installs textured backgrounds; the default background only clears the framebuffer. */
-  createBackground?: typeof WebGLBackground;
+  createBackground?: new (...args: ConstructorParameters<typeof WebGLBackground>) => WebGLBackgroundSystem;
   /** Installs shadow rendering; shadowMap is null when omitted. */
-  createShadowMap?: typeof WebGLShadowMap;
+  createShadowMap?: new (...args: ConstructorParameters<typeof WebGLShadowMap>) => WebGLShadowMapSystem;
   /** Installs HDR output and post-processing. */
-  createOutput?: typeof WebGLOutput;
+  createOutput?: new (...args: ConstructorParameters<typeof WebGLOutput>) => WebGLOutputSystem;
   /** Supplies the DFG lookup texture required by physical materials. */
   getDFGLUT?: () => Texture;
   /** Supplies LTC lookup textures for rectangular area lights. */
@@ -277,12 +280,12 @@ export class WebGLRenderer {
   resetState: () => void;
   /** Assigned synchronously by initGLContext, including after context restoration. */
   capabilities!: WebGLCapabilitiesState;
-  extensions!: ReturnType<typeof WebGLExtensions>;
-  properties!: ReturnType<typeof WebGLProperties>;
-  renderLists!: ReturnType<typeof WebGLRenderLists>;
+  extensions!: WebGLExtensions;
+  properties!: WebGLProperties;
+  renderLists!: WebGLRenderLists;
   /** Assigned synchronously by initGLContext, including after context restoration. */
   shadowMap!: WebGLShadowMapSystem | null;
-  state!: ReturnType<typeof WebGLState>;
+  state!: WebGLState;
   /** Assigned synchronously by initGLContext, including after context restoration. */
   info!: WebGLInfoState;
 
@@ -508,30 +511,30 @@ export class WebGLRenderer {
     function getContext(contextName: "webgl2", contextAttributes?: any) {
       return canvas.getContext(contextName, contextAttributes) as WebGL2RenderingContext | null;
     }
-    let extensions: ReturnType<typeof WebGLExtensions>;
+    let extensions: WebGLExtensions;
     let capabilities: WebGLCapabilitiesState;
-    let state: ReturnType<typeof WebGLState>;
+    let state: WebGLState;
     let info: WebGLInfoState;
-    let properties: ReturnType<typeof WebGLProperties>;
-    let textures: ReturnType<typeof WebGLTextures>;
-    let environments: ReturnType<typeof WebGLEnvironments> | null;
-    let attributes: ReturnType<typeof WebGLAttributes>;
-    let geometries: ReturnType<typeof WebGLGeometries>;
-    let objects: ReturnType<typeof WebGLObjects>;
-    let programCache: ReturnType<typeof WebGLPrograms>;
-    let materials: ReturnType<typeof WebGLMaterials>;
-    let renderLists: ReturnType<typeof WebGLRenderLists>;
-    let renderStates: ReturnType<typeof WebGLRenderStates>;
-    let clipping: ReturnType<typeof WebGLClipping>;
+    let properties: WebGLProperties;
+    let textures: WebGLTextures;
+    let environments: (WebGLEnvironmentProvider & { dispose(): void }) | null;
+    let attributes: WebGLAttributes;
+    let geometries: WebGLGeometries;
+    let objects: WebGLObjects;
+    let programCache: WebGLPrograms;
+    let materials: WebGLMaterials;
+    let renderLists: WebGLRenderLists;
+    let renderStates: WebGLRenderStates;
+    let clipping: WebGLClipping;
     let shadowMap: WebGLShadowMapSystem | null;
     let background: Omit<WebGLBackgroundSystem, "addToRenderList" | "dispose"> &
       Partial<Pick<WebGLBackgroundSystem, "addToRenderList" | "dispose">>;
-    let morphtargets: ReturnType<typeof WebGLMorphtargets>;
-    let bufferRenderer: ReturnType<typeof WebGLBufferRenderer>;
-    let indexedBufferRenderer: ReturnType<typeof WebGLIndexedBufferRenderer>;
-    let utils: ReturnType<typeof WebGLUtils>;
-    let bindingStates: ReturnType<typeof WebGLBindingStates>;
-    let uniformsGroups: ReturnType<typeof WebGLUniformsGroups>;
+    let morphtargets: WebGLMorphtargets;
+    let bufferRenderer: WebGLBufferRenderer;
+    let indexedBufferRenderer: WebGLIndexedBufferRenderer;
+    let utils: WebGLUtils;
+    let bindingStates: WebGLBindingStates;
+    let uniformsGroups: WebGLUniformsGroups;
     try {
       const contextAttributes: any = {
         alpha: true,
@@ -569,46 +572,39 @@ export class WebGLRenderer {
       throw e;
     }
     function initGLContext() {
-      extensions = WebGLExtensions(_gl);
+      const gl = _gl!;
+      extensions = new WebGLExtensions(gl);
       extensions.init();
-      utils = WebGLUtils(_gl, extensions);
-      capabilities = WebGLCapabilities(_gl, extensions, parameters, utils);
-      state = WebGLState(_gl, extensions);
+      utils = new WebGLUtils(gl, extensions);
+      capabilities = new WebGLCapabilities(gl, extensions, parameters, utils);
+      state = new WebGLState(gl, extensions);
       if (capabilities.reversedDepthBuffer && reversedDepthBuffer) {
         state.buffers.depth.setReversed(true);
       }
       _scratchFramebuffer = _gl!.createFramebuffer();
       _srcFramebuffer = _gl!.createFramebuffer();
       _dstFramebuffer = _gl!.createFramebuffer();
-      info = WebGLInfo();
-      properties = WebGLProperties();
-      textures = new (WebGLTextures as typeof WebGLTextures & {
-        new (...args: Parameters<typeof WebGLTextures>): ReturnType<typeof WebGLTextures>;
-      })(_gl, extensions, state, properties, capabilities, utils, info);
-      environments = parameters.createEnvironments ? parameters.createEnvironments(_this) : null;
-      attributes = WebGLAttributes(_gl);
-      bindingStates = WebGLBindingStates(_gl, attributes);
-      geometries = WebGLGeometries(_gl, attributes, info, bindingStates);
-      objects = WebGLObjects(_gl, geometries, attributes, bindingStates, info);
-      morphtargets = WebGLMorphtargets(_gl, capabilities, textures);
-      clipping = new (WebGLClipping as typeof WebGLClipping & {
-        new (...args: Parameters<typeof WebGLClipping>): ReturnType<typeof WebGLClipping>;
-      })(properties);
-      programCache = WebGLPrograms(_this, environments, extensions, capabilities, bindingStates, clipping);
-      materials = WebGLMaterials(_this, properties);
-      renderLists = WebGLRenderLists();
-      renderStates = WebGLRenderStates(extensions, parameters.ltcTextures ?? null);
+      info = new WebGLInfo();
+      properties = new WebGLProperties();
+      textures = new WebGLTextures(gl, extensions, state, properties, capabilities, utils, info);
+      environments = parameters.createEnvironments ? new parameters.createEnvironments(_this) : null;
+      attributes = new WebGLAttributes(gl);
+      bindingStates = new WebGLBindingStates(gl, attributes);
+      geometries = new WebGLGeometries(gl, attributes, info, bindingStates);
+      objects = new WebGLObjects(gl, geometries, attributes, bindingStates, info);
+      morphtargets = new WebGLMorphtargets(gl, capabilities, textures);
+      clipping = new WebGLClipping(properties);
+      programCache = new WebGLPrograms(_this, environments, extensions, capabilities, bindingStates, clipping);
+      materials = new WebGLMaterials(_this, properties);
+      renderLists = new WebGLRenderLists();
+      renderStates = new WebGLRenderStates(extensions, parameters.ltcTextures ?? null);
       background = parameters.createBackground
-        ? parameters.createBackground(_this, environments, state, objects, _alpha, premultipliedAlpha)
-        : WebGLClearBackground(_this, state, _alpha, premultipliedAlpha);
-      shadowMap = parameters.createShadowMap ? parameters.createShadowMap(_this, objects, capabilities) : null;
-      uniformsGroups = WebGLUniformsGroups(_gl, info, capabilities, state);
-      bufferRenderer = new (WebGLBufferRenderer as typeof WebGLBufferRenderer & {
-        new (...args: Parameters<typeof WebGLBufferRenderer>): ReturnType<typeof WebGLBufferRenderer>;
-      })(_gl, extensions, info);
-      indexedBufferRenderer = new (WebGLIndexedBufferRenderer as typeof WebGLIndexedBufferRenderer & {
-        new (...args: Parameters<typeof WebGLIndexedBufferRenderer>): ReturnType<typeof WebGLIndexedBufferRenderer>;
-      })(_gl, extensions, info);
+        ? new parameters.createBackground(_this, environments, state, objects, _alpha, premultipliedAlpha)
+        : new WebGLClearBackground(_this, state, _alpha, premultipliedAlpha);
+      shadowMap = parameters.createShadowMap ? new parameters.createShadowMap(_this, objects, capabilities) : null;
+      uniformsGroups = new WebGLUniformsGroups(gl, info, capabilities, state);
+      bufferRenderer = new WebGLBufferRenderer(gl, extensions, info);
+      indexedBufferRenderer = new WebGLIndexedBufferRenderer(gl, extensions, info);
       info.programs = programCache.programs;
       /**
        * Holds details about the capabilities of the current rendering context.
@@ -676,7 +672,7 @@ export class WebGLRenderer {
     }
     // initialize internal render target for non-UnsignedByteType color buffer
     if (_outputBufferType !== TextureType.UnsignedByte) {
-      output = parameters.createOutput!(_outputBufferType, canvas.width, canvas.height, antialias, depth, stencil);
+      output = new parameters.createOutput!(_outputBufferType, canvas.width, canvas.height, antialias, depth, stencil);
     }
     /**
      * Returns the rendering context.
@@ -1118,7 +1114,7 @@ export class WebGLRenderer {
       const program = setProgram(camera, scene === null ? _emptyScene : scene, geometry, material, object);
       state.setMaterial(material, frontFaceCW);
       //
-      let index = geometry.index;
+      let index: BufferGeometry["index"] | undefined = geometry.index;
       let rangeFactor = 1;
       if (materialProperties.wireframe === true) {
         index = geometries.getWireframeAttribute(geometry);
@@ -1146,7 +1142,7 @@ export class WebGLRenderer {
       //
       bindingStates.setup(object, material, program, geometry, index);
       let attribute: any;
-      let renderer = bufferRenderer;
+      let renderer: WebGLBufferRenderer | WebGLIndexedBufferRenderer = bufferRenderer;
       if (index !== null) {
         attribute = attributes.get(index);
         renderer = indexedBufferRenderer;
@@ -1182,7 +1178,7 @@ export class WebGLRenderer {
           const starts = batchedMesh._multiDrawStarts;
           const counts = batchedMesh._multiDrawCounts;
           const drawCount = batchedMesh._multiDrawCount;
-          const bytesPerElement = index ? attributes.get(index).bytesPerElement : 1;
+          const bytesPerElement = index ? attributes.get(index)!.bytesPerElement : 1;
           const uniforms: WebGLUniforms = properties.get(material).currentProgram.getUniforms();
           for (let i = 0; i < drawCount; i++) {
             uniforms.setValue(_gl, "_gl_DrawID", i);
@@ -1358,7 +1354,7 @@ export class WebGLRenderer {
     function onAnimationFrame(time: number) {
       if (onAnimationFrameCallback) onAnimationFrameCallback(time);
     }
-    const animation = WebGLAnimation();
+    const animation = new WebGLAnimation();
     animation.setAnimationLoop(onAnimationFrame);
     if (typeof self !== "undefined") animation.setContext(self);
     /**
@@ -1522,7 +1518,7 @@ export class WebGLRenderer {
             if (sortObjects) {
               _vector4.setFromMatrixPosition(object.matrixWorld).applyMatrix4(_projScreenMatrix);
             }
-            const geometry: BufferGeometry = objects.update(object);
+            const geometry: BufferGeometry = objects.update(object as Sprite);
             const material = (object as Sprite).material;
             if (material.visible) {
               currentRenderList.push(object, geometry, material, groupOrder, _vector4.z, null, camera);
@@ -1857,6 +1853,7 @@ export class WebGLRenderer {
       materialProperties.toneMapping = parameters.toneMapping;
     }
     function setProgram(camera: any, scene: any, geometry: any, material: any, object?: any) {
+      const gl = _gl!;
       if (scene.isScene !== true) scene = _emptyScene; // scene could be a Mesh, Line, Points, ...
       textures.resetTextureUnits();
       const fog = scene.fog;
@@ -2015,14 +2012,14 @@ export class WebGLRenderer {
           camera._reversedDepth = true;
           camera.updateProjectionMatrix();
         }
-        p_uniforms.setValue(_gl, "projectionMatrix", camera.projectionMatrix);
-        p_uniforms.setValue(_gl, "viewMatrix", camera.matrixWorldInverse);
+        p_uniforms.setValue(gl, "projectionMatrix", camera.projectionMatrix);
+        p_uniforms.setValue(gl, "viewMatrix", camera.matrixWorldInverse);
         const uCamPos = p_uniforms.map.cameraPosition;
         if (uCamPos !== undefined) {
-          uCamPos.setValue(_gl, _vector3.setFromMatrixPosition(camera.matrixWorld));
+          uCamPos.setValue!(gl, _vector3.setFromMatrixPosition(camera.matrixWorld));
         }
         if (capabilities.logarithmicDepthBuffer) {
-          p_uniforms.setValue(_gl, "logDepthBufFC", 2.0 / (Math.log(camera.far + 1.0) / Math.LN2));
+          p_uniforms.setValue(gl, "logDepthBufFC", 2.0 / (Math.log(camera.far + 1.0) / Math.LN2));
         }
         // consider moving isOrthographic to UniformLib and WebGLMaterials, see https://github.com/mrdoob/three.js/pull/26467#issuecomment-1645185067
         if (
@@ -2033,7 +2030,7 @@ export class WebGLRenderer {
           material.isMeshStandardMaterial ||
           material.isShaderMaterial
         ) {
-          p_uniforms.setValue(_gl, "isOrthographic", camera.isOrthographicCamera === true);
+          p_uniforms.setValue(gl, "isOrthographic", camera.isOrthographicCamera === true);
         }
         if (_currentCamera !== camera) {
           _currentCamera = camera;
@@ -2048,38 +2045,38 @@ export class WebGLRenderer {
       if (materialProperties.needsLights) {
         // Set shadow map uniforms first to ensure they get the first texture units
         if (lights.state.sunShadowMap.length > 0) {
-          p_uniforms.setValue(_gl, "sunShadowMap", lights.state.sunShadowMap, textures);
+          p_uniforms.setValue(gl, "sunShadowMap", lights.state.sunShadowMap, textures);
         }
         if (lights.state.directionalShadowMap.length > 0) {
-          p_uniforms.setValue(_gl, "directionalShadowMap", lights.state.directionalShadowMap, textures);
+          p_uniforms.setValue(gl, "directionalShadowMap", lights.state.directionalShadowMap, textures);
         }
         if (lights.state.spotShadowMap.length > 0) {
-          p_uniforms.setValue(_gl, "spotShadowMap", lights.state.spotShadowMap, textures);
+          p_uniforms.setValue(gl, "spotShadowMap", lights.state.spotShadowMap, textures);
         }
         if (lights.state.pointShadowMap.length > 0) {
-          p_uniforms.setValue(_gl, "pointShadowMap", lights.state.pointShadowMap, textures);
+          p_uniforms.setValue(gl, "pointShadowMap", lights.state.pointShadowMap, textures);
         }
       }
       // skinning and morph target uniforms must be set even if material didn't change
       // auto-setting of texture unit for bone and morph texture must go before other textures
       // otherwise textures used for skinning and morphing can take over texture units reserved for other material textures
       if (object.isSkinnedMesh) {
-        p_uniforms.setOptional(_gl, object, "bindMatrix");
-        p_uniforms.setOptional(_gl, object, "bindMatrixInverse");
+        p_uniforms.setOptional(gl, object, "bindMatrix");
+        p_uniforms.setOptional(gl, object, "bindMatrixInverse");
         const skeleton = object.skeleton;
         if (skeleton) {
           if (skeleton.boneTexture === null) skeleton.computeBoneTexture();
-          p_uniforms.setValue(_gl, "boneTexture", skeleton.boneTexture, textures);
+          p_uniforms.setValue(gl, "boneTexture", skeleton.boneTexture, textures);
         }
       }
       if (object.isBatchedMesh) {
-        p_uniforms.setOptional(_gl, object, "batchingTexture");
-        p_uniforms.setValue(_gl, "batchingTexture", object._matricesTexture, textures);
-        p_uniforms.setOptional(_gl, object, "batchingIdTexture");
-        p_uniforms.setValue(_gl, "batchingIdTexture", object._indirectTexture, textures);
-        p_uniforms.setOptional(_gl, object, "batchingColorTexture");
+        p_uniforms.setOptional(gl, object, "batchingTexture");
+        p_uniforms.setValue(gl, "batchingTexture", object._matricesTexture, textures);
+        p_uniforms.setOptional(gl, object, "batchingIdTexture");
+        p_uniforms.setValue(gl, "batchingIdTexture", object._indirectTexture, textures);
+        p_uniforms.setOptional(gl, object, "batchingColorTexture");
         if (object._colorsTexture !== null) {
-          p_uniforms.setValue(_gl, "batchingColorTexture", object._colorsTexture, textures);
+          p_uniforms.setValue(gl, "batchingColorTexture", object._colorsTexture, textures);
         }
       }
       const morphAttributes = geometry.morphAttributes;
@@ -2092,7 +2089,7 @@ export class WebGLRenderer {
       }
       if (refreshMaterial || materialProperties.receiveShadow !== object.receiveShadow) {
         materialProperties.receiveShadow = object.receiveShadow;
-        p_uniforms.setValue(_gl, "receiveShadow", object.receiveShadow);
+        p_uniforms.setValue(gl, "receiveShadow", object.receiveShadow);
       }
       if (
         (material.isMeshStandardMaterial || material.isMeshLambertMaterial || material.isMeshPhongMaterial) &&
@@ -2110,7 +2107,7 @@ export class WebGLRenderer {
         m_uniforms.dfgLUT.value = parameters.getDFGLUT();
       }
       if (refreshMaterial) {
-        p_uniforms.setValue(_gl, "toneMappingExposure", _this.toneMappingExposure);
+        p_uniforms.setValue(gl, "toneMappingExposure", _this.toneMappingExposure);
         if (materialProperties.needsLights) {
           // the current material requires lighting info
           // note: all lighting uniforms are always set correctly
@@ -2150,19 +2147,19 @@ export class WebGLRenderer {
           m_uniforms.probesMax.value = grids.max;
           m_uniforms.probesResolution.value = grids.resolution;
         }
-        WebGLUniforms.upload(_gl, getUniformList(materialProperties), m_uniforms, textures);
+        WebGLUniforms.upload(gl, getUniformList(materialProperties), m_uniforms, textures);
       }
       if (material.isShaderMaterial && material.uniformsNeedUpdate === true) {
-        WebGLUniforms.upload(_gl, getUniformList(materialProperties), m_uniforms, textures);
+        WebGLUniforms.upload(gl, getUniformList(materialProperties), m_uniforms, textures);
         material.uniformsNeedUpdate = false;
       }
       if (material.isSpriteMaterial) {
-        p_uniforms.setValue(_gl, "center", object.center);
+        p_uniforms.setValue(gl, "center", object.center);
       }
       // common matrices
-      p_uniforms.setValue(_gl, "modelViewMatrix", object.modelViewMatrix);
-      p_uniforms.setValue(_gl, "normalMatrix", object.normalMatrix);
-      p_uniforms.setValue(_gl, "modelMatrix", object.matrixWorld);
+      p_uniforms.setValue(gl, "modelViewMatrix", object.modelViewMatrix);
+      p_uniforms.setValue(gl, "normalMatrix", object.normalMatrix);
+      p_uniforms.setValue(gl, "modelMatrix", object.matrixWorld);
       // UBOs
       if (material.uniformsGroups !== undefined) {
         const groups = material.uniformsGroups;
@@ -2466,7 +2463,7 @@ export class WebGLRenderer {
           }
           // the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
           if (x >= 0 && x <= renderTarget.width - width && y >= 0 && y <= renderTarget.height - height) {
-            _gl!.readPixels(x, y, width, height, utils.convert(textureFormat), utils.convert(textureType), buffer);
+            _gl!.readPixels(x, y, width, height, utils.convert(textureFormat)!, utils.convert(textureType)!, buffer);
           }
         } finally {
           // restore framebuffer of current render target if necessary
@@ -2563,7 +2560,7 @@ export class WebGLRenderer {
           const glBuffer = _gl!.createBuffer();
           _gl!.bindBuffer(GL.PIXEL_PACK_BUFFER, glBuffer);
           _gl!.bufferData(GL.PIXEL_PACK_BUFFER, buffer.byteLength, GL.STREAM_READ);
-          _gl!.readPixels(x, y, width, height, utils.convert(textureFormat), utils.convert(textureType), 0);
+          _gl!.readPixels(x, y, width, height, utils.convert(textureFormat)!, utils.convert(textureType)!, 0);
           _gl!.bindBuffer(GL.PIXEL_PACK_BUFFER, null);
           // reset the frame buffer to the currently set buffer before waiting
 
@@ -2661,8 +2658,8 @@ export class WebGLRenderer {
         dstZ = 0;
       }
       // Set up the destination target
-      const glFormat = utils.convert(dstTexture.format);
-      const glType = utils.convert(dstTexture.type);
+      const glFormat = utils.convert(dstTexture.format)!;
+      const glType = utils.convert(dstTexture.type)!;
       let glTarget: any;
       if ((dstTexture as any).isData3DTexture) {
         textures.setTexture3D(dstTexture, 0);

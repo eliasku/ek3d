@@ -1,4 +1,4 @@
-import { initScene } from "./scene";
+import { MatcapScene } from "./scene";
 import type { OffscreenScene } from "./scene";
 
 interface StartMessage {
@@ -26,7 +26,7 @@ self.addEventListener("message", (event: MessageEvent<StartMessage>) => {
     }
   };
   try {
-    scene = initScene(
+    scene = new MatcapScene(
       canvas,
       width,
       height,

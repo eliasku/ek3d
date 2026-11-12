@@ -59,7 +59,7 @@ async function init(): Promise<void> {
   canvas.dataset.state = "loading";
   const ammo = await loadAmmo();
   if (disposed) return;
-  const physics = AmmoPhysics(ammo);
+  const physics = new AmmoPhysics(ammo);
   cleanup.push(() => physics.dispose());
   const scene = new Scene();
   cleanup.push(() => disposeObject(scene));

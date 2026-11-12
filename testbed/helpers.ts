@@ -16,64 +16,102 @@ import type { HemisphereLight } from "ek3d/lights/HemisphereLight";
 import type { PointLight } from "ek3d/lights/PointLight";
 
 /** Attach world-space helpers directly to the scene, not to the transformed demonstration stage. */
-export function setupHelpers(
-  scene: Scene,
-  targets: {
-    object: Object3D;
-    camera: Camera;
-    directional: DirectionalLight;
-    point: PointLight;
-    hemisphere: HemisphereLight;
-    skeletonRoot: Object3D;
-  },
-) {
-  const axes = new AxesHelper(2);
-  const grid = new GridHelper(12, 12, 0x7788aa, 0x394457);
-  grid.position.y = -1.48;
-  const bounds = new BoxHelper(targets.object, 0xffcc33);
-  const camera = new CameraHelper(targets.camera);
-  const directional = new DirectionalLightHelper(targets.directional, 0.4);
-  const point = new PointLightHelper(targets.point, 0.25);
-  const hemisphere = new HemisphereLightHelper(targets.hemisphere, 0.3);
-  const skeleton = new SkeletonHelper(targets.skeletonRoot);
-  const direction = new Vector3(0, 1, 0);
-  const position = new Vector3();
-  const arrow = new ArrowHelper(direction, position, 1.2, 0x44ffcc);
-  const helpers = [axes, grid, bounds, camera, directional, point, hemisphere, skeleton, arrow];
-  let visible = false;
-  let disposed = false;
-  for (const helper of helpers) {
-    helper.visible = false;
-    scene.add(helper);
+export class SceneHelpers {
+  private bounds: BoxHelper;
+  private camera: CameraHelper;
+  private directional: DirectionalLightHelper;
+  private point: PointLightHelper;
+  private hemisphere: HemisphereLightHelper;
+  private direction: Vector3;
+  private position: Vector3;
+  private arrow: ArrowHelper;
+  private helpers: (
+    | AxesHelper
+    | GridHelper
+    | BoxHelper
+    | CameraHelper
+    | DirectionalLightHelper
+    | PointLightHelper
+    | HemisphereLightHelper
+    | SkeletonHelper
+    | ArrowHelper
+  )[];
+  private visible: boolean;
+  private disposed: boolean;
+
+  constructor(
+    private scene: Scene,
+    private targets: {
+      object: Object3D;
+      camera: Camera;
+      directional: DirectionalLight;
+      point: PointLight;
+      hemisphere: HemisphereLight;
+      skeletonRoot: Object3D;
+    },
+  ) {
+    const axes = new AxesHelper(2);
+    const grid = new GridHelper(12, 12, 0x7788aa, 0x394457);
+    grid.position.y = -1.48;
+    this.bounds = new BoxHelper(targets.object, 0xffcc33);
+    this.camera = new CameraHelper(targets.camera);
+    this.directional = new DirectionalLightHelper(targets.directional, 0.4);
+    this.point = new PointLightHelper(targets.point, 0.25);
+    this.hemisphere = new HemisphereLightHelper(targets.hemisphere, 0.3);
+    const skeleton = new SkeletonHelper(targets.skeletonRoot);
+    this.direction = new Vector3(0, 1, 0);
+    this.position = new Vector3();
+    this.arrow = new ArrowHelper(this.direction, this.position, 1.2, 0x44ffcc);
+    this.helpers = [
+      axes,
+      grid,
+      this.bounds,
+      this.camera,
+      this.directional,
+      this.point,
+      this.hemisphere,
+      skeleton,
+      this.arrow,
+    ];
+    this.visible = false;
+    this.disposed = false;
+    for (const helper of this.helpers) {
+      helper.visible = false;
+      scene.add(helper);
+    }
+    this.setVisible = this.setVisible.bind(this);
+    this.update = this.update.bind(this);
+    this.dispose = this.dispose.bind(this);
   }
-  return {
-    setVisible(value: boolean) {
-      visible = value;
-      for (const helper of helpers) helper.visible = value;
-    },
-    update() {
-      if (!visible || disposed) return;
-      targets.object.updateWorldMatrix(true, false);
-      targets.skeletonRoot.updateWorldMatrix(true, true);
-      targets.camera.updateWorldMatrix(true, false);
-      bounds.update();
-      camera.update();
-      directional.update();
-      point.update();
-      hemisphere.update();
-      targets.object.getWorldPosition(position);
-      arrow.position.copy(position);
-      targets.object.getWorldDirection(direction);
-      arrow.setDirection(direction);
-      // SkeletonHelper updates its endpoints during the renderer's matrix-world traversal.
-    },
-    dispose() {
-      if (disposed) return;
-      disposed = true;
-      for (const helper of helpers) {
-        scene.remove(helper);
-        helper.dispose();
-      }
-    },
-  };
+
+  setVisible(value: boolean) {
+    this.visible = value;
+    for (const helper of this.helpers) helper.visible = value;
+  }
+
+  update() {
+    if (!this.visible || this.disposed) return;
+    this.targets.object.updateWorldMatrix(true, false);
+    this.targets.skeletonRoot.updateWorldMatrix(true, true);
+    this.targets.camera.updateWorldMatrix(true, false);
+    this.bounds.update();
+    this.camera.update();
+    this.directional.update();
+    this.point.update();
+    this.hemisphere.update();
+    this.targets.object.getWorldPosition(this.position);
+    this.arrow.position.copy(this.position);
+    this.targets.object.getWorldDirection(this.direction);
+    this.arrow.setDirection(this.direction);
+    // SkeletonHelper updates its endpoints during the renderer's matrix-world traversal.
+  }
+
+  dispose() {
+    if (this.disposed) return;
+    this.disposed = true;
+    for (const helper of this.helpers) {
+      this.scene.remove(helper);
+      helper.dispose();
+    }
+  }
 }

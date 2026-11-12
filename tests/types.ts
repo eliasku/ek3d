@@ -320,7 +320,7 @@ renderer.setAnimationLoop((time: string) => {});
 // @ts-expect-error Window RAF callbacks receive no XR frame argument.
 renderer.setAnimationLoop((time: number, frame: object) => {});
 
-const output: WebGLOutputSystem = WebGLOutput(TextureType.HalfFloat, 64, 48, false, true, false);
+const output: WebGLOutputSystem = new WebGLOutput(TextureType.HalfFloat, 64, 48, false, true, false);
 const effect: WebGLOutputEffect = {
   needsSwap: true,
   enabled: true,
@@ -360,12 +360,16 @@ const raw = new RawShaderMaterial({
 const rawClone: RawShaderMaterial = raw.clone();
 void [outputBegun, outputCompositing, outputRenderPass, rawClone];
 
-// @ts-expect-error Output factories return the complete lifecycle, not an inert object.
-new WebGLRenderer({ createOutput: () => ({ dispose() {} }) });
-// @ts-expect-error Output factory dimensions are numeric.
-WebGLOutput(TextureType.HalfFloat, "64", 48, false, true, false);
-// @ts-expect-error Output factory antialiasing is boolean.
-WebGLOutput(TextureType.HalfFloat, 64, 48, 4, true, false);
+new WebGLRenderer({
+  // @ts-expect-error Output constructors implement the complete lifecycle, not an inert object.
+  createOutput: class {
+    dispose() {}
+  },
+});
+// @ts-expect-error Output constructor dimensions are numeric.
+new WebGLOutput(TextureType.HalfFloat, "64", 48, false, true, false);
+// @ts-expect-error Output constructor antialiasing is boolean.
+new WebGLOutput(TextureType.HalfFloat, 64, 48, 4, true, false);
 // @ts-expect-error An effect needs a render operation.
 outputRenderer.setEffects([{ enabled: true }]);
 // @ts-expect-error Render targets are not arbitrary texture values.
@@ -452,62 +456,68 @@ custom.copy(customClone);
 new ShaderMaterial(backgroundCubeShader);
 new WebGLRenderer({ createBackground: WebGLBackground, shaders: { MeshBasicMaterial: basicShader } });
 new WebGLRenderer({
-  createBackground(renderer, environments, state, objects, alpha, premultipliedAlpha) {
-    const typedRenderer: WebGLRenderer = renderer;
-    const typedEnvironments: WebGLEnvironmentProvider | null = environments;
-    const typedState: WebGLBackgroundState = state;
-    const typedObjects: WebGLBackgroundObjects = objects;
-    const typedAlpha: boolean = alpha;
-    const typedPremultipliedAlpha: boolean = premultipliedAlpha;
-    const background: WebGLBackgroundSystem = WebGLBackground(
-      typedRenderer,
-      typedEnvironments,
-      typedState,
-      typedObjects,
-      typedAlpha,
-      typedPremultipliedAlpha,
-    );
-    const clear: Color = background.getClearColor();
-    const opacity: number = background.getClearAlpha();
-    background.setClearColor("navy", 0.5);
-    background.setClearColor(new Color(), 1);
-    background.setClearAlpha(1);
-    background.render(scene);
-    const list: WebGLBackgroundRenderList = {
-      unshift(object, geometry, material, groupOrder, z, group) {
-        const mesh: Mesh = object;
-        const order: number = groupOrder;
-        const depth: number = z;
-        const noGroup: null = group;
-        void [mesh, geometry, material, order, depth, noGroup];
-      },
-    };
-    background.addToRenderList(list, scene);
-    background.dispose();
-    // @ts-expect-error Factory renderer is not an untyped argument.
-    renderer.setSize("640", 480);
-    // @ts-expect-error Environment conversion receives textures, not pixel buffers.
-    environments?.get(pixels);
-    // @ts-expect-error Factory state exposes actual clear-buffer arguments.
-    state.buffers.color.setClear("red", 0, 0, 1, false);
-    // @ts-expect-error Object upload requires a mesh.
-    objects.update(texture);
-    // @ts-expect-error Factory alpha is boolean.
-    const invalidAlpha: string = alpha;
-    // @ts-expect-error All six factory arguments are required.
-    WebGLBackground(renderer, environments, state, objects, alpha);
-    // @ts-expect-error Factory state cannot omit its clear buffers.
-    WebGLBackground(renderer, environments, {}, objects, alpha, premultipliedAlpha);
-    // @ts-expect-error The result accepts colors, not arrays.
-    background.setClearColor([1, 0, 0]);
-    // @ts-expect-error Clear opacity is numeric.
-    background.setClearAlpha("opaque");
-    // @ts-expect-error Background rendering accepts scene objects, not textures.
-    background.render(texture);
-    // @ts-expect-error Background queues require an unshift implementation.
-    background.addToRenderList({}, scene);
-    void [clear, opacity, invalidAlpha];
-    return background;
+  createBackground: class extends WebGLBackground {
+    constructor(...args: ConstructorParameters<typeof WebGLBackground>) {
+      super(...args);
+      const [renderer, environments, state, objects, alpha, premultipliedAlpha] = args;
+      const typedRenderer: WebGLRenderer = renderer;
+      const typedEnvironments: WebGLEnvironmentProvider | null = environments;
+      const typedState: WebGLBackgroundState = state;
+      const typedObjects: WebGLBackgroundObjects = objects;
+      const typedAlpha: boolean = alpha;
+      const typedPremultipliedAlpha: boolean = premultipliedAlpha;
+      const background: WebGLBackgroundSystem = this;
+      const clear: Color = background.getClearColor();
+      const opacity: number = background.getClearAlpha();
+      background.setClearColor("navy", 0.5);
+      background.setClearColor(new Color(), 1);
+      background.setClearAlpha(1);
+      background.render(scene);
+      const list: WebGLBackgroundRenderList = {
+        unshift(object, geometry, material, groupOrder, z, group) {
+          const mesh: Mesh = object;
+          const order: number = groupOrder;
+          const depth: number = z;
+          const noGroup: null = group;
+          void [mesh, geometry, material, order, depth, noGroup];
+        },
+      };
+      background.addToRenderList(list, scene);
+      background.dispose();
+      // @ts-expect-error Factory renderer is not an untyped argument.
+      renderer.setSize("640", 480);
+      // @ts-expect-error Environment conversion receives textures, not pixel buffers.
+      environments?.get(pixels);
+      // @ts-expect-error Factory state exposes actual clear-buffer arguments.
+      state.buffers.color.setClear("red", 0, 0, 1, false);
+      // @ts-expect-error Object upload requires a mesh.
+      objects.update(texture);
+      // @ts-expect-error Factory alpha is boolean.
+      const invalidAlpha: string = alpha;
+      // @ts-expect-error All six factory arguments are required.
+      new WebGLBackground(renderer, environments, state, objects, alpha);
+      // @ts-expect-error Factory state cannot omit its clear buffers.
+      new WebGLBackground(renderer, environments, {}, objects, alpha, premultipliedAlpha);
+      // @ts-expect-error The result accepts colors, not arrays.
+      background.setClearColor([1, 0, 0]);
+      // @ts-expect-error Clear opacity is numeric.
+      background.setClearAlpha("opaque");
+      // @ts-expect-error Background rendering accepts scene objects, not textures.
+      background.render(texture);
+      // @ts-expect-error Background queues require an unshift implementation.
+      background.addToRenderList({}, scene);
+      void [
+        clear,
+        opacity,
+        invalidAlpha,
+        typedRenderer,
+        typedEnvironments,
+        typedState,
+        typedObjects,
+        typedAlpha,
+        typedPremultipliedAlpha,
+      ];
+    }
   },
 });
 void [sceneClone, planeClone, planeWidth, customClone];
@@ -529,14 +539,18 @@ const environmentRenderer = new WebGLRenderer({
   createEnvironments: WebGLEnvironments,
 });
 new WebGLRenderer({
-  createEnvironments(renderer) {
-    const typedRenderer: WebGLRenderer = renderer;
-    // @ts-expect-error Environment factories receive a concrete renderer.
-    renderer.setSize("640", 480);
-    return WebGLEnvironments(typedRenderer);
+  createEnvironments: class extends WebGLEnvironments {
+    constructor(...args: ConstructorParameters<typeof WebGLEnvironments>) {
+      super(...args);
+      const [renderer] = args;
+      const typedRenderer: WebGLRenderer = renderer;
+      // @ts-expect-error Environment factories receive a concrete renderer.
+      renderer.setSize("640", 480);
+      void typedRenderer;
+    }
   },
 });
-const environments = WebGLEnvironments(environmentRenderer);
+const environments = new WebGLEnvironments(environmentRenderer);
 const environmentProvider: WebGLEnvironmentProvider = environments;
 const convertedEnvironment: Texture | null = environments.get(texture);
 const blurredEnvironment: Texture | null = environments.get(texture, true);
@@ -649,33 +663,36 @@ const cubeDepthClone: CubeDepthTexture = cubeDepth.clone();
 const faceWidth: number = cubeDepth.images[0].width;
 const shadowRenderer = new WebGLRenderer({
   shaders: { MeshLambertMaterial: lambertShader, MeshDepthMaterial: depthShader, MeshDistanceMaterial: distanceShader },
-  createShadowMap(renderer, objects, capabilities) {
-    const typedRenderer: WebGLRenderer = renderer;
-    const typedObjects: WebGLShadowMapObjects = objects;
-    const typedCapabilities: WebGLShadowMapCapabilities = capabilities;
-    const geometry: BufferGeometry = objects.update(mesh);
-    const maximum: number = capabilities.maxTextureSize;
-    const shadows: WebGLShadowMapSystem = WebGLShadowMap(typedRenderer, typedObjects, typedCapabilities);
-    shadows.enabled = true;
-    shadows.autoUpdate = false;
-    shadows.needsUpdate = true;
-    shadows.type = ShadowMap.PCF;
-    shadows.render([directional, point], scene, camera);
-    shadows.dispose();
-    // @ts-expect-error Uploads require scene objects.
-    objects.update(texture);
-    // @ts-expect-error Factory renderer arguments are not any.
-    renderer.setSize("640", 480);
-    // @ts-expect-error Texture size is numeric.
-    const invalidMaximum: string = capabilities.maxTextureSize;
-    // @ts-expect-error Factory requires all three arguments.
-    WebGLShadowMap(renderer, objects);
-    // @ts-expect-error Capabilities must expose maxTextureSize.
-    WebGLShadowMap(renderer, objects, {});
-    // @ts-expect-error Object upload must return geometry.
-    WebGLShadowMap(renderer, { update: () => texture }, capabilities);
-    void [geometry, maximum, invalidMaximum];
-    return shadows;
+  createShadowMap: class extends WebGLShadowMap {
+    constructor(...args: ConstructorParameters<typeof WebGLShadowMap>) {
+      super(...args);
+      const [renderer, objects, capabilities] = args;
+      const typedRenderer: WebGLRenderer = renderer;
+      const typedObjects: WebGLShadowMapObjects = objects;
+      const typedCapabilities: WebGLShadowMapCapabilities = capabilities;
+      const geometry: BufferGeometry = objects.update(mesh);
+      const maximum: number = capabilities.maxTextureSize;
+      const shadows: WebGLShadowMapSystem = this;
+      shadows.enabled = true;
+      shadows.autoUpdate = false;
+      shadows.needsUpdate = true;
+      shadows.type = ShadowMap.PCF;
+      shadows.render([directional, point], scene, camera);
+      shadows.dispose();
+      // @ts-expect-error Uploads require scene objects.
+      objects.update(texture);
+      // @ts-expect-error Factory renderer arguments are not any.
+      renderer.setSize("640", 480);
+      // @ts-expect-error Texture size is numeric.
+      const invalidMaximum: string = capabilities.maxTextureSize;
+      // @ts-expect-error Factory requires all three arguments.
+      new WebGLShadowMap(renderer, objects);
+      // @ts-expect-error Capabilities must expose maxTextureSize.
+      new WebGLShadowMap(renderer, objects, {});
+      // @ts-expect-error Object upload must return geometry.
+      new WebGLShadowMap(renderer, { update: () => texture }, capabilities);
+      void [geometry, maximum, invalidMaximum, typedRenderer, typedObjects, typedCapabilities];
+    }
   },
 });
 new WebGLRenderer({ createShadowMap: WebGLShadowMap });
@@ -684,11 +701,22 @@ optionalShadows?.render([directional, point], scene, camera);
 // @ts-expect-error Shadow rendering is opt-in, hence nullable.
 const requiredShadows: WebGLShadowMapSystem = shadowRenderer.shadowMap;
 new WebGLRenderer({
-  // @ts-expect-error Factory results must implement render and dispose.
-  createShadowMap: () => ({ enabled: false, autoUpdate: true, needsUpdate: false, type: ShadowMap.PCF }),
+  // @ts-expect-error Shadow constructors must implement render and dispose.
+  createShadowMap: class {
+    enabled: boolean = false;
+    autoUpdate: boolean = true;
+    needsUpdate: boolean = false;
+    type: ShadowMap = ShadowMap.PCF;
+  },
 });
-// @ts-expect-error Factories cannot require a string renderer.
-new WebGLRenderer({ createShadowMap: (renderer: string) => optionalShadows! });
+new WebGLRenderer({
+  // @ts-expect-error Shadow constructors cannot require a string renderer.
+  createShadowMap: class extends WebGLShadowMap {
+    constructor(_renderer: string, objects: WebGLShadowMapObjects, capabilities: WebGLShadowMapCapabilities) {
+      super(shadowRenderer, objects, capabilities);
+    }
+  },
+});
 // @ts-expect-error Shadow lists require lights.
 optionalShadows?.render([mesh], scene, camera);
 // @ts-expect-error Shadow rendering requires a camera.
@@ -745,15 +773,34 @@ void [
 ];
 
 // @ts-expect-error Environment factories require a concrete renderer.
-WebGLEnvironments({});
+new WebGLEnvironments({});
 // @ts-expect-error Environment factories require their renderer argument.
-WebGLEnvironments();
-// @ts-expect-error Environment factories must return disposal as well as conversion.
-new WebGLRenderer({ createEnvironments: () => ({ get: () => null }) });
-// @ts-expect-error Environment factories cannot return non-texture results.
-new WebGLRenderer({ createEnvironments: () => ({ get: () => 1, dispose() {} }) });
-// @ts-expect-error Environment factories cannot require a string renderer.
-new WebGLRenderer({ createEnvironments: (renderer: string) => environments });
+new WebGLEnvironments();
+new WebGLRenderer({
+  // @ts-expect-error Environment constructors must implement disposal as well as conversion.
+  createEnvironments: class {
+    get() {
+      return null;
+    }
+  },
+});
+new WebGLRenderer({
+  // @ts-expect-error Environment conversion cannot return non-texture results.
+  createEnvironments: class {
+    get() {
+      return 1;
+    }
+    dispose() {}
+  },
+});
+new WebGLRenderer({
+  // @ts-expect-error Environment constructors cannot require a string renderer.
+  createEnvironments: class extends WebGLEnvironments {
+    constructor(_renderer: string) {
+      super(environmentRenderer);
+    }
+  },
+});
 // @ts-expect-error Conversion accepts textures, not pixel buffers.
 environments.get(pixels);
 // @ts-expect-error PMREM selection is boolean.
@@ -819,10 +866,23 @@ new MeshBasicMaterial({ reflectivity: "bright" });
 // @ts-expect-error Basic refraction ratio is numeric.
 new MeshBasicMaterial({ refractionRatio: false });
 
-// @ts-expect-error A factory must return the complete background lifecycle.
-new WebGLRenderer({ createBackground: () => ({ render() {} }) });
-// @ts-expect-error A factory receives a renderer, not a string.
-new WebGLRenderer({ createBackground: (renderer: string) => WebGLBackground });
+new WebGLRenderer({
+  // @ts-expect-error A constructor must implement the complete background lifecycle.
+  createBackground: class {
+    render() {}
+  },
+});
+new WebGLRenderer({
+  // @ts-expect-error A background constructor receives a renderer, not a string.
+  createBackground: class extends WebGLBackground {
+    constructor(
+      _renderer: string,
+      ...args: [WebGLEnvironmentProvider | null, WebGLBackgroundState, WebGLBackgroundObjects, boolean, boolean]
+    ) {
+      super(environmentRenderer, ...args);
+    }
+  },
+});
 // @ts-expect-error Scene backgrounds are colors or textures, not color strings.
 scene.background = "navy";
 // @ts-expect-error Background intensity is numeric.
@@ -2224,3 +2284,29 @@ renderer.outputColorSpace.toUpperCase();
 renderer.outputColorSpace = 1;
 // @ts-expect-error Reading the output color space must not erase its string type.
 renderer.outputColorSpace.toFixed();
+
+renderer.state.buffers.color.setMask(true);
+renderer.state.buffers.depth.setClear(1);
+renderer.state.setScissorTest(false);
+renderer.extensions.get("EXT_texture_filter_anisotropic")?.MAX_TEXTURE_MAX_ANISOTROPY_EXT.toFixed();
+// @ts-expect-error Color masks are boolean flags.
+renderer.state.buffers.color.setMask(1);
+// @ts-expect-error Depth clear values are numeric.
+renderer.state.buffers.depth.setClear("1");
+// @ts-expect-error Scissor tests require boolean flags.
+renderer.state.setScissorTest("false");
+// @ts-expect-error Extension names are strings.
+renderer.extensions.has(0);
+// @ts-expect-error Property caches require object keys.
+renderer.properties.get(1);
+// @ts-expect-error Property slot names are strings.
+renderer.properties.update({}, 0, null);
+renderer.state.setPolygonOffset(false);
+renderer.state.setPolygonOffset(true, 1, 1);
+// @ts-expect-error Enabled polygon offsets require both numeric factors.
+renderer.state.setPolygonOffset(true);
+
+const uniformVector2Output = new Vector2(1, 2).toArray(new Float32Array(2));
+uniformVector2Output.subarray(0, 1);
+const uniformMatrix3Output = new Matrix3().toArray(new Float32Array(9));
+uniformMatrix3Output.subarray(0, 1);

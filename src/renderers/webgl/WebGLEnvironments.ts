@@ -4,48 +4,65 @@ import type { WebGLRenderer } from "../WebGLRenderer";
 import { Mapping } from "../../constants";
 import { PMREMGenerator } from "../../extras/PMREMGenerator";
 import { WebGLCubeRenderTarget } from "../WebGLCubeRenderTarget";
-export function WebGLEnvironments(renderer: WebGLRenderer): WebGLEnvironmentProvider & { dispose(): void } {
-  let cubeMaps = new WeakMap<any, any>();
-  let pmremMaps = new WeakMap<any, any>();
-  let pmremGenerator: PMREMGenerator | null = null;
-  const sources = new Set<any>();
-  const sourceRefs = new WeakMap<any, any>();
-  const registry = new FinalizationRegistry((ref?: any) => sources.delete(ref));
-  function track(texture: Texture) {
-    if (sourceRefs.has(texture)) return;
-    const ref = new WeakRef<any>(texture);
-    sourceRefs.set(texture, ref);
-    sources.add(ref);
-    registry.register(texture, ref, ref);
-    texture.addEventListener("dispose", onTextureDispose);
+export class WebGLEnvironments implements WebGLEnvironmentProvider {
+  private readonly renderer: WebGLRenderer;
+  private cubeMaps: WeakMap<Texture, WebGLCubeRenderTarget> = new WeakMap();
+  private pmremMaps: WeakMap<Texture, WebGLCubeRenderTarget> = new WeakMap();
+  private pmremGenerator: PMREMGenerator | null = null;
+  private readonly sources: Set<WeakRef<Texture>> = new Set();
+  private readonly sourceRefs: WeakMap<Texture, WeakRef<Texture>> = new WeakMap();
+  private readonly registry: FinalizationRegistry<WeakRef<Texture>>;
+
+  constructor(renderer: WebGLRenderer) {
+    this.renderer = renderer;
+    this.onSourceFinalize = this.onSourceFinalize.bind(this);
+    this.registry = new FinalizationRegistry(this.onSourceFinalize);
+    this.onTextureDispose = this.onTextureDispose.bind(this);
+    this.get = this.get.bind(this);
+    this.dispose = this.dispose.bind(this);
   }
-  function get(texture: Texture | null | undefined, usePMREM: boolean = false): Texture | null {
+
+  private onSourceFinalize(ref: WeakRef<Texture>): void {
+    this.sources.delete(ref);
+  }
+
+  private track(texture: Texture): void {
+    if (this.sourceRefs.has(texture)) return;
+    const ref = new WeakRef(texture);
+    this.sourceRefs.set(texture, ref);
+    this.sources.add(ref);
+    this.registry.register(texture, ref, ref);
+    texture.addEventListener("dispose", this.onTextureDispose);
+  }
+
+  get(texture: Texture | null | undefined, usePMREM: boolean = false): Texture | null {
     if (texture === null || texture === undefined) return null;
     if (usePMREM) {
-      return getPMREM(texture);
+      return this.getPMREM(texture);
     }
-    return getCube(texture);
+    return this.getCube(texture);
   }
-  function getCube(texture: Texture): Texture | null {
+
+  private getCube(texture: Texture): Texture | null {
     if (texture && texture.isTexture) {
       const mapping = texture.mapping;
       if (mapping === Mapping.EquirectangularReflection || mapping === Mapping.EquirectangularRefraction) {
-        if (cubeMaps.has(texture)) {
-          const cubemap = cubeMaps.get(texture).texture;
-          return mapTextureMapping(cubemap, texture.mapping);
+        if (this.cubeMaps.has(texture)) {
+          const cubemap = this.cubeMaps.get(texture)!.texture;
+          return this.mapTextureMapping(cubemap, texture.mapping);
         } else {
           const image = texture.image;
           if (image && image.height > 0) {
             const renderTarget = new WebGLCubeRenderTarget(image.height);
             try {
-              renderTarget.fromEquirectangularTexture(renderer, texture);
-            } catch (error: any) {
+              renderTarget.fromEquirectangularTexture(this.renderer, texture);
+            } catch (error: unknown) {
               renderTarget.dispose();
               throw error;
             }
-            cubeMaps.set(texture, renderTarget);
-            track(texture);
-            return mapTextureMapping(renderTarget.texture, texture.mapping);
+            this.cubeMaps.set(texture, renderTarget);
+            this.track(texture);
+            return this.mapTextureMapping(renderTarget.texture, texture.mapping);
           } else {
             // image not yet ready. try the conversion next frame
             return null;
@@ -55,7 +72,8 @@ export function WebGLEnvironments(renderer: WebGLRenderer): WebGLEnvironmentProv
     }
     return texture;
   }
-  function getPMREM(texture: Texture): Texture | null {
+
+  private getPMREM(texture: Texture): Texture | null {
     if (texture && texture.isTexture && texture.isPMREMTexture !== true) {
       const mapping = texture.mapping;
       const isEquirectMap =
@@ -63,30 +81,33 @@ export function WebGLEnvironments(renderer: WebGLRenderer): WebGLEnvironmentProv
       const isCubeMap = mapping === Mapping.CubeReflection || mapping === Mapping.CubeRefraction;
       // equirect/cube map to PMREM conversion
       if (isEquirectMap || isCubeMap) {
-        let renderTarget = pmremMaps.get(texture);
+        let renderTarget = this.pmremMaps.get(texture);
         const currentPMREMVersion = renderTarget !== undefined ? renderTarget.texture.pmremVersion : 0;
         if (texture.isRenderTargetTexture && texture.pmremVersion !== currentPMREMVersion) {
-          if (pmremGenerator === null) pmremGenerator = new PMREMGenerator(renderer);
+          if (this.pmremGenerator === null) this.pmremGenerator = new PMREMGenerator(this.renderer);
           renderTarget = isEquirectMap
-            ? pmremGenerator.fromEquirectangular(texture, renderTarget)
-            : pmremGenerator.fromCubemap(texture, renderTarget);
+            ? this.pmremGenerator.fromEquirectangular(texture, renderTarget)
+            : this.pmremGenerator.fromCubemap(texture, renderTarget);
           renderTarget.texture.pmremVersion = texture.pmremVersion;
-          pmremMaps.set(texture, renderTarget);
-          track(texture);
+          this.pmremMaps.set(texture, renderTarget);
+          this.track(texture);
           return renderTarget.texture;
         } else {
           if (renderTarget !== undefined) {
             return renderTarget.texture;
           } else {
             const image = texture.image;
-            if ((isEquirectMap && image && image.height > 0) || (isCubeMap && image && isCubeTextureComplete(image))) {
-              if (pmremGenerator === null) pmremGenerator = new PMREMGenerator(renderer);
+            if (
+              (isEquirectMap && image && image.height > 0) ||
+              (isCubeMap && image && this.isCubeTextureComplete(image))
+            ) {
+              if (this.pmremGenerator === null) this.pmremGenerator = new PMREMGenerator(this.renderer);
               renderTarget = isEquirectMap
-                ? pmremGenerator.fromEquirectangular(texture)
-                : pmremGenerator.fromCubemap(texture);
+                ? this.pmremGenerator.fromEquirectangular(texture)
+                : this.pmremGenerator.fromCubemap(texture);
               renderTarget.texture.pmremVersion = texture.pmremVersion;
-              pmremMaps.set(texture, renderTarget);
-              track(texture);
+              this.pmremMaps.set(texture, renderTarget);
+              this.track(texture);
               return renderTarget.texture;
             } else {
               // image not yet ready. try the conversion next frame
@@ -98,7 +119,8 @@ export function WebGLEnvironments(renderer: WebGLRenderer): WebGLEnvironmentProv
     }
     return texture;
   }
-  function mapTextureMapping(texture: Texture, mapping: Mapping) {
+
+  private mapTextureMapping(texture: Texture, mapping: Mapping): Texture {
     if (mapping === Mapping.EquirectangularReflection) {
       texture.mapping = Mapping.CubeReflection;
     } else if (mapping === Mapping.EquirectangularRefraction) {
@@ -106,7 +128,8 @@ export function WebGLEnvironments(renderer: WebGLRenderer): WebGLEnvironmentProv
     }
     return texture;
   }
-  function isCubeTextureComplete(image?: any) {
+
+  private isCubeTextureComplete(image: ArrayLike<unknown>): boolean {
     let count = 0;
     const length = 6;
     for (let i = 0; i < length; i++) {
@@ -114,41 +137,39 @@ export function WebGLEnvironments(renderer: WebGLRenderer): WebGLEnvironmentProv
     }
     return count === length;
   }
-  function onTextureDispose(event?: any) {
+
+  private onTextureDispose(event: { target: Texture }): void {
     const texture = event.target;
-    texture.removeEventListener("dispose", onTextureDispose);
-    const ref = sourceRefs.get(texture);
+    texture.removeEventListener("dispose", this.onTextureDispose);
+    const ref = this.sourceRefs.get(texture);
     if (ref !== undefined) {
-      sources.delete(ref);
-      registry.unregister(ref);
-      sourceRefs.delete(texture);
+      this.sources.delete(ref);
+      this.registry.unregister(ref);
+      this.sourceRefs.delete(texture);
     }
-    const cube = cubeMaps.get(texture);
+    const cube = this.cubeMaps.get(texture);
     if (cube !== undefined) {
-      cubeMaps.delete(texture);
+      this.cubeMaps.delete(texture);
       cube.dispose();
     }
-    const pmrem = pmremMaps.get(texture);
+    const pmrem = this.pmremMaps.get(texture);
     if (pmrem !== undefined) {
-      pmremMaps.delete(texture);
+      this.pmremMaps.delete(texture);
       pmrem.dispose();
     }
   }
-  function dispose() {
-    for (const ref of sources) {
+
+  dispose(): void {
+    for (const ref of this.sources) {
       const texture = ref.deref();
-      if (texture !== undefined) onTextureDispose({ target: texture });
+      if (texture !== undefined) this.onTextureDispose({ target: texture });
     }
-    sources.clear();
-    cubeMaps = new WeakMap();
-    pmremMaps = new WeakMap();
-    if (pmremGenerator !== null) {
-      pmremGenerator.dispose();
-      pmremGenerator = null;
+    this.sources.clear();
+    this.cubeMaps = new WeakMap();
+    this.pmremMaps = new WeakMap();
+    if (this.pmremGenerator !== null) {
+      this.pmremGenerator.dispose();
+      this.pmremGenerator = null;
     }
   }
-  return {
-    get: get,
-    dispose: dispose,
-  };
 }

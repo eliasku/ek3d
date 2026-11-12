@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import OffscreenWorker from "ek3d/addons/offscreen/offscreen?worker";
 import { initJank } from "ek3d/addons/offscreen/jank";
-import { initScene } from "ek3d/addons/offscreen/scene";
+import { MatcapScene } from "ek3d/addons/offscreen/scene";
 import type { OffscreenScene } from "ek3d/addons/offscreen/scene";
 
 const left = document.querySelector<HTMLCanvasElement>("#onscreen");
@@ -25,7 +25,7 @@ function fail(canvas: HTMLCanvasElement, error: unknown): void {
   console.error(error);
 }
 try {
-  scene = initScene(
+  scene = new MatcapScene(
     onscreen,
     onscreen.clientWidth,
     onscreen.clientHeight,

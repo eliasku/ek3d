@@ -12,7 +12,7 @@ import type { Texture } from "ek3d/textures/Texture";
 import beginVertex from "ek3d/renderers/shaders/ShaderChunk/begin_vertex.glsl";
 import { disposeObject } from "./dispose-object";
 import { birdDeclarations, birdTransform } from "./gpgpu-bird-gltf-shaders";
-import { createBirdSimulation } from "./gpgpu-bird-simulation";
+import { BirdSimulation } from "./gpgpu-bird-simulation";
 
 const selected = Math.floor(Math.random() * 2);
 const models = ["Parrot.glb", "Flamingo.glb"],
@@ -125,7 +125,7 @@ new GLTFLoader().load(
       };
       const sim = (() => {
         try {
-          return createBirdSimulation(canvas, width, colors[selected], true);
+          return new BirdSimulation(canvas, width, colors[selected], true);
         } catch (error) {
           geometry.dispose();
           material.dispose();

@@ -179,7 +179,7 @@ test("AmmoPhysics adds scene bodies, synchronizes instances and disposes the sim
   instances.userData.physics = { mass: 1, restitution: 0.75 };
   const scene = new Scene();
   scene.add(ground, instances);
-  const physics = AmmoPhysics(runtime);
+  const physics = new AmmoPhysics(runtime);
   try {
     physics.addScene(scene);
     assert.equal(world.bodies.length, 3);

@@ -6,7 +6,7 @@ import { Color } from "ek3d/math/Color";
 import { Mesh } from "ek3d/objects/Mesh";
 import type { Texture } from "ek3d/textures/Texture";
 import { birdVS, birdFS } from "./gpgpu-bird-shaders";
-import { createBirdSimulation } from "./gpgpu-bird-simulation";
+import { BirdSimulation } from "./gpgpu-bird-simulation";
 
 const canvas = document.querySelector<HTMLCanvasElement>("#scene");
 if (!canvas) throw new Error("Missing flock canvas");
@@ -40,7 +40,7 @@ const uniforms = {
 };
 const material = new ShaderMaterial({ uniforms, vertexShader: birdVS, fragmentShader: birdFS, side: Side.Double });
 try {
-  const sim = createBirdSimulation(canvas, width, 0xffffff, false);
+  const sim = new BirdSimulation(canvas, width, 0xffffff, false);
   const mesh = new Mesh(geometry, material);
   mesh.rotation.y = Math.PI / 2;
   mesh.matrixAutoUpdate = false;

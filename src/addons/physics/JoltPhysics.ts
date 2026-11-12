@@ -81,50 +81,67 @@ export interface JoltRuntime {
 }
 
 /** Creates a simulation with a caller-owned initialized Jolt runtime. Dispose it before releasing the runtime. */
-export function JoltPhysics(jolt: JoltRuntime): {
-  addScene(scene: Object3D): void;
-  addMesh(mesh: Mesh, mass?: number, restitution?: number): void;
-  setMeshPosition(mesh: Mesh, position: Vector3, index?: number): void;
-  setMeshVelocity(mesh: Mesh, velocity: Vector3, index?: number): void;
-  dispose(): void;
-} {
-  const settings = new jolt.JoltSettings();
-  const filter = new jolt.ObjectLayerPairFilterTable(2);
-  filter.EnableCollision(0, 1);
-  filter.EnableCollision(1, 1);
-  const broadPhase = new jolt.BroadPhaseLayerInterfaceTable(2, 2);
-  for (let layer = 0; layer < 2; layer++) {
-    const value = new jolt.BroadPhaseLayer(layer);
-    broadPhase.MapObjectToBroadPhaseLayer(layer, value);
-    jolt.destroy(value);
-  }
-  settings.mObjectLayerPairFilter = filter;
-  settings.mBroadPhaseLayerInterface = broadPhase;
-  settings.mObjectVsBroadPhaseLayerFilter = new jolt.ObjectVsBroadPhaseLayerFilterTable(broadPhase, 2, filter, 2);
-  // JoltInterface takes ownership of the three collision filters.
-  const world = new jolt.JoltInterface(settings);
-  jolt.destroy(settings);
-  const bodyInterface = world.GetPhysicsSystem().GetBodyInterface();
-  const entries = new Map<Mesh, { bodies: JoltBody[]; dynamic: boolean }>();
-  const position = new Vector3();
-  const rotation = new Quaternion();
-  const scale = new Vector3();
-  const matrix = new Matrix4();
-  const timer = new Timer();
-  let disposed = false;
+export class JoltPhysics {
+  private jolt: JoltRuntime;
+  private world: JoltWorld;
+  private bodyInterface: JoltBodyInterface;
+  private entries: Map<Mesh, { bodies: JoltBody[]; dynamic: boolean }>;
+  private position: Vector3;
+  private rotation: Quaternion;
+  private scale: Vector3;
+  private matrix: Matrix4;
+  private timer: Timer;
+  private disposed: boolean;
+  private interval: ReturnType<typeof setInterval>;
 
-  function addMesh(mesh: Mesh, mass = 0, restitution = 0): void {
-    if (disposed) throw new Error("JoltPhysics is disposed");
-    if (entries.has(mesh)) throw new Error("JoltPhysics: Mesh already added");
+  constructor(jolt: JoltRuntime) {
+    this.jolt = jolt;
+    const settings = new jolt.JoltSettings();
+    const filter = new jolt.ObjectLayerPairFilterTable(2);
+    filter.EnableCollision(0, 1);
+    filter.EnableCollision(1, 1);
+    const broadPhase = new jolt.BroadPhaseLayerInterfaceTable(2, 2);
+    for (let layer = 0; layer < 2; layer++) {
+      const value = new jolt.BroadPhaseLayer(layer);
+      broadPhase.MapObjectToBroadPhaseLayer(layer, value);
+      jolt.destroy(value);
+    }
+    settings.mObjectLayerPairFilter = filter;
+    settings.mBroadPhaseLayerInterface = broadPhase;
+    settings.mObjectVsBroadPhaseLayerFilter = new jolt.ObjectVsBroadPhaseLayerFilterTable(broadPhase, 2, filter, 2);
+    // JoltInterface takes ownership of the three collision filters.
+    this.world = new jolt.JoltInterface(settings);
+    jolt.destroy(settings);
+    this.bodyInterface = this.world.GetPhysicsSystem().GetBodyInterface();
+    this.entries = new Map();
+    this.position = new Vector3();
+    this.rotation = new Quaternion();
+    this.scale = new Vector3();
+    this.matrix = new Matrix4();
+    this.timer = new Timer();
+    this.disposed = false;
+
+    this.addScene = this.addScene.bind(this);
+    this.addMesh = this.addMesh.bind(this);
+    this.setMeshPosition = this.setMeshPosition.bind(this);
+    this.setMeshVelocity = this.setMeshVelocity.bind(this);
+    this.dispose = this.dispose.bind(this);
+    this.step = this.step.bind(this);
+    this.interval = setInterval(this.step, 1000 / 60);
+  }
+
+  addMesh(mesh: Mesh, mass = 0, restitution = 0): void {
+    if (this.disposed) throw new Error("JoltPhysics is disposed");
+    if (this.entries.has(mesh)) throw new Error("JoltPhysics: Mesh already added");
     const geometry = mesh.geometry;
     let shape: JoltShape;
     if (geometry instanceof BoxGeometry) {
       const { width, height, depth } = geometry.parameters;
-      const half = new jolt.Vec3(width / 2, height / 2, depth / 2);
-      shape = new jolt.BoxShape(half, 0.025 * Math.min(width, height, depth), null);
-      jolt.destroy(half);
+      const half = new this.jolt.Vec3(width / 2, height / 2, depth / 2);
+      shape = new this.jolt.BoxShape(half, 0.025 * Math.min(width, height, depth), null);
+      this.jolt.destroy(half);
     } else if (geometry instanceof SphereGeometry || geometry instanceof IcosahedronGeometry) {
-      shape = new jolt.SphereShape(geometry.parameters.radius, null);
+      shape = new this.jolt.SphereShape(geometry.parameters.radius, null);
     } else {
       console.error("JoltPhysics: Unsupported geometry type:", geometry.type);
       return;
@@ -135,37 +152,39 @@ export function JoltPhysics(jolt: JoltRuntime): {
       const count = mesh instanceof InstancedMesh ? mesh.count : 1;
       for (let index = 0; index < count; index++) {
         if (mesh instanceof InstancedMesh) {
-          matrix.fromArray(mesh.instanceMatrix.array, index * 16).decompose(position, rotation, scale);
+          this.matrix
+            .fromArray(mesh.instanceMatrix.array, index * 16)
+            .decompose(this.position, this.rotation, this.scale);
         } else {
-          position.copy(mesh.position);
-          rotation.copy(mesh.quaternion);
+          this.position.copy(mesh.position);
+          this.rotation.copy(mesh.quaternion);
         }
-        const p = new jolt.RVec3(position.x, position.y, position.z);
-        const q = new jolt.Quat(rotation.x, rotation.y, rotation.z, rotation.w);
-        const creation = new jolt.BodyCreationSettings(
+        const p = new this.jolt.RVec3(this.position.x, this.position.y, this.position.z);
+        const q = new this.jolt.Quat(this.rotation.x, this.rotation.y, this.rotation.z, this.rotation.w);
+        const creation = new this.jolt.BodyCreationSettings(
           shape,
           p,
           q,
-          mass > 0 ? jolt.EMotionType_Dynamic : jolt.EMotionType_Static,
+          mass > 0 ? this.jolt.EMotionType_Dynamic : this.jolt.EMotionType_Static,
           mass > 0 ? 1 : 0,
         );
-        jolt.destroy(p);
-        jolt.destroy(q);
+        this.jolt.destroy(p);
+        this.jolt.destroy(q);
         creation.mRestitution = restitution;
         let body: JoltBody;
         try {
-          body = bodyInterface.CreateBody(creation);
+          body = this.bodyInterface.CreateBody(creation);
         } finally {
-          jolt.destroy(creation);
+          this.jolt.destroy(creation);
         }
         bodies.push(body);
-        bodyInterface.AddBody(body.GetID(), jolt.EActivation_Activate);
+        this.bodyInterface.AddBody(body.GetID(), this.jolt.EActivation_Activate);
       }
-      entries.set(mesh, { bodies, dynamic: mass > 0 });
+      this.entries.set(mesh, { bodies, dynamic: mass > 0 });
     } catch (error) {
       for (const body of bodies) {
-        bodyInterface.RemoveBody(body.GetID());
-        bodyInterface.DestroyBody(body.GetID());
+        this.bodyInterface.RemoveBody(body.GetID());
+        this.bodyInterface.DestroyBody(body.GetID());
       }
       throw error;
     } finally {
@@ -173,63 +192,63 @@ export function JoltPhysics(jolt: JoltRuntime): {
     }
   }
 
-  function addScene(scene: Object3D): void {
+  addScene(scene: Object3D): void {
     scene.traverse((child) => {
       if (child instanceof Mesh && child.userData.physics) {
         const physics = child.userData.physics as { mass?: number; restitution?: number };
-        addMesh(child, physics.mass, physics.restitution);
+        this.addMesh(child, physics.mass, physics.restitution);
       }
     });
   }
 
-  function getBody(mesh: Mesh, index: number): JoltBody {
-    if (disposed) throw new Error("JoltPhysics is disposed");
-    const body = entries.get(mesh)?.bodies[index];
+  private getBody(mesh: Mesh, index: number): JoltBody {
+    if (this.disposed) throw new Error("JoltPhysics is disposed");
+    const body = this.entries.get(mesh)?.bodies[index];
     if (!body) throw new Error("JoltPhysics: Mesh or instance is not registered");
     return body;
   }
 
-  function setMeshPosition(mesh: Mesh, value: Vector3, index = 0): void {
-    const body = getBody(mesh, index);
-    const p = new jolt.RVec3(value.x, value.y, value.z);
-    const q = new jolt.Quat(0, 0, 0, 1);
-    const zero = new jolt.Vec3(0, 0, 0);
+  setMeshPosition(mesh: Mesh, value: Vector3, index = 0): void {
+    const body = this.getBody(mesh, index);
+    const p = new this.jolt.RVec3(value.x, value.y, value.z);
+    const q = new this.jolt.Quat(0, 0, 0, 1);
+    const zero = new this.jolt.Vec3(0, 0, 0);
     try {
-      bodyInterface.SetPositionAndRotation(body.GetID(), p, q, jolt.EActivation_Activate);
-      bodyInterface.SetLinearAndAngularVelocity(body.GetID(), zero, zero);
-      syncMesh(mesh, entries.get(mesh)!.bodies);
+      this.bodyInterface.SetPositionAndRotation(body.GetID(), p, q, this.jolt.EActivation_Activate);
+      this.bodyInterface.SetLinearAndAngularVelocity(body.GetID(), zero, zero);
+      this.syncMesh(mesh, this.entries.get(mesh)!.bodies);
     } finally {
-      jolt.destroy(p);
-      jolt.destroy(q);
-      jolt.destroy(zero);
+      this.jolt.destroy(p);
+      this.jolt.destroy(q);
+      this.jolt.destroy(zero);
     }
   }
 
-  function setMeshVelocity(mesh: Mesh, value: Vector3, index = 0): void {
-    const body = getBody(mesh, index);
-    const velocity = new jolt.Vec3(value.x, value.y, value.z);
+  setMeshVelocity(mesh: Mesh, value: Vector3, index = 0): void {
+    const body = this.getBody(mesh, index);
+    const velocity = new this.jolt.Vec3(value.x, value.y, value.z);
     try {
-      bodyInterface.SetLinearVelocity(body.GetID(), velocity);
-      bodyInterface.ActivateBody(body.GetID());
+      this.bodyInterface.SetLinearVelocity(body.GetID(), velocity);
+      this.bodyInterface.ActivateBody(body.GetID());
     } finally {
-      jolt.destroy(velocity);
+      this.jolt.destroy(velocity);
     }
   }
 
-  function syncMesh(mesh: Mesh, bodies: JoltBody[]): void {
+  private syncMesh(mesh: Mesh, bodies: JoltBody[]): void {
     for (let index = 0; index < bodies.length; index++) {
       const body = bodies[index];
       const p = body.GetPosition();
       const q = body.GetRotation();
-      position.set(p.GetX(), p.GetY(), p.GetZ());
-      rotation.set(q.GetX(), q.GetY(), q.GetZ(), q.GetW());
+      this.position.set(p.GetX(), p.GetY(), p.GetZ());
+      this.rotation.set(q.GetX(), q.GetY(), q.GetZ(), q.GetW());
       if (mesh instanceof InstancedMesh) {
-        mesh.getMatrixAt(index, matrix);
-        scale.setFromMatrixScale(matrix);
-        matrix.compose(position, rotation, scale).toArray(mesh.instanceMatrix.array, index * 16);
+        mesh.getMatrixAt(index, this.matrix);
+        this.scale.setFromMatrixScale(this.matrix);
+        this.matrix.compose(this.position, this.rotation, this.scale).toArray(mesh.instanceMatrix.array, index * 16);
       } else {
-        mesh.position.copy(position);
-        mesh.quaternion.copy(rotation);
+        mesh.position.copy(this.position);
+        mesh.quaternion.copy(this.rotation);
       }
     }
     if (mesh instanceof InstancedMesh) {
@@ -238,33 +257,27 @@ export function JoltPhysics(jolt: JoltRuntime): {
     }
   }
 
-  function step(): void {
-    timer.update();
-    const delta = Math.min(timer.getDelta(), 1 / 30);
-    world.Step(delta, delta > 1 / 55 ? 2 : 1);
-    for (const [mesh, entry] of entries) {
-      if (entry.dynamic) syncMesh(mesh, entry.bodies);
+  private step(): void {
+    this.timer.update();
+    const delta = Math.min(this.timer.getDelta(), 1 / 30);
+    this.world.Step(delta, delta > 1 / 55 ? 2 : 1);
+    for (const [mesh, entry] of this.entries) {
+      if (entry.dynamic) this.syncMesh(mesh, entry.bodies);
     }
   }
-  const interval = setInterval(step, 1000 / 60);
-  return {
-    addScene,
-    addMesh,
-    setMeshPosition,
-    setMeshVelocity,
-    dispose(): void {
-      if (disposed) return;
-      disposed = true;
-      clearInterval(interval);
-      timer.dispose();
-      for (const { bodies } of entries.values()) {
-        for (const body of bodies) {
-          bodyInterface.RemoveBody(body.GetID());
-          bodyInterface.DestroyBody(body.GetID());
-        }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    clearInterval(this.interval);
+    this.timer.dispose();
+    for (const { bodies } of this.entries.values()) {
+      for (const body of bodies) {
+        this.bodyInterface.RemoveBody(body.GetID());
+        this.bodyInterface.DestroyBody(body.GetID());
       }
-      entries.clear();
-      jolt.destroy(world);
-    },
-  };
+    }
+    this.entries.clear();
+    this.jolt.destroy(this.world);
+  }
 }

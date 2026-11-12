@@ -101,23 +101,54 @@ export interface RapierRuntime {
 }
 
 /** Creates a Rapier world using an initialized, caller-owned runtime. */
-export function RapierPhysics(RAPIER: RapierRuntime) {
-  const world = new RAPIER.World({ x: 0, y: -9.81, z: 0 });
-  const entries = new Map<Mesh, { bodies: RapierBody[]; colliders: RapierCollider[]; dynamic: boolean }>();
-  const timer = new Timer();
-  const matrix = new Matrix4();
-  const position = new Vector3();
-  const rotation = new Quaternion();
-  const scale = new Vector3();
-  const zero = { x: 0, y: 0, z: 0 };
-  let disposed = false;
+export class RapierPhysics {
+  RAPIER: RapierRuntime;
+  world: RapierWorld;
+  // Reassigning exposed references must not replace the simulation's captured state.
+  private runtime: RapierRuntime;
+  private simulation: RapierWorld;
+  private entries: Map<Mesh, { bodies: RapierBody[]; colliders: RapierCollider[]; dynamic: boolean }>;
+  private timer: Timer;
+  private matrix: Matrix4;
+  private position: Vector3;
+  private rotation: Quaternion;
+  private scale: Vector3;
+  private zero: RapierVector;
+  private disposed: boolean;
+  private interval: ReturnType<typeof setInterval>;
 
-  function shapeFor(geometry: BufferGeometry): RapierColliderDesc | null {
+  constructor(RAPIER: RapierRuntime) {
+    this.runtime = RAPIER;
+    this.simulation = new RAPIER.World({ x: 0, y: -9.81, z: 0 });
+    this.entries = new Map();
+    this.timer = new Timer();
+    this.matrix = new Matrix4();
+    this.position = new Vector3();
+    this.rotation = new Quaternion();
+    this.scale = new Vector3();
+    this.zero = { x: 0, y: 0, z: 0 };
+    this.disposed = false;
+
+    this.addScene = this.addScene.bind(this);
+    this.addMesh = this.addMesh.bind(this);
+    this.removeMesh = this.removeMesh.bind(this);
+    this.setMeshPosition = this.setMeshPosition.bind(this);
+    this.setMeshVelocity = this.setMeshVelocity.bind(this);
+    this.applyImpulse = this.applyImpulse.bind(this);
+    this.addHeightfield = this.addHeightfield.bind(this);
+    this.step = this.step.bind(this);
+    this.dispose = this.dispose.bind(this);
+    this.interval = setInterval(this.step, 1000 / 60);
+    this.RAPIER = RAPIER;
+    this.world = this.simulation;
+  }
+
+  private shapeFor(geometry: BufferGeometry): RapierColliderDesc | null {
     const p = (geometry as BufferGeometry & { parameters?: Record<string, number> }).parameters ?? {};
     switch (geometry.type) {
       case "RoundedBoxGeometry": {
         const r = p.radius ?? 0.1;
-        return RAPIER.ColliderDesc.roundCuboid(
+        return this.runtime.ColliderDesc.roundCuboid(
           (p.width ?? 1) / 2 - r,
           (p.height ?? 1) / 2 - r,
           (p.depth ?? 1) / 2 - r,
@@ -125,14 +156,14 @@ export function RapierPhysics(RAPIER: RapierRuntime) {
         );
       }
       case "BoxGeometry":
-        return RAPIER.ColliderDesc.cuboid((p.width ?? 1) / 2, (p.height ?? 1) / 2, (p.depth ?? 1) / 2);
+        return this.runtime.ColliderDesc.cuboid((p.width ?? 1) / 2, (p.height ?? 1) / 2, (p.depth ?? 1) / 2);
       case "SphereGeometry":
       case "IcosahedronGeometry":
-        return RAPIER.ColliderDesc.ball(p.radius ?? 1);
+        return this.runtime.ColliderDesc.ball(p.radius ?? 1);
       case "CylinderGeometry":
-        return RAPIER.ColliderDesc.cylinder((p.height ?? 0.5) / 2, p.radiusBottom ?? 0.5);
+        return this.runtime.ColliderDesc.cylinder((p.height ?? 0.5) / 2, p.radiusBottom ?? 0.5);
       case "CapsuleGeometry":
-        return RAPIER.ColliderDesc.capsule((p.height ?? 0.5) / 2, p.radius ?? 0.5);
+        return this.runtime.ColliderDesc.capsule((p.height ?? 0.5) / 2, p.radius ?? 0.5);
       case "BufferGeometry": {
         const attribute = geometry.getAttribute("position");
         if (!attribute || attribute instanceof GLBufferAttribute)
@@ -147,7 +178,7 @@ export function RapierPhysics(RAPIER: RapierRuntime) {
         const indices = index
           ? Uint32Array.from(index.array)
           : Uint32Array.from({ length: attribute.count }, (_, i) => i);
-        return RAPIER.ColliderDesc.trimesh(vertices, indices);
+        return this.runtime.ColliderDesc.trimesh(vertices, indices);
       }
       default:
         console.error("RapierPhysics: Unsupported geometry type:", geometry.type);
@@ -155,36 +186,39 @@ export function RapierPhysics(RAPIER: RapierRuntime) {
     }
   }
 
-  function check(mesh: Mesh): void {
-    if (disposed) throw new Error("RapierPhysics is disposed");
-    if (entries.has(mesh)) throw new Error("RapierPhysics: Mesh already added");
+  private check(mesh: Mesh): void {
+    if (this.disposed) throw new Error("RapierPhysics is disposed");
+    if (this.entries.has(mesh)) throw new Error("RapierPhysics: Mesh already added");
   }
-  function createBody(
+
+  private createBody(
     p: RapierVector,
     q: RapierRotation,
     mass: number,
     shape: RapierColliderDesc,
   ): { body: RapierBody; collider: RapierCollider } {
-    const desc = mass > 0 ? RAPIER.RigidBodyDesc.dynamic() : RAPIER.RigidBodyDesc.fixed();
+    const desc = mass > 0 ? this.runtime.RigidBodyDesc.dynamic() : this.runtime.RigidBodyDesc.fixed();
     desc.setTranslation(p.x, p.y, p.z);
     desc.setRotation(q);
-    const body = world.createRigidBody(desc);
+    const body = this.simulation.createRigidBody(desc);
     try {
-      return { body, collider: world.createCollider(shape, body) };
+      return { body, collider: this.simulation.createCollider(shape, body) };
     } catch (error) {
-      world.removeRigidBody(body);
+      this.simulation.removeRigidBody(body);
       throw error;
     }
   }
-  function register(mesh: Mesh, bodies: RapierBody[], colliders: RapierCollider[], dynamic: boolean): void {
-    entries.set(mesh, { bodies, colliders, dynamic });
+
+  private register(mesh: Mesh, bodies: RapierBody[], colliders: RapierCollider[], dynamic: boolean): void {
+    this.entries.set(mesh, { bodies, colliders, dynamic });
     if (!mesh.userData.physics) mesh.userData.physics = {};
     mesh.userData.physics.body = mesh instanceof InstancedMesh ? bodies : bodies[0];
     mesh.userData.physics.collider = mesh instanceof InstancedMesh ? colliders : colliders[0];
   }
-  function addMesh(mesh: Mesh, mass = 0, restitution = 0): void {
-    check(mesh);
-    const shape = shapeFor(mesh.geometry);
+
+  addMesh(mesh: Mesh, mass = 0, restitution = 0): void {
+    this.check(mesh);
+    const shape = this.shapeFor(mesh.geometry);
     if (!shape) return;
     shape.setMass(mass);
     shape.setRestitution(restitution);
@@ -193,34 +227,37 @@ export function RapierPhysics(RAPIER: RapierRuntime) {
     try {
       const count = mesh instanceof InstancedMesh ? mesh.count : 1;
       for (let i = 0; i < count; i++) {
-        if (mesh instanceof InstancedMesh) mesh.getMatrixAt(i, matrix).decompose(position, rotation, scale);
-        else {
-          position.copy(mesh.position);
-          rotation.copy(mesh.quaternion);
+        if (mesh instanceof InstancedMesh) {
+          mesh.getMatrixAt(i, this.matrix).decompose(this.position, this.rotation, this.scale);
+        } else {
+          this.position.copy(mesh.position);
+          this.rotation.copy(mesh.quaternion);
         }
-        const result = createBody(position, rotation, mass, shape);
+        const result = this.createBody(this.position, this.rotation, mass, shape);
         bodies.push(result.body);
         colliders.push(result.collider);
       }
-      register(mesh, bodies, colliders, mass > 0);
+      this.register(mesh, bodies, colliders, mass > 0);
     } catch (error) {
-      for (const body of bodies) world.removeRigidBody(body);
+      for (const body of bodies) this.simulation.removeRigidBody(body);
       throw error;
     }
   }
-  function addScene(scene: Object3D): void {
+
+  addScene(scene: Object3D): void {
     scene.traverse((child) => {
       if (child instanceof Mesh && child.userData.physics) {
         const data = child.userData.physics as { mass?: number; restitution?: number };
-        addMesh(child, data.mass, data.restitution);
+        this.addMesh(child, data.mass, data.restitution);
       }
     });
   }
-  function removeMesh(mesh: Mesh): void {
-    const entry = entries.get(mesh);
+
+  removeMesh(mesh: Mesh): void {
+    const entry = this.entries.get(mesh);
     if (!entry) return;
-    entries.delete(mesh);
-    for (const body of entry.bodies) world.removeRigidBody(body);
+    this.entries.delete(mesh);
+    for (const body of entry.bodies) this.simulation.removeRigidBody(body);
     const data = mesh.userData.physics as
       | { body?: RapierBody | RapierBody[]; collider?: RapierCollider | RapierCollider[] }
       | undefined;
@@ -229,57 +266,57 @@ export function RapierPhysics(RAPIER: RapierRuntime) {
       if (data.collider === entry.colliders || data.collider === entry.colliders[0]) delete data.collider;
     }
   }
-  function getBody(mesh: Mesh, index: number): RapierBody {
-    if (disposed) throw new Error("RapierPhysics is disposed");
-    const body = entries.get(mesh)?.bodies[index];
+
+  private getBody(mesh: Mesh, index: number): RapierBody {
+    if (this.disposed) throw new Error("RapierPhysics is disposed");
+    const body = this.entries.get(mesh)?.bodies[index];
     if (!body) throw new Error("RapierPhysics: Mesh or instance is not registered");
     return body;
   }
-  function setMeshPosition(mesh: Mesh, value: RapierVector, index = 0): void {
-    const body = getBody(mesh, index);
-    body.setAngvel(zero, true);
-    body.setLinvel(zero, true);
+
+  setMeshPosition(mesh: Mesh, value: RapierVector, index = 0): void {
+    const body = this.getBody(mesh, index);
+    body.setAngvel(this.zero, true);
+    body.setLinvel(this.zero, true);
     body.setTranslation(value, true);
   }
-  function setMeshVelocity(mesh: Mesh, value: RapierVector, index = 0): void {
-    getBody(mesh, index).setLinvel(value, true);
+
+  setMeshVelocity(mesh: Mesh, value: RapierVector, index = 0): void {
+    this.getBody(mesh, index).setLinvel(value, true);
   }
-  function applyImpulse(mesh: Mesh, value: RapierVector, index = 0): void {
-    getBody(mesh, index).applyImpulse(value, true);
+
+  applyImpulse(mesh: Mesh, value: RapierVector, index = 0): void {
+    this.getBody(mesh, index).applyImpulse(value, true);
   }
-  function addHeightfield(
-    mesh: Mesh,
-    width: number,
-    depth: number,
-    heights: Float32Array,
-    size: RapierVector,
-  ): RapierBody {
-    check(mesh);
-    const shape = RAPIER.ColliderDesc.heightfield(width, depth, heights, size);
-    const { body, collider } = createBody(mesh.position, mesh.quaternion, 0, shape);
-    register(mesh, [body], [collider], false);
+
+  addHeightfield(mesh: Mesh, width: number, depth: number, heights: Float32Array, size: RapierVector): RapierBody {
+    this.check(mesh);
+    const shape = this.runtime.ColliderDesc.heightfield(width, depth, heights, size);
+    const { body, collider } = this.createBody(mesh.position, mesh.quaternion, 0, shape);
+    this.register(mesh, [body], [collider], false);
     return body;
   }
-  function step(delta?: number): void {
-    if (disposed) return;
+
+  step(delta?: number): void {
+    if (this.disposed) return;
     if (delta === undefined) {
-      timer.update();
-      delta = timer.getDelta();
+      this.timer.update();
+      delta = this.timer.getDelta();
     }
-    world.timestep = Math.min(delta, 1 / 30);
-    world.step();
-    for (const [mesh, entry] of entries) {
+    this.simulation.timestep = Math.min(delta, 1 / 30);
+    this.simulation.step();
+    for (const [mesh, entry] of this.entries) {
       if (!entry.dynamic) continue;
       for (let i = 0; i < entry.bodies.length; i++) {
         const body = entry.bodies[i];
         if (mesh instanceof InstancedMesh) {
-          mesh.getMatrixAt(i, matrix).decompose(position, rotation, scale);
+          mesh.getMatrixAt(i, this.matrix).decompose(this.position, this.rotation, this.scale);
           const p = body.translation(),
             q = body.rotation();
-          position.set(p.x, p.y, p.z);
-          rotation.set(q.x, q.y, q.z, q.w);
-          matrix.compose(position, rotation, scale);
-          mesh.setMatrixAt(i, matrix);
+          this.position.set(p.x, p.y, p.z);
+          this.rotation.set(q.x, q.y, q.z, q.w);
+          this.matrix.compose(this.position, this.rotation, this.scale);
+          mesh.setMatrixAt(i, this.matrix);
         } else {
           const p = body.translation(),
             q = body.rotation();
@@ -293,26 +330,13 @@ export function RapierPhysics(RAPIER: RapierRuntime) {
       }
     }
   }
-  const interval = setInterval(step, 1000 / 60);
-  function dispose(): void {
-    if (disposed) return;
-    clearInterval(interval);
-    timer.dispose();
-    for (const mesh of entries.keys()) removeMesh(mesh);
-    disposed = true;
-    world.free();
+
+  dispose(): void {
+    if (this.disposed) return;
+    clearInterval(this.interval);
+    this.timer.dispose();
+    for (const mesh of this.entries.keys()) this.removeMesh(mesh);
+    this.disposed = true;
+    this.simulation.free();
   }
-  return {
-    RAPIER,
-    world,
-    addScene,
-    addMesh,
-    removeMesh,
-    setMeshPosition,
-    setMeshVelocity,
-    applyImpulse,
-    addHeightfield,
-    step,
-    dispose,
-  };
 }

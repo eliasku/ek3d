@@ -171,8 +171,8 @@ test("uniform uploads retain numeric fast paths, math arrays and nested value up
     uniform3f: (name: string, x: number, y: number, z: number) => {
       uploads[name] = [x, y, z];
     },
-  };
-  const uniforms = new WebGLUniforms(gl);
+  } as unknown as WebGL2RenderingContext;
+  const uniforms = new WebGLUniforms(gl, {});
   const numeric = [1, 2, 3, 4, 5, 6];
   const typed = new Float32Array([6, 5, 4, 3, 2, 1]);
   const lightValues = [{ color: new Color(1, 2, 3) }, { color: new Color(4, 5, 6) }];

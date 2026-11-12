@@ -2,9 +2,9 @@ import { Blending } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 import { Mesh } from "ek3d/objects/Mesh";
-import { blendingScene, labelMaterial } from "./materials-blending-common";
+import { BlendingScene, labelMaterial } from "./materials-blending-common";
 
-const { scene, load, cleanup } = blendingScene(70, 600);
+const { scene, load, cleanup } = new BlendingScene(70, 600);
 const blendings = [
   { name: "No", constant: Blending.No },
   { name: "Normal", constant: Blending.Normal },

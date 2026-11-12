@@ -1,3 +1,4 @@
+import type { BufferAttribute } from "../core/BufferAttribute";
 import type { Matrix4 } from "./Matrix4";
 import type { Vector2 } from "./Vector2";
 import type { Vector3 } from "./Vector3";
@@ -497,7 +498,9 @@ export class Matrix3 {
    * @param [offset=0] - Index of the first element in the array.
    * @return The matrix elements in column-major order.
    */
-  toArray(array: number[] = [], offset: number = 0): number[] {
+  toArray(array?: number[], offset?: number): number[];
+  toArray<T extends number[] | BufferAttribute["array"]>(array: T, offset?: number): T;
+  toArray(array: number[] | BufferAttribute["array"] = [], offset: number = 0): number[] | BufferAttribute["array"] {
     const te = this.elements;
     array[offset] = te[0];
     array[offset + 1] = te[1];

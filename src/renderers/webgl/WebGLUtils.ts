@@ -1,9 +1,18 @@
 import { GL } from "../../GL";
 import { PixelFormat, TextureType, ColorSpace, Transfer } from "../../constants";
 import { ColorManagement } from "../../math/ColorManagement";
-export function WebGLUtils(gl?: any, extensions?: any) {
-  function convert(p?: any, colorSpace: string = ColorSpace.No) {
-    let extension: any;
+import type { WebGLExtensions } from "./WebGLExtensions";
+export class WebGLUtils {
+  private readonly gl: WebGL2RenderingContext;
+  private readonly extensions: WebGLExtensions;
+
+  constructor(gl: WebGL2RenderingContext, extensions: WebGLExtensions) {
+    this.gl = gl;
+    this.extensions = extensions;
+    this.convert = this.convert.bind(this);
+  }
+
+  convert(p: number | string, colorSpace: string = ColorSpace.No): number | null {
     const transfer = ColorManagement.getTransfer(colorSpace);
     if (p === TextureType.UnsignedByte) return GL.UNSIGNED_BYTE;
     if (p === TextureType.UnsignedShort4444) return GL.UNSIGNED_SHORT_4_4_4_4;
@@ -36,7 +45,7 @@ export function WebGLUtils(gl?: any, extensions?: any) {
       p === PixelFormat.RGBA_S3TC_DXT5
     ) {
       if (transfer === Transfer.SRGB) {
-        extension = extensions.get("WEBGL_compressed_texture_s3tc_srgb");
+        const extension = this.extensions.get("WEBGL_compressed_texture_s3tc_srgb");
         if (extension !== null) {
           if (p === PixelFormat.RGB_S3TC_DXT1) return extension.COMPRESSED_SRGB_S3TC_DXT1_EXT;
           if (p === PixelFormat.RGBA_S3TC_DXT1) return extension.COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT;
@@ -46,7 +55,7 @@ export function WebGLUtils(gl?: any, extensions?: any) {
           return null;
         }
       } else {
-        extension = extensions.get("WEBGL_compressed_texture_s3tc");
+        const extension = this.extensions.get("WEBGL_compressed_texture_s3tc");
         if (extension !== null) {
           if (p === PixelFormat.RGB_S3TC_DXT1) return extension.COMPRESSED_RGB_S3TC_DXT1_EXT;
           if (p === PixelFormat.RGBA_S3TC_DXT1) return extension.COMPRESSED_RGBA_S3TC_DXT1_EXT;
@@ -64,7 +73,7 @@ export function WebGLUtils(gl?: any, extensions?: any) {
       p === PixelFormat.RGBA_PVRTC_4BPPV1 ||
       p === PixelFormat.RGBA_PVRTC_2BPPV1
     ) {
-      extension = extensions.get("WEBGL_compressed_texture_pvrtc");
+      const extension = this.extensions.get("WEBGL_compressed_texture_pvrtc");
       if (extension !== null) {
         if (p === PixelFormat.RGB_PVRTC_4BPPV1) return extension.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
         if (p === PixelFormat.RGB_PVRTC_2BPPV1) return extension.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
@@ -84,7 +93,7 @@ export function WebGLUtils(gl?: any, extensions?: any) {
       p === PixelFormat.RG11_EAC ||
       p === PixelFormat.SIGNED_RG11_EAC
     ) {
-      extension = extensions.get("WEBGL_compressed_texture_etc");
+      const extension = this.extensions.get("WEBGL_compressed_texture_etc");
       if (extension !== null) {
         if (p === PixelFormat.RGB_ETC1 || p === PixelFormat.RGB_ETC2)
           return transfer === Transfer.SRGB ? extension.COMPRESSED_SRGB8_ETC2 : extension.COMPRESSED_RGB8_ETC2;
@@ -117,7 +126,7 @@ export function WebGLUtils(gl?: any, extensions?: any) {
       p === PixelFormat.RGBA_ASTC_12x10 ||
       p === PixelFormat.RGBA_ASTC_12x12
     ) {
-      extension = extensions.get("WEBGL_compressed_texture_astc");
+      const extension = this.extensions.get("WEBGL_compressed_texture_astc");
       if (extension !== null) {
         if (p === PixelFormat.RGBA_ASTC_4x4)
           return transfer === Transfer.SRGB
@@ -181,7 +190,7 @@ export function WebGLUtils(gl?: any, extensions?: any) {
     }
     // BPTC
     if (p === PixelFormat.RGBA_BPTC || p === PixelFormat.RGB_BPTC_SIGNED || p === PixelFormat.RGB_BPTC_UNSIGNED) {
-      extension = extensions.get("EXT_texture_compression_bptc");
+      const extension = this.extensions.get("EXT_texture_compression_bptc");
       if (extension !== null) {
         if (p === PixelFormat.RGBA_BPTC)
           return transfer === Transfer.SRGB
@@ -200,7 +209,7 @@ export function WebGLUtils(gl?: any, extensions?: any) {
       p === PixelFormat.RED_GREEN_RGTC2 ||
       p === PixelFormat.SIGNED_RED_GREEN_RGTC2
     ) {
-      extension = extensions.get("EXT_texture_compression_rgtc");
+      const extension = this.extensions.get("EXT_texture_compression_rgtc");
       if (extension !== null) {
         if (p === PixelFormat.RED_RGTC1) return extension.COMPRESSED_RED_RGTC1_EXT;
         if (p === PixelFormat.SIGNED_RED_RGTC1) return extension.COMPRESSED_SIGNED_RED_RGTC1_EXT;
@@ -213,7 +222,7 @@ export function WebGLUtils(gl?: any, extensions?: any) {
     //
     if (p === TextureType.UnsignedInt248) return GL.UNSIGNED_INT_24_8;
     // if "p" can't be resolved, assume the user defines a WebGL constant as a string (fallback/workaround for packed RGB formats)
-    return gl[p] !== undefined ? gl[p] : null;
+    const constants = this.gl as unknown as Record<string | number, number | undefined>;
+    return constants[p] !== undefined ? constants[p]! : null;
   }
-  return { convert: convert };
 }

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "vite-plus/test";
-import { createArchiveResolver, isZipBuffer, readMtlxArchive } from "../src/addons/loaders/materialx/MaterialXArchive";
+import { ArchiveResolver, isZipBuffer, readMtlxArchive } from "../src/addons/loaders/materialx/MaterialXArchive";
 import {
   createStrictInterfaceValidator,
   type MaterialXValidationNode,
@@ -22,7 +22,7 @@ test("MaterialX archives locate exactly one document and resolve cached resource
   assert.equal(isZipBuffer(new Uint8Array([80, 75, 3, 4])), true);
   assert.equal(archive.mtlxPath, "materials/main.mtlx");
   assert.equal(archive.text, "<materialx/>");
-  const resolver = createArchiveResolver(archive.files);
+  const resolver = new ArchiveResolver(archive.files);
   const url = resolver.resolve("tex.png");
   assert.ok(url);
   assert.equal(resolver.resolve("tex.png"), url);

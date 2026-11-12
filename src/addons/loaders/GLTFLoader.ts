@@ -617,33 +617,33 @@ export class GLTFLoader extends Loader<GLTF, string> {
 
 /* GLTFREGISTRY */
 
-interface GLTFRegistryInstance {
-  get(key: string): any;
-  add(key: string, object: any): void;
-  remove(key: string): void;
-  removeAll(): void;
-}
+class GLTFRegistry {
+  private objects: Record<string, unknown> = {};
 
-function GLTFRegistry(): GLTFRegistryInstance {
-  let objects: Record<string, any> = {};
+  constructor() {
+    this.get = this.get.bind(this);
+    this.add = this.add.bind(this);
+    this.remove = this.remove.bind(this);
+    this.removeAll = this.removeAll.bind(this);
+  }
 
-  return {
-    get: function (key) {
-      return objects[key];
-    },
+  get<T = unknown>(key: string): T | undefined {
+    // Each caller owns the value type associated with its cache key.
+    const object = this.objects[key] as T | undefined;
+    return object;
+  }
 
-    add: function (key, object) {
-      objects[key] = object;
-    },
+  add(key: string, object: unknown): void {
+    this.objects[key] = object;
+  }
 
-    remove: function (key) {
-      delete objects[key];
-    },
+  remove(key: string): void {
+    delete this.objects[key];
+  }
 
-    removeAll: function () {
-      objects = {};
-    },
-  };
+  removeAll(): void {
+    this.objects = {};
+  }
 }
 
 /*********************************/
@@ -721,7 +721,7 @@ class GLTFLightsExtension implements GLTFLoaderPlugin {
   _loadLight(lightIndex: number): Promise<any> {
     const parser = this.parser;
     const cacheKey = "light:" + lightIndex;
-    let dependency = parser.cache.get(cacheKey);
+    let dependency = parser.cache.get<Promise<DirectionalLight | PointLight | SpotLight>>(cacheKey);
 
     if (dependency) return dependency;
 
@@ -2086,7 +2086,7 @@ const ALPHA_MODES = {
  * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#default-material
  */
 // The default material is stored as a plain property, so it survives `cache.removeAll()` like upstream.
-function createDefaultMaterial(cache: GLTFRegistryInstance & Record<string, Material>): Material {
+function createDefaultMaterial(cache: GLTFRegistry & Record<string, Material>): Material {
   if (cache["DefaultMaterial"] === undefined) {
     cache["DefaultMaterial"] = new MeshStandardMaterial({
       color: 0xffffff,
@@ -2308,7 +2308,7 @@ export class GLTFParser {
   options: GLTFParserOptions;
 
   // loader object cache
-  cache: GLTFRegistryInstance;
+  cache: GLTFRegistry;
 
   // associations between Three.js objects and glTF elements
   associations: Map<object, GLTFJson>;
@@ -2350,7 +2350,7 @@ export class GLTFParser {
     };
 
     // loader object cache
-    this.cache = GLTFRegistry();
+    this.cache = new GLTFRegistry();
 
     // associations between Three.js objects and glTF elements
     this.associations = new Map();
@@ -2686,7 +2686,7 @@ export class GLTFParser {
    * Requests all dependencies of the specified type asynchronously, with caching.
    */
   getDependencies(type: string): Promise<any[]> {
-    let dependencies = this.cache.get(type);
+    let dependencies = this.cache.get<Promise<unknown[]>>(type);
 
     if (!dependencies) {
       const defs: unknown[] = this.json[type + (type === "mesh" ? "es" : "s")] || [];
@@ -2803,7 +2803,7 @@ export class GLTFParser {
           ibSlice +
           ":" +
           accessorDef.count;
-        let ib = parser.cache.get(ibCacheKey);
+        let ib = parser.cache.get<InterleavedBuffer>(ibCacheKey);
 
         if (!ib) {
           array = new TypedArray(bufferView!, ibSlice * byteStride, (accessorDef.count * byteStride) / elementBytes);
@@ -3097,7 +3097,7 @@ export class GLTFParser {
     if (object.isPoints) {
       const cacheKey = "PointsMaterial:" + material.uuid;
 
-      let pointsMaterial = this.cache.get(cacheKey);
+      let pointsMaterial = this.cache.get<PointsMaterial>(cacheKey);
 
       if (!pointsMaterial) {
         pointsMaterial = new PointsMaterial();
@@ -3113,7 +3113,7 @@ export class GLTFParser {
     } else if (object.isLine) {
       const cacheKey = "LineBasicMaterial:" + material.uuid;
 
-      let lineMaterial = this.cache.get(cacheKey);
+      let lineMaterial = this.cache.get<LineBasicMaterial>(cacheKey);
 
       if (!lineMaterial) {
         lineMaterial = new LineBasicMaterial();
@@ -3135,7 +3135,7 @@ export class GLTFParser {
       if (useVertexColors) cacheKey += "vertex-colors:";
       if (useFlatShading) cacheKey += "flat-shading:";
 
-      let cachedMaterial = this.cache.get(cacheKey);
+      let cachedMaterial = this.cache.get<Material>(cacheKey);
 
       if (!cachedMaterial) {
         cachedMaterial = material.clone();
@@ -3388,7 +3388,7 @@ export class GLTFParser {
     for (let i = 0, il = primitives.length; i < il; i++) {
       const material =
         primitives[i].material === undefined
-          ? createDefaultMaterial(this.cache as GLTFRegistryInstance & Record<string, Material>)
+          ? createDefaultMaterial(this.cache as GLTFRegistry & Record<string, Material>)
           : this.getDependency("material", primitives[i].material);
 
       pending.push(material);

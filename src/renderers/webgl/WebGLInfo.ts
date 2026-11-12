@@ -30,53 +30,55 @@ export interface WebGLInfoState {
   reset(): void;
   update(count: number, mode: number, instanceCount: number): void;
 }
-export function WebGLInfo(): WebGLInfoState {
-  const memory: WebGLInfoState["memory"] = {
+export class WebGLInfo implements WebGLInfoState {
+  memory: WebGLInfoState["memory"] = {
     geometries: 0,
     textures: 0,
   };
-  const render: WebGLInfoState["render"] = {
+  private readonly renderState: WebGLInfoState["render"] = {
     frame: 0,
     calls: 0,
     triangles: 0,
     points: 0,
     lines: 0,
   };
-  function update(count: number, mode: number, instanceCount: number) {
-    render.calls++;
+  render: WebGLInfoState["render"] = this.renderState;
+  programs: WebGLProgramInfo[] | null = null;
+  autoReset: boolean = true;
+
+  constructor() {
+    this.reset = this.reset.bind(this);
+    this.update = this.update.bind(this);
+  }
+
+  update(count: number, mode: number, instanceCount: number): void {
+    this.renderState.calls++;
     switch (mode) {
       case GL.TRIANGLES:
-        render.triangles += instanceCount * (count / 3);
+        this.renderState.triangles += instanceCount * (count / 3);
         break;
       case GL.LINES:
-        render.lines += instanceCount * (count / 2);
+        this.renderState.lines += instanceCount * (count / 2);
         break;
       case GL.LINE_STRIP:
-        render.lines += instanceCount * (count - 1);
+        this.renderState.lines += instanceCount * (count - 1);
         break;
       case GL.LINE_LOOP:
-        render.lines += instanceCount * count;
+        this.renderState.lines += instanceCount * count;
         break;
       case GL.POINTS:
-        render.points += instanceCount * count;
+        this.renderState.points += instanceCount * count;
         break;
       default:
         error("WebGLInfo: Unknown draw mode:", mode);
         break;
     }
   }
-  function reset() {
-    render.calls = 0;
-    render.triangles = 0;
-    render.points = 0;
-    render.lines = 0;
+
+  reset(): void {
+    this.renderState.calls = 0;
+    this.renderState.triangles = 0;
+    this.renderState.points = 0;
+    this.renderState.lines = 0;
   }
-  return {
-    memory: memory,
-    render: render,
-    programs: null,
-    autoReset: true,
-    reset: reset,
-    update: update,
-  };
 }

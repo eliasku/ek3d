@@ -104,351 +104,347 @@ interface ParserState {
   addLineGeometry(vertices: string[], uvs: string[]): void;
 }
 
-function createState(): ParserState {
-  const state: ParserState = {
-    objects: [],
-    object: {} as ParsedObject,
+class OBJParserState implements ParserState {
+  objects: ParsedObject[] = [];
+  object: ParsedObject = {} as ParsedObject;
+  vertices: number[] = [];
+  normals: number[] = [];
+  colors: (number | undefined)[] = [];
+  uvs: number[] = [];
+  materials: Record<string, Material> = {};
+  materialLibraries: string[] = [];
 
-    vertices: [],
-    normals: [],
-    colors: [],
-    uvs: [],
+  constructor() {
+    this.startObject("", false);
+  }
 
-    materials: {},
-    materialLibraries: [],
+  startObject(name: string, fromDeclaration?: boolean): void {
+    // If the current object (initial from reset) is not from a g/o declaration in the parsed
+    // file. We need to use it for the first parsed g/o to keep things in sync.
+    if (this.object && this.object.fromDeclaration === false) {
+      this.object.name = name;
+      this.object.fromDeclaration = fromDeclaration !== false;
+      return;
+    }
 
-    startObject(name: string, fromDeclaration?: boolean): void {
-      // If the current object (initial from reset) is not from a g/o declaration in the parsed
-      // file. We need to use it for the first parsed g/o to keep things in sync.
-      if (this.object && this.object.fromDeclaration === false) {
-        this.object.name = name;
-        this.object.fromDeclaration = fromDeclaration !== false;
-        return;
-      }
+    const previousMaterial =
+      this.object && typeof this.object.currentMaterial === "function" ? this.object.currentMaterial() : undefined;
 
-      const previousMaterial =
-        this.object && typeof this.object.currentMaterial === "function" ? this.object.currentMaterial() : undefined;
+    if (this.object && typeof this.object._finalize === "function") {
+      this.object._finalize(true);
+    }
 
-      if (this.object && typeof this.object._finalize === "function") {
-        this.object._finalize(true);
-      }
+    const object: ParsedObject = {
+      name: name || "",
+      fromDeclaration: fromDeclaration !== false,
 
-      const object: ParsedObject = {
-        name: name || "",
-        fromDeclaration: fromDeclaration !== false,
+      geometry: {
+        vertices: [],
+        normals: [],
+        colors: [],
+        uvs: [],
+        hasUVIndices: false,
+      },
+      materials: [],
+      smooth: true,
 
-        geometry: {
-          vertices: [],
-          normals: [],
-          colors: [],
-          uvs: [],
-          hasUVIndices: false,
-        },
-        materials: [],
-        smooth: true,
+      startMaterial(name: string, libraries: string[]): ParsedMaterial {
+        const previous = this._finalize(false);
 
-        startMaterial(name: string, libraries: string[]): ParsedMaterial {
-          const previous = this._finalize(false);
+        // New usemtl declaration overwrites an inherited material, except if faces were declared
+        // after the material, then it must be preserved for proper MultiMaterial continuation.
+        if (previous && (previous.inherited || previous.groupCount <= 0)) {
+          this.materials.splice(previous.index, 1);
+        }
 
-          // New usemtl declaration overwrites an inherited material, except if faces were declared
-          // after the material, then it must be preserved for proper MultiMaterial continuation.
-          if (previous && (previous.inherited || previous.groupCount <= 0)) {
-            this.materials.splice(previous.index, 1);
-          }
+        const material: ParsedMaterial = {
+          index: this.materials.length,
+          name: name || "",
+          mtllib: Array.isArray(libraries) && libraries.length > 0 ? libraries[libraries.length - 1] : "",
+          smooth: previous !== undefined ? previous.smooth : this.smooth,
+          groupStart: previous !== undefined ? previous.groupEnd : 0,
+          groupEnd: -1,
+          groupCount: -1,
+          inherited: false,
 
-          const material: ParsedMaterial = {
-            index: this.materials.length,
-            name: name || "",
-            mtllib: Array.isArray(libraries) && libraries.length > 0 ? libraries[libraries.length - 1] : "",
-            smooth: previous !== undefined ? previous.smooth : this.smooth,
-            groupStart: previous !== undefined ? previous.groupEnd : 0,
-            groupEnd: -1,
-            groupCount: -1,
-            inherited: false,
+          clone(index?: number): ParsedMaterial {
+            const cloned: ParsedMaterial = {
+              index: typeof index === "number" ? index : this.index,
+              name: this.name,
+              mtllib: this.mtllib,
+              smooth: this.smooth,
+              groupStart: 0,
+              groupEnd: -1,
+              groupCount: -1,
+              inherited: false,
+              clone: function (this: ParsedMaterial, i?: number) {
+                // New clones bind to themselves, matching upstream's self-referential clone.
+                return this.clone.call(this, i);
+              },
+            } as ParsedMaterial;
+            cloned.clone = this.clone.bind(cloned);
+            return cloned;
+          },
+        };
 
-            clone(index?: number): ParsedMaterial {
-              const cloned: ParsedMaterial = {
-                index: typeof index === "number" ? index : this.index,
-                name: this.name,
-                mtllib: this.mtllib,
-                smooth: this.smooth,
-                groupStart: 0,
-                groupEnd: -1,
-                groupCount: -1,
-                inherited: false,
-                clone: function (this: ParsedMaterial, i?: number) {
-                  // New clones bind to themselves, matching upstream's self-referential clone.
-                  return this.clone.call(this, i);
-                },
-              } as ParsedMaterial;
-              cloned.clone = this.clone.bind(cloned);
-              return cloned;
-            },
-          };
+        this.materials.push(material);
 
-          this.materials.push(material);
+        return material;
+      },
 
-          return material;
-        },
+      currentMaterial(): ParsedMaterial | undefined {
+        if (this.materials.length > 0) {
+          return this.materials[this.materials.length - 1];
+        }
 
-        currentMaterial(): ParsedMaterial | undefined {
-          if (this.materials.length > 0) {
-            return this.materials[this.materials.length - 1];
-          }
+        return undefined;
+      },
 
-          return undefined;
-        },
+      _finalize(end: boolean): ParsedMaterial | undefined {
+        const lastMultiMaterial = this.currentMaterial();
+        if (lastMultiMaterial && lastMultiMaterial.groupEnd === -1) {
+          lastMultiMaterial.groupEnd = this.geometry.vertices.length / 3;
+          lastMultiMaterial.groupCount = lastMultiMaterial.groupEnd - lastMultiMaterial.groupStart;
+          lastMultiMaterial.inherited = false;
+        }
 
-        _finalize(end: boolean): ParsedMaterial | undefined {
-          const lastMultiMaterial = this.currentMaterial();
-          if (lastMultiMaterial && lastMultiMaterial.groupEnd === -1) {
-            lastMultiMaterial.groupEnd = this.geometry.vertices.length / 3;
-            lastMultiMaterial.groupCount = lastMultiMaterial.groupEnd - lastMultiMaterial.groupStart;
-            lastMultiMaterial.inherited = false;
-          }
-
-          // Ignore objects tail materials if no face declarations followed them before a new o/g started.
-          if (end && this.materials.length > 1) {
-            for (let mi = this.materials.length - 1; mi >= 0; mi--) {
-              if (this.materials[mi].groupCount <= 0) {
-                this.materials.splice(mi, 1);
-              }
+        // Ignore objects tail materials if no face declarations followed them before a new o/g started.
+        if (end && this.materials.length > 1) {
+          for (let mi = this.materials.length - 1; mi >= 0; mi--) {
+            if (this.materials[mi].groupCount <= 0) {
+              this.materials.splice(mi, 1);
             }
           }
+        }
 
-          // Guarantee at least one empty material, this makes the creation later more straight forward.
-          if (end && this.materials.length === 0) {
-            this.materials.push({
-              name: "",
-              mtllib: "",
-              index: 0,
-              groupStart: 0,
-              groupEnd: 0,
-              groupCount: 0,
-              inherited: false,
-              smooth: this.smooth,
-              clone() {
-                return this;
-              },
-            });
-          }
+        // Guarantee at least one empty material, this makes the creation later more straight forward.
+        if (end && this.materials.length === 0) {
+          this.materials.push({
+            name: "",
+            mtllib: "",
+            index: 0,
+            groupStart: 0,
+            groupEnd: 0,
+            groupCount: 0,
+            inherited: false,
+            smooth: this.smooth,
+            clone() {
+              return this;
+            },
+          });
+        }
 
-          return lastMultiMaterial;
-        },
-      };
+        return lastMultiMaterial;
+      },
+    };
 
-      // Inherit previous objects material.
-      // Spec tells us that a declared material must be set to all objects until a new material is declared.
-      // If a usemtl declaration is encountered while this new object is being parsed, it will
-      // overwrite the inherited material. Exception being that there was already face declarations
-      // to the inherited material, then it will be preserved for proper MultiMaterial continuation.
+    // Inherit previous objects material.
+    // Spec tells us that a declared material must be set to all objects until a new material is declared.
+    // If a usemtl declaration is encountered while this new object is being parsed, it will
+    // overwrite the inherited material. Exception being that there was already face declarations
+    // to the inherited material, then it will be preserved for proper MultiMaterial continuation.
 
-      if (previousMaterial && previousMaterial.name && typeof previousMaterial.clone === "function") {
-        const declared = previousMaterial.clone(0);
-        declared.inherited = true;
-        object.materials.push(declared);
-      }
+    if (previousMaterial && previousMaterial.name && typeof previousMaterial.clone === "function") {
+      const declared = previousMaterial.clone(0);
+      declared.inherited = true;
+      object.materials.push(declared);
+    }
 
-      state.objects.push(object);
-      state.object = object;
-    },
+    this.objects.push(object);
+    this.object = object;
+  }
 
-    finalize(): void {
-      if (this.object && typeof this.object._finalize === "function") {
-        this.object._finalize(true);
-      }
-    },
+  finalize(): void {
+    if (this.object && typeof this.object._finalize === "function") {
+      this.object._finalize(true);
+    }
+  }
 
-    parseVertexIndex(value: string, len: number): number {
-      const index = parseInt(value, 10);
-      return (index >= 0 ? index - 1 : index + len / 3) * 3;
-    },
+  parseVertexIndex(value: string, len: number): number {
+    const index = parseInt(value, 10);
+    return (index >= 0 ? index - 1 : index + len / 3) * 3;
+  }
 
-    parseNormalIndex(value: string, len: number): number {
-      const index = parseInt(value, 10);
-      return (index >= 0 ? index - 1 : index + len / 3) * 3;
-    },
+  parseNormalIndex(value: string, len: number): number {
+    const index = parseInt(value, 10);
+    return (index >= 0 ? index - 1 : index + len / 3) * 3;
+  }
 
-    parseUVIndex(value: string, len: number): number {
-      const index = parseInt(value, 10);
-      return (index >= 0 ? index - 1 : index + len / 2) * 2;
-    },
+  parseUVIndex(value: string, len: number): number {
+    const index = parseInt(value, 10);
+    return (index >= 0 ? index - 1 : index + len / 2) * 2;
+  }
 
-    addVertex(a: number, b: number, c: number): void {
-      const src = this.vertices;
-      const dst = this.object.geometry.vertices;
+  addVertex(a: number, b: number, c: number): void {
+    const src = this.vertices;
+    const dst = this.object.geometry.vertices;
 
-      dst.push(src[a], src[a + 1], src[a + 2]);
-      dst.push(src[b], src[b + 1], src[b + 2]);
-      dst.push(src[c], src[c + 1], src[c + 2]);
-    },
+    dst.push(src[a], src[a + 1], src[a + 2]);
+    dst.push(src[b], src[b + 1], src[b + 2]);
+    dst.push(src[c], src[c + 1], src[c + 2]);
+  }
 
-    addVertexPoint(a: number): void {
-      const src = this.vertices;
-      const dst = this.object.geometry.vertices;
+  addVertexPoint(a: number): void {
+    const src = this.vertices;
+    const dst = this.object.geometry.vertices;
 
-      dst.push(src[a], src[a + 1], src[a + 2]);
-    },
+    dst.push(src[a], src[a + 1], src[a + 2]);
+  }
 
-    addVertexLine(a: number): void {
-      const src = this.vertices;
-      const dst = this.object.geometry.vertices;
+  addVertexLine(a: number): void {
+    const src = this.vertices;
+    const dst = this.object.geometry.vertices;
 
-      dst.push(src[a], src[a + 1], src[a + 2]);
-    },
+    dst.push(src[a], src[a + 1], src[a + 2]);
+  }
 
-    addNormal(a: number, b: number, c: number): void {
-      const src = this.normals;
-      const dst = this.object.geometry.normals;
+  addNormal(a: number, b: number, c: number): void {
+    const src = this.normals;
+    const dst = this.object.geometry.normals;
 
-      dst.push(src[a], src[a + 1], src[a + 2]);
-      dst.push(src[b], src[b + 1], src[b + 2]);
-      dst.push(src[c], src[c + 1], src[c + 2]);
-    },
+    dst.push(src[a], src[a + 1], src[a + 2]);
+    dst.push(src[b], src[b + 1], src[b + 2]);
+    dst.push(src[c], src[c + 1], src[c + 2]);
+  }
 
-    addFaceNormal(a: number, b: number, c: number): void {
-      const src = this.vertices;
-      const dst = this.object.geometry.normals;
+  addFaceNormal(a: number, b: number, c: number): void {
+    const src = this.vertices;
+    const dst = this.object.geometry.normals;
 
-      _vA.fromArray(src, a);
-      _vB.fromArray(src, b);
-      _vC.fromArray(src, c);
+    _vA.fromArray(src, a);
+    _vB.fromArray(src, b);
+    _vC.fromArray(src, c);
 
-      _cb.subVectors(_vC, _vB);
-      _ab.subVectors(_vA, _vB);
-      _cb.cross(_ab);
+    _cb.subVectors(_vC, _vB);
+    _ab.subVectors(_vA, _vB);
+    _cb.cross(_ab);
 
-      _cb.normalize();
+    _cb.normalize();
 
-      dst.push(_cb.x, _cb.y, _cb.z);
-      dst.push(_cb.x, _cb.y, _cb.z);
-      dst.push(_cb.x, _cb.y, _cb.z);
-    },
+    dst.push(_cb.x, _cb.y, _cb.z);
+    dst.push(_cb.x, _cb.y, _cb.z);
+    dst.push(_cb.x, _cb.y, _cb.z);
+  }
 
-    addColor(a: number, b: number, c: number): void {
-      const src = this.colors;
-      const dst = this.object.geometry.colors as number[];
+  addColor(a: number, b: number, c: number): void {
+    const src = this.colors;
+    const dst = this.object.geometry.colors as number[];
 
-      // Upstream pushes placeholder "undefined" entries for vertices without colors;
-      // they read back as undefined only for absent colors, so guard each component.
-      if (src[a] !== undefined) dst.push(src[a]!, src[a + 1]!, src[a + 2]!);
-      if (src[b] !== undefined) dst.push(src[b]!, src[b + 1]!, src[b + 2]!);
-      if (src[c] !== undefined) dst.push(src[c]!, src[c + 1]!, src[c + 2]!);
-    },
+    // Upstream pushes placeholder "undefined" entries for vertices without colors;
+    // they read back as undefined only for absent colors, so guard each component.
+    if (src[a] !== undefined) dst.push(src[a]!, src[a + 1]!, src[a + 2]!);
+    if (src[b] !== undefined) dst.push(src[b]!, src[b + 1]!, src[b + 2]!);
+    if (src[c] !== undefined) dst.push(src[c]!, src[c + 1]!, src[c + 2]!);
+  }
 
-    addUV(a: number, b: number, c: number): void {
-      const src = this.uvs;
-      const dst = this.object.geometry.uvs;
+  addUV(a: number, b: number, c: number): void {
+    const src = this.uvs;
+    const dst = this.object.geometry.uvs;
 
-      dst.push(src[a], src[a + 1]);
-      dst.push(src[b], src[b + 1]);
-      dst.push(src[c], src[c + 1]);
-    },
+    dst.push(src[a], src[a + 1]);
+    dst.push(src[b], src[b + 1]);
+    dst.push(src[c], src[c + 1]);
+  }
 
-    addDefaultUV(): void {
-      const dst = this.object.geometry.uvs;
+  addDefaultUV(): void {
+    const dst = this.object.geometry.uvs;
 
-      dst.push(0, 0);
-      dst.push(0, 0);
-      dst.push(0, 0);
-    },
+    dst.push(0, 0);
+    dst.push(0, 0);
+    dst.push(0, 0);
+  }
 
-    addUVLine(a: number): void {
-      const src = this.uvs;
-      const dst = this.object.geometry.uvs;
+  addUVLine(a: number): void {
+    const src = this.uvs;
+    const dst = this.object.geometry.uvs;
 
-      dst.push(src[a], src[a + 1]);
-    },
+    dst.push(src[a], src[a + 1]);
+  }
 
-    addFace(
-      a: string,
-      b: string,
-      c: string,
-      ua: string,
-      ub: string,
-      uc: string,
-      na: string,
-      nb: string,
-      nc: string,
-    ): void {
-      const vLen = this.vertices.length;
+  addFace(
+    a: string,
+    b: string,
+    c: string,
+    ua: string,
+    ub: string,
+    uc: string,
+    na: string,
+    nb: string,
+    nc: string,
+  ): void {
+    const vLen = this.vertices.length;
 
-      let ia = this.parseVertexIndex(a, vLen);
-      const ib = this.parseVertexIndex(b, vLen);
-      const ic = this.parseVertexIndex(c, vLen);
+    let ia = this.parseVertexIndex(a, vLen);
+    const ib = this.parseVertexIndex(b, vLen);
+    const ic = this.parseVertexIndex(c, vLen);
 
-      this.addVertex(ia, ib, ic);
-      this.addColor(ia, ib, ic);
+    this.addVertex(ia, ib, ic);
+    this.addColor(ia, ib, ic);
 
-      // normals
+    // normals
 
-      if (na !== undefined && na !== "") {
-        const nLen = this.normals.length;
+    if (na !== undefined && na !== "") {
+      const nLen = this.normals.length;
 
-        ia = this.parseNormalIndex(na, nLen);
-        const nb2 = this.parseNormalIndex(nb, nLen);
-        const nc2 = this.parseNormalIndex(nc, nLen);
+      ia = this.parseNormalIndex(na, nLen);
+      const nb2 = this.parseNormalIndex(nb, nLen);
+      const nc2 = this.parseNormalIndex(nc, nLen);
 
-        this.addNormal(ia, nb2, nc2);
-      } else {
-        this.addFaceNormal(ia, ia === ia ? ib : ib, ic);
-      }
+      this.addNormal(ia, nb2, nc2);
+    } else {
+      this.addFaceNormal(ia, ia === ia ? ib : ib, ic);
+    }
 
-      // uvs
+    // uvs
 
-      if (ua !== undefined && ua !== "") {
-        const uvLen = this.uvs.length;
-
-        ia = this.parseUVIndex(ua, uvLen);
-        const ub2 = this.parseUVIndex(ub, uvLen);
-        const uc2 = this.parseUVIndex(uc, uvLen);
-
-        this.addUV(ia, ub2, uc2);
-
-        this.object.geometry.hasUVIndices = true;
-      } else {
-        // add placeholder values (for inconsistent face definitions)
-
-        this.addDefaultUV();
-      }
-    },
-
-    addPointGeometry(vertices: string[]): void {
-      this.object.geometry.type = "Points";
-
-      const vLen = this.vertices.length;
-
-      for (let vi = 0, l = vertices.length; vi < l; vi++) {
-        const index = this.parseVertexIndex(vertices[vi], vLen);
-
-        this.addVertexPoint(index);
-        this.addColor(index, index, index);
-      }
-    },
-
-    addLineGeometry(vertices: string[], uvs: string[]): void {
-      this.object.geometry.type = "Line";
-
-      const vLen = this.vertices.length;
+    if (ua !== undefined && ua !== "") {
       const uvLen = this.uvs.length;
 
-      // a line statement defines a polyline, so convert it to pairs of vertices for line segments
+      ia = this.parseUVIndex(ua, uvLen);
+      const ub2 = this.parseUVIndex(ub, uvLen);
+      const uc2 = this.parseUVIndex(uc, uvLen);
 
-      for (let vi = 0, l = vertices.length - 1; vi < l; vi++) {
-        this.addVertexLine(this.parseVertexIndex(vertices[vi], vLen));
-        this.addVertexLine(this.parseVertexIndex(vertices[vi + 1], vLen));
-      }
+      this.addUV(ia, ub2, uc2);
 
-      for (let uvi = 0, l = uvs.length - 1; uvi < l; uvi++) {
-        this.addUVLine(this.parseUVIndex(uvs[uvi], uvLen));
-        this.addUVLine(this.parseUVIndex(uvs[uvi + 1], uvLen));
-      }
-    },
-  };
+      this.object.geometry.hasUVIndices = true;
+    } else {
+      // add placeholder values (for inconsistent face definitions)
 
-  state.startObject("", false);
+      this.addDefaultUV();
+    }
+  }
 
-  return state;
+  addPointGeometry(vertices: string[]): void {
+    this.object.geometry.type = "Points";
+
+    const vLen = this.vertices.length;
+
+    for (let vi = 0, l = vertices.length; vi < l; vi++) {
+      const index = this.parseVertexIndex(vertices[vi], vLen);
+
+      this.addVertexPoint(index);
+      this.addColor(index, index, index);
+    }
+  }
+
+  addLineGeometry(vertices: string[], uvs: string[]): void {
+    this.object.geometry.type = "Line";
+
+    const vLen = this.vertices.length;
+    const uvLen = this.uvs.length;
+
+    // a line statement defines a polyline, so convert it to pairs of vertices for line segments
+
+    for (let vi = 0, l = vertices.length - 1; vi < l; vi++) {
+      this.addVertexLine(this.parseVertexIndex(vertices[vi], vLen));
+      this.addVertexLine(this.parseVertexIndex(vertices[vi + 1], vLen));
+    }
+
+    for (let uvi = 0, l = uvs.length - 1; uvi < l; uvi++) {
+      this.addUVLine(this.parseUVIndex(uvs[uvi], uvLen));
+      this.addUVLine(this.parseUVIndex(uvs[uvi + 1], uvLen));
+    }
+  }
 }
 
 /** The loaded OBJ container, carrying the referenced material library file names. */
@@ -561,7 +557,7 @@ export class OBJLoader extends Loader<Group, string> {
    * @return The parsed OBJ.
    */
   parse(text: string): OBJGroup {
-    const state = createState();
+    const state = new OBJParserState();
 
     if (text.indexOf("\r\n") !== -1) {
       // This is faster than String.split with regex that splits on both

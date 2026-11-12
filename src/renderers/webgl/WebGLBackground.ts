@@ -4,6 +4,9 @@ import type { Material } from "../../materials/Material";
 import type { Object3D } from "../../core/Object3D";
 import type { WebGLEnvironmentProvider } from "./WebGLEnvironmentAccess";
 import type { WebGLRenderer } from "../WebGLRenderer";
+import type { Scene } from "../../scenes/Scene";
+import type { Texture } from "../../textures/Texture";
+import type { CubeTexture } from "../../textures/CubeTexture";
 import { getEnvironment } from "./WebGLEnvironmentAccess";
 import { backgroundShader } from "../shaders/BackgroundShader";
 import { backgroundCubeShader } from "../shaders/BackgroundCubeShader";
@@ -46,51 +49,76 @@ const _rgb = { r: 0, b: 0, g: 0 };
 const _m1 = /*@__PURE__*/ new Matrix4();
 const _m = /*@__PURE__*/ new Matrix3();
 _m.set(-1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-export function WebGLBackground(
-  renderer: WebGLRenderer,
-  environments: WebGLEnvironmentProvider | null,
-  state: WebGLBackgroundState,
-  objects: WebGLBackgroundObjects,
-  alpha: boolean,
-  premultipliedAlpha: boolean,
-): WebGLBackgroundSystem {
-  const clearColor = new Color(0x000000);
-  let clearAlpha = alpha === true ? 0 : 1;
-  let planeMesh: Mesh<ShaderMaterial> | undefined;
-  let boxMesh: Mesh<ShaderMaterial> | undefined;
-  let currentBackground: any = null;
-  let currentBackgroundVersion = 0;
-  let currentTonemapping: any = null;
-  function getBackground(scene: Object3D) {
-    let background = (scene as any).isScene === true ? (scene as any).background : null;
-    if (background && background.isTexture) {
-      const usePMREM = (scene as any).backgroundBlurriness > 0; // use PMREM if the user wants to blur the background
-      background = getEnvironment(environments, background, usePMREM);
+export class WebGLBackground implements WebGLBackgroundSystem {
+  private readonly renderer: WebGLRenderer;
+  private readonly environments: WebGLEnvironmentProvider | null;
+  private readonly state: WebGLBackgroundState;
+  private readonly objects: WebGLBackgroundObjects;
+  private readonly premultipliedAlpha: boolean;
+  private readonly clearColor: Color = new Color(0x000000);
+  private clearAlpha: number;
+  private planeMesh: Mesh<ShaderMaterial> | undefined = undefined;
+  private boxMesh: Mesh<ShaderMaterial> | undefined = undefined;
+  private currentBackground: unknown = null;
+  private currentBackgroundVersion: number = 0;
+  private currentTonemapping: WebGLRenderer["toneMapping"] | null = null;
+
+  constructor(
+    renderer: WebGLRenderer,
+    environments: WebGLEnvironmentProvider | null,
+    state: WebGLBackgroundState,
+    objects: WebGLBackgroundObjects,
+    alpha: boolean,
+    premultipliedAlpha: boolean,
+  ) {
+    this.renderer = renderer;
+    this.environments = environments;
+    this.state = state;
+    this.objects = objects;
+    this.premultipliedAlpha = premultipliedAlpha;
+    this.clearAlpha = alpha === true ? 0 : 1;
+    this.getClearColor = this.getClearColor.bind(this);
+    this.setClearColor = this.setClearColor.bind(this);
+    this.getClearAlpha = this.getClearAlpha.bind(this);
+    this.setClearAlpha = this.setClearAlpha.bind(this);
+    this.render = this.render.bind(this);
+    this.addToRenderList = this.addToRenderList.bind(this);
+    this.dispose = this.dispose.bind(this);
+  }
+
+  private getBackground(scene: Object3D): Color | Texture | null {
+    let background = (scene as Scene).isScene === true ? (scene as Scene).background : null;
+    if (background && (background as Texture).isTexture) {
+      const usePMREM = (scene as Scene).backgroundBlurriness > 0; // use PMREM if the user wants to blur the background
+      background = getEnvironment(this.environments, background as Texture, usePMREM);
     }
     return background;
   }
-  function render(scene: Object3D) {
+
+  render(scene: Object3D): void {
     let forceClear = false;
-    const background = getBackground(scene);
+    const background = this.getBackground(scene);
     if (background === null) {
-      setClear(clearColor, clearAlpha);
-    } else if (background && background.isColor) {
-      setClear(background, 1);
+      this.setClear(this.clearColor, this.clearAlpha);
+    } else if (background && (background as Color).isColor) {
+      this.setClear(background as Color, 1);
       forceClear = true;
     }
-    if (renderer.autoClear || forceClear) {
+    if (this.renderer.autoClear || forceClear) {
       // buffers might not be writable which is required to ensure a correct clear
-      state.buffers.depth.setTest(true);
-      state.buffers.depth.setMask(true);
-      state.buffers.color.setMask(true);
-      renderer.clear(renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil);
+      this.state.buffers.depth.setTest(true);
+      this.state.buffers.depth.setMask(true);
+      this.state.buffers.color.setMask(true);
+      this.renderer.clear(this.renderer.autoClearColor, this.renderer.autoClearDepth, this.renderer.autoClearStencil);
     }
   }
-  function addToRenderList(renderList: WebGLBackgroundRenderList, scene: Object3D) {
-    const background = getBackground(scene);
-    if (background && background.isCubeTexture) {
-      if (boxMesh === undefined) {
-        boxMesh = new Mesh(
+
+  addToRenderList(renderList: WebGLBackgroundRenderList, scene: Object3D): void {
+    const background = this.getBackground(scene);
+    if (background && (background as CubeTexture).isCubeTexture) {
+      const texture = background as Texture;
+      if (this.boxMesh === undefined) {
+        this.boxMesh = new Mesh(
           new BoxGeometry(1, 1, 1),
           new ShaderMaterial({
             name: "BackgroundCubeMaterial",
@@ -104,45 +132,51 @@ export function WebGLBackground(
             allowOverride: false,
           }),
         );
-        boxMesh.geometry.deleteAttribute("normal");
-        boxMesh.geometry.deleteAttribute("uv");
-        boxMesh.onBeforeRender = function (this: Mesh, _renderer: WebGLRenderer, _scene: Object3D, camera: Camera) {
+        this.boxMesh.geometry.deleteAttribute("normal");
+        this.boxMesh.geometry.deleteAttribute("uv");
+        this.boxMesh.onBeforeRender = function (
+          this: Mesh,
+          _renderer: WebGLRenderer,
+          _scene: Object3D,
+          camera: Camera,
+        ) {
           this.matrixWorld.copyPosition(camera.matrixWorld);
         };
         // add "envMap" material property so the renderer can evaluate it like for built-in materials
-        Object.defineProperty(boxMesh.material, "envMap", {
-          get: function (this: any) {
+        Object.defineProperty(this.boxMesh.material, "envMap", {
+          get: function (this: ShaderMaterial) {
             return this.uniforms.envMap.value;
           },
         });
-        objects.update(boxMesh);
+        this.objects.update(this.boxMesh);
       }
-      boxMesh.material.uniforms.envMap.value = background;
-      boxMesh.material.uniforms.backgroundBlurriness.value = (scene as any).backgroundBlurriness;
-      boxMesh.material.uniforms.backgroundIntensity.value = (scene as any).backgroundIntensity;
+      this.boxMesh.material.uniforms.envMap.value = background;
+      this.boxMesh.material.uniforms.backgroundBlurriness.value = (scene as Scene).backgroundBlurriness;
+      this.boxMesh.material.uniforms.backgroundIntensity.value = (scene as Scene).backgroundIntensity;
       // note: since the matrix is orthonormal, we can use the more-efficient transpose() in lieu of invert()
-      const backgroundRotation = boxMesh.material.uniforms.backgroundRotation.value as Matrix3;
-      backgroundRotation.setFromMatrix4(_m1.makeRotationFromEuler((scene as any).backgroundRotation)).transpose();
-      if (background.isRenderTargetTexture === false) {
+      const backgroundRotation = this.boxMesh.material.uniforms.backgroundRotation.value as Matrix3;
+      backgroundRotation.setFromMatrix4(_m1.makeRotationFromEuler((scene as Scene).backgroundRotation)).transpose();
+      if (texture.isRenderTargetTexture === false) {
         backgroundRotation.premultiply(_m);
       }
-      boxMesh.material.toneMapped = ColorManagement.getTransfer(background.colorSpace) !== Transfer.SRGB;
+      this.boxMesh.material.toneMapped = ColorManagement.getTransfer(texture.colorSpace) !== Transfer.SRGB;
       if (
-        currentBackground !== background ||
-        currentBackgroundVersion !== background.version ||
-        currentTonemapping !== renderer.toneMapping
+        this.currentBackground !== background ||
+        this.currentBackgroundVersion !== texture.version ||
+        this.currentTonemapping !== this.renderer.toneMapping
       ) {
-        boxMesh.material.needsUpdate = true;
-        currentBackground = background;
-        currentBackgroundVersion = background.version;
-        currentTonemapping = renderer.toneMapping;
+        this.boxMesh.material.needsUpdate = true;
+        this.currentBackground = background;
+        this.currentBackgroundVersion = texture.version;
+        this.currentTonemapping = this.renderer.toneMapping;
       }
-      boxMesh.layers.enableAll();
+      this.boxMesh.layers.enableAll();
       // push to the pre-sorted opaque render list
-      renderList.unshift(boxMesh, boxMesh.geometry, boxMesh.material, 0, 0, null);
-    } else if (background && background.isTexture) {
-      if (planeMesh === undefined) {
-        planeMesh = new Mesh(
+      renderList.unshift(this.boxMesh, this.boxMesh.geometry, this.boxMesh.material, 0, 0, null);
+    } else if (background && (background as Texture).isTexture) {
+      const texture = background as Texture;
+      if (this.planeMesh === undefined) {
+        this.planeMesh = new Mesh(
           new PlaneGeometry(2, 2),
           new ShaderMaterial({
             name: "BackgroundMaterial",
@@ -156,71 +190,72 @@ export function WebGLBackground(
             allowOverride: false,
           }),
         );
-        planeMesh.geometry.deleteAttribute("normal");
+        this.planeMesh.geometry.deleteAttribute("normal");
         // add "map" material property so the renderer can evaluate it like for built-in materials
-        Object.defineProperty(planeMesh.material, "map", {
-          get: function (this: any) {
+        Object.defineProperty(this.planeMesh.material, "map", {
+          get: function (this: ShaderMaterial) {
             return this.uniforms.t2D.value;
           },
         });
-        objects.update(planeMesh);
+        this.objects.update(this.planeMesh);
       }
-      planeMesh.material.uniforms.t2D.value = background;
-      planeMesh.material.uniforms.backgroundIntensity.value = (scene as any).backgroundIntensity;
-      planeMesh.material.toneMapped = ColorManagement.getTransfer(background.colorSpace) !== Transfer.SRGB;
-      if (background.matrixAutoUpdate === true) {
-        background.updateMatrix();
+      this.planeMesh.material.uniforms.t2D.value = background;
+      this.planeMesh.material.uniforms.backgroundIntensity.value = (scene as Scene).backgroundIntensity;
+      this.planeMesh.material.toneMapped = ColorManagement.getTransfer(texture.colorSpace) !== Transfer.SRGB;
+      if (texture.matrixAutoUpdate === true) {
+        texture.updateMatrix();
       }
-      (planeMesh.material.uniforms.uvTransform.value as Matrix3).copy(background.matrix);
+      (this.planeMesh.material.uniforms.uvTransform.value as Matrix3).copy(texture.matrix);
       if (
-        currentBackground !== background ||
-        currentBackgroundVersion !== background.version ||
-        currentTonemapping !== renderer.toneMapping
+        this.currentBackground !== background ||
+        this.currentBackgroundVersion !== texture.version ||
+        this.currentTonemapping !== this.renderer.toneMapping
       ) {
-        planeMesh.material.needsUpdate = true;
-        currentBackground = background;
-        currentBackgroundVersion = background.version;
-        currentTonemapping = renderer.toneMapping;
+        this.planeMesh.material.needsUpdate = true;
+        this.currentBackground = background;
+        this.currentBackgroundVersion = texture.version;
+        this.currentTonemapping = this.renderer.toneMapping;
       }
-      planeMesh.layers.enableAll();
+      this.planeMesh.layers.enableAll();
       // push to the pre-sorted opaque render list
-      renderList.unshift(planeMesh, planeMesh.geometry, planeMesh.material, 0, 0, null);
+      renderList.unshift(this.planeMesh, this.planeMesh.geometry, this.planeMesh.material, 0, 0, null);
     }
   }
-  function setClear(color: Color, alpha: number) {
-    color.getRGB(_rgb, getUnlitUniformColorSpace(renderer));
-    state.buffers.color.setClear(_rgb.r, _rgb.g, _rgb.b, alpha, premultipliedAlpha);
+
+  private setClear(color: Color, alpha: number): void {
+    color.getRGB(_rgb, getUnlitUniformColorSpace(this.renderer));
+    this.state.buffers.color.setClear(_rgb.r, _rgb.g, _rgb.b, alpha, this.premultipliedAlpha);
   }
-  function dispose() {
-    if (boxMesh !== undefined) {
-      boxMesh.geometry.dispose();
-      boxMesh.material.dispose();
-      boxMesh = undefined;
+
+  dispose(): void {
+    if (this.boxMesh !== undefined) {
+      this.boxMesh.geometry.dispose();
+      this.boxMesh.material.dispose();
+      this.boxMesh = undefined;
     }
-    if (planeMesh !== undefined) {
-      planeMesh.geometry.dispose();
-      planeMesh.material.dispose();
-      planeMesh = undefined;
+    if (this.planeMesh !== undefined) {
+      this.planeMesh.geometry.dispose();
+      this.planeMesh.material.dispose();
+      this.planeMesh = undefined;
     }
   }
-  return {
-    getClearColor: function () {
-      return clearColor;
-    },
-    setClearColor: function (color: Color | number | string, alpha: number = 1) {
-      clearColor.set(color);
-      clearAlpha = alpha;
-      setClear(clearColor, clearAlpha);
-    },
-    getClearAlpha: function () {
-      return clearAlpha;
-    },
-    setClearAlpha: function (alpha: number) {
-      clearAlpha = alpha;
-      setClear(clearColor, clearAlpha);
-    },
-    render: render,
-    addToRenderList: addToRenderList,
-    dispose: dispose,
-  };
+
+  getClearColor(): Color {
+    return this.clearColor;
+  }
+
+  setClearColor(color: Color | number | string, alpha: number = 1): void {
+    this.clearColor.set(color);
+    this.clearAlpha = alpha;
+    this.setClear(this.clearColor, this.clearAlpha);
+  }
+
+  getClearAlpha(): number {
+    return this.clearAlpha;
+  }
+
+  setClearAlpha(alpha: number): void {
+    this.clearAlpha = alpha;
+    this.setClear(this.clearColor, this.clearAlpha);
+  }
 }

@@ -3,9 +3,9 @@ import { Equation, Blending, Factor } from "ek3d/constants";
 import { PlaneGeometry } from "ek3d/geometries/PlaneGeometry";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 import { Mesh } from "ek3d/objects/Mesh";
-import { blendingScene, labelMaterial } from "./materials-blending-common";
+import { BlendingScene, labelMaterial } from "./materials-blending-common";
 
-const { scene, load, cleanup } = blendingScene(80, 700);
+const { scene, load, cleanup } = new BlendingScene(80, 700);
 const dst = [
   { name: "Zero", constant: Factor.Zero },
   { name: "One", constant: Factor.One },

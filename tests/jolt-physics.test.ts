@@ -139,7 +139,7 @@ function fixture(): { runtime: JoltRuntime; removed: Body[]; bodies: Body[]; des
 test("Jolt teleport resets velocity without destroying a body and preserves instance scale", () => {
   vi.useFakeTimers();
   const { runtime, bodies, removed } = fixture();
-  const physics = JoltPhysics(runtime);
+  const physics = new JoltPhysics(runtime);
   const geometry = new BoxGeometry();
   const material = new MeshBasicMaterial();
   const mesh = new InstancedMesh(geometry, material, 2);
@@ -181,7 +181,7 @@ test("Jolt teleport resets velocity without destroying a body and preserves inst
 
 test("Jolt tracks static bodies for teleport and disposal without touching caller resources", () => {
   const { runtime, removed } = fixture();
-  const physics = JoltPhysics(runtime);
+  const physics = new JoltPhysics(runtime);
   const geometry = new BoxGeometry();
   const material = new MeshBasicMaterial();
   const mesh = new Mesh(geometry, material);
