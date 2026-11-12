@@ -5,7 +5,13 @@ import { RenderTarget } from "../core/RenderTarget";
  *
  */
 export class WebGLRenderTarget extends RenderTarget {
-  isWebGLRenderTarget: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isWebGLRenderTarget: boolean = true;
 
   /**
    * Constructs a new 3D render target.
@@ -16,13 +22,6 @@ export class WebGLRenderTarget extends RenderTarget {
    */
   constructor(width: number = 1, height: number = 1, options: RenderTargetOptions = {}) {
     super(width, height, options);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isWebGLRenderTarget = true;
   }
 
   override clone(): WebGLRenderTarget {

@@ -50,56 +50,56 @@ export class TrackballControls<TObject extends TrackballCamera = TrackballCamera
   /**
    * Represents the properties of the screen. Automatically set when `handleResize()` is called.
    */
-  screen: { left: number; top: number; width: number; height: number };
+  screen: { left: number; top: number; width: number; height: number } = { left: 0, top: 0, width: 0, height: 0 };
 
   /**
    * The rotation speed.
    *
    * @default 1
    */
-  rotateSpeed: number;
+  rotateSpeed: number = 1.0;
 
   /**
    * The zoom speed.
    *
    * @default 1.2
    */
-  zoomSpeed: number;
+  zoomSpeed: number = 1.2;
 
   /**
    * The pan speed.
    *
    * @default 0.3
    */
-  panSpeed: number;
+  panSpeed: number = 0.3;
 
   /**
    * The roll speed used for multi-touch roll.
    *
    * @default 1
    */
-  rollSpeed: number;
+  rollSpeed: number = 1.0;
 
   /**
    * Whether rotation is disabled or not.
    *
    * @default false
    */
-  noRotate: boolean;
+  noRotate: boolean = false;
 
   /**
    * Whether zooming is disabled or not.
    *
    * @default false
    */
-  noZoom: boolean;
+  noZoom: boolean = false;
 
   /**
    * Whether panning is disabled or not.
    *
    * @default false
    */
-  noPan: boolean;
+  noPan: boolean = false;
 
   /**
    * Whether two finger twist gesture rolls
@@ -107,49 +107,49 @@ export class TrackballControls<TObject extends TrackballCamera = TrackballCamera
    *
    * @default false
    */
-  multiTouchRoll: boolean;
+  multiTouchRoll: boolean = false;
 
   /**
    * Whether damping is disabled or not.
    *
    * @default false
    */
-  staticMoving: boolean;
+  staticMoving: boolean = false;
 
   /**
    * Defines the intensity of damping. Only considered if `staticMoving` is set to `false`.
    *
    * @default 0.2
    */
-  dynamicDampingFactor: number;
+  dynamicDampingFactor: number = 0.2;
 
   /**
    * How far you can dolly in (perspective camera only).
    *
    * @default 0
    */
-  minDistance: number;
+  minDistance: number = 0;
 
   /**
    * How far you can dolly out (perspective camera only).
    *
    * @default Infinity
    */
-  maxDistance: number;
+  maxDistance: number = Infinity;
 
   /**
    * How far you can zoom in (orthographic camera only).
    *
    * @default 0
    */
-  minZoom: number;
+  minZoom: number = 0;
 
   /**
    * How far you can zoom out (orthographic camera only).
    *
    * @default Infinity
    */
-  maxZoom: number;
+  maxZoom: number = Infinity;
 
   /**
    * This array holds keycodes for controlling interactions.
@@ -172,58 +172,58 @@ export class TrackballControls<TObject extends TrackballCamera = TrackballCamera
   /**
    * The focus point of the controls.
    */
-  target: Vector3;
+  target: Vector3 = new Vector3();
 
   state: number;
-  keyState: number;
+  keyState: number = _STATE.NONE;
 
-  _lastPosition: Vector3;
-  _lastUp: Vector3;
-  _lastZoom: number;
-  _touchZoomDistanceStart: number;
-  _touchZoomDistanceEnd: number;
-  _touchRollAngle: number;
-  _touchRollPointerIds: string;
-  _lastAngle: number;
-  _lastRollAngle: number;
+  _lastPosition: Vector3 = new Vector3();
+  _lastUp: Vector3 = new Vector3();
+  _lastZoom: number = 1;
+  _touchZoomDistanceStart: number = 0;
+  _touchZoomDistanceEnd: number = 0;
+  _touchRollAngle: number = 0;
+  _touchRollPointerIds: string = "";
+  _lastAngle: number = 0;
+  _lastRollAngle: number = 0;
 
-  _eye: Vector3;
+  _eye: Vector3 = new Vector3();
 
-  _movePrev: Vector2;
-  _moveCurr: Vector2;
+  _movePrev: Vector2 = new Vector2();
+  _moveCurr: Vector2 = new Vector2();
 
-  _lastAxis: Vector3;
+  _lastAxis: Vector3 = new Vector3();
 
-  _zoomStart: Vector2;
-  _zoomEnd: Vector2;
+  _zoomStart: Vector2 = new Vector2();
+  _zoomEnd: Vector2 = new Vector2();
 
-  _panStart: Vector2;
-  _panEnd: Vector2;
+  _panStart: Vector2 = new Vector2();
+  _panEnd: Vector2 = new Vector2();
 
-  _pointers: { pointerId: number; pointerType: string; pageX: number; pageY: number }[];
-  _pointerPositions: Record<number, { x: number; y: number }>;
+  _pointers: { pointerId: number; pointerType: string; pageX: number; pageY: number }[] = [];
+  _pointerPositions: Record<number, { x: number; y: number }> = {};
 
-  _onPointerMove: (event: PointerEvent) => void;
-  _onPointerDown: (event: PointerEvent) => void;
-  _onPointerUp: (event: PointerEvent) => void;
-  _onPointerCancel: (event: PointerEvent) => void;
-  _onContextMenu: (event: Event) => void;
-  _onMouseWheel: (event: WheelEvent) => void;
-  _onKeyDown: (event: KeyboardEvent) => void;
-  _onKeyUp: () => void;
+  _onPointerMove: (event: PointerEvent) => void = onPointerMove.bind(this);
+  _onPointerDown: (event: PointerEvent) => void = onPointerDown.bind(this);
+  _onPointerUp: (event: PointerEvent) => void = onPointerUp.bind(this);
+  _onPointerCancel: (event: PointerEvent) => void = onPointerCancel.bind(this);
+  _onContextMenu: (event: Event) => void = onContextMenu.bind(this);
+  _onMouseWheel: (event: WheelEvent) => void = onMouseWheel.bind(this);
+  _onKeyDown: (event: KeyboardEvent) => void = onKeyDown.bind(this);
+  _onKeyUp: () => void = onKeyUp.bind(this);
 
-  _onTouchStart: (event: PointerEvent) => void;
-  _onTouchMove: (event: PointerEvent) => void;
-  _onTouchEnd: (event: PointerEvent) => void;
+  _onTouchStart: (event: PointerEvent) => void = onTouchStart.bind(this);
+  _onTouchMove: (event: PointerEvent) => void = onTouchMove.bind(this);
+  _onTouchEnd: (event: PointerEvent) => void = onTouchEnd.bind(this);
 
-  _onMouseDown: (event: PointerEvent) => void;
-  _onMouseMove: (event: PointerEvent) => void;
-  _onMouseUp: () => void;
+  _onMouseDown: (event: PointerEvent) => void = onMouseDown.bind(this);
+  _onMouseMove: (event: PointerEvent) => void = onMouseMove.bind(this);
+  _onMouseUp: () => void = onMouseUp.bind(this);
 
-  _target0: Vector3;
-  _position0: Vector3;
-  _up0: Vector3;
-  _zoom0: number;
+  _target0: Vector3 = this.target.clone();
+  _position0: Vector3 = this.object.position.clone();
+  _up0: Vector3 = this.object.up.clone();
+  _zoom0: number = this.object.zoom;
 
   /**
    * Constructs a new controls instance.
@@ -234,83 +234,14 @@ export class TrackballControls<TObject extends TrackballCamera = TrackballCamera
   constructor(object: TObject, domElement: HTMLElement | null = null) {
     super(object, domElement);
 
-    this.screen = { left: 0, top: 0, width: 0, height: 0 };
-
-    this.rotateSpeed = 1.0;
-    this.zoomSpeed = 1.2;
-    this.panSpeed = 0.3;
-    this.rollSpeed = 1.0;
-    this.noRotate = false;
-    this.noZoom = false;
-    this.noPan = false;
-    this.multiTouchRoll = false;
-    this.staticMoving = false;
-    this.dynamicDampingFactor = 0.2;
-    this.minDistance = 0;
-    this.maxDistance = Infinity;
-    this.minZoom = 0;
-    this.maxZoom = Infinity;
-
     this.keys = ["KeyA" /*A*/, "KeyS" /*S*/, "KeyD" /*D*/];
 
     this.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN };
 
-    this.target = new Vector3();
-
     // internals
 
     this.state = _STATE.NONE;
-    this.keyState = _STATE.NONE;
-
-    this._lastPosition = new Vector3();
-    this._lastUp = new Vector3();
-    this._lastZoom = 1;
-    this._touchZoomDistanceStart = 0;
-    this._touchZoomDistanceEnd = 0;
-    this._touchRollAngle = 0;
-    this._touchRollPointerIds = "";
-    this._lastAngle = 0;
-    this._lastRollAngle = 0;
-
-    this._eye = new Vector3();
-
-    this._movePrev = new Vector2();
-    this._moveCurr = new Vector2();
-
-    this._lastAxis = new Vector3();
-
-    this._zoomStart = new Vector2();
-    this._zoomEnd = new Vector2();
-
-    this._panStart = new Vector2();
-    this._panEnd = new Vector2();
-
-    this._pointers = [];
-    this._pointerPositions = {};
-
-    this._onPointerMove = onPointerMove.bind(this);
-    this._onPointerDown = onPointerDown.bind(this);
-    this._onPointerUp = onPointerUp.bind(this);
-    this._onPointerCancel = onPointerCancel.bind(this);
-    this._onContextMenu = onContextMenu.bind(this);
-    this._onMouseWheel = onMouseWheel.bind(this);
-    this._onKeyDown = onKeyDown.bind(this);
-    this._onKeyUp = onKeyUp.bind(this);
-
-    this._onTouchStart = onTouchStart.bind(this);
-    this._onTouchMove = onTouchMove.bind(this);
-    this._onTouchEnd = onTouchEnd.bind(this);
-
-    this._onMouseDown = onMouseDown.bind(this);
-    this._onMouseMove = onMouseMove.bind(this);
-    this._onMouseUp = onMouseUp.bind(this);
-
     // for reset
-
-    this._target0 = this.target.clone();
-    this._position0 = this.object.position.clone();
-    this._up0 = this.object.up.clone();
-    this._zoom0 = this.object.zoom;
 
     if (domElement !== null) {
       this.connect(domElement);

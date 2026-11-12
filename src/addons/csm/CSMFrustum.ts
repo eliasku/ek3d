@@ -19,8 +19,20 @@ const inverseProjectionMatrix = new Matrix4();
  */
 export class CSMFrustum {
   zNear: number;
-  zFar: number;
-  vertices: { near: Vector3[]; far: Vector3[] };
+  /**
+   * The zFar value.
+   *
+   */
+  zFar: number = 1;
+  /**
+   * An object representing the vertices of the near and
+   * far plane in view space.
+   *
+   */
+  vertices: { near: Vector3[]; far: Vector3[] } = {
+    near: [new Vector3(), new Vector3(), new Vector3(), new Vector3()],
+    far: [new Vector3(), new Vector3(), new Vector3(), new Vector3()],
+  };
 
   /**
    * Constructs a new CSM frustum.
@@ -34,22 +46,6 @@ export class CSMFrustum {
      * The near clip-space value depends on the projection coordinate convention.
      */
     this.zNear = data.webGL === true ? -1 : 0;
-
-    /**
-     * The zFar value.
-     *
-     */
-    this.zFar = 1;
-
-    /**
-     * An object representing the vertices of the near and
-     * far plane in view space.
-     *
-     */
-    this.vertices = {
-      near: [new Vector3(), new Vector3(), new Vector3(), new Vector3()],
-      far: [new Vector3(), new Vector3(), new Vector3(), new Vector3()],
-    };
 
     if (data.projectionMatrix !== undefined) {
       this.setFromProjectionMatrix(data.projectionMatrix, data.maxFar || 10000);

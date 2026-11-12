@@ -25,8 +25,16 @@ import type { WebGLRenderTarget as RT } from "../../renderers/WebGLRenderTarget"
  *
  */
 export class SMAAPass extends Pass {
-  _edgesRT: WebGLRenderTarget;
-  _weightsRT: WebGLRenderTarget;
+  // render targets
+
+  _edgesRT: WebGLRenderTarget = new WebGLRenderTarget(1, 1, {
+    depthBuffer: false,
+    type: TextureType.HalfFloat,
+  });
+  _weightsRT: WebGLRenderTarget = new WebGLRenderTarget(1, 1, {
+    depthBuffer: false,
+    type: TextureType.HalfFloat,
+  });
   _areaTexture: Texture;
   _searchTexture: Texture;
   _uniformsEdges: Record<string, { value: any; needsUpdate?: boolean }>;
@@ -43,18 +51,8 @@ export class SMAAPass extends Pass {
   constructor() {
     super();
 
-    // render targets
-
-    this._edgesRT = new WebGLRenderTarget(1, 1, {
-      depthBuffer: false,
-      type: TextureType.HalfFloat,
-    });
     this._edgesRT.texture.name = "SMAAPass.edges";
 
-    this._weightsRT = new WebGLRenderTarget(1, 1, {
-      depthBuffer: false,
-      type: TextureType.HalfFloat,
-    });
     this._weightsRT.texture.name = "SMAAPass.weights";
 
     // textures

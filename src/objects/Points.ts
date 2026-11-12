@@ -20,12 +20,32 @@ const _position = /*@__PURE__*/ new Vector3();
  *
  */
 export class Points extends Object3D {
-  isPoints: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isPoints: boolean = true;
 
   geometry: BufferGeometry;
   material: Material | Material[];
-  morphTargetDictionary: Record<string, number> | undefined;
-  morphTargetInfluences: number[] | undefined;
+  /**
+   * A dictionary representing the morph targets in the geometry. The key is the
+   * morph targets name, the value its attribute index. This member is `undefined`
+   * by default and only set when morph targets are detected in the geometry.
+   *
+   * @default undefined
+   */
+  morphTargetDictionary: Record<string, number> | undefined = undefined;
+  /**
+   * An array of weights typically in the range `[0,1]` that specify how much of the morph
+   * is applied. This member is `undefined` by default and only set when morph targets are
+   * detected in the geometry.
+   *
+   * @default undefined
+   */
+  morphTargetInfluences: number[] | undefined = undefined;
 
   /**
    * Constructs a new point cloud.
@@ -37,13 +57,6 @@ export class Points extends Object3D {
     super();
     if (geometry === undefined || material === undefined)
       throw new Error("Points requires explicit geometry and material.");
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isPoints = true;
     this.type = "Points";
     /**
      * The points geometry.
@@ -56,22 +69,6 @@ export class Points extends Object3D {
      * Supplied explicitly by the caller.
      */
     this.material = material;
-    /**
-     * A dictionary representing the morph targets in the geometry. The key is the
-     * morph targets name, the value its attribute index. This member is `undefined`
-     * by default and only set when morph targets are detected in the geometry.
-     *
-     * @default undefined
-     */
-    this.morphTargetDictionary = undefined;
-    /**
-     * An array of weights typically in the range `[0,1]` that specify how much of the morph
-     * is applied. This member is `undefined` by default and only set when morph targets are
-     * detected in the geometry.
-     *
-     * @default undefined
-     */
-    this.morphTargetInfluences = undefined;
     this.updateMorphTargets();
   }
   clone(recursive: boolean = true): Points {

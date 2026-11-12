@@ -29,7 +29,13 @@ import { Vector2 } from "../../math/Vector2";
  *
  */
 export class QuadraticBezierCurve extends Curve<Vector2> {
-  isQuadraticBezierCurve: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isQuadraticBezierCurve: boolean = true;
 
   v0: Vector2;
   v1: Vector2;
@@ -44,13 +50,6 @@ export class QuadraticBezierCurve extends Curve<Vector2> {
    */
   constructor(v0: Vector2 = new Vector2(), v1: Vector2 = new Vector2(), v2: Vector2 = new Vector2()) {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isQuadraticBezierCurve = true;
     this.type = "QuadraticBezierCurve";
     /**
      * The start point.

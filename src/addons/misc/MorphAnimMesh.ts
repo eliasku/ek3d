@@ -7,8 +7,8 @@ import { MeshBasicMaterial } from "../../materials/MeshBasicMaterial";
 import { Mesh } from "../../objects/Mesh";
 
 export class MorphAnimMesh extends Mesh {
-  mixer: AnimationMixer;
-  activeAction: AnimationAction | null;
+  mixer: AnimationMixer = new AnimationMixer(this);
+  activeAction: AnimationAction | null = null;
 
   constructor(
     geometry: BufferGeometry = new BufferGeometry(),
@@ -17,10 +17,6 @@ export class MorphAnimMesh extends Mesh {
     super(geometry, material);
 
     this.type = "MorphAnimMesh";
-
-    this.mixer = new AnimationMixer(this);
-
-    this.activeAction = null;
   }
 
   setDirectionForward() {

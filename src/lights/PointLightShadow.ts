@@ -5,20 +5,19 @@ import { PerspectiveCamera } from "../cameras/PerspectiveCamera";
  *
  */
 export class PointLightShadow extends LightShadow<PerspectiveCamera> {
-  isPointLightShadow: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isPointLightShadow: boolean = true;
 
   /**
    * Constructs a new point light shadow.
    */
   constructor() {
     super(new PerspectiveCamera(90, 1, 0.5, 500));
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isPointLightShadow = true;
   }
 
   override clone(_recursive?: boolean): PointLightShadow {

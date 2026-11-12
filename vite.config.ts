@@ -14,7 +14,7 @@ export default defineConfig(({ command }) => ({
     // The plugin uses standard Vite types; Vite+ exposes Rolldown plugin types.
     vitePluginTsMangle({
       entrySourceFiles: [],
-      tsconfigPath: "tsconfig.crasher.json",
+      tsconfigPath: "scripts/tsconfig.lib.json",
       enabled: command === "build",
       // shortcut: dynamic WebGL backend calls lose renamed properties; enable after removing their type erasure.
       useMangler: false,

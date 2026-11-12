@@ -75,13 +75,38 @@ export class GTAOPass extends Pass {
   camera: PerspectiveCamera;
   width: number;
   height: number;
-  output: number;
-  blendIntensity: number;
-  pdRings: number;
-  pdRadiusExponent: number;
-  pdSamples: number;
-  radius: number | undefined;
-  gtaoNoiseTexture: DataTexture;
+  /**
+   * The output configuration.
+   *
+   * @default 0
+   */
+  output: number = 0;
+  /**
+   * The AO blend intensity.
+   *
+   * @default 1
+   */
+  blendIntensity: number = 1.0;
+  /**
+   * The number of Poisson Denoise rings.
+   *
+   * @default 2
+   */
+  pdRings: number = 2.0;
+  /**
+   * The Poisson Denoise radius exponent.
+   *
+   * @default 2
+   */
+  pdRadiusExponent: number = 2.0;
+  /**
+   * The Poisson Denoise sample count.
+   *
+   * @default 16
+   */
+  pdSamples: number = 16;
+  radius: number | undefined = undefined;
+  gtaoNoiseTexture: DataTexture = generateMagicSquareNoise();
   pdNoiseTexture: DataTexture;
   gtaoRenderTarget: WebGLRenderTarget;
   pdRenderTarget: WebGLRenderTarget;
@@ -96,8 +121,8 @@ export class GTAOPass extends Pass {
   blendMaterial: ShaderMaterial;
   _fsQuad: FullScreenQuad;
   _originalClearColor: Color;
-  _renderGBuffer: boolean;
-  _visibilityCache: Object3D[];
+  _renderGBuffer: boolean = true;
+  _visibilityCache: Object3D[] = [];
 
   /** Output modes. */
   static OUTPUT: {
@@ -170,45 +195,6 @@ export class GTAOPass extends Pass {
      */
     this.scene = scene;
 
-    /**
-     * The output configuration.
-     *
-     * @default 0
-     */
-    this.output = 0;
-    this._renderGBuffer = true;
-    this._visibilityCache = [];
-
-    /**
-     * The AO blend intensity.
-     *
-     * @default 1
-     */
-    this.blendIntensity = 1.0;
-
-    /**
-     * The number of Poisson Denoise rings.
-     *
-     * @default 2
-     */
-    this.pdRings = 2.0;
-
-    /**
-     * The Poisson Denoise radius exponent.
-     *
-     * @default 2
-     */
-    this.pdRadiusExponent = 2.0;
-
-    /**
-     * The Poisson Denoise sample count.
-     *
-     * @default 16
-     */
-    this.pdSamples = 16;
-    this.radius = undefined;
-
-    this.gtaoNoiseTexture = generateMagicSquareNoise();
     this.pdNoiseTexture = this._generateNoise();
 
     this.gtaoRenderTarget = new WebGLRenderTarget(this.width, this.height, {

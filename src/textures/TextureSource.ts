@@ -11,11 +11,31 @@ let _sourceId = 0;
  * definition so the same data can be used with multiple texture instances.
  */
 export class TextureSource {
-  isTextureSource: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isTextureSource: boolean = true;
   uuid: string;
   data: any;
-  dataReady: boolean;
-  version: number;
+  /**
+   * This property is only relevant when {@link TextureSource#needsUpdate} is set to `true` and
+   * provides more control on how texture data should be processed. When `dataReady` is set
+   * to `false`, the engine performs the memory allocation (if necessary) but does not transfer
+   * the data into the GPU memory.
+   *
+   * @default true
+   */
+  dataReady: boolean = true;
+  /**
+   * This starts at `0` and counts how many times {@link TextureSource#needsUpdate} is set to `true`.
+   *
+   * @readonly
+   * @default 0
+   */
+  version: number = 0;
   readonly id: number;
 
   /**
@@ -24,13 +44,6 @@ export class TextureSource {
    * @param [data=null] - The data definition of a texture.
    */
   constructor(data: any = null) {
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isTextureSource = true;
     /**
      * The ID of the source.
      *
@@ -54,22 +67,6 @@ export class TextureSource {
      *
      */
     this.data = data;
-    /**
-     * This property is only relevant when {@link TextureSource#needsUpdate} is set to `true` and
-     * provides more control on how texture data should be processed. When `dataReady` is set
-     * to `false`, the engine performs the memory allocation (if necessary) but does not transfer
-     * the data into the GPU memory.
-     *
-     * @default true
-     */
-    this.dataReady = true;
-    /**
-     * This starts at `0` and counts how many times {@link TextureSource#needsUpdate} is set to `true`.
-     *
-     * @readonly
-     * @default 0
-     */
-    this.version = 0;
   }
   /**
    * Returns the dimensions of the source into the given target vector.
@@ -170,7 +167,14 @@ function serializeImage(image?: any) {
  * @deprecated since r186. Use {@link TextureSource} instead. `Source` has been renamed to `TextureSource`.
  */
 export class Source extends TextureSource {
-  isSource: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @deprecated since r186. Use {@link TextureSource#isTextureSource} instead.
+   * @readonly
+   * @default true
+   */
+  isSource: boolean = true;
 
   /**
    * Constructs a new texture source.
@@ -183,13 +187,5 @@ export class Source extends TextureSource {
       'Source: "Source" has been renamed to "TextureSource". Please update your code to use "THREE.TextureSource" instead.',
     ); // @deprecated, r186
     super(data);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @deprecated since r186. Use {@link TextureSource#isTextureSource} instead.
-     * @readonly
-     * @default true
-     */
-    this.isSource = true;
   }
 }

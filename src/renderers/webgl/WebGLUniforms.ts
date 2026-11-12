@@ -718,14 +718,13 @@ type UniformNode = SingleUniform | PureArrayUniform | StructuredUniform;
 class SingleUniform {
   id: string | number;
   addr: WebGLUniformLocation | null;
-  cache: (number | boolean)[];
+  cache: (number | boolean)[] = [];
   type: number;
   setValue: ((gl: WebGL2RenderingContext, value: any, textures?: WebGLTextures) => void) | undefined;
 
   constructor(id: string | number, activeInfo: WebGLActiveInfo, addr: WebGLUniformLocation | null) {
     this.id = id;
     this.addr = addr;
-    this.cache = [];
     this.type = activeInfo.type;
     this.setValue = getSingularSetter(activeInfo.type);
     // this.path = activeInfo.name; // DEBUG
@@ -734,7 +733,7 @@ class SingleUniform {
 class PureArrayUniform {
   id: string | number;
   addr: WebGLUniformLocation | null;
-  cache: number[];
+  cache: number[] = [];
   type: number;
   size: number;
   setValue: ((gl: WebGL2RenderingContext, value: any, textures?: WebGLTextures) => void) | undefined;
@@ -742,7 +741,6 @@ class PureArrayUniform {
   constructor(id: string | number, activeInfo: WebGLActiveInfo, addr: WebGLUniformLocation | null) {
     this.id = id;
     this.addr = addr;
-    this.cache = [];
     this.type = activeInfo.type;
     this.size = activeInfo.size;
     this.setValue = getPureArraySetter(activeInfo.type);
@@ -765,15 +763,12 @@ function setValueStructured(
 class StructuredUniform {
   id: string | number;
   declare type?: undefined;
-  seq: UniformNode[];
-  map: Record<string | number, UniformNode>;
-  setValue: (gl: WebGL2RenderingContext, value: any, textures?: WebGLTextures) => void;
+  seq: UniformNode[] = [];
+  map: Record<string | number, UniformNode> = {};
+  setValue: (gl: WebGL2RenderingContext, value: any, textures?: WebGLTextures) => void = setValueStructured;
 
   constructor(id: string | number) {
     this.id = id;
-    this.seq = [];
-    this.map = {};
-    this.setValue = setValueStructured;
   }
 }
 // --- Top-level ---
@@ -828,12 +823,10 @@ function parseUniform(
 }
 // Root Container
 export class WebGLUniforms {
-  seq: UniformNode[];
-  map: Record<string | number, UniformNode>;
+  seq: UniformNode[] = [];
+  map: Record<string | number, UniformNode> = {};
 
   constructor(gl: WebGL2RenderingContext, program: WebGLProgram) {
-    this.seq = [];
-    this.map = {};
     const n: number = gl.getProgramParameter(program, GL.ACTIVE_UNIFORMS);
     for (let i = 0; i < n; ++i) {
       const info = gl.getActiveUniform(program, i)!,

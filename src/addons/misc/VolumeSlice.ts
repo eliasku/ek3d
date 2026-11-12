@@ -9,8 +9,8 @@ import type { Volume, VolumeAxis } from "./Volume";
 export class VolumeSlice {
   volume: Volume;
   axis: VolumeAxis;
-  canvas: HTMLCanvasElement;
-  canvasBuffer: HTMLCanvasElement;
+  canvas: HTMLCanvasElement = document.createElement("canvas");
+  canvasBuffer: HTMLCanvasElement = document.createElement("canvas");
   ctx: CanvasRenderingContext2D;
   ctxBuffer: CanvasRenderingContext2D;
   iLength: number;
@@ -26,8 +26,6 @@ export class VolumeSlice {
     this.volume = volume;
     this._index = index;
     this.axis = axis;
-    this.canvas = document.createElement("canvas");
-    this.canvasBuffer = document.createElement("canvas");
     const extracted = volume.extractPerpendicularPlane(axis, index);
     this.iLength = extracted.iLength;
     this.jLength = extracted.jLength;

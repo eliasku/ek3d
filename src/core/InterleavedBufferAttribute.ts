@@ -14,8 +14,18 @@ const _vector = /*@__PURE__*/ new Vector3();
  * different offsets into the buffer.
  */
 export class InterleavedBufferAttribute {
-  isInterleavedBufferAttribute: boolean;
-  name: string;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isInterleavedBufferAttribute: boolean = true;
+  /**
+   * The name of the buffer attribute.
+   *
+   */
+  name: string = "";
   data: InterleavedBuffer;
   itemSize: number;
   offset: number;
@@ -31,18 +41,6 @@ export class InterleavedBufferAttribute {
    * @param [normalized=false] - Whether the data are normalized or not.
    */
   constructor(interleavedBuffer: InterleavedBuffer, itemSize: number, offset: number, normalized: boolean = false) {
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isInterleavedBufferAttribute = true;
-    /**
-     * The name of the buffer attribute.
-     *
-     */
-    this.name = "";
     /**
      * The buffer holding the interleaved data.
      *

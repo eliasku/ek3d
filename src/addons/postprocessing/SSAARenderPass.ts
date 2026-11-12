@@ -48,16 +48,46 @@ type CameraWithViewOffset = Camera & {
 export class SSAARenderPass extends Pass {
   scene: Scene;
   camera: CameraWithViewOffset;
-  sampleLevel: number;
-  unbiased: boolean;
-  stencilBuffer: boolean;
+  /**
+   * The sample level. Specified as n, where the number of
+   * samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
+   *
+   * @default 4
+   */
+  sampleLevel: number = 4;
+  /**
+   * Whether the pass should be unbiased or not. This property has the most
+   * visible effect when rendering to a RGBA8 buffer because it mitigates
+   * rounding errors. By default RGBA16F is used.
+   *
+   * @default true
+   */
+  unbiased: boolean = true;
+  /**
+   * Whether to use a stencil buffer or not. This property can't
+   * be changed after the first render.
+   *
+   * @default false
+   */
+  stencilBuffer: boolean = false;
   clearColor: number | Color | string;
   clearAlpha: number;
-  _sampleRenderTarget: WebGLRenderTarget | null;
-  _oldClearColor: Color;
-  _copyUniforms: Record<string, { value: any; needsUpdate?: boolean }>;
-  _copyMaterial: ShaderMaterial;
-  _fsQuad: FullScreenQuad;
+  // internals
+
+  _sampleRenderTarget: WebGLRenderTarget | null = null;
+  _oldClearColor: Color = new Color();
+  _copyUniforms: Record<string, { value: any; needsUpdate?: boolean }> = cloneUniforms(CopyShader.uniforms);
+  _copyMaterial: ShaderMaterial = new ShaderMaterial({
+    uniforms: this._copyUniforms,
+    vertexShader: CopyShader.vertexShader,
+    fragmentShader: CopyShader.fragmentShader,
+    transparent: true,
+    depthTest: false,
+    depthWrite: false,
+    premultipliedAlpha: true,
+    blending: Blending.Additive,
+  });
+  _fsQuad: FullScreenQuad = new FullScreenQuad(this._copyMaterial);
 
   /**
    * Constructs a new SSAA render pass.
@@ -80,31 +110,6 @@ export class SSAARenderPass extends Pass {
     this.camera = camera;
 
     /**
-     * The sample level. Specified as n, where the number of
-     * samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
-     *
-     * @default 4
-     */
-    this.sampleLevel = 4;
-
-    /**
-     * Whether the pass should be unbiased or not. This property has the most
-     * visible effect when rendering to a RGBA8 buffer because it mitigates
-     * rounding errors. By default RGBA16F is used.
-     *
-     * @default true
-     */
-    this.unbiased = true;
-
-    /**
-     * Whether to use a stencil buffer or not. This property can't
-     * be changed after the first render.
-     *
-     * @default false
-     */
-    this.stencilBuffer = false;
-
-    /**
      * The clear color of the render pass.
      *
      * @default 0x000000
@@ -117,27 +122,6 @@ export class SSAARenderPass extends Pass {
      * @default 0
      */
     this.clearAlpha = clearAlpha;
-
-    // internals
-
-    this._sampleRenderTarget = null;
-
-    this._oldClearColor = new Color();
-
-    this._copyUniforms = cloneUniforms(CopyShader.uniforms);
-
-    this._copyMaterial = new ShaderMaterial({
-      uniforms: this._copyUniforms,
-      vertexShader: CopyShader.vertexShader,
-      fragmentShader: CopyShader.fragmentShader,
-      transparent: true,
-      depthTest: false,
-      depthWrite: false,
-      premultipliedAlpha: true,
-      blending: Blending.Additive,
-    });
-
-    this._fsQuad = new FullScreenQuad(this._copyMaterial);
   }
 
   /**

@@ -6,15 +6,12 @@ type NormalResult = { positions: BufferAttribute["array"]; normals: Float32Array
 
 export class TileCreasedNormalsPlugin {
   creaseAngle: number;
-  _requestId: number;
-  _pending: Map<number, (result: NormalResult) => void>;
+  _requestId: number = 0;
+  _pending: Map<number, (result: NormalResult) => void> = new Map<number, (result: NormalResult) => void>();
   _worker: Worker;
 
   constructor({ creaseAngle = Math.PI / 3 }: { creaseAngle?: number } = {}) {
     this.creaseAngle = creaseAngle;
-
-    this._requestId = 0;
-    this._pending = new Map<number, (result: NormalResult) => void>();
 
     const workerCode = `
 

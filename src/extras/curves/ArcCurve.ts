@@ -4,7 +4,13 @@ import { EllipseCurve } from "./EllipseCurve";
  *
  */
 export class ArcCurve extends EllipseCurve {
-  isArcCurve: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isArcCurve: boolean = true;
 
   /**
    * Constructs a new arc curve.
@@ -25,13 +31,6 @@ export class ArcCurve extends EllipseCurve {
     aClockwise?: boolean,
   ) {
     super(aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isArcCurve = true;
     this.type = "ArcCurve";
   }
   override clone(): ArcCurve {

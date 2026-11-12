@@ -9,7 +9,13 @@ import { CompressedTexture } from "./CompressedTexture";
  *
  */
 export class CompressedArrayTexture extends CompressedTexture {
-  isCompressedArrayTexture: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isCompressedArrayTexture: boolean = true;
   wrapR: Wrapping;
   layerUpdates: Set<number>;
 
@@ -33,13 +39,6 @@ export class CompressedArrayTexture extends CompressedTexture {
     type?: TextureType,
   ) {
     super(mipmaps, width, height, format, type);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isCompressedArrayTexture = true;
     /**
      * The image property of a compressed texture just defines its dimensions.
      *

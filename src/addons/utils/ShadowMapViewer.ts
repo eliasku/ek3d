@@ -13,33 +13,47 @@ import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
 /** Displays a directional or spot light's shadow map as an overlay. */
 export class ShadowMapViewer {
   enabled: boolean = true;
-  size: { width: number; height: number; set(width: number, height: number): void };
-  position: { x: number; y: number; set(x: number, y: number): void };
-  private camera: OrthographicCamera;
-  private scene: Scene;
-  private mesh: Mesh<ShaderMaterial>;
-  private label: Mesh<MeshBasicMaterial> | null = null;
-  private light: DirectionalLight | SpotLight;
-
-  constructor(light: DirectionalLight | SpotLight) {
-    this.light = light;
-    this.camera = new OrthographicCamera(
-      -window.innerWidth / 2,
-      window.innerWidth / 2,
-      window.innerHeight / 2,
-      -window.innerHeight / 2,
-      1,
-      10,
-    );
-    this.camera.position.z = 2;
-    this.scene = new Scene();
-    this.mesh = new Mesh<ShaderMaterial>(
-      new PlaneGeometry(256, 256),
-      new ShaderMaterial({
-        uniforms: { tDiffuse: { value: null }, opacity: { value: 1 } },
-        vertexShader: `varying vec2 vUv;
+  size: { width: number; height: number; set(width: number, height: number): void } = {
+    width: 256,
+    height: 256,
+    set: (width, height) => {
+      this.size.width = width;
+      this.size.height = height;
+      this.mesh.scale.set(width / 256, height / 256, 1);
+      this.position.set(this.position.x, this.position.y);
+    },
+  };
+  position: { x: number; y: number; set(x: number, y: number): void } = {
+    x: 10,
+    y: 10,
+    set: (x, y) => {
+      this.position.x = x;
+      this.position.y = y;
+      this.mesh.position.set(
+        -window.innerWidth / 2 + this.size.width / 2 + x,
+        window.innerHeight / 2 - this.size.height / 2 - y,
+        0,
+      );
+      if (this.label)
+        this.label.position.set(this.mesh.position.x, this.mesh.position.y - this.size.height / 2 + 12.5, 0);
+    },
+  };
+  private camera: OrthographicCamera = new OrthographicCamera(
+    -window.innerWidth / 2,
+    window.innerWidth / 2,
+    window.innerHeight / 2,
+    -window.innerHeight / 2,
+    1,
+    10,
+  );
+  private scene: Scene = new Scene();
+  private mesh: Mesh<ShaderMaterial> = new Mesh<ShaderMaterial>(
+    new PlaneGeometry(256, 256),
+    new ShaderMaterial({
+      uniforms: { tDiffuse: { value: null }, opacity: { value: 1 } },
+      vertexShader: `varying vec2 vUv;
 void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-        fragmentShader: `uniform float opacity;
+      fragmentShader: `uniform float opacity;
 uniform sampler2D tDiffuse;
 varying vec2 vUv;
 void main() {
@@ -50,8 +64,14 @@ void main() {
   gl_FragColor = vec4(vec3(1.0 - depth), opacity);
 #endif
 }`,
-      }),
-    );
+    }),
+  );
+  private label: Mesh<MeshBasicMaterial> | null = null;
+  private light: DirectionalLight | SpotLight;
+
+  constructor(light: DirectionalLight | SpotLight) {
+    this.light = light;
+    this.camera.position.z = 2;
     this.scene.add(this.mesh);
     if (light.name) {
       const canvas = document.createElement("canvas");
@@ -69,31 +89,6 @@ void main() {
       );
       this.scene.add(this.label);
     }
-    this.position = {
-      x: 10,
-      y: 10,
-      set: (x, y) => {
-        this.position.x = x;
-        this.position.y = y;
-        this.mesh.position.set(
-          -window.innerWidth / 2 + this.size.width / 2 + x,
-          window.innerHeight / 2 - this.size.height / 2 - y,
-          0,
-        );
-        if (this.label)
-          this.label.position.set(this.mesh.position.x, this.mesh.position.y - this.size.height / 2 + 12.5, 0);
-      },
-    };
-    this.size = {
-      width: 256,
-      height: 256,
-      set: (width, height) => {
-        this.size.width = width;
-        this.size.height = height;
-        this.mesh.scale.set(width / 256, height / 256, 1);
-        this.position.set(this.position.x, this.position.y);
-      },
-    };
     this.update();
   }
 

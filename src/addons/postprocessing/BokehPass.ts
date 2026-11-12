@@ -50,7 +50,7 @@ export class BokehPass extends Pass {
   _fsQuad: FullScreenQuad;
   _renderTargetDepth: WebGLRenderTarget;
   _materialDepth: MeshDepthMaterial;
-  _oldClearColor: Color;
+  _oldClearColor: Color = new Color();
 
   /**
    * Constructs a new Bokeh pass.
@@ -134,8 +134,6 @@ export class BokehPass extends Pass {
     // internals
 
     this._fsQuad = new FullScreenQuad(this.materialBokeh);
-
-    this._oldClearColor = new Color();
   }
 
   /**

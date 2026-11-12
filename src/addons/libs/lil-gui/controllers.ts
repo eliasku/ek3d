@@ -6,7 +6,7 @@ import type { GUI } from "./GUI";
  */
 export class BooleanController extends Controller {
   /** The checkbox input of the widget. */
-  $input: HTMLInputElement;
+  $input: HTMLInputElement = document.createElement("input");
 
   /**
    * Constructs a boolean checkbox controller.
@@ -18,7 +18,6 @@ export class BooleanController extends Controller {
   constructor(parent: GUI, object: Record<string, unknown>, property: string) {
     super(parent, object, property, "boolean", "label");
 
-    this.$input = document.createElement("input");
     this.$input.setAttribute("type", "checkbox");
     this.$input.setAttribute("aria-labelledby", this.$name.id);
 
@@ -44,8 +43,9 @@ export class BooleanController extends Controller {
  * Controls a function property and runs it on click.
  */
 export class FunctionController extends Controller {
+  // Buttons are the only case where widget contains name
   /** The button element that renders the function name. */
-  $button: HTMLButtonElement;
+  $button: HTMLButtonElement = document.createElement("button");
 
   /**
    * Constructs a function button controller.
@@ -57,8 +57,6 @@ export class FunctionController extends Controller {
   constructor(parent: GUI, object: Record<string, unknown>, property: string) {
     super(parent, object, property, "function");
 
-    // Buttons are the only case where widget contains name
-    this.$button = document.createElement("button");
     this.$button.appendChild(this.$name);
     this.$widget.appendChild(this.$button);
 
@@ -80,7 +78,7 @@ export class FunctionController extends Controller {
  */
 export class StringController extends Controller {
   /** The text input of the widget. */
-  $input: HTMLInputElement;
+  $input: HTMLInputElement = document.createElement("input");
 
   /**
    * Constructs a string controller.
@@ -92,7 +90,6 @@ export class StringController extends Controller {
   constructor(parent: GUI, object: Record<string, unknown>, property: string) {
     super(parent, object, property, "string");
 
-    this.$input = document.createElement("input");
     this.$input.setAttribute("type", "text");
     this.$input.setAttribute("spellcheck", "false");
     this.$input.setAttribute("aria-labelledby", this.$name.id);

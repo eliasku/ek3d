@@ -20,34 +20,23 @@ function isNearZero(value: number) {
  * modifying the triangle parameters.
  */
 export class ExtendedTriangle extends Triangle {
-  isExtendedTriangle: boolean;
-  satAxes: Vector3[];
-  satBounds: SeparatingAxisBounds[];
-  points: Vector3[];
-  plane: Plane;
-  isDegenerateIntoSegment: boolean;
-  isDegenerateIntoPoint: boolean;
-  degenerateSegment: Line3;
-  needsUpdate: boolean;
+  isExtendedTriangle: boolean = true;
+  satAxes: Vector3[] = Array.from({ length: 4 }, () => new Vector3());
+  satBounds: SeparatingAxisBounds[] = Array.from({ length: 4 }, () => new SeparatingAxisBounds());
+  points: Vector3[] = [this.a, this.b, this.c];
+  plane: Plane = new Plane();
+  isDegenerateIntoSegment: boolean = false;
+  isDegenerateIntoPoint: boolean = false;
+  degenerateSegment: Line3 = new Line3();
+  /**
+   * Indicates that the triangle fields have changed so cached variables to accelerate other
+   * function execution can be updated. Must be set to true after modifying the triangle
+   * `a`, `b`, `c` fields.
+   */
+  needsUpdate: boolean = true;
 
   constructor(...args: ConstructorParameters<typeof Triangle>) {
     super(...args);
-
-    this.isExtendedTriangle = true;
-    this.satAxes = Array.from({ length: 4 }, () => new Vector3());
-    this.satBounds = Array.from({ length: 4 }, () => new SeparatingAxisBounds());
-    this.points = [this.a, this.b, this.c];
-    this.plane = new Plane();
-    this.isDegenerateIntoSegment = false;
-    this.isDegenerateIntoPoint = false;
-    this.degenerateSegment = new Line3();
-
-    /**
-     * Indicates that the triangle fields have changed so cached variables to accelerate other
-     * function execution can be updated. Must be set to true after modifying the triangle
-     * `a`, `b`, `c` fields.
-     */
-    this.needsUpdate = true;
   }
 
   override clone(): ExtendedTriangle {

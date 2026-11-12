@@ -29,17 +29,16 @@ import { Object3D } from "../core/Object3D";
  *
  */
 export class Group extends Object3D {
-  isGroup: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isGroup: boolean = true;
 
   constructor() {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isGroup = true;
     this.type = "Group";
   }
   clone(recursive?: boolean): Group {

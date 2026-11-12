@@ -6,7 +6,13 @@ import { Curve } from "../core/Curve";
  *
  */
 export class LineCurve3 extends Curve<Vector3> {
-  isLineCurve3: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isLineCurve3: boolean = true;
 
   v1: Vector3;
   v2: Vector3;
@@ -19,13 +25,6 @@ export class LineCurve3 extends Curve<Vector3> {
    */
   constructor(v1: Vector3 = new Vector3(), v2: Vector3 = new Vector3()) {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isLineCurve3 = true;
     this.type = "LineCurve3";
     /**
      * The start point.

@@ -80,7 +80,7 @@ export class UltraHDRLoader extends Loader<DataTexture, string> {
    *
    * @default TextureType.HalfFloat
    */
-  type: TextureType;
+  type: TextureType = TextureType.HalfFloat;
 
   /**
    * Constructs a new Ultra HDR loader.
@@ -89,8 +89,6 @@ export class UltraHDRLoader extends Loader<DataTexture, string> {
    */
   constructor(manager?: LoadingManager) {
     super(manager);
-
-    this.type = TextureType.HalfFloat;
   }
 
   /**

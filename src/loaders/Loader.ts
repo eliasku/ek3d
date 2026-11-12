@@ -6,13 +6,48 @@ import { LoadingManager } from "./LoadingManager";
  */
 export abstract class Loader<T = unknown, U = string> {
   manager: LoadingManager;
-  crossOrigin: string;
-  withCredentials: boolean;
-  path: string;
-  resourcePath: string;
-  requestHeader: Record<string, string>;
-  priority: "high" | "low" | "auto";
-  cache: RequestCache;
+  /**
+   * The crossOrigin string to implement CORS for loading the url from a
+   * different domain that allows CORS.
+   *
+   * @default 'anonymous'
+   */
+  crossOrigin: string = "anonymous";
+  /**
+   * Whether the XMLHttpRequest uses credentials.
+   *
+   * @default false
+   */
+  withCredentials: boolean = false;
+  /**
+   * The base path from which the asset will be loaded.
+   *
+   */
+  path: string = "";
+  /**
+   * The base path from which additional resources like textures will be loaded.
+   *
+   */
+  resourcePath: string = "";
+  /**
+   * The [request header](https://developer.mozilla.org/en-US/docs/Glossary/Request_header)
+   * used in HTTP request.
+   *
+   */
+  requestHeader: Record<string, string> = {};
+  /**
+   * The request priority hint. Image loaders use `HTMLImageElement.fetchPriority`.
+   *
+   * @default 'auto'
+   */
+  priority: "high" | "low" | "auto" = "auto";
+  /**
+   * The HTTP cache mode passed to `fetch()`. This does not affect {@link Cache}
+   * or loaders using `HTMLImageElement`.
+   *
+   * @default 'default'
+   */
+  cache: RequestCache = "default";
   /**
    * The default material name used when creating materials for loaded objects.
    * Not all loaders honor this setting.
@@ -31,48 +66,6 @@ export abstract class Loader<T = unknown, U = string> {
      * @default A new LoadingManager instance
      */
     this.manager = manager !== undefined ? manager : new LoadingManager();
-    /**
-     * The crossOrigin string to implement CORS for loading the url from a
-     * different domain that allows CORS.
-     *
-     * @default 'anonymous'
-     */
-    this.crossOrigin = "anonymous";
-    /**
-     * Whether the XMLHttpRequest uses credentials.
-     *
-     * @default false
-     */
-    this.withCredentials = false;
-    /**
-     * The base path from which the asset will be loaded.
-     *
-     */
-    this.path = "";
-    /**
-     * The base path from which additional resources like textures will be loaded.
-     *
-     */
-    this.resourcePath = "";
-    /**
-     * The [request header](https://developer.mozilla.org/en-US/docs/Glossary/Request_header)
-     * used in HTTP request.
-     *
-     */
-    this.requestHeader = {};
-    /**
-     * The request priority hint. Image loaders use `HTMLImageElement.fetchPriority`.
-     *
-     * @default 'auto'
-     */
-    this.priority = "auto";
-    /**
-     * The HTTP cache mode passed to `fetch()`. This does not affect {@link Cache}
-     * or loaders using `HTMLImageElement`.
-     *
-     * @default 'default'
-     */
-    this.cache = "default";
   }
   /**
    * This method needs to be implemented by all concrete loaders. It holds the

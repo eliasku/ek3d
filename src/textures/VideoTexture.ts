@@ -18,8 +18,21 @@ import { Texture } from "./Texture";
  *
  */
 export class VideoTexture extends Texture {
-  isVideoTexture: boolean;
-  _requestVideoFrameCallbackId: number;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isVideoTexture: boolean = true;
+  /**
+   * The video frame request callback identifier, which is a positive integer.
+   *
+   * Value of 0 represents no scheduled rVFC.
+   *
+   * @private
+   */
+  _requestVideoFrameCallbackId: number = 0;
 
   /**
    * Constructs a new video texture.
@@ -47,13 +60,6 @@ export class VideoTexture extends Texture {
   ) {
     super(video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy);
     /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isVideoTexture = true;
-    /**
      * Whether to generate mipmaps (if possible) for a texture.
      *
      * Overwritten and set to `false` by default.
@@ -61,14 +67,6 @@ export class VideoTexture extends Texture {
      * @default false
      */
     this.generateMipmaps = false;
-    /**
-     * The video frame request callback identifier, which is a positive integer.
-     *
-     * Value of 0 represents no scheduled rVFC.
-     *
-     * @private
-     */
-    this._requestVideoFrameCallbackId = 0;
     const updateVideo = () => {
       this.needsUpdate = true;
       this._requestVideoFrameCallbackId = video.requestVideoFrameCallback(updateVideo);

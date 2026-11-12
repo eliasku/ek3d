@@ -39,9 +39,20 @@ import { generateUUID } from "../../math/MathUtils";
  *
  */
 export class Shape extends Path {
-  uuid: string;
+  /**
+   * The UUID of the shape.
+   *
+   * @readonly
+   */
+  uuid: string = generateUUID();
 
-  holes: Path[];
+  /**
+   * Defines the holes in the shape. Hole definitions must use the
+   * opposite winding order (CW/CCW) than the outer shape.
+   *
+   * @readonly
+   */
+  holes: Path[] = [];
 
   /**
    * Constructs a new shape.
@@ -50,20 +61,7 @@ export class Shape extends Path {
    */
   constructor(points?: Vector2[]) {
     super(points);
-    /**
-     * The UUID of the shape.
-     *
-     * @readonly
-     */
-    this.uuid = generateUUID();
     this.type = "Shape";
-    /**
-     * Defines the holes in the shape. Hole definitions must use the
-     * opposite winding order (CW/CCW) than the outer shape.
-     *
-     * @readonly
-     */
-    this.holes = [];
   }
   /**
    * Returns an array representing each contour of the holes

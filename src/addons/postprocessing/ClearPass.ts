@@ -20,10 +20,17 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  *
  */
 export class ClearPass extends Pass {
-  needsSwap: boolean;
+  /**
+   * Overwritten to disable the swap.
+   *
+   * @default false
+   */
+  needsSwap: boolean = false;
   clearColor: number | Color | string;
   clearAlpha: number;
-  _oldClearColor: Color;
+  // internals
+
+  _oldClearColor: Color = new Color();
 
   /**
    * Constructs a new clear pass.
@@ -33,12 +40,6 @@ export class ClearPass extends Pass {
    */
   constructor(clearColor: number | Color | string = 0x000000, clearAlpha: number = 0) {
     super();
-    /**
-     * Overwritten to disable the swap.
-     *
-     * @default false
-     */
-    this.needsSwap = false;
     /**
      * The clear color.
      *
@@ -51,10 +52,6 @@ export class ClearPass extends Pass {
      * @default 0
      */
     this.clearAlpha = clearAlpha;
-
-    // internals
-
-    this._oldClearColor = new Color();
   }
 
   /**

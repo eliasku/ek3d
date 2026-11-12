@@ -9,13 +9,11 @@ import { HDRLoader } from "./HDRLoader";
 
 /** Loads six RGBE images into an HDR cube texture. */
 export class HDRCubeTextureLoader extends Loader<CubeTexture, string[]> {
-  hdrLoader: HDRLoader;
-  type: TextureType;
+  hdrLoader: HDRLoader = new HDRLoader(this.manager);
+  type: TextureType = TextureType.HalfFloat;
 
   constructor(manager?: LoadingManager) {
     super(manager);
-    this.hdrLoader = new HDRLoader(this.manager);
-    this.type = TextureType.HalfFloat;
   }
 
   load(

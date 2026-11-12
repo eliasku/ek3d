@@ -77,9 +77,9 @@ export class MeshSurfaceSampler {
   normalAttribute: Attribute | undefined;
   colorAttribute: Attribute | undefined;
   uvAttribute: Attribute | undefined;
-  weightAttribute: Attribute | null;
+  weightAttribute: Attribute | null = null;
 
-  distribution: Float32Array | null;
+  distribution: Float32Array | null = null;
 
   /**
    * Constructs a mesh surface sampler.
@@ -100,9 +100,6 @@ export class MeshSurfaceSampler {
     this.normalAttribute = readAttribute(this.geometry, "normal");
     this.colorAttribute = readAttribute(this.geometry, "color");
     this.uvAttribute = readAttribute(this.geometry, "uv");
-    this.weightAttribute = null;
-
-    this.distribution = null;
   }
 
   /**

@@ -54,32 +54,32 @@ export class PointerLockControls<TObject extends Camera = Camera> extends Contro
    *
    * @default false
    */
-  isLocked: boolean;
+  isLocked: boolean = false;
 
   /**
    * Camera pitch, lower limit. Range is '[0, Math.PI]' in radians.
    *
    * @default 0
    */
-  minPolarAngle: number;
+  minPolarAngle: number = 0;
 
   /**
    * Camera pitch, upper limit. Range is '[0, Math.PI]' in radians.
    *
    * @default Math.PI
    */
-  maxPolarAngle: number;
+  maxPolarAngle: number = Math.PI;
 
   /**
    * Multiplier for how much the pointer movement influences the camera rotation.
    *
    * @default 1
    */
-  pointerSpeed: number;
+  pointerSpeed: number = 1.0;
 
-  _onMouseMove: (event: MouseEvent) => void;
-  _onPointerlockChange: () => void;
-  _onPointerlockError: () => void;
+  _onMouseMove: (event: MouseEvent) => void = onMouseMove.bind(this);
+  _onPointerlockChange: () => void = onPointerlockChange.bind(this);
+  _onPointerlockError: () => void = onPointerlockError.bind(this);
 
   /**
    * Constructs a new controls instance.
@@ -89,15 +89,6 @@ export class PointerLockControls<TObject extends Camera = Camera> extends Contro
    */
   constructor(camera: TObject, domElement: HTMLElement | null = null) {
     super(camera, domElement);
-
-    this.isLocked = false;
-    this.minPolarAngle = 0;
-    this.maxPolarAngle = Math.PI;
-    this.pointerSpeed = 1.0;
-
-    this._onMouseMove = onMouseMove.bind(this);
-    this._onPointerlockChange = onPointerlockChange.bind(this);
-    this._onPointerlockError = onPointerlockError.bind(this);
 
     if (this.domElement !== null) {
       this.connect(this.domElement);

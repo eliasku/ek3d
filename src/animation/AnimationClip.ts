@@ -17,8 +17,18 @@ export class AnimationClip {
   tracks: KeyframeTrack[];
   duration: number;
   blendMode: AnimationBlendMode;
-  uuid: string;
-  userData: any;
+  /**
+   * The UUID of the animation clip.
+   *
+   * @readonly
+   */
+  uuid: string = generateUUID();
+  /**
+   * An object that can be used to store custom data about the animation clip.
+   * It should not hold references to functions as these will not be cloned.
+   *
+   */
+  userData: any = {};
 
   /**
    * Constructs a new animation clip.
@@ -61,18 +71,6 @@ export class AnimationClip {
      *
      */
     this.blendMode = blendMode;
-    /**
-     * The UUID of the animation clip.
-     *
-     * @readonly
-     */
-    this.uuid = generateUUID();
-    /**
-     * An object that can be used to store custom data about the animation clip.
-     * It should not hold references to functions as these will not be cloned.
-     *
-     */
-    this.userData = {};
     // this means it should figure out its duration by scanning the tracks
     if (this.duration < 0) {
       this.resetDuration();

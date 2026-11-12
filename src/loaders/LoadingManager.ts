@@ -21,7 +21,7 @@ import { Cache } from "./Cache";
  * ```
  */
 export class LoadingManager {
-  cache: Cache;
+  cache: Cache = new Cache();
   fileRequests: Record<
     string,
     {
@@ -29,17 +29,29 @@ export class LoadingManager {
       onProgress?: (event: ProgressEvent) => void;
       onError?: (error: unknown) => void;
     }[]
-  >;
+  > = Object.create(null);
   imageRequests: WeakMap<
     HTMLImageElement,
     { onLoad?: (image: HTMLImageElement) => void; onError?: (error: Event) => void }[]
-  >;
-  bitmapErrors: WeakMap<Promise<unknown>, unknown>;
-  onStart: ((url: string, loaded: number, total: number) => void) | undefined;
+  > = new WeakMap();
+  bitmapErrors: WeakMap<Promise<unknown>, unknown> = new WeakMap();
+  // Refer to #5689 for the reason why we don't set .onStart
+  // in the constructor
+  /**
+   * Executes when an item starts loading.
+   *
+   * @default undefined
+   */
+  onStart: ((url: string, loaded: number, total: number) => void) | undefined = undefined;
   onLoad: (() => void) | undefined;
   onProgress: ((url: string, loaded: number, total: number) => void) | undefined;
   onError: ((url: string) => void) | undefined;
-  _abortController: AbortController | null;
+  /**
+   * Used for aborting ongoing requests in loaders using this manager.
+   *
+   * @private
+   */
+  _abortController: AbortController | null = null;
   itemStart: (url: string) => void;
   itemEnd: (url: string) => void;
   itemError: (url: string) => void;
@@ -62,23 +74,11 @@ export class LoadingManager {
     onProgress?: (url: string, loaded: number, total: number) => void,
     onError?: (url: string) => void,
   ) {
-    this.cache = new Cache();
-    this.fileRequests = Object.create(null);
-    this.imageRequests = new WeakMap();
-    this.bitmapErrors = new WeakMap();
     let isLoading = false;
     let itemsLoaded = 0;
     let itemsTotal = 0;
     let urlModifier: ((url: string) => string) | undefined = undefined;
     const handlers: any[] = [];
-    // Refer to #5689 for the reason why we don't set .onStart
-    // in the constructor
-    /**
-     * Executes when an item starts loading.
-     *
-     * @default undefined
-     */
-    this.onStart = undefined;
     /**
      * Executes when all items have been loaded.
      *
@@ -97,12 +97,6 @@ export class LoadingManager {
      * @default undefined
      */
     this.onError = onError;
-    /**
-     * Used for aborting ongoing requests in loaders using this manager.
-     *
-     * @private
-     */
-    this._abortController = null;
     /**
      * This should be called by any loader using the manager when the loader
      * starts loading an item.

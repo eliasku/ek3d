@@ -85,11 +85,27 @@ export type ShadowMaterialParameters = Omit<
  *
  */
 export class ShadowMaterial extends Material {
-  isShadowMaterial: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isShadowMaterial: boolean = true;
 
-  color: Color;
+  /**
+   * Color of the material.
+   *
+   * @default (0,0,0)
+   */
+  color: Color = new Color(0x000000);
 
-  fog: boolean;
+  /**
+   * Whether the material is affected by fog or not.
+   *
+   * @default true
+   */
+  fog: boolean = true;
 
   /**
    * Constructs a new shadow material.
@@ -102,20 +118,7 @@ export class ShadowMaterial extends Material {
    */
   constructor(parameters?: ShadowMaterialParameters) {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isShadowMaterial = true;
     this.type = "ShadowMaterial";
-    /**
-     * Color of the material.
-     *
-     * @default (0,0,0)
-     */
-    this.color = new Color(0x000000);
     /**
      * Overwritten since shadow materials are transparent
      * by default.
@@ -123,12 +126,6 @@ export class ShadowMaterial extends Material {
      * @default true
      */
     this.transparent = true;
-    /**
-     * Whether the material is affected by fog or not.
-     *
-     * @default true
-     */
-    this.fog = true;
     this.setValues(parameters);
   }
   clone(): ShadowMaterial {

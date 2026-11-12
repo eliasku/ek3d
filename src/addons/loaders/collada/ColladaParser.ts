@@ -296,11 +296,9 @@ export function parseId(text: string) {
 export class ColladaParser {
   library: ColladaLibrary | undefined;
   collada: Element | undefined;
-  count: number;
+  count: number = 0;
 
-  constructor() {
-    this.count = 0;
-  }
+  constructor() {}
 
   generateId() {
     return "three_default_" + this.count++;

@@ -19,7 +19,7 @@
     "./*": "./src/*.ts"
   },
   "scripts": {
-    "typecheck": "node node_modules/typescript/bin/tsc --noEmit",
+    "typecheck": "node node_modules/typescript/bin/tsc -b",
     "test": "vp test",
     "dev": "vp dev --host 127.0.0.1",
     "preview": "vp preview --host 127.0.0.1",

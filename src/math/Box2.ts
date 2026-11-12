@@ -4,7 +4,13 @@ const _vector = /*@__PURE__*/ new Vector2();
  * Represents an axis-aligned bounding box (AABB) in 2D space.
  */
 export class Box2 {
-  isBox2: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isBox2: boolean = true;
   min: Vector2;
   max: Vector2;
 
@@ -15,13 +21,6 @@ export class Box2 {
    * @param [max=(-Infinity,-Infinity)] - A vector representing the upper boundary of the box.
    */
   constructor(min: Vector2 = new Vector2(+Infinity, +Infinity), max: Vector2 = new Vector2(-Infinity, -Infinity)) {
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isBox2 = true;
     /**
      * The lower boundary of the box.
      *

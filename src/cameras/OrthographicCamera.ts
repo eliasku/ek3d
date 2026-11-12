@@ -20,9 +20,26 @@ import { Camera } from "./Camera";
  *
  */
 export class OrthographicCamera extends Camera {
-  isOrthographicCamera: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isOrthographicCamera: boolean = true;
 
-  zoom: number;
+  /**
+   * The zoom factor of the camera.
+   *
+   * @default 1
+   */
+  zoom: number = 1;
+  /**
+   * Represents the frustum window specification. This property should not be edited
+   * directly but via {@link PerspectiveCamera#setViewOffset} and {@link PerspectiveCamera#clearViewOffset}.
+   *
+   * @default null
+   */
   view: {
     enabled: boolean;
     fullWidth: number;
@@ -31,7 +48,7 @@ export class OrthographicCamera extends Camera {
     offsetY: number;
     width: number;
     height: number;
-  } | null;
+  } | null = null;
   left: number;
   right: number;
   top: number;
@@ -58,27 +75,7 @@ export class OrthographicCamera extends Camera {
     far: number = 2000,
   ) {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isOrthographicCamera = true;
     this.type = "OrthographicCamera";
-    /**
-     * The zoom factor of the camera.
-     *
-     * @default 1
-     */
-    this.zoom = 1;
-    /**
-     * Represents the frustum window specification. This property should not be edited
-     * directly but via {@link PerspectiveCamera#setViewOffset} and {@link PerspectiveCamera#clearViewOffset}.
-     *
-     * @default null
-     */
-    this.view = null;
     /**
      * The left plane of the camera's frustum.
      *

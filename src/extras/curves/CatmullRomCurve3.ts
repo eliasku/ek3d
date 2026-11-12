@@ -108,7 +108,13 @@ const pz = /*@__PURE__*/ new CubicPoly();
  *
  */
 export class CatmullRomCurve3 extends Curve<Vector3> {
-  isCatmullRomCurve3: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isCatmullRomCurve3: boolean = true;
 
   points: Vector3[];
   closed: boolean;
@@ -130,13 +136,6 @@ export class CatmullRomCurve3 extends Curve<Vector3> {
     tension: number = 0.5,
   ) {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isCatmullRomCurve3 = true;
     this.type = "CatmullRomCurve3";
     /**
      * An array of 3D points defining the curve.

@@ -113,54 +113,341 @@ export interface MaterialProperties {
  * @abstract
  */
 export class Material extends EventDispatcher {
-  isMaterial: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isMaterial: boolean = true;
   uuid: string;
-  name: string;
-  type: string;
-  blending: Blending;
-  side: Side;
-  vertexColors: boolean;
-  opacity: number;
-  transparent: boolean;
-  alphaHash: boolean;
-  blendSrc: Factor;
-  blendDst: Factor;
-  blendEquation: Equation;
-  blendSrcAlpha: Factor | null;
-  blendDstAlpha: Factor | null;
-  blendEquationAlpha: Equation | null;
+  /**
+   * The name of the material.
+   *
+   */
+  name: string = "";
+  /**
+   * The type property is used for detecting the object type
+   * in context of serialization/deserialization.
+   *
+   * @readonly
+   */
+  type: string = "Material";
+  /**
+   * Defines the blending type of the material.
+   *
+   * It must be set to `Blending.Custom` if custom blending properties like
+   * {@link Material#blendSrc}, {@link Material#blendDst} or {@link Material#blendEquation}
+   * should have any effect.
+   *
+   * @default Blending.Normal
+   */
+  blending: Blending = Blending.Normal;
+  /**
+   * Defines which side of faces will be rendered - front, back or both.
+   *
+   * @default Side.Front
+   */
+  side: Side = Side.Front;
+  /**
+   * If set to `true`, vertex colors should be used.
+   *
+   * The engine supports RGB and RGBA vertex colors depending on whether a three (RGB) or
+   * four (RGBA) component color buffer attribute is used.
+   *
+   * @default false
+   */
+  vertexColors: boolean = false;
+  /**
+   * Defines how transparent the material is.
+   * A value of `0.0` indicates fully transparent, `1.0` is fully opaque.
+   *
+   * If the {@link Material#transparent} is not set to `true`,
+   * the material will remain fully opaque and this value will only affect its color.
+   *
+   * @default 1
+   */
+  opacity: number = 1;
+  /**
+   * Defines whether this material is transparent. This has an effect on
+   * rendering as transparent objects need special treatment and are rendered
+   * after non-transparent objects.
+   *
+   * When set to true, the extent to which the material is transparent is
+   * controlled by {@link Material#opacity}.
+   *
+   * @default false
+   */
+  transparent: boolean = false;
+  /**
+   * Enables alpha hashed transparency, an alternative to {@link Material#transparent} or
+   * {@link Material#alphaTest}. The material will not be rendered if opacity is lower than
+   * a random threshold. Randomization introduces some grain or noise, but approximates alpha
+   * blending without the associated problems of sorting. Using TAA can reduce the resulting noise.
+   *
+   * @default false
+   */
+  alphaHash: boolean = false;
+  /**
+   * Defines the blending source factor.
+   *
+   * @default Factor.SrcAlpha
+   */
+  blendSrc: Factor = Factor.SrcAlpha;
+  /**
+   * Defines the blending destination factor.
+   *
+   * @default Factor.OneMinusSrcAlpha
+   */
+  blendDst: Factor = Factor.OneMinusSrcAlpha;
+  /**
+   * Defines the blending equation.
+   *
+   * @default Equation.Add
+   */
+  blendEquation: Equation = Equation.Add;
+  /**
+   * Defines the blending source alpha factor.
+   *
+   * @default null
+   */
+  blendSrcAlpha: Factor | null = null;
+  /**
+   * Defines the blending destination alpha factor.
+   *
+   * @default null
+   */
+  blendDstAlpha: Factor | null = null;
+  /**
+   * Defines the blending equation of the alpha channel.
+   *
+   * @default null
+   */
+  blendEquationAlpha: Equation | null = null;
   blendColor: Color;
-  blendAlpha: number;
-  depthFunc: DepthFunc;
-  depthTest: boolean;
-  depthWrite: boolean;
-  stencilWriteMask: number;
-  stencilFunc: StencilFunc;
-  stencilRef: number;
-  stencilFuncMask: number;
-  stencilFail: StencilOp;
-  stencilZFail: StencilOp;
-  stencilZPass: StencilOp;
-  stencilWrite: boolean;
-  clippingPlanes: Plane[] | null;
-  clipIntersection: boolean;
-  clipShadows: boolean;
-  shadowSide: Side | null;
-  colorWrite: boolean;
-  precision: string | null;
-  polygonOffset: boolean;
-  polygonOffsetFactor: number;
-  polygonOffsetUnits: number;
-  dithering: boolean;
-  alphaToCoverage: boolean;
-  premultipliedAlpha: boolean;
-  forceSinglePass: boolean;
-  allowOverride: boolean;
-  visible: boolean;
-  toneMapped: boolean;
-  userData: any;
-  version: number;
-  _alphaTest: number;
+  /**
+   * Represents the alpha value of the constant blend color.
+   *
+   * This property has only an effect when using custom blending with `ConstantAlpha` or `OneMinusConstantAlpha`.
+   *
+   * @default 0
+   */
+  blendAlpha: number = 0;
+  /**
+   * Defines the depth function.
+   *
+   * @default DepthFunc.LessEqual
+   */
+  depthFunc: DepthFunc = DepthFunc.LessEqual;
+  /**
+   * Whether to have depth test enabled when rendering this material.
+   * When the depth test is disabled, the depth write will also be implicitly disabled.
+   *
+   * @default true
+   */
+  depthTest: boolean = true;
+  /**
+   * Whether rendering this material has any effect on the depth buffer.
+   *
+   * When drawing 2D overlays it can be useful to disable the depth writing in
+   * order to layer several things together without creating z-index artifacts.
+   *
+   * @default true
+   */
+  depthWrite: boolean = true;
+  /**
+   * The bit mask to use when writing to the stencil buffer.
+   *
+   * @default 0xff
+   */
+  stencilWriteMask: number = 0xff;
+  /**
+   * The stencil comparison function to use.
+   *
+   * @default StencilFunc.Always
+   */
+  stencilFunc: StencilFunc = StencilFunc.Always;
+  /**
+   * The value to use when performing stencil comparisons or stencil operations.
+   *
+   * @default 0
+   */
+  stencilRef: number = 0;
+  /**
+   * The bit mask to use when comparing against the stencil buffer.
+   *
+   * @default 0xff
+   */
+  stencilFuncMask: number = 0xff;
+  /**
+   * Which stencil operation to perform when the comparison function returns `false`.
+   *
+   * @default StencilOp.Keep
+   */
+  stencilFail: StencilOp = StencilOp.Keep;
+  /**
+   * Which stencil operation to perform when the comparison function returns
+   * `true` but the depth test fails.
+   *
+   * @default StencilOp.Keep
+   */
+  stencilZFail: StencilOp = StencilOp.Keep;
+  /**
+   * Which stencil operation to perform when the comparison function returns
+   * `true` and the depth test passes.
+   *
+   * @default StencilOp.Keep
+   */
+  stencilZPass: StencilOp = StencilOp.Keep;
+  /**
+   * Whether stencil operations are performed against the stencil buffer. In
+   * order to perform writes or comparisons against the stencil buffer this
+   * value must be `true`.
+   *
+   * @default false
+   */
+  stencilWrite: boolean = false;
+  /**
+   * User-defined clipping planes specified as THREE.Plane objects in world
+   * space. These planes apply to the objects this material is attached to.
+   * Points in space whose signed distance to the plane is negative are clipped
+   * (not rendered). This requires {@link WebGLRenderer#localClippingEnabled} to
+   * be `true`.
+   *
+   * @default null
+   */
+  clippingPlanes: Plane[] | null = null;
+  /**
+   * Changes the behavior of clipping planes so that only their intersection is
+   * clipped, rather than their union.
+   *
+   * @default false
+   */
+  clipIntersection: boolean = false;
+  /**
+   * Defines whether to clip shadows according to the clipping planes specified
+   * on this material.
+   *
+   * @default false
+   */
+  clipShadows: boolean = false;
+  /**
+   * Defines which side of faces cast shadows. If `null`, the side casting shadows
+   * is determined as follows:
+   *
+   * - When {@link Material#side} is set to `Side.Front`, the back side cast shadows.
+   * - When {@link Material#side} is set to `Side.Back`, the front side cast shadows.
+   * - When {@link Material#side} is set to `Side.Double`, both sides cast shadows.
+   *
+   * @default null
+   */
+  shadowSide: Side | null = null;
+  /**
+   * Whether to render the material's color.
+   *
+   * This can be used in conjunction with {@link Object3D#renderOder} to create invisible
+   * objects that occlude other objects.
+   *
+   * @default true
+   */
+  colorWrite: boolean = true;
+  /**
+   * Override the renderer's default precision for this material.
+   *
+   * @default null
+   */
+  precision: string | null = null;
+  /**
+   * Whether to use polygon offset or not. When enabled, each fragment's depth value will
+   * be offset after it is interpolated from the depth values of the appropriate vertices.
+   * The offset is added before the depth test is performed and before the value is written
+   * into the depth buffer.
+   *
+   * Can be useful for rendering hidden-line images, for applying decals to surfaces, and for
+   * rendering solids with highlighted edges.
+   *
+   * @default false
+   */
+  polygonOffset: boolean = false;
+  /**
+   * Specifies a scale factor that is used to create a variable depth offset for each polygon.
+   *
+   * @default 0
+   */
+  polygonOffsetFactor: number = 0;
+  /**
+   * Is multiplied by an implementation-specific value to create a constant depth offset.
+   *
+   * @default 0
+   */
+  polygonOffsetUnits: number = 0;
+  /**
+   * Whether to apply dithering to the color to remove the appearance of banding.
+   *
+   * @default false
+   */
+  dithering: boolean = false;
+  /**
+   * Whether alpha to coverage should be enabled or not. Can only be used with MSAA-enabled contexts
+   * (meaning when the renderer was created with *antialias* parameter set to `true`). Enabling this
+   * will smooth aliasing on clip plane edges and alphaTest-clipped edges.
+   *
+   * @default false
+   */
+  alphaToCoverage: boolean = false;
+  /**
+   * Whether to premultiply the alpha (transparency) value.
+   *
+   * @default false
+   */
+  premultipliedAlpha: boolean = false;
+  /**
+   * Whether double-sided, transparent objects should be rendered with a single pass or not.
+   *
+   * The engine renders double-sided, transparent objects with two draw calls (back faces first,
+   * then front faces) to mitigate transparency artifacts. There are scenarios however where this
+   * approach produces no quality gains but still doubles draw calls e.g. when rendering flat
+   * vegetation like grass sprites. In these cases, set the `forceSinglePass` flag to `true` to
+   * disable the two pass rendering to avoid performance issues.
+   *
+   * @default false
+   */
+  forceSinglePass: boolean = false;
+  /**
+   * Whether it's possible to override the material with {@link Scene#overrideMaterial} or not.
+   *
+   * @default true
+   */
+  allowOverride: boolean = true;
+  /**
+   * Defines whether 3D objects using this material are visible.
+   *
+   * @default true
+   */
+  visible: boolean = true;
+  /**
+   * Defines whether this material is tone mapped according to the renderer's tone mapping setting.
+   *
+   * It is ignored when rendering to a render target or using post processing.
+   * In these cases, all materials are honored by tone mapping.
+   *
+   * @default true
+   */
+  toneMapped: boolean = true;
+  /**
+   * An object that can be used to store custom data about the Material. It
+   * should not hold references to functions as these will not be cloned.
+   *
+   */
+  userData: any = {};
+  /**
+   * This starts at `0` and counts how many times {@link Material#needsUpdate} is set to `true`.
+   *
+   * @readonly
+   * @default 0
+   */
+  version: number = 0;
+  _alphaTest: number = 0;
 
   readonly id: number;
 
@@ -169,13 +456,6 @@ export class Material extends EventDispatcher {
    */
   constructor() {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isMaterial = true;
     /**
      * The ID of the material.
      *
@@ -195,109 +475,6 @@ export class Material extends EventDispatcher {
      */
     this.uuid = generateUUID();
     /**
-     * The name of the material.
-     *
-     */
-    this.name = "";
-    /**
-     * The type property is used for detecting the object type
-     * in context of serialization/deserialization.
-     *
-     * @readonly
-     */
-    this.type = "Material";
-    /**
-     * Defines the blending type of the material.
-     *
-     * It must be set to `Blending.Custom` if custom blending properties like
-     * {@link Material#blendSrc}, {@link Material#blendDst} or {@link Material#blendEquation}
-     * should have any effect.
-     *
-     * @default Blending.Normal
-     */
-    this.blending = Blending.Normal;
-    /**
-     * Defines which side of faces will be rendered - front, back or both.
-     *
-     * @default Side.Front
-     */
-    this.side = Side.Front;
-    /**
-     * If set to `true`, vertex colors should be used.
-     *
-     * The engine supports RGB and RGBA vertex colors depending on whether a three (RGB) or
-     * four (RGBA) component color buffer attribute is used.
-     *
-     * @default false
-     */
-    this.vertexColors = false;
-    /**
-     * Defines how transparent the material is.
-     * A value of `0.0` indicates fully transparent, `1.0` is fully opaque.
-     *
-     * If the {@link Material#transparent} is not set to `true`,
-     * the material will remain fully opaque and this value will only affect its color.
-     *
-     * @default 1
-     */
-    this.opacity = 1;
-    /**
-     * Defines whether this material is transparent. This has an effect on
-     * rendering as transparent objects need special treatment and are rendered
-     * after non-transparent objects.
-     *
-     * When set to true, the extent to which the material is transparent is
-     * controlled by {@link Material#opacity}.
-     *
-     * @default false
-     */
-    this.transparent = false;
-    /**
-     * Enables alpha hashed transparency, an alternative to {@link Material#transparent} or
-     * {@link Material#alphaTest}. The material will not be rendered if opacity is lower than
-     * a random threshold. Randomization introduces some grain or noise, but approximates alpha
-     * blending without the associated problems of sorting. Using TAA can reduce the resulting noise.
-     *
-     * @default false
-     */
-    this.alphaHash = false;
-    /**
-     * Defines the blending source factor.
-     *
-     * @default Factor.SrcAlpha
-     */
-    this.blendSrc = Factor.SrcAlpha;
-    /**
-     * Defines the blending destination factor.
-     *
-     * @default Factor.OneMinusSrcAlpha
-     */
-    this.blendDst = Factor.OneMinusSrcAlpha;
-    /**
-     * Defines the blending equation.
-     *
-     * @default Equation.Add
-     */
-    this.blendEquation = Equation.Add;
-    /**
-     * Defines the blending source alpha factor.
-     *
-     * @default null
-     */
-    this.blendSrcAlpha = null;
-    /**
-     * Defines the blending destination alpha factor.
-     *
-     * @default null
-     */
-    this.blendDstAlpha = null;
-    /**
-     * Defines the blending equation of the alpha channel.
-     *
-     * @default null
-     */
-    this.blendEquationAlpha = null;
-    /**
      * Represents the RGB values of the constant blend color.
      *
      * This property has only an effect when using custom blending with `ConstantColor` or `OneMinusConstantColor`.
@@ -305,229 +482,6 @@ export class Material extends EventDispatcher {
      * @default (0,0,0)
      */
     this.blendColor = new Color(0, 0, 0);
-    /**
-     * Represents the alpha value of the constant blend color.
-     *
-     * This property has only an effect when using custom blending with `ConstantAlpha` or `OneMinusConstantAlpha`.
-     *
-     * @default 0
-     */
-    this.blendAlpha = 0;
-    /**
-     * Defines the depth function.
-     *
-     * @default DepthFunc.LessEqual
-     */
-    this.depthFunc = DepthFunc.LessEqual;
-    /**
-     * Whether to have depth test enabled when rendering this material.
-     * When the depth test is disabled, the depth write will also be implicitly disabled.
-     *
-     * @default true
-     */
-    this.depthTest = true;
-    /**
-     * Whether rendering this material has any effect on the depth buffer.
-     *
-     * When drawing 2D overlays it can be useful to disable the depth writing in
-     * order to layer several things together without creating z-index artifacts.
-     *
-     * @default true
-     */
-    this.depthWrite = true;
-    /**
-     * The bit mask to use when writing to the stencil buffer.
-     *
-     * @default 0xff
-     */
-    this.stencilWriteMask = 0xff;
-    /**
-     * The stencil comparison function to use.
-     *
-     * @default StencilFunc.Always
-     */
-    this.stencilFunc = StencilFunc.Always;
-    /**
-     * The value to use when performing stencil comparisons or stencil operations.
-     *
-     * @default 0
-     */
-    this.stencilRef = 0;
-    /**
-     * The bit mask to use when comparing against the stencil buffer.
-     *
-     * @default 0xff
-     */
-    this.stencilFuncMask = 0xff;
-    /**
-     * Which stencil operation to perform when the comparison function returns `false`.
-     *
-     * @default StencilOp.Keep
-     */
-    this.stencilFail = StencilOp.Keep;
-    /**
-     * Which stencil operation to perform when the comparison function returns
-     * `true` but the depth test fails.
-     *
-     * @default StencilOp.Keep
-     */
-    this.stencilZFail = StencilOp.Keep;
-    /**
-     * Which stencil operation to perform when the comparison function returns
-     * `true` and the depth test passes.
-     *
-     * @default StencilOp.Keep
-     */
-    this.stencilZPass = StencilOp.Keep;
-    /**
-     * Whether stencil operations are performed against the stencil buffer. In
-     * order to perform writes or comparisons against the stencil buffer this
-     * value must be `true`.
-     *
-     * @default false
-     */
-    this.stencilWrite = false;
-    /**
-     * User-defined clipping planes specified as THREE.Plane objects in world
-     * space. These planes apply to the objects this material is attached to.
-     * Points in space whose signed distance to the plane is negative are clipped
-     * (not rendered). This requires {@link WebGLRenderer#localClippingEnabled} to
-     * be `true`.
-     *
-     * @default null
-     */
-    this.clippingPlanes = null;
-    /**
-     * Changes the behavior of clipping planes so that only their intersection is
-     * clipped, rather than their union.
-     *
-     * @default false
-     */
-    this.clipIntersection = false;
-    /**
-     * Defines whether to clip shadows according to the clipping planes specified
-     * on this material.
-     *
-     * @default false
-     */
-    this.clipShadows = false;
-    /**
-     * Defines which side of faces cast shadows. If `null`, the side casting shadows
-     * is determined as follows:
-     *
-     * - When {@link Material#side} is set to `Side.Front`, the back side cast shadows.
-     * - When {@link Material#side} is set to `Side.Back`, the front side cast shadows.
-     * - When {@link Material#side} is set to `Side.Double`, both sides cast shadows.
-     *
-     * @default null
-     */
-    this.shadowSide = null;
-    /**
-     * Whether to render the material's color.
-     *
-     * This can be used in conjunction with {@link Object3D#renderOder} to create invisible
-     * objects that occlude other objects.
-     *
-     * @default true
-     */
-    this.colorWrite = true;
-    /**
-     * Override the renderer's default precision for this material.
-     *
-     * @default null
-     */
-    this.precision = null;
-    /**
-     * Whether to use polygon offset or not. When enabled, each fragment's depth value will
-     * be offset after it is interpolated from the depth values of the appropriate vertices.
-     * The offset is added before the depth test is performed and before the value is written
-     * into the depth buffer.
-     *
-     * Can be useful for rendering hidden-line images, for applying decals to surfaces, and for
-     * rendering solids with highlighted edges.
-     *
-     * @default false
-     */
-    this.polygonOffset = false;
-    /**
-     * Specifies a scale factor that is used to create a variable depth offset for each polygon.
-     *
-     * @default 0
-     */
-    this.polygonOffsetFactor = 0;
-    /**
-     * Is multiplied by an implementation-specific value to create a constant depth offset.
-     *
-     * @default 0
-     */
-    this.polygonOffsetUnits = 0;
-    /**
-     * Whether to apply dithering to the color to remove the appearance of banding.
-     *
-     * @default false
-     */
-    this.dithering = false;
-    /**
-     * Whether alpha to coverage should be enabled or not. Can only be used with MSAA-enabled contexts
-     * (meaning when the renderer was created with *antialias* parameter set to `true`). Enabling this
-     * will smooth aliasing on clip plane edges and alphaTest-clipped edges.
-     *
-     * @default false
-     */
-    this.alphaToCoverage = false;
-    /**
-     * Whether to premultiply the alpha (transparency) value.
-     *
-     * @default false
-     */
-    this.premultipliedAlpha = false;
-    /**
-     * Whether double-sided, transparent objects should be rendered with a single pass or not.
-     *
-     * The engine renders double-sided, transparent objects with two draw calls (back faces first,
-     * then front faces) to mitigate transparency artifacts. There are scenarios however where this
-     * approach produces no quality gains but still doubles draw calls e.g. when rendering flat
-     * vegetation like grass sprites. In these cases, set the `forceSinglePass` flag to `true` to
-     * disable the two pass rendering to avoid performance issues.
-     *
-     * @default false
-     */
-    this.forceSinglePass = false;
-    /**
-     * Whether it's possible to override the material with {@link Scene#overrideMaterial} or not.
-     *
-     * @default true
-     */
-    this.allowOverride = true;
-    /**
-     * Defines whether 3D objects using this material are visible.
-     *
-     * @default true
-     */
-    this.visible = true;
-    /**
-     * Defines whether this material is tone mapped according to the renderer's tone mapping setting.
-     *
-     * It is ignored when rendering to a render target or using post processing.
-     * In these cases, all materials are honored by tone mapping.
-     *
-     * @default true
-     */
-    this.toneMapped = true;
-    /**
-     * An object that can be used to store custom data about the Material. It
-     * should not hold references to functions as these will not be cloned.
-     *
-     */
-    this.userData = {};
-    /**
-     * This starts at `0` and counts how many times {@link Material#needsUpdate} is set to `true`.
-     *
-     * @readonly
-     * @default 0
-     */
-    this.version = 0;
-    this._alphaTest = 0;
   }
   /**
    * Sets the alpha value to be used when running an alpha test. The material

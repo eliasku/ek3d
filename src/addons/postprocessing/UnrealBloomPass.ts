@@ -43,15 +43,30 @@ export class UnrealBloomPass extends Pass {
   radius: number;
   threshold: number;
   resolution: Vector2;
-  clearColor: Color;
-  needsSwap: boolean;
-  renderTargetsHorizontal: WebGLRenderTarget[];
-  renderTargetsVertical: WebGLRenderTarget[];
+  /**
+   * The effect's clear color
+   *
+   * @default (0,0,0)
+   */
+  clearColor: Color = new Color(0, 0, 0);
+  /**
+   * Overwritten to disable the swap.
+   *
+   * @default false
+   */
+  needsSwap: boolean = false;
+  // internals
+
+  // render targets
+  renderTargetsHorizontal: WebGLRenderTarget[] = [];
+  renderTargetsVertical: WebGLRenderTarget[] = [];
   renderTargetBright: WebGLRenderTarget;
-  nMips: number;
+  nMips: number = 5;
   highPassUniforms: Record<string, { value: any; needsUpdate?: boolean }>;
   materialHighPassFilter: ShaderMaterial;
-  separableBlurMaterials: ShaderMaterial[];
+  // gaussian blur materials
+
+  separableBlurMaterials: ShaderMaterial[] = [];
   compositeMaterial: ShaderMaterial;
   copyUniforms: Record<string, { value: any; needsUpdate?: boolean }>;
   blendMaterial: ShaderMaterial;
@@ -99,26 +114,6 @@ export class UnrealBloomPass extends Pass {
      */
     this.resolution = resolution !== undefined ? new Vector2(resolution.x, resolution.y) : new Vector2(256, 256);
 
-    /**
-     * The effect's clear color
-     *
-     * @default (0,0,0)
-     */
-    this.clearColor = new Color(0, 0, 0);
-
-    /**
-     * Overwritten to disable the swap.
-     *
-     * @default false
-     */
-    this.needsSwap = false;
-
-    // internals
-
-    // render targets
-    this.renderTargetsHorizontal = [];
-    this.renderTargetsVertical = [];
-    this.nMips = 5;
     let resx = Math.round(this.resolution.x / 2);
     let resy = Math.round(this.resolution.y / 2);
 
@@ -166,9 +161,6 @@ export class UnrealBloomPass extends Pass {
       fragmentShader: highPassShader.fragmentShader,
     });
 
-    // gaussian blur materials
-
-    this.separableBlurMaterials = [];
     // These sizes have been changed to account for the altered coefficients-calculation to avoid blockiness,
     // while retaining the same blur-strength. For details see https://github.com/mrdoob/three.js/pull/31528
     const kernelSizeArray = [6, 10, 14, 18, 22];

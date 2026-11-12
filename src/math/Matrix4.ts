@@ -48,7 +48,11 @@ import { ensureTypeFlag } from "../utils";
  * transpose of any matrices outlined here to make sense of the calculations.
  */
 export class Matrix4 {
-  elements: number[];
+  /**
+   * A column-major list of matrix values.
+   *
+   */
+  elements: number[] = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
   /**
    * This flag can be used for type testing.
    *
@@ -100,11 +104,6 @@ export class Matrix4 {
     n44?: number,
   ) {
     ensureTypeFlag(this, "isMatrix4");
-    /**
-     * A column-major list of matrix values.
-     *
-     */
-    this.elements = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
     if (n11! !== undefined) {
       this.set(n11!, n12!, n13!, n14!, n21!, n22!, n23!, n24!, n31!, n32!, n33!, n34!, n41!, n42!, n43!, n44!);
     }

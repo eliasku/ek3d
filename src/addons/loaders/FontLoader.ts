@@ -143,8 +143,8 @@ export class FontLoader extends Loader<Font> {
  * ```
  */
 export class Font {
-  isFont: boolean;
-  type: string;
+  isFont: boolean = true;
+  type: string = "Font";
   data: FontData;
 
   /**
@@ -153,8 +153,6 @@ export class Font {
    * @param data - The font data as JSON.
    */
   constructor(data: FontData) {
-    this.isFont = true;
-    this.type = "Font";
     this.data = data;
   }
   /**

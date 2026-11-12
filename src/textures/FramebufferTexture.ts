@@ -32,7 +32,13 @@ import { TextureFilter } from "../constants";
  *
  */
 export class FramebufferTexture extends Texture {
-  isFramebufferTexture: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isFramebufferTexture: boolean = true;
 
   /**
    * Constructs a new framebuffer texture.
@@ -42,13 +48,6 @@ export class FramebufferTexture extends Texture {
    */
   constructor(width?: number, height?: number) {
     super({ width, height });
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isFramebufferTexture = true;
     /**
      * How the texture is sampled when a texel covers more than one pixel.
      *

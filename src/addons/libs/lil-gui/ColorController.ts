@@ -15,7 +15,7 @@ interface ColorFormat {
  */
 export class ColorController extends Controller {
   /** The swatch input of the widget. */
-  $input: HTMLInputElement;
+  $input: HTMLInputElement = document.createElement("input");
 
   /** The text input of the widget. */
   $text: HTMLInputElement;
@@ -39,7 +39,6 @@ export class ColorController extends Controller {
   constructor(parent: GUI, object: Record<string, unknown>, property: string, rgbScale = 1) {
     super(parent, object, property, "color");
 
-    this.$input = document.createElement("input");
     this.$input.setAttribute("type", "color");
     this.$input.setAttribute("tabindex", "-1");
     this.$input.setAttribute("aria-labelledby", this.$name.id);

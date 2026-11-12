@@ -6,7 +6,13 @@ import { Data3DTexture } from "../textures/Data3DTexture";
  *
  */
 export class WebGL3DRenderTarget extends WebGLRenderTarget {
-  isWebGL3DRenderTarget: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isWebGL3DRenderTarget: boolean = true;
 
   /**
    * Constructs a new 3D render target.
@@ -18,13 +24,6 @@ export class WebGL3DRenderTarget extends WebGLRenderTarget {
    */
   constructor(width: number = 1, height: number = 1, depth: number = 1, options: RenderTargetOptions = {}) {
     super(width, height, options);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isWebGL3DRenderTarget = true;
     this.depth = depth;
     /**
      * Overwritten with a different texture type.

@@ -311,7 +311,7 @@ export class HDRLoader extends DataTextureLoader {
    *
    * @default TextureType.HalfFloat
    */
-  type: TextureType;
+  type: TextureType = TextureType.HalfFloat;
 
   /**
    * Constructs a new RGBE/HDR loader.
@@ -320,8 +320,6 @@ export class HDRLoader extends DataTextureLoader {
    */
   constructor(manager?: LoadingManager) {
     super(manager);
-
-    this.type = TextureType.HalfFloat;
   }
 
   /**

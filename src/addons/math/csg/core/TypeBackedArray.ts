@@ -21,15 +21,13 @@ function ceilToFourByteStride(byteLength: number): number {
 }
 
 export class TypeBackedArray {
-  expansionFactor: number;
+  expansionFactor: number = 1.5;
   type: NumericArrayConstructor;
-  length: number;
+  length: number = 0;
   array: NumericArray;
 
   constructor(type: NumericArrayConstructor, initialSize = 500) {
-    this.expansionFactor = 1.5;
     this.type = type;
-    this.length = 0;
     const bufferType = areSharedArrayBuffersSupported() ? SharedArrayBuffer : ArrayBuffer;
     this.array = new type(new bufferType(ceilToFourByteStride(initialSize * type.BYTES_PER_ELEMENT)));
   }

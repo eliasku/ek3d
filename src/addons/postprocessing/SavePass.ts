@@ -23,10 +23,26 @@ import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
  *
  */
 export class SavePass extends Pass {
-  uniforms: typeof CopyShader.uniforms;
-  material: ShaderMaterial;
+  /**
+   * The pass uniforms.
+   */
+  uniforms: typeof CopyShader.uniforms = cloneUniforms(CopyShader.uniforms);
+  /**
+   * The pass material.
+   */
+  material: ShaderMaterial = new ShaderMaterial({
+    uniforms: this.uniforms,
+    vertexShader: CopyShader.vertexShader,
+    fragmentShader: CopyShader.fragmentShader,
+    blending: Blending.No,
+  });
   renderTarget: WebGLRenderTarget;
-  needsSwap: boolean;
+  /**
+   * Overwritten to disable the swap.
+   *
+   * @default false
+   */
+  needsSwap: boolean = false;
   _fsQuad: FullScreenQuad;
 
   /**
@@ -38,20 +54,6 @@ export class SavePass extends Pass {
   constructor(renderTarget?: WebGLRenderTarget) {
     super();
     /**
-     * The pass uniforms.
-     */
-    this.uniforms = cloneUniforms(CopyShader.uniforms);
-    /**
-     * The pass material.
-     */
-    this.material = new ShaderMaterial({
-      uniforms: this.uniforms,
-      vertexShader: CopyShader.vertexShader,
-      fragmentShader: CopyShader.fragmentShader,
-      blending: Blending.No,
-    });
-
-    /**
      * The render target which is used to save the read buffer.
      */
     this.renderTarget =
@@ -60,13 +62,6 @@ export class SavePass extends Pass {
       // will be resized later
       this.renderTarget.texture.name = "SavePass.rt";
     }
-
-    /**
-     * Overwritten to disable the swap.
-     *
-     * @default false
-     */
-    this.needsSwap = false;
 
     // internals
 

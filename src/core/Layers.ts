@@ -11,20 +11,18 @@
  * is an instance of this class.
  */
 export class Layers {
-  mask: number;
+  /**
+   * A bit mask storing which of the 32 layers this layers object is currently
+   * a member of.
+   *
+   */
+  mask: number = 1 | 0;
 
   /**
    * Constructs a new layers instance, with membership
    * initially set to layer `0`.
    */
-  constructor() {
-    /**
-     * A bit mask storing which of the 32 layers this layers object is currently
-     * a member of.
-     *
-     */
-    this.mask = 1 | 0;
-  }
+  constructor() {}
   /**
    * Sets membership to the given layer, and remove membership all other layers.
    *

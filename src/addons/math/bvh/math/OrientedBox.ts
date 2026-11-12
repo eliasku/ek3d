@@ -14,40 +14,26 @@ import { closestPointsSegmentToSegment } from "./MathUtilities";
  *
  */
 export class OrientedBox {
-  isOrientedBox: boolean;
-  min: Vector3;
-  max: Vector3;
-  matrix: Matrix4;
-  invMatrix: Matrix4;
-  points: Vector3[];
-  satAxes: Vector3[];
-  satBounds: SeparatingAxisBounds[];
-  alignedSatBounds: SeparatingAxisBounds[];
-  needsUpdate: boolean;
+  isOrientedBox: boolean = true;
+  min: Vector3 = new Vector3();
+  max: Vector3 = new Vector3();
+  /**
+   * Matrix transformation applied to the box.
+   */
+  matrix: Matrix4 = new Matrix4();
+  invMatrix: Matrix4 = new Matrix4();
+  points: Vector3[] = Array.from({ length: 8 }, () => new Vector3());
+  satAxes: Vector3[] = Array.from({ length: 3 }, () => new Vector3());
+  satBounds: SeparatingAxisBounds[] = Array.from({ length: 3 }, () => new SeparatingAxisBounds());
+  alignedSatBounds: SeparatingAxisBounds[] = Array.from({ length: 3 }, () => new SeparatingAxisBounds());
+  /**
+   * Indicates that the bounding box fields have changed so cached variables to accelerate
+   * other function execution can be updated. Must be set to true after modifying the
+   * oriented box `min`, `max`, `matrix` fields.
+   */
+  needsUpdate: boolean = false;
 
   constructor(min?: Vector3, max?: Vector3, matrix?: Matrix4) {
-    this.isOrientedBox = true;
-
-    this.min = new Vector3();
-
-    this.max = new Vector3();
-
-    /**
-     * Matrix transformation applied to the box.
-     */
-    this.matrix = new Matrix4();
-    this.invMatrix = new Matrix4();
-    this.points = Array.from({ length: 8 }, () => new Vector3());
-    this.satAxes = Array.from({ length: 3 }, () => new Vector3());
-    this.satBounds = Array.from({ length: 3 }, () => new SeparatingAxisBounds());
-    this.alignedSatBounds = Array.from({ length: 3 }, () => new SeparatingAxisBounds());
-    /**
-     * Indicates that the bounding box fields have changed so cached variables to accelerate
-     * other function execution can be updated. Must be set to true after modifying the
-     * oriented box `min`, `max`, `matrix` fields.
-     */
-    this.needsUpdate = false;
-
     if (min) this.min.copy(min);
     if (max) this.max.copy(max);
     if (matrix) this.matrix.copy(matrix);

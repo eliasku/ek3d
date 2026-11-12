@@ -10,10 +10,10 @@ import { Interpolant } from "../Interpolant";
  *
  */
 export class CubicInterpolant extends Interpolant {
-  _weightPrev: number;
-  _offsetPrev: number;
-  _weightNext: number;
-  _offsetNext: number;
+  _weightPrev: number = -0;
+  _offsetPrev: number = -0;
+  _weightNext: number = -0;
+  _offsetNext: number = -0;
 
   /**
    * Constructs a new cubic interpolant.
@@ -30,10 +30,6 @@ export class CubicInterpolant extends Interpolant {
     resultBuffer?: NumericAnimationBuffer | null,
   ) {
     super(parameterPositions, sampleValues, sampleSize, resultBuffer);
-    this._weightPrev = -0;
-    this._offsetPrev = -0;
-    this._weightNext = -0;
-    this._offsetNext = -0;
     this.DefaultSettings_ = {
       endingStart: EndingMode.ZeroCurvature,
       endingEnd: EndingMode.ZeroCurvature,

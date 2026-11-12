@@ -11,98 +11,88 @@ import { Euler } from "../math/Euler";
  *
  */
 export class Scene extends Object3D {
-  isScene: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isScene: boolean = true;
 
-  background: Color | Texture | null;
-  environment: Texture | null;
-  fog: Fog | FogExp2 | null;
-  backgroundBlurriness: number;
-  backgroundIntensity: number;
-  backgroundRotation: Euler;
-  environmentIntensity: number;
-  environmentRotation: Euler;
-  overrideMaterial: Material | null;
+  /**
+   * Defines the background of the scene. Valid inputs are:
+   *
+   * - A color for defining a uniform colored background.
+   * - A texture for defining a (flat) textured background.
+   * - Cube textures or equirectangular textures for defining a skybox.
+   *
+   * @default null
+   */
+  background: Color | Texture | null = null;
+  /**
+   * Sets the environment map for all physical materials in the scene. However,
+   * it's not possible to overwrite an existing texture assigned to the `envMap`
+   * material property.
+   *
+   * @default null
+   */
+  environment: Texture | null = null;
+  /**
+   * A fog instance defining the type of fog that affects everything
+   * rendered in the scene.
+   *
+   * @default null
+   */
+  fog: Fog | FogExp2 | null = null;
+  /**
+   * Sets the blurriness of the background. Only influences environment maps
+   * assigned to {@link Scene#background}. Valid input is a float between `0`
+   * and `1`.
+   *
+   * @default 0
+   */
+  backgroundBlurriness: number = 0;
+  /**
+   * Attenuates the color of the background. Only applies to background textures.
+   *
+   * @default 1
+   */
+  backgroundIntensity: number = 1;
+  /**
+   * The rotation of the background in radians. Only influences environment maps
+   * assigned to {@link Scene#background}.
+   *
+   * @default (0,0,0)
+   */
+  backgroundRotation: Euler = new Euler();
+  /**
+   * Attenuates the color of the environment. Only influences environment maps
+   * assigned to {@link Scene#environment}.
+   *
+   * @default 1
+   */
+  environmentIntensity: number = 1;
+  /**
+   * The rotation of the environment map in radians. Only influences physical materials
+   * in the scene when {@link Scene#environment} is used.
+   *
+   * @default (0,0,0)
+   */
+  environmentRotation: Euler = new Euler();
+  /**
+   * Forces everything in the scene to be rendered with the defined material. It is possible
+   * to exclude materials from override by setting {@link Material#allowOverride} to `false`.
+   *
+   * @default null
+   */
+  overrideMaterial: Material | null = null;
 
   /**
    * Constructs a new scene.
    */
   constructor() {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isScene = true;
     this.type = "Scene";
-    /**
-     * Defines the background of the scene. Valid inputs are:
-     *
-     * - A color for defining a uniform colored background.
-     * - A texture for defining a (flat) textured background.
-     * - Cube textures or equirectangular textures for defining a skybox.
-     *
-     * @default null
-     */
-    this.background = null;
-    /**
-     * Sets the environment map for all physical materials in the scene. However,
-     * it's not possible to overwrite an existing texture assigned to the `envMap`
-     * material property.
-     *
-     * @default null
-     */
-    this.environment = null;
-    /**
-     * A fog instance defining the type of fog that affects everything
-     * rendered in the scene.
-     *
-     * @default null
-     */
-    this.fog = null;
-    /**
-     * Sets the blurriness of the background. Only influences environment maps
-     * assigned to {@link Scene#background}. Valid input is a float between `0`
-     * and `1`.
-     *
-     * @default 0
-     */
-    this.backgroundBlurriness = 0;
-    /**
-     * Attenuates the color of the background. Only applies to background textures.
-     *
-     * @default 1
-     */
-    this.backgroundIntensity = 1;
-    /**
-     * The rotation of the background in radians. Only influences environment maps
-     * assigned to {@link Scene#background}.
-     *
-     * @default (0,0,0)
-     */
-    this.backgroundRotation = new Euler();
-    /**
-     * Attenuates the color of the environment. Only influences environment maps
-     * assigned to {@link Scene#environment}.
-     *
-     * @default 1
-     */
-    this.environmentIntensity = 1;
-    /**
-     * The rotation of the environment map in radians. Only influences physical materials
-     * in the scene when {@link Scene#environment} is used.
-     *
-     * @default (0,0,0)
-     */
-    this.environmentRotation = new Euler();
-    /**
-     * Forces everything in the scene to be rendered with the defined material. It is possible
-     * to exclude materials from override by setting {@link Material#allowOverride} to `false`.
-     *
-     * @default null
-     */
-    this.overrideMaterial = null;
   }
   copy(source: any, recursive?: any): this {
     super.copy(source, recursive);

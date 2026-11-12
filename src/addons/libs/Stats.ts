@@ -14,10 +14,10 @@ export class Stats {
    */
   dom: HTMLDivElement;
 
-  _panels: StatsPanel[];
+  _panels: StatsPanel[] = [];
 
   /** Index of the visible panel. */
-  mode: number;
+  mode: number = 0;
 
   _beginTime: number;
   _prevTime: number;
@@ -36,12 +36,9 @@ export class Stats {
    * Constructs the statistics panel and appends nothing; callers add `stats.dom` themselves.
    */
   constructor() {
-    this.mode = 0;
-
     const container = document.createElement("div");
     container.style.cssText = "position:fixed;top:0;left:0;cursor:pointer;opacity:0.9;z-index:10000";
 
-    this._panels = [];
     this._onClick = (event: MouseEvent) => {
       event.preventDefault();
       this.showPanel(++this.mode % container.children.length);
@@ -133,8 +130,8 @@ export class StatsPanel {
   _fg: string;
   _bg: string;
 
-  _min: number;
-  _max: number;
+  _min: number = Infinity;
+  _max: number = 0;
 
   _PR: number;
   _WIDTH: number;
@@ -159,9 +156,6 @@ export class StatsPanel {
     this._name = name;
     this._fg = fg;
     this._bg = bg;
-    this._min = Infinity;
-    this._max = 0;
-
     const round = Math.round;
     const PR = round(window.devicePixelRatio || 1);
     this._PR = PR;

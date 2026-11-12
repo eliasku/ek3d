@@ -48,12 +48,35 @@ export class SSAOPass extends Pass {
   camera: PerspectiveCamera;
   width: number;
   height: number;
-  kernelRadius: number;
-  kernel: Vector3[];
-  noiseTexture: DataTexture | null;
-  output: number;
-  minDistance: number;
-  maxDistance: number;
+  /**
+   * The kernel radius controls how wide the
+   * AO spreads.
+   *
+   * @default 8
+   */
+  kernelRadius: number = 8;
+  kernel: Vector3[] = [];
+  noiseTexture: DataTexture | null = null;
+  /**
+   * The output configuration.
+   *
+   * @default 0
+   */
+  output: number = 0;
+  /**
+   * Defines the minimum distance that should be
+   * affected by the AO.
+   *
+   * @default 0.005
+   */
+  minDistance: number = 0.005;
+  /**
+   * Defines the maximum distance that should be
+   * affected by the AO.
+   *
+   * @default 0.1
+   */
+  maxDistance: number = 0.1;
   normalRenderTarget: WebGLRenderTarget;
   ssaoRenderTarget: WebGLRenderTarget;
   blurRenderTarget: WebGLRenderTarget;
@@ -62,7 +85,7 @@ export class SSAOPass extends Pass {
   blurMaterial: ShaderMaterial;
   depthRenderMaterial: ShaderMaterial;
   copyMaterial: ShaderMaterial;
-  _visibilityCache: Object3D[];
+  _visibilityCache: Object3D[] = [];
   _fsQuad: FullScreenQuad;
   _originalClearColor: Color;
 
@@ -129,41 +152,6 @@ export class SSAOPass extends Pass {
      * The scene to render the AO for.
      */
     this.scene = scene;
-
-    /**
-     * The kernel radius controls how wide the
-     * AO spreads.
-     *
-     * @default 8
-     */
-    this.kernelRadius = 8;
-    this.kernel = [];
-    this.noiseTexture = null;
-
-    /**
-     * The output configuration.
-     *
-     * @default 0
-     */
-    this.output = 0;
-
-    /**
-     * Defines the minimum distance that should be
-     * affected by the AO.
-     *
-     * @default 0.005
-     */
-    this.minDistance = 0.005;
-
-    /**
-     * Defines the maximum distance that should be
-     * affected by the AO.
-     *
-     * @default 0.1
-     */
-    this.maxDistance = 0.1;
-
-    this._visibilityCache = [];
 
     //
 

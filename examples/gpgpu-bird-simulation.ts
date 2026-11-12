@@ -24,8 +24,8 @@ export class BirdSimulation {
   compute: GPUComputationRenderer;
   position: GPUComputationVariable;
   velocity: GPUComputationVariable;
-  private camera: PerspectiveCamera;
-  private renderScene: Scene;
+  private camera: PerspectiveCamera = new PerspectiveCamera(75, innerWidth / innerHeight, 1, 3000);
+  private renderScene: Scene = new Scene();
   private dfg: DataTexture;
   private renderer: WebGLRenderer;
   private computation: GPUComputationRenderer;
@@ -53,9 +53,7 @@ export class BirdSimulation {
     background: number,
     antialias: boolean,
   ) {
-    this.camera = new PerspectiveCamera(75, innerWidth / innerHeight, 1, 3000);
     this.camera.position.z = 350;
-    this.renderScene = new Scene();
     this.renderScene.background = new Color(background);
     this.renderScene.fog = new Fog(background, 100, 1000);
     this.dfg = createDFGLUT();

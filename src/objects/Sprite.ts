@@ -49,11 +49,24 @@ const _uvC = /*@__PURE__*/ new Vector2();
  *
  */
 export class Sprite extends Object3D {
-  isSprite: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isSprite: boolean = true;
 
   geometry: BufferGeometry;
   material: SpriteMaterial;
-  center: Vector2;
+  /**
+   * The sprite's anchor point, and the point around which the sprite rotates.
+   * A value of `(0.5, 0.5)` corresponds to the midpoint of the sprite. A value
+   * of `(0, 0)` corresponds to the lower left corner of the sprite.
+   *
+   * @default (0.5,0.5)
+   */
+  center: Vector2 = new Vector2(0.5, 0.5);
 
   /**
    * Constructs a new sprite.
@@ -63,13 +76,6 @@ export class Sprite extends Object3D {
   constructor(material: SpriteMaterial) {
     super();
     if (material === undefined) throw new Error("Sprite requires explicit material.");
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isSprite = true;
     this.type = "Sprite";
     if (_geometry === undefined) {
       _geometry = new BufferGeometry();
@@ -91,14 +97,6 @@ export class Sprite extends Object3D {
      *
      */
     this.material = material;
-    /**
-     * The sprite's anchor point, and the point around which the sprite rotates.
-     * A value of `(0.5, 0.5)` corresponds to the midpoint of the sprite. A value
-     * of `(0, 0)` corresponds to the lower left corner of the sprite.
-     *
-     * @default (0.5,0.5)
-     */
-    this.center = new Vector2(0.5, 0.5);
   }
   /**
    * Returns `true` if this sprite intersects the given frustum.

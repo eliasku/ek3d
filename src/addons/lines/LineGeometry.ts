@@ -6,11 +6,10 @@ import { LineSegmentsGeometry } from "./LineSegmentsGeometry";
 
 /** A chain of vertices forming a polyline for Line2. */
 export class LineGeometry extends LineSegmentsGeometry {
-  isLineGeometry: boolean;
+  isLineGeometry: boolean = true;
 
   constructor() {
     super();
-    this.isLineGeometry = true;
     this.type = "LineGeometry";
   }
 

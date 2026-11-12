@@ -27,7 +27,13 @@ export interface InterleavedBufferSerializationData {
  * An introduction into interleaved arrays can be found here: [Interleaved array basics](https://blog.tojicode.com/2011/05/interleaved-array-basics.html)
  */
 export class InterleavedBuffer {
-  isInterleavedBuffer: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isInterleavedBuffer: boolean = true;
   array:
     | Int8Array
     | Uint8Array
@@ -40,9 +46,26 @@ export class InterleavedBuffer {
     | Float64Array;
   stride: number;
   count: number;
-  usage: BufferUsage;
-  updateRanges: { start: number; count: number }[];
-  version: number;
+  /**
+   * Defines the intended usage pattern of the data store for optimization purposes.
+   *
+   * Note: After the initial use of a buffer, its usage cannot be changed. Instead,
+   * instantiate a new one and set the desired usage before the next render.
+   *
+   * @default BufferUsage.StaticDraw
+   */
+  usage: BufferUsage = BufferUsage.StaticDraw;
+  /**
+   * This can be used to only update some components of stored vectors (for example, just the
+   * component related to color). Use the `addUpdateRange()` function to add ranges to this array.
+   *
+   */
+  updateRanges: { start: number; count: number }[] = [];
+  /**
+   * A version number, incremented every time the `needsUpdate` is set to `true`.
+   *
+   */
+  version: number = 0;
   uuid: string;
 
   /**
@@ -65,13 +88,6 @@ export class InterleavedBuffer {
     stride: number,
   ) {
     /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isInterleavedBuffer = true;
-    /**
      * A typed array with a shared buffer storing attribute data.
      *
      */
@@ -87,26 +103,6 @@ export class InterleavedBuffer {
      * @readonly
      */
     this.count = array !== undefined ? array.length / stride : 0;
-    /**
-     * Defines the intended usage pattern of the data store for optimization purposes.
-     *
-     * Note: After the initial use of a buffer, its usage cannot be changed. Instead,
-     * instantiate a new one and set the desired usage before the next render.
-     *
-     * @default BufferUsage.StaticDraw
-     */
-    this.usage = BufferUsage.StaticDraw;
-    /**
-     * This can be used to only update some components of stored vectors (for example, just the
-     * component related to color). Use the `addUpdateRange()` function to add ranges to this array.
-     *
-     */
-    this.updateRanges = [];
-    /**
-     * A version number, incremented every time the `needsUpdate` is set to `true`.
-     *
-     */
-    this.version = 0;
     /**
      * The UUID of the interleaved buffer.
      *

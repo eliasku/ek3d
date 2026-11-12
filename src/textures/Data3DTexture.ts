@@ -6,7 +6,13 @@ import { Wrapping, TextureFilter } from "../constants";
  *
  */
 export class Data3DTexture extends Texture {
-  isData3DTexture: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isData3DTexture: boolean = true;
   wrapR: Wrapping;
 
   /**
@@ -43,13 +49,6 @@ export class Data3DTexture extends Texture {
     //
     // See #14839
     super(null);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isData3DTexture = true;
     /**
      * The image definition of a data texture.
      *

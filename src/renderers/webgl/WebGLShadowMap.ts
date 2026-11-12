@@ -82,13 +82,13 @@ const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
 const _lookTarget = /*@__PURE__*/ new Vector3();
 export class WebGLShadowMap implements WebGLShadowMapSystem {
-  private _frustum: Frustum;
-  private _shadowMapSize: Vector2;
-  private _viewportSize: Vector2;
-  private _viewport: Vector4;
-  private _depthMaterial: MeshDepthMaterial;
-  private _distanceMaterial: MeshDistanceMaterial;
-  private _materialCache: Record<string, Record<string, Material & MaterialProperties>>;
+  private _frustum: Frustum = new Frustum();
+  private _shadowMapSize: Vector2 = new Vector2();
+  private _viewportSize: Vector2 = new Vector2();
+  private _viewport: Vector4 = new Vector4();
+  private _depthMaterial: MeshDepthMaterial = new MeshDepthMaterial();
+  private _distanceMaterial: MeshDistanceMaterial = new MeshDistanceMaterial();
+  private _materialCache: Record<string, Record<string, Material & MaterialProperties>> = {};
   private _maxTextureSize: number;
   private shadowSide: Record<Side, Side>;
   private shadowMaterialVertical: ShaderMaterial;
@@ -111,13 +111,6 @@ export class WebGLShadowMap implements WebGLShadowMapSystem {
     private objects: WebGLShadowMapObjects,
     capabilities: WebGLShadowMapCapabilities,
   ) {
-    this._frustum = new Frustum();
-    this._shadowMapSize = new Vector2();
-    this._viewportSize = new Vector2();
-    this._viewport = new Vector4();
-    this._depthMaterial = new MeshDepthMaterial();
-    this._distanceMaterial = new MeshDistanceMaterial();
-    this._materialCache = {};
     this._maxTextureSize = capabilities.maxTextureSize;
     this.shadowSide = { [Side.Front]: Side.Back, [Side.Back]: Side.Front, [Side.Double]: Side.Double };
     this.shadowMaterialVertical = new ShaderMaterial({

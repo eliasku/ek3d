@@ -83,14 +83,11 @@ function getOverlapEdge(tri1: Triangle, e1: number, tri2: Triangle, e2: number, 
 }
 
 export class HalfEdgeHelper extends EdgesHelper {
-  straightEdges: boolean;
-  displayDisconnectedEdges: boolean;
+  straightEdges: boolean = false;
+  displayDisconnectedEdges: boolean = false;
 
   constructor(geometry: BufferGeometry | null = null, halfEdges: HalfEdgeMap | null = null) {
     super();
-    this.straightEdges = false;
-    this.displayDisconnectedEdges = false;
-
     if (geometry && halfEdges) {
       this.setHalfEdges(geometry, halfEdges);
     }

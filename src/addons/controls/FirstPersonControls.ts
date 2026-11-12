@@ -21,14 +21,14 @@ export class FirstPersonControls<TObject extends Object3D = Object3D> extends Co
    *
    * @default 1
    */
-  movementSpeed: number;
+  movementSpeed: number = 1.0;
 
   /**
    * The look around speed.
    *
    * @default 0.005
    */
-  lookSpeed: number;
+  lookSpeed: number = 0.005;
 
   /**
    * How quickly the movement and look velocity catches up to the input. Lower
@@ -36,21 +36,21 @@ export class FirstPersonControls<TObject extends Object3D = Object3D> extends Co
    *
    * @default 0.1
    */
-  dampingFactor: number;
+  dampingFactor: number = 0.1;
 
   /**
    * Whether it's possible to vertically look around or not.
    *
    * @default true
    */
-  lookVertical: boolean;
+  lookVertical: boolean = true;
 
   /**
    * Whether the camera is automatically moved forward or not.
    *
    * @default false
    */
-  autoForward: boolean;
+  autoForward: boolean = false;
 
   /**
    * Whether or not the camera's height influences the forward movement speed.
@@ -58,49 +58,49 @@ export class FirstPersonControls<TObject extends Object3D = Object3D> extends Co
    *
    * @default false
    */
-  heightSpeed: boolean;
+  heightSpeed: boolean = false;
 
   /**
    * Determines how much faster the camera moves when it's y-component is near `heightMax`.
    *
    * @default 1
    */
-  heightCoef: number;
+  heightCoef: number = 1.0;
 
   /**
    * Lower camera height limit used for movement speed adjustment.
    *
    * @default 0
    */
-  heightMin: number;
+  heightMin: number = 0.0;
 
   /**
    * Upper camera height limit used for movement speed adjustment.
    *
    * @default 1
    */
-  heightMax: number;
+  heightMax: number = 1.0;
 
   /**
    * Whether or not looking around is vertically constrained by `verticalMin` and `verticalMax`.
    *
    * @default false
    */
-  constrainVertical: boolean;
+  constrainVertical: boolean = false;
 
   /**
    * How far you can vertically look around, lower limit. Range is `0` to `Math.PI` in radians.
    *
    * @default 0
    */
-  verticalMin: number;
+  verticalMin: number = 0;
 
   /**
    * How far you can vertically look around, upper limit. Range is `0` to `Math.PI` in radians.
    *
    * @default Math.PI
    */
-  verticalMax: number;
+  verticalMax: number = Math.PI;
 
   /**
    * Whether the mouse is pressed down or not.
@@ -108,43 +108,43 @@ export class FirstPersonControls<TObject extends Object3D = Object3D> extends Co
    * @readonly
    * @default false
    */
-  mouseDragOn: boolean;
+  mouseDragOn: boolean = false;
 
   // internals
 
-  _velocity: Vector3;
+  _velocity: Vector3 = new Vector3();
 
-  _pointerX: number;
-  _pointerY: number;
+  _pointerX: number = 0;
+  _pointerY: number = 0;
 
-  _pointerDownX: number;
-  _pointerDownY: number;
+  _pointerDownX: number = 0;
+  _pointerDownY: number = 0;
 
-  _pointerCount: number;
+  _pointerCount: number = 0;
 
   /** forward / backward come from keys and the pointer, tracked per source so they don't
    * clobber: while a forward / backward key is held, a click only looks */
-  _keyForward: boolean;
-  _keyBackward: boolean;
-  _pointerForward: boolean;
-  _pointerBackward: boolean;
-  _moveLeft: boolean;
-  _moveRight: boolean;
-  _moveUp: boolean;
-  _moveDown: boolean;
+  _keyForward: boolean = false;
+  _keyBackward: boolean = false;
+  _pointerForward: boolean = false;
+  _pointerBackward: boolean = false;
+  _moveLeft: boolean = false;
+  _moveRight: boolean = false;
+  _moveUp: boolean = false;
+  _moveDown: boolean = false;
 
-  _lat: number;
-  _lon: number;
+  _lat: number = 0;
+  _lon: number = 0;
 
-  _lonVelocity: number;
-  _latVelocity: number;
+  _lonVelocity: number = 0;
+  _latVelocity: number = 0;
 
-  _onPointerMove: (event: PointerEvent) => void;
-  _onPointerDown: (event: PointerEvent) => void;
-  _onPointerUp: (event: PointerEvent) => void;
-  _onContextMenu: (event: Event) => void;
-  _onKeyDown: (event: KeyboardEvent) => void;
-  _onKeyUp: (event: KeyboardEvent) => void;
+  _onPointerMove: (event: PointerEvent) => void = onPointerMove.bind(this);
+  _onPointerDown: (event: PointerEvent) => void = onPointerDown.bind(this);
+  _onPointerUp: (event: PointerEvent) => void = onPointerUp.bind(this);
+  _onContextMenu: (event: Event) => void = onContextMenu.bind(this);
+  _onKeyDown: (event: KeyboardEvent) => void = onKeyDown.bind(this);
+  _onKeyUp: (event: KeyboardEvent) => void = onKeyUp.bind(this);
 
   /**
    * Constructs a new controls instance.
@@ -155,54 +155,8 @@ export class FirstPersonControls<TObject extends Object3D = Object3D> extends Co
   constructor(object: TObject, domElement: HTMLElement | null = null) {
     super(object, domElement);
 
-    this.movementSpeed = 1.0;
-    this.lookSpeed = 0.005;
-    this.dampingFactor = 0.1;
-    this.lookVertical = true;
-    this.autoForward = false;
-    this.heightSpeed = false;
-    this.heightCoef = 1.0;
-    this.heightMin = 0.0;
-    this.heightMax = 1.0;
-    this.constrainVertical = false;
-    this.verticalMin = 0;
-    this.verticalMax = Math.PI;
-    this.mouseDragOn = false;
-
-    this._velocity = new Vector3();
-
-    this._pointerX = 0;
-    this._pointerY = 0;
-
-    this._pointerDownX = 0;
-    this._pointerDownY = 0;
-
-    this._pointerCount = 0;
-
     // forward / backward come from keys and the pointer, tracked per source so they don't
     // clobber: while a forward / backward key is held, a click only looks
-    this._keyForward = false;
-    this._keyBackward = false;
-    this._pointerForward = false;
-    this._pointerBackward = false;
-    this._moveLeft = false;
-    this._moveRight = false;
-    this._moveUp = false;
-    this._moveDown = false;
-
-    this._lat = 0;
-    this._lon = 0;
-
-    this._lonVelocity = 0;
-    this._latVelocity = 0;
-
-    this._onPointerMove = onPointerMove.bind(this);
-    this._onPointerDown = onPointerDown.bind(this);
-    this._onPointerUp = onPointerUp.bind(this);
-    this._onContextMenu = onContextMenu.bind(this);
-    this._onKeyDown = onKeyDown.bind(this);
-    this._onKeyUp = onKeyUp.bind(this);
-
     if (domElement !== null) {
       this.connect(domElement);
     }

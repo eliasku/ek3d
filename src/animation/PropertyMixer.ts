@@ -18,17 +18,37 @@ export class PropertyMixer {
   binding: AnimationBinding;
   valueSize: number;
   buffer: AnimationBuffer;
-  _cacheIndex: number | null;
+  _cacheIndex: number | null = null;
   _workIndex: number | undefined;
   _mixBufferRegion: MixFunction;
   _mixBufferRegionAdditive: MixFunction;
   _setIdentity: (this: PropertyMixer) => void;
-  _origIndex: number;
-  _addIndex: number;
-  cumulativeWeight: number;
-  cumulativeWeightAdditive: number;
-  useCount: number;
-  referenceCount: number;
+  _origIndex: number = 3;
+  _addIndex: number = 4;
+  /**
+   * Accumulated weight of the property binding.
+   *
+   * @default 0
+   */
+  cumulativeWeight: number = 0;
+  /**
+   * Accumulated additive weight of the property binding.
+   *
+   * @default 0
+   */
+  cumulativeWeightAdditive: number = 0;
+  /**
+   * Number of active keyframe tracks currently using this property binding.
+   *
+   * @default 0
+   */
+  useCount: number = 0;
+  /**
+   * Number of keyframe tracks referencing this property binding.
+   *
+   * @default 0
+   */
+  referenceCount: number = 0;
 
   /**
    * Constructs a new property mixer.
@@ -43,7 +63,6 @@ export class PropertyMixer {
      *
      */
     this.binding = binding;
-    this._cacheIndex = null;
     /**
      * The keyframe track value size.
      *
@@ -91,32 +110,6 @@ export class PropertyMixer {
     this._mixBufferRegion = mixFunction;
     this._mixBufferRegionAdditive = mixFunctionAdditive;
     this._setIdentity = setIdentity;
-    this._origIndex = 3;
-    this._addIndex = 4;
-    /**
-     * Accumulated weight of the property binding.
-     *
-     * @default 0
-     */
-    this.cumulativeWeight = 0;
-    /**
-     * Accumulated additive weight of the property binding.
-     *
-     * @default 0
-     */
-    this.cumulativeWeightAdditive = 0;
-    /**
-     * Number of active keyframe tracks currently using this property binding.
-     *
-     * @default 0
-     */
-    this.useCount = 0;
-    /**
-     * Number of keyframe tracks referencing this property binding.
-     *
-     * @default 0
-     */
-    this.referenceCount = 0;
   }
   /**
    * Accumulates data in the `incoming` region into `accu<i>`.

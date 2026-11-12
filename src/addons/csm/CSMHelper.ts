@@ -19,9 +19,24 @@ import type { CSM } from "./CSM";
  */
 export class CSMHelper extends Group {
   csm: CSM;
-  displayFrustum: boolean;
-  displayPlanes: boolean;
-  displayShadowBounds: boolean;
+  /**
+   * Whether to display the CSM frustum or not.
+   *
+   * @default true
+   */
+  displayFrustum: boolean = true;
+  /**
+   * Whether to display the cascade planes or not.
+   *
+   * @default true
+   */
+  displayPlanes: boolean = true;
+  /**
+   * Whether to display the shadow bounds or not.
+   *
+   * @default true
+   */
+  displayShadowBounds: boolean = true;
   frustumLines: LineSegments<LineBasicMaterial>;
   cascadeLines: Box3Helper[];
   cascadePlanes: Mesh<MeshBasicMaterial>[];
@@ -40,27 +55,6 @@ export class CSMHelper extends Group {
      *
      */
     this.csm = csm;
-
-    /**
-     * Whether to display the CSM frustum or not.
-     *
-     * @default true
-     */
-    this.displayFrustum = true;
-
-    /**
-     * Whether to display the cascade planes or not.
-     *
-     * @default true
-     */
-    this.displayPlanes = true;
-
-    /**
-     * Whether to display the shadow bounds or not.
-     *
-     * @default true
-     */
-    this.displayShadowBounds = true;
 
     const indices = new Uint16Array([0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7]);
     const positions = new Float32Array(24);

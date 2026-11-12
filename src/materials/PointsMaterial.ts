@@ -36,14 +36,68 @@ export type PointsMaterialParameters = Omit<Partial<PointsMaterial>, "color"> & 
  *
  */
 export class PointsMaterial extends Material {
-  isPointsMaterial: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isPointsMaterial: boolean = true;
 
-  color: Color;
-  map: Texture | null;
-  alphaMap: Texture | null;
-  size: number;
-  sizeAttenuation: boolean;
-  fog: boolean;
+  /**
+   * Color of the material.
+   *
+   * @default (1,1,1)
+   */
+  color: Color = new Color(0xffffff);
+  /**
+   * The color map. May optionally include an alpha channel, typically combined
+   * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
+   * color is modulated by the diffuse `color`.
+   *
+   * `map` represents color data, and the texture must be assigned a
+   * {@link Texture#colorSpace}. Most `map` textures set
+   * `texture.colorSpace = ColorSpace.SRGB`.
+   *
+   * @default null
+   */
+  map: Texture | null = null;
+  /**
+   * The alpha map is a grayscale texture that controls the opacity across the
+   * surface (black: fully transparent; white: fully opaque).
+   *
+   * Only the color of the texture is used, ignoring the alpha channel if one
+   * exists. For RGB and RGBA textures, the renderer will use the green channel
+   * when sampling this texture due to the extra bit of precision provided for
+   * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
+   * luminance/alpha textures will also still work as expected.
+   *
+   * `alphaMap` represents non-color data. Any texture assigned must have
+   * `texture.colorSpace = ColorSpace.No` (default).
+   *
+   * @default null
+   */
+  alphaMap: Texture | null = null;
+  /**
+   * Defines the size of the points in pixels.
+   *
+   * Might be capped if the value exceeds hardware dependent parameters like [GL.ALIASED_POINT_SIZE_RANGE](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter).
+   *
+   * @default 1
+   */
+  size: number = 1;
+  /**
+   * Specifies whether size of individual points is attenuated by the camera depth (perspective camera only).
+   *
+   * @default true
+   */
+  sizeAttenuation: boolean = true;
+  /**
+   * Whether the material is affected by fog or not.
+   *
+   * @default true
+   */
+  fog: boolean = true;
 
   /**
    * Constructs a new points material.
@@ -56,68 +110,7 @@ export class PointsMaterial extends Material {
    */
   constructor(parameters?: PointsMaterialParameters) {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isPointsMaterial = true;
     this.type = "PointsMaterial";
-    /**
-     * Color of the material.
-     *
-     * @default (1,1,1)
-     */
-    this.color = new Color(0xffffff);
-    /**
-     * The color map. May optionally include an alpha channel, typically combined
-     * with {@link Material#transparent} or {@link Material#alphaTest}. The texture map
-     * color is modulated by the diffuse `color`.
-     *
-     * `map` represents color data, and the texture must be assigned a
-     * {@link Texture#colorSpace}. Most `map` textures set
-     * `texture.colorSpace = ColorSpace.SRGB`.
-     *
-     * @default null
-     */
-    this.map = null;
-    /**
-     * The alpha map is a grayscale texture that controls the opacity across the
-     * surface (black: fully transparent; white: fully opaque).
-     *
-     * Only the color of the texture is used, ignoring the alpha channel if one
-     * exists. For RGB and RGBA textures, the renderer will use the green channel
-     * when sampling this texture due to the extra bit of precision provided for
-     * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
-     * luminance/alpha textures will also still work as expected.
-     *
-     * `alphaMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = ColorSpace.No` (default).
-     *
-     * @default null
-     */
-    this.alphaMap = null;
-    /**
-     * Defines the size of the points in pixels.
-     *
-     * Might be capped if the value exceeds hardware dependent parameters like [GL.ALIASED_POINT_SIZE_RANGE](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter).
-     *
-     * @default 1
-     */
-    this.size = 1;
-    /**
-     * Specifies whether size of individual points is attenuated by the camera depth (perspective camera only).
-     *
-     * @default true
-     */
-    this.sizeAttenuation = true;
-    /**
-     * Whether the material is affected by fog or not.
-     *
-     * @default true
-     */
-    this.fog = true;
     this.setValues(parameters);
   }
   clone(): PointsMaterial {

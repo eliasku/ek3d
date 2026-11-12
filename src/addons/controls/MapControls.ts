@@ -27,7 +27,7 @@ const _panCurrent = new Vector3();
  * @augments OrbitControls
  */
 export class MapControls<TObject extends MapCamera = MapCamera> extends OrbitControls<TObject> {
-  _panWorldStart: Vector3;
+  _panWorldStart: Vector3 = new Vector3();
 
   /**
    * Constructs a new controls instance.
@@ -58,8 +58,6 @@ export class MapControls<TObject extends MapCamera = MapCamera> extends OrbitCon
      * @default {ONE: TOUCH.PAN, TWO: TOUCH.DOLLY_ROTATE}
      */
     this.touches = { ONE: TOUCH.PAN, TWO: TOUCH.DOLLY_ROTATE };
-
-    this._panWorldStart = new Vector3();
   }
 
   override _handleMouseDownPan(event: { clientX: number; clientY: number }): void {

@@ -34,7 +34,13 @@ import { Object3D } from "../core/Object3D";
  *
  */
 export class DirectionalLight extends Light {
-  isDirectionalLight: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isDirectionalLight: boolean = true;
 
   target: Object3D;
   shadow: DirectionalLightShadow;
@@ -47,13 +53,6 @@ export class DirectionalLight extends Light {
    */
   constructor(color?: number | Color | string, intensity?: number) {
     super(color, intensity);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isDirectionalLight = true;
     this.type = "DirectionalLight";
     this.position.copy(Object3D.DEFAULT_UP);
     this.updateMatrix();

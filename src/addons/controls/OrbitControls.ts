@@ -99,14 +99,14 @@ export class OrbitControls<TObject extends OrbitCamera = OrbitCamera> extends Co
    * The focus point of the controls, the `object` orbits around this.
    * It can be updated manually at any point to change the focus of the controls.
    */
-  target: Vector3;
+  target: Vector3 = new Vector3();
 
   /**
    * The focus point of the `minTargetRadius` and `maxTargetRadius` limits.
    * It can be updated manually at any point to change the center of interest
    * for the `target`.
    */
-  cursor: Vector3;
+  cursor: Vector3 = new Vector3();
 
   /**
    * How far you can dolly in (perspective camera only).
@@ -283,28 +283,28 @@ export class OrbitControls<TObject extends OrbitCamera = OrbitCamera> extends Co
   /**
    * Used internally by `saveState()` and `reset()`.
    */
-  target0: Vector3;
+  target0: Vector3 = this.target.clone();
 
   /**
    * Used internally by `saveState()` and `reset()`.
    */
-  position0: Vector3;
+  position0: Vector3 = this.object.position.clone();
 
   /**
    * Used internally by `saveState()` and `reset()`.
    */
-  zoom0: number;
+  zoom0: number = this.object.zoom;
 
-  _cursorStyle: "" | "grab";
+  _cursorStyle: "" | "grab" = "";
 
   // the target DOM element for key events
-  _domElementKeyEvents: HTMLElement | Window | null;
+  _domElementKeyEvents: HTMLElement | Window | null = null;
 
   // internals
 
-  _lastPosition: Vector3;
-  _lastQuaternion: Quaternion;
-  _lastTargetPosition: Vector3;
+  _lastPosition: Vector3 = new Vector3();
+  _lastQuaternion: Quaternion = new Quaternion();
+  _lastTargetPosition: Vector3 = new Vector3();
 
   // so camera.up is the orbit axis
   _quat: Quaternion;
@@ -365,27 +365,12 @@ export class OrbitControls<TObject extends OrbitCamera = OrbitCamera> extends Co
 
     this.state = _STATE.NONE;
 
-    this.target = new Vector3();
-    this.cursor = new Vector3();
-
     this.keys = { LEFT: "ArrowLeft", UP: "ArrowUp", RIGHT: "ArrowRight", BOTTOM: "ArrowDown" };
     this.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN };
     this.touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN };
 
-    this.target0 = this.target.clone();
-    this.position0 = this.object.position.clone();
-    this.zoom0 = this.object.zoom;
-
-    this._cursorStyle = "";
-
     // the target DOM element for key events
-    this._domElementKeyEvents = null;
-
     // internals
-
-    this._lastPosition = new Vector3();
-    this._lastQuaternion = new Quaternion();
-    this._lastTargetPosition = new Vector3();
 
     // so camera.up is the orbit axis
     this._quat = new Quaternion().setFromUnitVectors(object.up, new Vector3(0, 1, 0));

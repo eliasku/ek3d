@@ -2,13 +2,10 @@ import { Vector3 } from "../../../../math/Vector3";
 import type { Box3 } from "../../../../math/Box3";
 
 export class SeparatingAxisBounds {
-  min: number;
-  max: number;
+  min: number = Infinity;
+  max: number = -Infinity;
 
-  constructor() {
-    this.min = Infinity;
-    this.max = -Infinity;
-  }
+  constructor() {}
 
   setFromPointsField(points: Vector3[], field: "x" | "y" | "z") {
     let min = Infinity;

@@ -12,7 +12,7 @@ import { GLSL, TextureFilter, Side } from "ek3d/constants";
 /** Two panels sample independent slices; key 4 cycles off / array / volume. */
 export class LayerTargets {
   object: Group;
-  private group: Group;
+  private group: Group = new Group();
   private geometry: PlaneGeometry;
   private quad: PlaneGeometry;
   private array: WebGLArrayRenderTarget;
@@ -26,7 +26,6 @@ export class LayerTargets {
   private colors: number[][];
 
   constructor(private renderer: WebGLRenderer) {
-    this.group = new Group();
     this.group.name = "Layered target samples";
     this.group.visible = false;
     this.group.position.set(0, 3.4, -1);

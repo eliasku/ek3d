@@ -7,7 +7,13 @@ import { Vector3 } from "../../math/Vector3";
  *
  */
 export class CubicBezierCurve3 extends Curve<Vector3> {
-  isCubicBezierCurve3: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isCubicBezierCurve3: boolean = true;
 
   v0: Vector3;
   v1: Vector3;
@@ -29,13 +35,6 @@ export class CubicBezierCurve3 extends Curve<Vector3> {
     v3: Vector3 = new Vector3(),
   ) {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isCubicBezierCurve3 = true;
     this.type = "CubicBezierCurve3";
     /**
      * The start point.

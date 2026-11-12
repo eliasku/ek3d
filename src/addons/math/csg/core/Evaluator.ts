@@ -12,23 +12,15 @@ import { GeometryBuilder } from "./operations/GeometryBuilder";
 import * as GeometryUtils from "./operations/GeometryUtils";
 
 export class Evaluator {
-  triangleSplitter: LegacyTriangleSplitter | CDTTriangleSplitter;
-  geometryBuilders: GeometryBuilder[];
-  attributes: string[];
-  useGroups: boolean;
-  consolidateGroups: boolean;
-  removeUnusedMaterials: boolean;
-  debug: OperationDebugData;
+  triangleSplitter: LegacyTriangleSplitter | CDTTriangleSplitter = new LegacyTriangleSplitter();
+  geometryBuilders: GeometryBuilder[] = [];
+  attributes: string[] = ["position", "uv", "normal"];
+  useGroups: boolean = true;
+  consolidateGroups: boolean = true;
+  removeUnusedMaterials: boolean = true;
+  debug: OperationDebugData = new OperationDebugData();
 
-  constructor() {
-    this.triangleSplitter = new LegacyTriangleSplitter();
-    this.geometryBuilders = [];
-    this.attributes = ["position", "uv", "normal"];
-    this.useGroups = true;
-    this.consolidateGroups = true;
-    this.removeUnusedMaterials = true;
-    this.debug = new OperationDebugData();
-  }
+  constructor() {}
 
   get useCDTClipping(): boolean {
     return this.triangleSplitter instanceof CDTTriangleSplitter;

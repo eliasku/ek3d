@@ -18,14 +18,62 @@ export type LineBasicMaterialParameters = Omit<Partial<LineBasicMaterial>, "colo
  *
  */
 export class LineBasicMaterial extends Material {
-  isLineBasicMaterial: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isLineBasicMaterial: boolean = true;
 
-  color: Color;
-  map: Texture | null;
-  linewidth: number;
-  linecap: string;
-  linejoin: string;
-  fog: boolean;
+  /**
+   * Color of the material.
+   *
+   * @default (1,1,1)
+   */
+  color: Color = new Color(0xffffff);
+  /**
+   * Sets the color of the lines using data from a texture. The texture map
+   * color is modulated by the diffuse `color`.
+   *
+   * `map` represents color data, and the texture must be assigned a
+   * {@link Texture#colorSpace}. Most `map` textures set
+   * `texture.colorSpace = ColorSpace.SRGB`.
+   *
+   * @default null
+   */
+  map: Texture | null = null;
+  /**
+   * Controls line thickness or lines.
+   *
+   * Can only be used with {@link SVGRenderer}. WebGL ignores this setting and always render line primitives with a
+   * width of one pixel.
+   *
+   * @default 1
+   */
+  linewidth: number = 1;
+  /**
+   * Defines appearance of line ends.
+   *
+   * Can only be used with {@link SVGRenderer}.
+   *
+   * @default 'round'
+   */
+  linecap: string = "round";
+  /**
+   * Defines appearance of line joints.
+   *
+   * Can only be used with {@link SVGRenderer}.
+   *
+   * @default 'round'
+   */
+  linejoin: string = "round";
+  /**
+   * Whether the material is affected by fog or not.
+   *
+   * @default true
+   */
+  fog: boolean = true;
 
   /**
    * Constructs a new line basic material.
@@ -38,62 +86,7 @@ export class LineBasicMaterial extends Material {
    */
   constructor(parameters?: LineBasicMaterialParameters) {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isLineBasicMaterial = true;
     this.type = "LineBasicMaterial";
-    /**
-     * Color of the material.
-     *
-     * @default (1,1,1)
-     */
-    this.color = new Color(0xffffff);
-    /**
-     * Sets the color of the lines using data from a texture. The texture map
-     * color is modulated by the diffuse `color`.
-     *
-     * `map` represents color data, and the texture must be assigned a
-     * {@link Texture#colorSpace}. Most `map` textures set
-     * `texture.colorSpace = ColorSpace.SRGB`.
-     *
-     * @default null
-     */
-    this.map = null;
-    /**
-     * Controls line thickness or lines.
-     *
-     * Can only be used with {@link SVGRenderer}. WebGL ignores this setting and always render line primitives with a
-     * width of one pixel.
-     *
-     * @default 1
-     */
-    this.linewidth = 1;
-    /**
-     * Defines appearance of line ends.
-     *
-     * Can only be used with {@link SVGRenderer}.
-     *
-     * @default 'round'
-     */
-    this.linecap = "round";
-    /**
-     * Defines appearance of line joints.
-     *
-     * Can only be used with {@link SVGRenderer}.
-     *
-     * @default 'round'
-     */
-    this.linejoin = "round";
-    /**
-     * Whether the material is affected by fog or not.
-     *
-     * @default true
-     */
-    this.fog = true;
     this.setValues(parameters);
   }
   clone(): LineBasicMaterial {

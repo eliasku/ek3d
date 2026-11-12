@@ -11,10 +11,29 @@ let _id = 0;
  *
  */
 export class UniformsGroup extends EventDispatcher {
-  isUniformsGroup: boolean;
-  name: string;
-  usage: BufferUsage;
-  uniforms: (Uniform | Uniform[])[];
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isUniformsGroup: boolean = true;
+  /**
+   * The name of the uniforms group.
+   *
+   */
+  name: string = "";
+  /**
+   * The buffer usage.
+   *
+   * @default BufferUsage.StaticDraw
+   */
+  usage: BufferUsage = BufferUsage.StaticDraw;
+  /**
+   * An array holding the uniforms.
+   *
+   */
+  uniforms: (Uniform | Uniform[])[] = [];
   id!: number;
 
   /**
@@ -23,35 +42,12 @@ export class UniformsGroup extends EventDispatcher {
   constructor() {
     super();
     /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isUniformsGroup = true;
-    /**
      * The ID of the 3D object.
      *
      * @name UniformsGroup#id
      * @readonly
      */
     Object.defineProperty(this, "id", { enumerable: false, configurable: false, writable: false, value: _id++ });
-    /**
-     * The name of the uniforms group.
-     *
-     */
-    this.name = "";
-    /**
-     * The buffer usage.
-     *
-     * @default BufferUsage.StaticDraw
-     */
-    this.usage = BufferUsage.StaticDraw;
-    /**
-     * An array holding the uniforms.
-     *
-     */
-    this.uniforms = [];
   }
   /**
    * Adds the given uniform to this uniforms group.

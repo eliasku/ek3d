@@ -1,24 +1,12 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "lib": ["ES2022", "ES2025.Float16", "DOM", "DOM.Iterable"],
-    "noEmit": true,
-    "allowJs": true,
-    "checkJs": false,
-    "strict": true,
-    "useDefineForClassFields": true,
-    "isolatedModules": false,
-    "skipLibCheck": false,
-    "types": ["node"]
+    "useDefineForClassFields": true
   },
-  "include": [
-    "src/**/*.ts",
-    "testbed/**/*.ts",
-    "examples/**/*.ts",
-    "tests/**/*.ts",
-    "scripts/**/*.ts",
-    "vite.config.ts"
+  "files": [],
+  "references": [
+    { "path": "./scripts/tsconfig.test.json" },
+    { "path": "./scripts/tsconfig.node.json" },
+    { "path": "./scripts/tsconfig.lib.json" }
   ]
 }

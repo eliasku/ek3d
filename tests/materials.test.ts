@@ -387,13 +387,16 @@ test("LTC half data represents the same fitted matrices and factories do not sha
 
 test("material IDs and physical setters retain descriptor and update contracts", () => {
   const material = new Material();
-  assert.deepEqual(Object.getOwnPropertyDescriptor(material, "id"), {
-    value: material.id,
-    writable: false,
-    enumerable: false,
-    configurable: false,
-  });
-  const physical = new MeshPhysicalMaterial();
+  const physical = new MeshPhysicalMaterial({ alphaTest: 0.25 });
+  for (const current of [material, physical]) {
+    assert.deepEqual(Object.getOwnPropertyDescriptor(current, "id"), {
+      value: current.id,
+      writable: false,
+      enumerable: false,
+      configurable: false,
+    });
+    assert.equal(Reflect.set(current, "id", -1), false);
+  }
   for (const property of [
     "anisotropy",
     "clearcoat",
@@ -417,6 +420,25 @@ test("material IDs and physical setters retain descriptor and update contracts",
   assert.equal(reflectivity?.configurable, false);
   physical.reflectivity = 0.25;
   assert.ok(Math.abs(physical.ior - 1.1 / 0.9) < 1e-12);
+  assert.equal(physical.alphaTest, 0.25);
+  const version = physical.version;
+  physical.alphaTest = 0.5;
+  assert.equal(physical.version, version);
+  physical.alphaTest = 0;
+  assert.equal(physical.version, version + 1);
+  physical.setValues({ alphaTest: 0.25 });
+  assert.equal(physical.version, version + 2);
+  const clone = physical.clone();
+  assert.equal(clone.alphaTest, 0.25);
+  assert.equal(clone.toJSON().alphaTest, 0.25);
+  const cloneVersion = clone.version;
+  clone.needsUpdate = false;
+  assert.equal(clone.version, cloneVersion);
+  clone.needsUpdate = true;
+  assert.equal(clone.version, cloneVersion + 1);
+  clone.alphaTest = 0;
+  assert.equal(clone.version, cloneVersion + 2);
+  assert.equal(physical.alphaTest, 0.25);
   const restored: Material & MaterialProperties = new Material().fromJSON({ roughness: 0.4 });
   assert.equal(restored.roughness, 0.4);
   assert.equal(restored.toJSON().roughness, 0.4);

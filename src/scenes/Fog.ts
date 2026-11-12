@@ -12,8 +12,18 @@ import { Color } from "../math/Color";
  * ```
  */
 export class Fog {
-  isFog: boolean;
-  name: string;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isFog: boolean = true;
+  /**
+   * The name of the fog.
+   *
+   */
+  name: string = "";
   color: Color;
   near: number;
   far: number;
@@ -26,18 +36,6 @@ export class Fog {
    * @param [far=1000] - The maximum distance at which fog stops being calculated and applied.
    */
   constructor(color: Color | number | string, near: number = 1, far: number = 1000) {
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isFog = true;
-    /**
-     * The name of the fog.
-     *
-     */
-    this.name = "";
     /**
      * The fog's color.
      *

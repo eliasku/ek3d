@@ -176,11 +176,11 @@ export class PLYLoader extends Loader<BufferGeometry, string> {
   /**
    * Maps default property names to custom ones, applied while parsing the header.
    */
-  propertyNameMapping: Record<string, string>;
+  propertyNameMapping: Record<string, string> = {};
   /**
    * Maps attribute names to the element properties that make up the attribute.
    */
-  customPropertyMapping: Record<string, string[]>;
+  customPropertyMapping: Record<string, string[]> = {};
 
   /**
    * Constructs a new PLY loader.
@@ -191,9 +191,6 @@ export class PLYLoader extends Loader<BufferGeometry, string> {
     super(manager);
 
     // internals
-
-    this.propertyNameMapping = {};
-    this.customPropertyMapping = {};
   }
 
   /**
@@ -968,11 +965,10 @@ class Float64BufferAttribute extends BufferAttribute {
 
 class ArrayStream {
   arr: string[];
-  i: number;
+  i: number = 0;
 
   constructor(arr: string[]) {
     this.arr = arr;
-    this.i = 0;
   }
 
   empty(): boolean {

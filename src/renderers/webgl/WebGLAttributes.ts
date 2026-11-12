@@ -15,11 +15,10 @@ export interface AttributeBuffer {
 }
 export class WebGLAttributes {
   private gl: WebGL2RenderingContext;
-  private buffers: WeakMap<Attribute, AttributeBuffer>;
+  private buffers: WeakMap<Attribute, AttributeBuffer> = new WeakMap();
 
   constructor(gl: WebGL2RenderingContext) {
     this.gl = gl;
-    this.buffers = new WeakMap();
     this.get = this.get.bind(this);
     this.remove = this.remove.bind(this);
     this.update = this.update.bind(this);

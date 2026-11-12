@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "ES2025.Float16", "DOM", "DOM.Iterable"],
+    "outDir": "../.local/crasher-emit",
+    "tsBuildInfoFile": "../node_modules/.cache/tsconfig.lib.tsbuildinfo"
+  },
+  "include": ["../src/**/*.ts", "../testbed/**/*.ts", "../examples/**/*.ts", "../tests/**/*.ts"],
+  "exclude": ["../tests/**/*.test.ts"]
+}

@@ -13,38 +13,34 @@ const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
  * from an array of cameras. This is particularly useful for multi-view renderers.
  */
 export class FrustumArray {
-  coordinateSystem: CoordinateSystem;
-  _frustums: Frustum[];
-  _count: number;
+  /**
+   * The coordinate system to use.
+   *
+   * @default CoordinateSystem.WebGL
+   */
+  coordinateSystem: CoordinateSystem = CoordinateSystem.WebGL;
+  /**
+   * A pool of frustum instances. It may hold more entries than are
+   * currently in use; surplus instances are kept for reuse to avoid
+   * reallocating when array cameras of different lengths are rendered.
+   *
+   * @private
+   */
+  _frustums: Frustum[] = [];
+  /**
+   * The number of frustums in {@link FrustumArray#_frustums} that are currently
+   * in use.
+   *
+   * @private
+   * @default 0
+   */
+  _count: number = 0;
 
   /**
    * Constructs a new frustum array.
    *
    */
-  constructor() {
-    /**
-     * The coordinate system to use.
-     *
-     * @default CoordinateSystem.WebGL
-     */
-    this.coordinateSystem = CoordinateSystem.WebGL;
-    /**
-     * A pool of frustum instances. It may hold more entries than are
-     * currently in use; surplus instances are kept for reuse to avoid
-     * reallocating when array cameras of different lengths are rendered.
-     *
-     * @private
-     */
-    this._frustums = [];
-    /**
-     * The number of frustums in {@link FrustumArray#_frustums} that are currently
-     * in use.
-     *
-     * @private
-     * @default 0
-     */
-    this._count = 0;
-  }
+  constructor() {}
   /**
    * Computes and caches a frustum for each camera of the given array camera.
    *

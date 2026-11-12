@@ -17,7 +17,13 @@ import { CubeTexture } from "../textures/CubeTexture";
  *
  */
 export class WebGLCubeRenderTarget extends WebGLRenderTarget {
-  isWebGLCubeRenderTarget: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isWebGLCubeRenderTarget: boolean = true;
 
   /**
    * Constructs a new cube render target.
@@ -27,13 +33,6 @@ export class WebGLCubeRenderTarget extends WebGLRenderTarget {
    */
   constructor(size: number = 1, options: RenderTargetOptions = {}) {
     super(size, size, options);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isWebGLCubeRenderTarget = true;
     const image: any = { width: size, height: size, depth: 1 };
     const images = [image, image, image, image, image, image];
     /**

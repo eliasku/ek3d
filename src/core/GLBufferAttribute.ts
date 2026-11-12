@@ -10,15 +10,29 @@
  * Notice that this class can only be used with {@link WebGLRenderer}.
  */
 export class GLBufferAttribute {
-  isGLBufferAttribute: boolean;
-  name: string;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isGLBufferAttribute: boolean = true;
+  /**
+   * The name of the buffer attribute.
+   *
+   */
+  name: string = "";
   buffer: WebGLBuffer & object;
   type: number;
   itemSize: number;
   elementSize: number;
   count: number;
   normalized: boolean;
-  version: number;
+  /**
+   * A version number, incremented every time the `needsUpdate` is set to `true`.
+   *
+   */
+  version: number = 0;
 
   /**
    * Constructs a new GL buffer attribute.
@@ -38,18 +52,6 @@ export class GLBufferAttribute {
     count: number,
     normalized: boolean = false,
   ) {
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isGLBufferAttribute = true;
-    /**
-     * The name of the buffer attribute.
-     *
-     */
-    this.name = "";
     /**
      * The native WebGL buffer.
      *
@@ -84,11 +86,6 @@ export class GLBufferAttribute {
      *
      */
     this.normalized = normalized;
-    /**
-     * A version number, incremented every time the `needsUpdate` is set to `true`.
-     *
-     */
-    this.version = 0;
   }
   /**
    * Flag to indicate that this attribute has changed and should be re-sent to

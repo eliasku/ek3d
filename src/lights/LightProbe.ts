@@ -17,7 +17,13 @@ import { Light } from "./Light";
  *
  */
 export class LightProbe extends Light {
-  isLightProbe: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isLightProbe: boolean = true;
 
   sh: SphericalHarmonics3;
 
@@ -29,13 +35,6 @@ export class LightProbe extends Light {
    */
   constructor(sh: SphericalHarmonics3 = new SphericalHarmonics3(), intensity: number = 1) {
     super(undefined, intensity);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isLightProbe = true;
     this.type = "LightProbe";
     /**
      * A light probe uses spherical harmonics to encode lighting information.

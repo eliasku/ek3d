@@ -145,18 +145,32 @@ export type DRACOOnProgress = (event: ProgressEvent) => void;
  * @augments Loader
  */
 export class DRACOLoader extends Loader<BufferGeometry, string> {
-  decoderPaths: { js: string | null; wasm: string | null; dep_js: string | null };
-  decoderConfig: { type?: "js" | "wasm"; wasmBinary?: ArrayBuffer };
-  decoderBinary: string | null;
-  decoderPending: Promise<void> | null;
+  decoderPaths: { js: string | null; wasm: string | null; dep_js: string | null } = {
+    js: WASM_JS_URL,
+    wasm: WASM_BIN_URL,
+    dep_js: JS_URL,
+  };
+  decoderConfig: { type?: "js" | "wasm"; wasmBinary?: ArrayBuffer } = {};
+  decoderBinary: string | null = null;
+  decoderPending: Promise<void> | null = null;
 
-  workerLimit: number;
-  workerPool: DRACOWorkerHost[];
-  workerNextTaskID: number;
-  workerSourceURL: string;
+  workerLimit: number = 4;
+  workerPool: DRACOWorkerHost[] = [];
+  workerNextTaskID: number = 1;
+  workerSourceURL: string = "";
 
-  defaultAttributeIDs: { position: string; normal: string; color: string; uv: string };
-  defaultAttributeTypes: { position: string; normal: string; color: string; uv: string };
+  defaultAttributeIDs: { position: string; normal: string; color: string; uv: string } = {
+    position: "POSITION",
+    normal: "NORMAL",
+    color: "COLOR",
+    uv: "TEX_COORD",
+  };
+  defaultAttributeTypes: { position: string; normal: string; color: string; uv: string } = {
+    position: "Float32Array",
+    normal: "Float32Array",
+    color: "Float32Array",
+    uv: "Float32Array",
+  };
 
   /**
    * Constructs a new Draco loader.
@@ -165,33 +179,6 @@ export class DRACOLoader extends Loader<BufferGeometry, string> {
    */
   constructor(manager?: LoadingManager) {
     super(manager);
-
-    this.decoderPaths = {
-      js: WASM_JS_URL,
-      wasm: WASM_BIN_URL,
-      dep_js: JS_URL,
-    };
-    this.decoderConfig = {};
-    this.decoderBinary = null;
-    this.decoderPending = null;
-
-    this.workerLimit = 4;
-    this.workerPool = [];
-    this.workerNextTaskID = 1;
-    this.workerSourceURL = "";
-
-    this.defaultAttributeIDs = {
-      position: "POSITION",
-      normal: "NORMAL",
-      color: "COLOR",
-      uv: "TEX_COORD",
-    };
-    this.defaultAttributeTypes = {
-      position: "Float32Array",
-      normal: "Float32Array",
-      color: "Float32Array",
-      uv: "Float32Array",
-    };
   }
 
   /**

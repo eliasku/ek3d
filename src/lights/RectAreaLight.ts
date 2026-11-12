@@ -35,7 +35,13 @@ import { Light } from "./Light";
  *
  */
 export class RectAreaLight extends Light {
-  isRectAreaLight: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isRectAreaLight: boolean = true;
 
   width: number;
   height: number;
@@ -50,13 +56,6 @@ export class RectAreaLight extends Light {
    */
   constructor(color?: number | Color | string, intensity?: number, width: number = 10, height: number = 10) {
     super(color, intensity);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isRectAreaLight = true;
     this.type = "RectAreaLight";
     /**
      * The width of the light.

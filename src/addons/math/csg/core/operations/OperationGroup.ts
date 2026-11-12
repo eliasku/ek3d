@@ -2,13 +2,11 @@ import { Group } from "../../../../../objects/Group";
 import { Matrix4 } from "../../../../../math/Matrix4";
 
 export class OperationGroup extends Group {
-  isOperationGroup: boolean;
-  _previousMatrix: Matrix4;
+  isOperationGroup: boolean = true;
+  _previousMatrix: Matrix4 = new Matrix4();
 
   constructor() {
     super();
-    this.isOperationGroup = true;
-    this._previousMatrix = new Matrix4();
   }
 
   markUpdated() {

@@ -47,15 +47,15 @@ const _clearColor = /*@__PURE__*/ new Color();
  */
 export class PMREMGenerator {
   _renderer: WebGLRenderer;
-  _cubeSize: number;
-  _sourceTarget: WebGLCubeRenderTarget | null;
-  _cubeCamera: CubeCamera;
-  _boxMesh: Mesh;
-  _cubemapMaterial: ShaderMaterial | null;
-  _equirectMaterial: ShaderMaterial | null;
-  _blurMaterial: ShaderMaterial | null;
-  _ggxMaterial: ShaderMaterial | null;
-  _integrationMaterial: ShaderMaterial | null;
+  _cubeSize: number = 0;
+  _sourceTarget: WebGLCubeRenderTarget | null = null;
+  _cubeCamera: CubeCamera = new CubeCamera(1, 10, null as unknown as WebGLCubeRenderTarget);
+  _boxMesh: Mesh = new Mesh(new BoxGeometry(5, 5, 5), null as unknown as Material);
+  _cubemapMaterial: ShaderMaterial | null = null;
+  _equirectMaterial: ShaderMaterial | null = null;
+  _blurMaterial: ShaderMaterial | null = null;
+  _ggxMaterial: ShaderMaterial | null = null;
+  _integrationMaterial: ShaderMaterial | null = null;
 
   /**
    * Constructs a new PMREM generator.
@@ -64,15 +64,6 @@ export class PMREMGenerator {
    */
   constructor(renderer: WebGLRenderer) {
     this._renderer = renderer;
-    this._cubeSize = 0;
-    this._sourceTarget = null;
-    this._cubeCamera = new CubeCamera(1, 10, null as unknown as WebGLCubeRenderTarget);
-    this._boxMesh = new Mesh(new BoxGeometry(5, 5, 5), null as unknown as Material);
-    this._cubemapMaterial = null;
-    this._equirectMaterial = null;
-    this._blurMaterial = null;
-    this._ggxMaterial = null;
-    this._integrationMaterial = null;
   }
   /**
    * Generates a PMREM from a scene, optionally applying a Gaussian blur before

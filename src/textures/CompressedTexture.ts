@@ -26,7 +26,13 @@ export interface CompressedTextureFace {
  *
  */
 export class CompressedTexture extends Texture<CompressedTextureMipmap> {
-  isCompressedTexture: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isCompressedTexture: boolean = true;
 
   /**
    * Constructs a new compressed texture.
@@ -60,13 +66,6 @@ export class CompressedTexture extends Texture<CompressedTextureMipmap> {
     colorSpace?: string,
   ) {
     super(null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isCompressedTexture = true;
     /**
      * The image property of a compressed texture just defines its dimensions.
      *

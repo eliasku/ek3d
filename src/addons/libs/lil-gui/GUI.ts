@@ -105,31 +105,31 @@ export class GUI {
   /**
    * The list of controllers and folders contained by this GUI.
    */
-  children: Array<GUI | Controller>;
+  children: Array<GUI | Controller> = [];
 
   /**
    * The list of controllers contained by this GUI.
    */
-  controllers: Controller[];
+  controllers: Controller[] = [];
 
   /**
    * The list of folders contained by this GUI.
    */
-  folders: GUI[];
+  folders: GUI[] = [];
 
   /**
    * Used to determine if the GUI is closed. Use `gui.open()` or `gui.close()` to change this.
    *
    * @default false
    */
-  _closed: boolean;
+  _closed: boolean = false;
 
   /**
    * Used to determine if the GUI is hidden. Use `gui.show()` or `gui.hide()` to change this.
    *
    * @default false
    */
-  _hidden: boolean;
+  _hidden: boolean = false;
 
   /**
    * Current title of the GUI. Use `gui.title('Title')` to modify this value.
@@ -139,7 +139,7 @@ export class GUI {
   /**
    * The outermost container element.
    */
-  domElement: HTMLDivElement;
+  domElement: HTMLDivElement = document.createElement("div");
 
   /**
    * The DOM element that contains the title.
@@ -153,9 +153,9 @@ export class GUI {
 
   _closeFolders: boolean = false;
 
-  _onChange: ((event: GUIChangeEvent) => void) | undefined;
-  _onFinishChange: ((event: GUIChangeEvent) => void) | undefined;
-  _onOpenClose: ((gui: GUI) => void) | undefined;
+  _onChange: ((event: GUIChangeEvent) => void) | undefined = undefined;
+  _onFinishChange: ((event: GUIChangeEvent) => void) | undefined = undefined;
+  _onOpenClose: ((gui: GUI) => void) | undefined = undefined;
 
   /**
    * Creates a panel that holds controllers.
@@ -175,17 +175,6 @@ export class GUI {
     this.parent = parent;
     this.root = parent ? parent.root : this;
 
-    this.children = [];
-    this.controllers = [];
-    this.folders = [];
-
-    this._closed = false;
-    this._hidden = false;
-    this._onChange = undefined;
-    this._onFinishChange = undefined;
-    this._onOpenClose = undefined;
-
-    this.domElement = document.createElement("div");
     this.domElement.classList.add("lil-gui");
 
     this.$title = document.createElement("button");

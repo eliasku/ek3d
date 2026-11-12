@@ -39,7 +39,7 @@ export class NURBSCurve extends Curve<Vector3> {
   knots: number[];
 
   /** An array of control points. */
-  controlPoints: Vector4[];
+  controlPoints: Vector4[] = [];
 
   /** Index of the start knot into the `knots` array. */
   startKnot: number;
@@ -70,7 +70,6 @@ export class NURBSCurve extends Curve<Vector3> {
 
     this.degree = degree;
     this.knots = knots;
-    this.controlPoints = [];
     this.startKnot = startKnot || 0;
     this.endKnot = endKnot || knotsLength;
 

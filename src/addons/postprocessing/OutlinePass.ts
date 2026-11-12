@@ -64,15 +64,63 @@ export class OutlinePass extends Pass {
   renderScene: Scene;
   renderCamera: PerspectiveCamera;
   selectedObjects: Object3D[];
-  visibleEdgeColor: Color;
-  hiddenEdgeColor: Color;
-  edgeGlow: number;
-  usePatternTexture: boolean;
-  patternTexture: Texture | null;
-  edgeThickness: number;
-  edgeStrength: number;
-  downSampleRatio: number;
-  pulsePeriod: number;
+  /**
+   * The visible edge color.
+   *
+   * @default (1,1,1)
+   */
+  visibleEdgeColor: Color = new Color(1, 1, 1);
+  /**
+   * The hidden edge color.
+   *
+   * @default (0.1,0.04,0.02)
+   */
+  hiddenEdgeColor: Color = new Color(0.1, 0.04, 0.02);
+  /**
+   * Can be used for an animated glow/pulse effect.
+   *
+   * @default 0
+   */
+  edgeGlow: number = 0.0;
+  /**
+   * Whether to use a pattern texture for to highlight selected
+   * 3D objects or not.
+   *
+   * @default false
+   */
+  usePatternTexture: boolean = false;
+  /**
+   * Can be used to highlight selected 3D objects. Requires to set
+   * {@link OutlinePass#usePatternTexture} to `true`.
+   *
+   * @default null
+   */
+  patternTexture: Texture | null = null;
+  /**
+   * The edge thickness.
+   *
+   * @default 1
+   */
+  edgeThickness: number = 1.0;
+  /**
+   * The edge strength.
+   *
+   * @default 3
+   */
+  edgeStrength: number = 3.0;
+  /**
+   * The downsample ratio. The effect can be rendered in a much
+   * lower resolution than the beauty pass.
+   *
+   * @default 2
+   */
+  downSampleRatio: number = 2;
+  /**
+   * The pulse period.
+   *
+   * @default 0
+   */
+  pulsePeriod: number = 0;
   resolution: Vector2;
   renderTargetMaskBuffer: WebGLRenderTarget;
   depthMaterial: MeshDepthMaterial;
@@ -95,8 +143,8 @@ export class OutlinePass extends Pass {
   tempPulseColor1: Color;
   tempPulseColor2: Color;
   textureMatrix: Matrix4;
-  _visibilityCache: Map<OutlineObject, boolean>;
-  _selectionCache: Set<Mesh>;
+  _visibilityCache: Map<OutlineObject, boolean> = new Map();
+  _selectionCache: Set<Mesh> = new Set();
 
   /** Static blur directions, shared by all instances. */
   static BlurDirectionX: Vector2 = new Vector2(1.0, 0.0);
@@ -126,75 +174,6 @@ export class OutlinePass extends Pass {
      * The selected 3D objects that should receive an outline.
      */
     this.selectedObjects = selectedObjects !== undefined ? selectedObjects : [];
-
-    /**
-     * The visible edge color.
-     *
-     * @default (1,1,1)
-     */
-    this.visibleEdgeColor = new Color(1, 1, 1);
-
-    /**
-     * The hidden edge color.
-     *
-     * @default (0.1,0.04,0.02)
-     */
-    this.hiddenEdgeColor = new Color(0.1, 0.04, 0.02);
-
-    /**
-     * Can be used for an animated glow/pulse effect.
-     *
-     * @default 0
-     */
-    this.edgeGlow = 0.0;
-
-    /**
-     * Whether to use a pattern texture for to highlight selected
-     * 3D objects or not.
-     *
-     * @default false
-     */
-    this.usePatternTexture = false;
-
-    /**
-     * Can be used to highlight selected 3D objects. Requires to set
-     * {@link OutlinePass#usePatternTexture} to `true`.
-     *
-     * @default null
-     */
-    this.patternTexture = null;
-
-    /**
-     * The edge thickness.
-     *
-     * @default 1
-     */
-    this.edgeThickness = 1.0;
-
-    /**
-     * The edge strength.
-     *
-     * @default 3
-     */
-    this.edgeStrength = 3.0;
-
-    /**
-     * The downsample ratio. The effect can be rendered in a much
-     * lower resolution than the beauty pass.
-     *
-     * @default 2
-     */
-    this.downSampleRatio = 2;
-
-    /**
-     * The pulse period.
-     *
-     * @default 0
-     */
-    this.pulsePeriod = 0;
-
-    this._visibilityCache = new Map();
-    this._selectionCache = new Set();
 
     /**
      * The effect's resolution.

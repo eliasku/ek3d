@@ -127,121 +127,121 @@ export class ArcballControls<TObject extends ArcballCamera = ArcballCamera> exte
   /**
    * The control's focus point.
    */
-  target: Vector3;
-  _currentTarget: Vector3;
+  target: Vector3 = new Vector3();
+  _currentTarget: Vector3 = new Vector3();
 
   /**
    * The size of the gizmo relative to the screen width and height.
    *
    * @default 0.67
    */
-  radiusFactor: number;
+  radiusFactor: number = 0.67;
 
   /**
    * Holds the mouse actions of this controls. This property is maintained by the methods
    * `setMouseAction()` and `unsetMouseAction()`.
    */
-  mouseActions: ArcballMouseAction[];
-  _mouseOp: "PAN" | "ROTATE" | "ZOOM" | "FOV" | null;
+  mouseActions: ArcballMouseAction[] = [];
+  _mouseOp: "PAN" | "ROTATE" | "ZOOM" | "FOV" | null = null;
 
   //global vectors and matrices that are used in some operations to avoid creating new objects every time (e.g. every time cursor moves)
-  _v2_1: Vector2;
-  _v3_1: Vector3;
-  _v3_2: Vector3;
+  _v2_1: Vector2 = new Vector2();
+  _v3_1: Vector3 = new Vector3();
+  _v3_2: Vector3 = new Vector3();
 
-  _m4_1: Matrix4;
-  _m4_2: Matrix4;
+  _m4_1: Matrix4 = new Matrix4();
+  _m4_2: Matrix4 = new Matrix4();
 
-  _quat: Quaternion;
+  _quat: Quaternion = new Quaternion();
 
   //transformation matrices
-  _translationMatrix: Matrix4;
-  _rotationMatrix: Matrix4;
-  _scaleMatrix: Matrix4;
+  _translationMatrix: Matrix4 = new Matrix4();
+  _rotationMatrix: Matrix4 = new Matrix4();
+  _scaleMatrix: Matrix4 = new Matrix4();
 
-  _rotationAxis: Vector3;
+  _rotationAxis: Vector3 = new Vector3();
 
   //camera state
-  _cameraMatrixState: Matrix4;
-  _cameraProjectionState: Matrix4;
+  _cameraMatrixState: Matrix4 = new Matrix4();
+  _cameraProjectionState: Matrix4 = new Matrix4();
 
-  _fovState: number;
-  _upState: Vector3;
-  _zoomState: number;
-  _nearPos: number;
-  _farPos: number;
+  _fovState: number = 1;
+  _upState: Vector3 = new Vector3();
+  _zoomState: number = 1;
+  _nearPos: number = 0;
+  _farPos: number = 0;
 
-  _gizmoMatrixState: Matrix4;
+  _gizmoMatrixState: Matrix4 = new Matrix4();
 
   //initial values
-  _up0: Vector3;
-  _zoom0: number;
-  _fov0: number;
-  _initialNear: number;
-  _nearPos0: number;
-  _initialFar: number;
-  _farPos0: number;
-  _cameraMatrixState0: Matrix4;
-  _gizmoMatrixState0: Matrix4;
-  _target0: Vector3;
+  _up0: Vector3 = new Vector3();
+  _zoom0: number = 1;
+  _fov0: number = 0;
+  _initialNear: number = 0;
+  _nearPos0: number = 0;
+  _initialFar: number = 0;
+  _farPos0: number = 0;
+  _cameraMatrixState0: Matrix4 = new Matrix4();
+  _gizmoMatrixState0: Matrix4 = new Matrix4();
+  _target0: Vector3 = new Vector3();
 
   //pointers array
-  _button: number;
-  _touchStart: PointerEvent[];
-  _touchCurrent: PointerEvent[];
-  _input: symbol;
+  _button: number = -1;
+  _touchStart: PointerEvent[] = [];
+  _touchCurrent: PointerEvent[] = [];
+  _input: symbol = INPUT.NONE;
 
   //two fingers touch interaction
-  _switchSensibility: number;
-  _startFingerDistance: number;
-  _currentFingerDistance: number;
-  _startFingerRotation: number;
-  _currentFingerRotation: number;
+  _switchSensibility: number = 32;
+  _startFingerDistance: number = 0;
+  _currentFingerDistance: number = 0;
+  _startFingerRotation: number = 0;
+  _currentFingerRotation: number = 0;
 
   //double tap
-  _devPxRatio: number;
-  _downValid: boolean;
-  _nclicks: number;
-  _downEvents: PointerEvent[];
-  _downStart: number;
-  _clickStart: number;
-  _maxDownTime: number;
-  _maxInterval: number;
-  _posThreshold: number;
-  _movementThreshold: number;
+  _devPxRatio: number = 0;
+  _downValid: boolean = true;
+  _nclicks: number = 0;
+  _downEvents: PointerEvent[] = [];
+  _downStart: number = 0;
+  _clickStart: number = 0;
+  _maxDownTime: number = 250;
+  _maxInterval: number = 300;
+  _posThreshold: number = 24;
+  _movementThreshold: number = 24;
 
   //cursor positions
-  _currentCursorPosition: Vector3;
-  _startCursorPosition: Vector3;
+  _currentCursorPosition: Vector3 = new Vector3();
+  _startCursorPosition: Vector3 = new Vector3();
 
   //grid
-  _grid: GridHelper | null;
-  _gridPosition: Vector3;
+  _grid: GridHelper | null = null;
+  _gridPosition: Vector3 = new Vector3();
 
   //gizmos
-  _gizmos: Group;
-  _curvePts: number;
+  _gizmos: Group = new Group();
+  _curvePts: number = 128;
 
   //animations
-  _timeStart: number;
-  _animationId: number;
+  _timeStart: number = -1;
+  _animationId: number = -1;
 
   /**
    * Duration of focus animations in ms.
    *
    * @default 500
    */
-  focusAnimationTime: number;
+  focusAnimationTime: number = 500;
 
   //rotate animation
-  _timePrev: number;
-  _timeCurrent: number;
-  _anglePrev: number;
-  _angleCurrent: number;
-  _cursorPosPrev: Vector3;
-  _cursorPosCurr: Vector3;
-  _wPrev: number;
-  _wCurr: number;
+  _timePrev: number = 0;
+  _timeCurrent: number = 0;
+  _anglePrev: number = 0;
+  _angleCurrent: number = 0;
+  _cursorPosPrev: Vector3 = new Vector3();
+  _cursorPosCurr: Vector3 = new Vector3();
+  _wPrev: number = 0;
+  _wCurr: number = 0;
 
   /**
    * If set to `true`, the camera's near and far values will be adjusted every time zoom is
@@ -254,35 +254,35 @@ export class ArcballControls<TObject extends ArcballCamera = ArcballCamera> exte
    *
    * @default false
    */
-  adjustNearFar: boolean;
+  adjustNearFar: boolean = false;
 
   /**
    * The scaling factor used when performing zoom operation.
    *
    * @default 1.1
    */
-  scaleFactor: number;
+  scaleFactor: number = 1.1;
 
   /**
    * The damping inertia used if 'enableAnimations` is set to `true`.
    *
    * @default 25
    */
-  dampingFactor: number;
+  dampingFactor: number = 25;
 
   /**
    * Maximum angular velocity allowed on rotation animation start.
    *
    * @default 20
    */
-  wMax: number;
+  wMax: number = 20;
 
   /**
    * Set to `true` to enable animations for rotation (damping) and focus operation.
    *
    * @default true
    */
-  enableAnimations: boolean;
+  enableAnimations: boolean = true;
 
   /**
    * If set to `true`, a grid will appear when panning operation is being performed
@@ -290,104 +290,104 @@ export class ArcballControls<TObject extends ArcballCamera = ArcballCamera> exte
    *
    * @default false
    */
-  enableGrid: boolean;
+  enableGrid: boolean = false;
 
   /**
    * Set to `true` to make zoom become cursor centered.
    *
    * @default false
    */
-  cursorZoom: boolean;
+  cursorZoom: boolean = false;
 
   /**
    * The minimum FOV in degrees.
    *
    * @default 5
    */
-  minFov: number;
+  minFov: number = 5;
 
   /**
    * The maximum FOV in degrees.
    *
    * @default 90
    */
-  maxFov: number;
+  maxFov: number = 90;
 
   /**
    * Speed of rotation.
    *
    * @default 1
    */
-  rotateSpeed: number;
+  rotateSpeed: number = 1;
 
   /**
    * Enable or disable camera panning.
    *
    * @default true
    */
-  enablePan: boolean;
+  enablePan: boolean = true;
 
   /**
    * Enable or disable camera rotation.
    *
    * @default true
    */
-  enableRotate: boolean;
+  enableRotate: boolean = true;
 
   /**
    * Enable or disable camera zoom.
    *
    * @default true
    */
-  enableZoom: boolean;
+  enableZoom: boolean = true;
 
   /**
    * Enable or disable gizmos.
    *
    * @default true
    */
-  enableGizmos: boolean;
+  enableGizmos: boolean = true;
 
   /**
    * Enable or disable camera focusing on double-tap (or click) operations.
    *
    * @default true
    */
-  enableFocus: boolean;
+  enableFocus: boolean = true;
 
   /**
    * How far you can dolly in. For perspective cameras only.
    *
    * @default 0
    */
-  minDistance: number;
+  minDistance: number = 0;
 
   /**
    * How far you can dolly out. For perspective cameras only.
    *
    * @default Infinity
    */
-  maxDistance: number;
+  maxDistance: number = Infinity;
 
   /**
    * How far you can zoom in. For orthographic cameras only.
    *
    * @default 0
    */
-  minZoom: number;
+  minZoom: number = 0;
 
   /**
    * How far you can zoom out. For orthographic cameras only.
    *
    * @default Infinity
    */
-  maxZoom: number;
+  maxZoom: number = Infinity;
 
   //trackball parameters
-  _tbRadius: number;
+  _tbRadius: number = 1;
 
   //FSA
-  _state: symbol;
+  _state: symbol = STATE.IDLE;
 
   _onContextMenu: (event: Event) => void;
   _onWheel: (event: WheelEvent) => void;
@@ -408,120 +408,6 @@ export class ArcballControls<TObject extends ArcballCamera = ArcballCamera> exte
     super(camera, domElement);
 
     this.scene = scene;
-
-    this.target = new Vector3();
-    this._currentTarget = new Vector3();
-
-    this.radiusFactor = 0.67;
-
-    this.mouseActions = [];
-    this._mouseOp = null;
-
-    this._v2_1 = new Vector2();
-    this._v3_1 = new Vector3();
-    this._v3_2 = new Vector3();
-
-    this._m4_1 = new Matrix4();
-    this._m4_2 = new Matrix4();
-
-    this._quat = new Quaternion();
-
-    this._translationMatrix = new Matrix4();
-    this._rotationMatrix = new Matrix4();
-    this._scaleMatrix = new Matrix4();
-
-    this._rotationAxis = new Vector3();
-
-    this._cameraMatrixState = new Matrix4();
-    this._cameraProjectionState = new Matrix4();
-
-    this._fovState = 1;
-    this._upState = new Vector3();
-    this._zoomState = 1;
-    this._nearPos = 0;
-    this._farPos = 0;
-
-    this._gizmoMatrixState = new Matrix4();
-
-    this._up0 = new Vector3();
-    this._zoom0 = 1;
-    this._fov0 = 0;
-    this._initialNear = 0;
-    this._nearPos0 = 0;
-    this._initialFar = 0;
-    this._farPos0 = 0;
-    this._cameraMatrixState0 = new Matrix4();
-    this._gizmoMatrixState0 = new Matrix4();
-    this._target0 = new Vector3();
-
-    this._button = -1;
-    this._touchStart = [];
-    this._touchCurrent = [];
-    this._input = INPUT.NONE;
-
-    this._switchSensibility = 32;
-    this._startFingerDistance = 0;
-    this._currentFingerDistance = 0;
-    this._startFingerRotation = 0;
-    this._currentFingerRotation = 0;
-
-    this._devPxRatio = 0;
-    this._downValid = true;
-    this._nclicks = 0;
-    this._downEvents = [];
-    this._downStart = 0;
-    this._clickStart = 0;
-    this._maxDownTime = 250;
-    this._maxInterval = 300;
-    this._posThreshold = 24;
-    this._movementThreshold = 24;
-
-    this._currentCursorPosition = new Vector3();
-    this._startCursorPosition = new Vector3();
-
-    this._grid = null;
-    this._gridPosition = new Vector3();
-
-    this._gizmos = new Group();
-    this._curvePts = 128;
-
-    this._timeStart = -1;
-    this._animationId = -1;
-
-    this.focusAnimationTime = 500;
-
-    this._timePrev = 0;
-    this._timeCurrent = 0;
-    this._anglePrev = 0;
-    this._angleCurrent = 0;
-    this._cursorPosPrev = new Vector3();
-    this._cursorPosCurr = new Vector3();
-    this._wPrev = 0;
-    this._wCurr = 0;
-
-    this.adjustNearFar = false;
-    this.scaleFactor = 1.1;
-    this.dampingFactor = 25;
-    this.wMax = 20;
-    this.enableAnimations = true;
-    this.enableGrid = false;
-    this.cursorZoom = false;
-    this.minFov = 5;
-    this.maxFov = 90;
-    this.rotateSpeed = 1;
-    this.enablePan = true;
-    this.enableRotate = true;
-    this.enableZoom = true;
-    this.enableGizmos = true;
-    this.enableFocus = true;
-    this.minDistance = 0;
-    this.maxDistance = Infinity;
-    this.minZoom = 0;
-    this.maxZoom = Infinity;
-
-    this._tbRadius = 1;
-
-    this._state = STATE.IDLE;
 
     this.setCamera(camera);
 

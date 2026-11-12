@@ -46,24 +46,162 @@ export type ShaderMaterialParameters = Partial<ShaderMaterial>;
  *
  */
 export class ShaderMaterial extends Material {
-  isShaderMaterial: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isShaderMaterial: boolean = true;
 
-  defines: Record<string, string | number | boolean>;
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
-  uniformsGroups: UniformsGroup[];
-  vertexShader: string;
-  fragmentShader: string;
-  lights: boolean;
-  clipping: boolean;
-  extensions: { clipCullDistance: boolean; multiDraw: boolean };
-  defaultAttributeValues: Record<string, number[]>;
-  index0AttributeName: string | undefined;
-  uniformsNeedUpdate: boolean;
-  glslVersion: "100" | "300 es" | null;
-  linewidth: number;
-  wireframe: boolean;
-  wireframeLinewidth: number;
-  fog: boolean;
+  /**
+   * Defines custom constants using `#define` directives within the GLSL code
+   * for both the vertex shader and the fragment shader; each key/value pair
+   * yields another directive.
+   * ```typescript
+   * const defines = {
+   *   FOO: 15,
+   *   BAR: true
+   * };
+   * ```
+   * Yields the lines:
+   * ```glsl
+   * #define FOO 15
+   * #define BAR true
+   * ```
+   *
+   */
+  defines: Record<string, string | number | boolean> = {};
+  /**
+   * An object of the form:
+   * ```typescript
+   * const uniforms = {
+   *   uniform1: { value: 1.0 },
+   *   uniform2: { value: 2 }
+   * };
+   * ```
+   * specifying the uniforms to be passed to the shader code; keys are uniform
+   * names, values are definitions of the form
+   * ```typescript
+   * const uniform = { value: 1.0 };
+   * ```
+   * where `value` is the value of the uniform. Names must match the name of
+   * the uniform, as defined in the GLSL code. Note that uniforms are refreshed
+   * on every frame, so updating the value of the uniform will immediately
+   * update the value available to the GLSL code.
+   *
+   */
+  uniforms: Record<string, { value: any; needsUpdate?: boolean }> = {};
+  /**
+   * An array holding uniforms groups for configuring UBOs.
+   *
+   */
+  uniformsGroups: UniformsGroup[] = [];
+  /**
+   * Vertex shader GLSL code. This is the actual code for the shader.
+   *
+   */
+  vertexShader: string = default_vertex;
+  /**
+   * Fragment shader GLSL code. This is the actual code for the shader.
+   *
+   */
+  fragmentShader: string = default_fragment;
+  /**
+   * Defines whether this material uses lighting; `true` to pass uniform data
+   * related to lighting to this shader.
+   *
+   * @default false
+   */
+  lights: boolean = false;
+  /**
+   * Defines whether this material supports clipping; `true` to let the renderer
+   * pass the clippingPlanes uniform.
+   *
+   * @default false
+   */
+  clipping: boolean = false;
+  /**
+   * This object allows to enable certain WebGL 2 extensions.
+   *
+   * - clipCullDistance: set to `true` to use vertex shader clipping
+   * - multiDraw: set to `true` to use vertex shader multi_draw / enable gl_DrawID
+   *
+   */
+  extensions: { clipCullDistance: boolean; multiDraw: boolean } = {
+    clipCullDistance: false, // set to use vertex shader clipping
+    multiDraw: false, // set to use vertex shader multi_draw / enable gl_DrawID
+  };
+  /**
+   * When the rendered geometry doesn't include these attributes but the
+   * material does, these default values will be passed to the shaders. This
+   * avoids errors when buffer data is missing.
+   *
+   * - color: [ 1, 1, 1 ]
+   * - uv: [ 0, 0 ]
+   * - uv1: [ 0, 0 ]
+   *
+   */
+  defaultAttributeValues: Record<string, number[]> = {
+    color: [1, 1, 1],
+    uv: [0, 0],
+    uv1: [0, 0],
+  };
+  /**
+   * If set, this calls [gl.bindAttribLocation](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation)
+   * to bind a generic vertex index to an attribute variable.
+   *
+   * @default undefined
+   */
+  index0AttributeName: string | undefined = undefined;
+  /**
+   * Can be used to force a uniform update while changing uniforms in
+   * {@link Object3D#onBeforeRender}.
+   *
+   * @default false
+   */
+  uniformsNeedUpdate: boolean = false;
+  /**
+   * Defines the GLSL version of custom shader code.
+   *
+   * @default null
+   */
+  glslVersion: "100" | "300 es" | null = null;
+  /**
+   * Controls line thickness or lines.
+   *
+   * WebGL ignores this setting and always render line primitives with a
+   * width of one pixel.
+   *
+   * @default 1
+   */
+  linewidth: number = 1;
+  /**
+   * Renders the geometry as a wireframe.
+   *
+   * @default false
+   */
+  wireframe: boolean = false;
+  /**
+   * Controls the thickness of the wireframe.
+   *
+   * WebGL ignores this property and always render
+   * 1 pixel wide lines.
+   *
+   * @default 1
+   */
+  wireframeLinewidth: number = 1;
+  /**
+   * Defines whether the material color is affected by global fog settings; `true`
+   * to pass fog uniforms to the shader.
+   *
+   * Supply the fog uniforms used by your shader (`fogColor` and either
+   * `fogNear`/`fogFar` or `fogDensity`) and implement the matching GLSL.
+   * Enabling this flag alone does not add fog calculations to custom shaders.
+   *
+   * @default false
+   */
+  fog: boolean = false;
 
   /**
    * Constructs a new shader material.
@@ -76,168 +214,13 @@ export class ShaderMaterial extends Material {
    */
   constructor(parameters?: ShaderMaterialParameters) {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isShaderMaterial = true;
     this.type = "ShaderMaterial";
-    /**
-     * Defines custom constants using `#define` directives within the GLSL code
-     * for both the vertex shader and the fragment shader; each key/value pair
-     * yields another directive.
-     * ```typescript
-     * const defines = {
-     *   FOO: 15,
-     *   BAR: true
-     * };
-     * ```
-     * Yields the lines:
-     * ```glsl
-     * #define FOO 15
-     * #define BAR true
-     * ```
-     *
-     */
-    this.defines = {};
-    /**
-     * An object of the form:
-     * ```typescript
-     * const uniforms = {
-     *   uniform1: { value: 1.0 },
-     *   uniform2: { value: 2 }
-     * };
-     * ```
-     * specifying the uniforms to be passed to the shader code; keys are uniform
-     * names, values are definitions of the form
-     * ```typescript
-     * const uniform = { value: 1.0 };
-     * ```
-     * where `value` is the value of the uniform. Names must match the name of
-     * the uniform, as defined in the GLSL code. Note that uniforms are refreshed
-     * on every frame, so updating the value of the uniform will immediately
-     * update the value available to the GLSL code.
-     *
-     */
-    this.uniforms = {};
-    /**
-     * An array holding uniforms groups for configuring UBOs.
-     *
-     */
-    this.uniformsGroups = [];
-    /**
-     * Vertex shader GLSL code. This is the actual code for the shader.
-     *
-     */
-    this.vertexShader = default_vertex;
-    /**
-     * Fragment shader GLSL code. This is the actual code for the shader.
-     *
-     */
-    this.fragmentShader = default_fragment;
-    /**
-     * Controls line thickness or lines.
-     *
-     * WebGL ignores this setting and always render line primitives with a
-     * width of one pixel.
-     *
-     * @default 1
-     */
-    this.linewidth = 1;
-    /**
-     * Renders the geometry as a wireframe.
-     *
-     * @default false
-     */
-    this.wireframe = false;
-    /**
-     * Controls the thickness of the wireframe.
-     *
-     * WebGL ignores this property and always render
-     * 1 pixel wide lines.
-     *
-     * @default 1
-     */
-    this.wireframeLinewidth = 1;
-    /**
-     * Defines whether the material color is affected by global fog settings; `true`
-     * to pass fog uniforms to the shader.
-     *
-     * Supply the fog uniforms used by your shader (`fogColor` and either
-     * `fogNear`/`fogFar` or `fogDensity`) and implement the matching GLSL.
-     * Enabling this flag alone does not add fog calculations to custom shaders.
-     *
-     * @default false
-     */
-    this.fog = false;
-    /**
-     * Defines whether this material uses lighting; `true` to pass uniform data
-     * related to lighting to this shader.
-     *
-     * @default false
-     */
-    this.lights = false;
-    /**
-     * Defines whether this material supports clipping; `true` to let the renderer
-     * pass the clippingPlanes uniform.
-     *
-     * @default false
-     */
-    this.clipping = false;
     /**
      * Overwritten and set to `true` by default.
      *
      * @default true
      */
     this.forceSinglePass = true;
-    /**
-     * This object allows to enable certain WebGL 2 extensions.
-     *
-     * - clipCullDistance: set to `true` to use vertex shader clipping
-     * - multiDraw: set to `true` to use vertex shader multi_draw / enable gl_DrawID
-     *
-     */
-    this.extensions = {
-      clipCullDistance: false, // set to use vertex shader clipping
-      multiDraw: false, // set to use vertex shader multi_draw / enable gl_DrawID
-    };
-    /**
-     * When the rendered geometry doesn't include these attributes but the
-     * material does, these default values will be passed to the shaders. This
-     * avoids errors when buffer data is missing.
-     *
-     * - color: [ 1, 1, 1 ]
-     * - uv: [ 0, 0 ]
-     * - uv1: [ 0, 0 ]
-     *
-     */
-    this.defaultAttributeValues = {
-      color: [1, 1, 1],
-      uv: [0, 0],
-      uv1: [0, 0],
-    };
-    /**
-     * If set, this calls [gl.bindAttribLocation](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation)
-     * to bind a generic vertex index to an attribute variable.
-     *
-     * @default undefined
-     */
-    this.index0AttributeName = undefined;
-    /**
-     * Can be used to force a uniform update while changing uniforms in
-     * {@link Object3D#onBeforeRender}.
-     *
-     * @default false
-     */
-    this.uniformsNeedUpdate = false;
-    /**
-     * Defines the GLSL version of custom shader code.
-     *
-     * @default null
-     */
-    this.glslVersion = null;
     if (parameters !== undefined) {
       this.setValues(parameters);
     }

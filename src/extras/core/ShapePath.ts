@@ -23,41 +23,35 @@ interface ShapePathEntry {
  * shapes. It is specifically used in context of fonts and SVG.
  */
 export class ShapePath {
-  type: string;
-  color: Color;
-  subPaths: Path[];
-  currentPath: Path | null;
-  userData: any;
+  type: string = "ShapePath";
+  /**
+   * The color of the shape.
+   *
+   */
+  color: Color = new Color();
+  /**
+   * The paths that have been generated for this shape.
+   *
+   * @default []
+   */
+  subPaths: Path[] = [];
+  /**
+   * The current path that is being generated.
+   *
+   * @default null
+   */
+  currentPath: Path | null = null;
+  /**
+   * An object that can be used to store custom data about the shape path.
+   * Mainly used by SVGLoader to store style information.
+   *
+   */
+  userData: any = {};
 
   /**
    * Constructs a new shape path.
    */
-  constructor() {
-    this.type = "ShapePath";
-    /**
-     * The color of the shape.
-     *
-     */
-    this.color = new Color();
-    /**
-     * The paths that have been generated for this shape.
-     *
-     * @default []
-     */
-    this.subPaths = [];
-    /**
-     * The current path that is being generated.
-     *
-     * @default null
-     */
-    this.currentPath = null;
-    /**
-     * An object that can be used to store custom data about the shape path.
-     * Mainly used by SVGLoader to store style information.
-     *
-     */
-    this.userData = {};
-  }
+  constructor() {}
   /**
    * Creates a new path and moves it current point to the given one.
    *

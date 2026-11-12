@@ -18,43 +18,203 @@ const _tempVec3 = /*@__PURE__*/ new Vector3();
  *
  */
 export class Texture<TMipmap = any> extends EventDispatcher {
-  isTexture: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isTexture: boolean = true;
   uuid: string;
-  name: string;
+  /**
+   * The name of the texture.
+   *
+   */
+  name: string = "";
   source: TextureSource;
-  mipmaps: TMipmap[];
+  /**
+   * An array holding user-defined mipmaps.
+   *
+   */
+  mipmaps: TMipmap[] = [];
   mapping: Mapping;
-  channel: number;
+  /**
+   * Lets you select the uv attribute to map the texture to. `0` for `uv`,
+   * `1` for `uv1`, `2` for `uv2` and `3` for `uv3`.
+   *
+   * @default 0
+   */
+  channel: number = 0;
   wrapS: Wrapping;
   wrapT: Wrapping;
   magFilter: TextureFilter;
   minFilter: TextureFilter;
   anisotropy: number;
   format: PixelFormat;
-  internalFormat: string | null;
+  /**
+   * The default internal format is derived from {@link Texture#format} and {@link Texture#type} and
+   * defines how the texture data is going to be stored on the GPU.
+   *
+   * This property allows to overwrite the default format.
+   *
+   * @default null
+   */
+  internalFormat: string | null = null;
   type: TextureType;
-  offset: Vector2;
-  repeat: Vector2;
-  center: Vector2;
-  rotation: number;
-  matrixAutoUpdate: boolean;
-  matrix: Matrix3;
-  generateMipmaps: boolean;
-  mipmapsAutoUpdate: boolean;
-  premultiplyAlpha: boolean;
-  flipY: boolean;
-  unpackAlignment: number;
+  /**
+   * How much a single repetition of the texture is offset from the beginning,
+   * in each direction U and V. Typical range is `0.0` to `1.0`.
+   *
+   * @default (0,0)
+   */
+  offset: Vector2 = new Vector2(0, 0);
+  /**
+   * How many times the texture is repeated across the surface, in each
+   * direction U and V. If repeat is set greater than `1` in either direction,
+   * the corresponding wrap parameter should also be set to `Wrapping.Repeat`
+   * or `Wrapping.MirroredRepeat` to achieve the desired tiling effect.
+   *
+   * @default (1,1)
+   */
+  repeat: Vector2 = new Vector2(1, 1);
+  /**
+   * The point around which rotation occurs. A value of `(0.5, 0.5)` corresponds
+   * to the center of the texture. Default is `(0, 0)`, the lower left.
+   *
+   * @default (0,0)
+   */
+  center: Vector2 = new Vector2(0, 0);
+  /**
+   * How much the texture is rotated around the center point, in radians.
+   * Positive values are counter-clockwise.
+   *
+   * @default 0
+   */
+  rotation: number = 0;
+  /**
+   * Whether to update the texture's uv-transformation {@link Texture#matrix}
+   * from the properties {@link Texture#offset}, {@link Texture#repeat},
+   * {@link Texture#rotation}, and {@link Texture#center}.
+   *
+   * Set this to `false` if you are specifying the uv-transform matrix directly.
+   *
+   * @default true
+   */
+  matrixAutoUpdate: boolean = true;
+  /**
+   * The uv-transformation matrix of the texture.
+   *
+   */
+  matrix: Matrix3 = new Matrix3();
+  /**
+   * Whether to generate mipmaps (if possible) for a texture.
+   *
+   * Set this to `false` if you are creating mipmaps manually.
+   *
+   * @default true
+   */
+  generateMipmaps: boolean = true;
+  /**
+   * Whether the renderer regenerates the mipmaps automatically whenever the
+   * texture is uploaded, rendered to or copied into. Set this to `false` to
+   * pause the regeneration and write the mip levels yourself. Requires
+   * {@link Texture#generateMipmaps}.
+   *
+   * @default true
+   */
+  mipmapsAutoUpdate: boolean = true;
+  /**
+   * If set to `true`, the alpha channel, if present, is multiplied into the
+   * color channels when the texture is uploaded to the GPU.
+   *
+   * Note that this property has no effect when using `ImageBitmap`. You need to
+   * configure premultiply alpha on bitmap creation instead.
+   *
+   * @default false
+   */
+  premultiplyAlpha: boolean = false;
+  /**
+   * If set to `true`, the texture is flipped along the vertical axis when
+   * uploaded to the GPU.
+   *
+   * Note that this property has no effect when using `ImageBitmap`. You need to
+   * configure the flip on bitmap creation instead.
+   *
+   * @default true
+   */
+  flipY: boolean = true;
+  /**
+   * Specifies the alignment requirements for the start of each pixel row in memory.
+   * The allowable values are `1` (byte-alignment), `2` (rows aligned to even-numbered bytes),
+   * `4` (word-alignment), and `8` (rows start on double-word boundaries).
+   *
+   * @default 4
+   */
+  unpackAlignment: number = 4; // valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
   colorSpace: string;
-  userData: any;
-  updateRanges: { start: number; count: number }[];
-  version: number;
-  onUpdate: ((...args: any[]) => any) | null;
-  renderTarget: (RenderTarget | WebGLRenderTarget) | null;
-  isRenderTargetTexture: boolean;
+  /**
+   * An object that can be used to store custom data about the texture. It
+   * should not hold references to functions as these will not be cloned.
+   *
+   */
+  userData: any = {};
+  /**
+   * This can be used to only update parts of a data texture (for example, just a few rows).
+   * Use the `addUpdateRange()` function to add ranges to this array.
+   *
+   */
+  updateRanges: { start: number; count: number }[] = [];
+  /**
+   * This starts at `0` and counts how many times {@link Texture#needsUpdate} is set to `true`.
+   *
+   * @readonly
+   * @default 0
+   */
+  version: number = 0;
+  /**
+   * A callback function, called when the texture is updated (e.g., when
+   * {@link Texture#needsUpdate} has been set to true and then the texture is used).
+   *
+   * @default null
+   */
+  onUpdate: ((...args: any[]) => any) | null = null;
+  /**
+   * An optional back reference to the textures render target.
+   *
+   * @default null
+   */
+  renderTarget: (RenderTarget | WebGLRenderTarget) | null = null;
+  /**
+   * Indicates whether a texture belongs to a render target or not.
+   *
+   * @readonly
+   * @default false
+   */
+  isRenderTargetTexture: boolean = false;
   isArrayTexture: boolean;
-  pmremVersion: number;
-  isPMREMTexture: boolean;
-  normalized: boolean;
+  /**
+   * Indicates whether this texture should be processed by `PMREMGenerator` or not
+   * (only relevant for render target textures).
+   *
+   * @readonly
+   * @default 0
+   */
+  pmremVersion: number = 0;
+  /**
+   * Indicates whether this texture is a prefiltered cube environment map generated
+   * by {@link PMREMGenerator}.
+   *
+   * @readonly
+   * @default false
+   */
+  isPMREMTexture: boolean = false;
+  /**
+   * Whether the texture should use one of the 16 bit integer formats which are normalized
+   * to [0, 1] or [-1, 1] (depending on signed/unsigned) when sampled.
+   *
+   * @default false
+   */
+  normalized: boolean = false;
   readonly id: number;
   /**
    * The default image for all textures.
@@ -106,13 +266,6 @@ export class Texture<TMipmap = any> extends EventDispatcher {
   ) {
     super();
     /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isTexture = true;
-    /**
      * The ID of the texture.
      *
      * @name Texture#id
@@ -131,11 +284,6 @@ export class Texture<TMipmap = any> extends EventDispatcher {
      */
     this.uuid = generateUUID();
     /**
-     * The name of the texture.
-     *
-     */
-    this.name = "";
-    /**
      * The data definition of a texture. A reference to the data source can be
      * shared across textures. This is often useful in context of spritesheets
      * where multiple textures render the same data but with different texture
@@ -144,24 +292,12 @@ export class Texture<TMipmap = any> extends EventDispatcher {
      */
     this.source = new TextureSource(image);
     /**
-     * An array holding user-defined mipmaps.
-     *
-     */
-    this.mipmaps = [];
-    /**
      * How the texture is applied to the object. The value `Mapping.UV`
      * is the default, where texture or uv coordinates are used to apply the map.
      *
      * @default Mapping.UV
      */
     this.mapping = mapping;
-    /**
-     * Lets you select the uv attribute to map the texture to. `0` for `uv`,
-     * `1` for `uv1`, `2` for `uv2` and `3` for `uv3`.
-     *
-     * @default 0
-     */
-    this.channel = 0;
     /**
      * This defines how the texture is wrapped horizontally and corresponds to
      * *U* in UV mapping.
@@ -204,110 +340,11 @@ export class Texture<TMipmap = any> extends EventDispatcher {
      */
     this.format = format;
     /**
-     * The default internal format is derived from {@link Texture#format} and {@link Texture#type} and
-     * defines how the texture data is going to be stored on the GPU.
-     *
-     * This property allows to overwrite the default format.
-     *
-     * @default null
-     */
-    this.internalFormat = null;
-    /**
      * The data type of the texture.
      *
      * @default TextureType.UnsignedByte
      */
     this.type = type;
-    /**
-     * How much a single repetition of the texture is offset from the beginning,
-     * in each direction U and V. Typical range is `0.0` to `1.0`.
-     *
-     * @default (0,0)
-     */
-    this.offset = new Vector2(0, 0);
-    /**
-     * How many times the texture is repeated across the surface, in each
-     * direction U and V. If repeat is set greater than `1` in either direction,
-     * the corresponding wrap parameter should also be set to `Wrapping.Repeat`
-     * or `Wrapping.MirroredRepeat` to achieve the desired tiling effect.
-     *
-     * @default (1,1)
-     */
-    this.repeat = new Vector2(1, 1);
-    /**
-     * The point around which rotation occurs. A value of `(0.5, 0.5)` corresponds
-     * to the center of the texture. Default is `(0, 0)`, the lower left.
-     *
-     * @default (0,0)
-     */
-    this.center = new Vector2(0, 0);
-    /**
-     * How much the texture is rotated around the center point, in radians.
-     * Positive values are counter-clockwise.
-     *
-     * @default 0
-     */
-    this.rotation = 0;
-    /**
-     * Whether to update the texture's uv-transformation {@link Texture#matrix}
-     * from the properties {@link Texture#offset}, {@link Texture#repeat},
-     * {@link Texture#rotation}, and {@link Texture#center}.
-     *
-     * Set this to `false` if you are specifying the uv-transform matrix directly.
-     *
-     * @default true
-     */
-    this.matrixAutoUpdate = true;
-    /**
-     * The uv-transformation matrix of the texture.
-     *
-     */
-    this.matrix = new Matrix3();
-    /**
-     * Whether to generate mipmaps (if possible) for a texture.
-     *
-     * Set this to `false` if you are creating mipmaps manually.
-     *
-     * @default true
-     */
-    this.generateMipmaps = true;
-    /**
-     * Whether the renderer regenerates the mipmaps automatically whenever the
-     * texture is uploaded, rendered to or copied into. Set this to `false` to
-     * pause the regeneration and write the mip levels yourself. Requires
-     * {@link Texture#generateMipmaps}.
-     *
-     * @default true
-     */
-    this.mipmapsAutoUpdate = true;
-    /**
-     * If set to `true`, the alpha channel, if present, is multiplied into the
-     * color channels when the texture is uploaded to the GPU.
-     *
-     * Note that this property has no effect when using `ImageBitmap`. You need to
-     * configure premultiply alpha on bitmap creation instead.
-     *
-     * @default false
-     */
-    this.premultiplyAlpha = false;
-    /**
-     * If set to `true`, the texture is flipped along the vertical axis when
-     * uploaded to the GPU.
-     *
-     * Note that this property has no effect when using `ImageBitmap`. You need to
-     * configure the flip on bitmap creation instead.
-     *
-     * @default true
-     */
-    this.flipY = true;
-    /**
-     * Specifies the alignment requirements for the start of each pixel row in memory.
-     * The allowable values are `1` (byte-alignment), `2` (rows aligned to even-numbered bytes),
-     * `4` (word-alignment), and `8` (rows start on double-word boundaries).
-     *
-     * @default 4
-     */
-    this.unpackAlignment = 4; // valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
     /**
      * Textures containing color data should be annotated with `ColorSpace.SRGB` or `ColorSpace.LinearSRGB`.
      *
@@ -315,74 +352,12 @@ export class Texture<TMipmap = any> extends EventDispatcher {
      */
     this.colorSpace = colorSpace;
     /**
-     * An object that can be used to store custom data about the texture. It
-     * should not hold references to functions as these will not be cloned.
-     *
-     */
-    this.userData = {};
-    /**
-     * This can be used to only update parts of a data texture (for example, just a few rows).
-     * Use the `addUpdateRange()` function to add ranges to this array.
-     *
-     */
-    this.updateRanges = [];
-    /**
-     * This starts at `0` and counts how many times {@link Texture#needsUpdate} is set to `true`.
-     *
-     * @readonly
-     * @default 0
-     */
-    this.version = 0;
-    /**
-     * A callback function, called when the texture is updated (e.g., when
-     * {@link Texture#needsUpdate} has been set to true and then the texture is used).
-     *
-     * @default null
-     */
-    this.onUpdate = null;
-    /**
-     * An optional back reference to the textures render target.
-     *
-     * @default null
-     */
-    this.renderTarget = null;
-    /**
-     * Indicates whether a texture belongs to a render target or not.
-     *
-     * @readonly
-     * @default false
-     */
-    this.isRenderTargetTexture = false;
-    /**
      * Indicates if a texture should be handled like a texture array.
      *
      * @readonly
      * @default false
      */
     this.isArrayTexture = image && image.depth && image.depth > 1 ? true : false;
-    /**
-     * Indicates whether this texture should be processed by `PMREMGenerator` or not
-     * (only relevant for render target textures).
-     *
-     * @readonly
-     * @default 0
-     */
-    this.pmremVersion = 0;
-    /**
-     * Indicates whether this texture is a prefiltered cube environment map generated
-     * by {@link PMREMGenerator}.
-     *
-     * @readonly
-     * @default false
-     */
-    this.isPMREMTexture = false;
-    /**
-     * Whether the texture should use one of the 16 bit integer formats which are normalized
-     * to [0, 1] or [-1, 1] (depending on signed/unsigned) when sampled.
-     *
-     * @default false
-     */
-    this.normalized = false;
   }
   /**
    * The width of the texture in pixels.

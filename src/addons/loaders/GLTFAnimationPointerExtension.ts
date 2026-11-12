@@ -105,15 +105,12 @@ interface Object3DLike {
  * bundled against upstream three's module identities.
  */
 export class GLTFAnimationPointerExtension {
-  name: string;
+  name: string = KHR_ANIMATION_POINTER;
   parser: GLTFParser;
-  animationPointerResolver: AnimationPointerResolver | null;
+  animationPointerResolver: AnimationPointerResolver | null = null;
 
   constructor(parser: GLTFParser) {
-    this.name = KHR_ANIMATION_POINTER;
     this.parser = parser;
-
-    this.animationPointerResolver = null;
   }
 
   setAnimationPointerResolver(animationPointerResolver: AnimationPointerResolver | null): this {

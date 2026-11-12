@@ -75,7 +75,7 @@ const defaults: GodraysPassParams = {
 export class GodraysPass extends Pass {
   light: PointLight | DirectionalLight;
   camera: PerspectiveCamera;
-  params: GodraysPassParams;
+  params: GodraysPassParams = { ...defaults, color: defaults.color.clone() };
   depthTexture: Texture | null = null;
   illumination: ShaderMaterial;
   blur: ShaderMaterial;
@@ -104,7 +104,6 @@ export class GodraysPass extends Pass {
     super();
     this.light = light;
     this.camera = camera;
-    this.params = { ...defaults, color: defaults.color.clone() };
     const targetOptions = {
       minFilter: TextureFilter.Nearest,
       magFilter: TextureFilter.Nearest,

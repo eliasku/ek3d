@@ -8,13 +8,10 @@ function pad(str: string, len: number, char = " ") {
 }
 
 export const TimeLogger = new (class {
-  _running: Record<string, number>;
-  _timing: Record<string, number>;
+  _running: Record<string, number> = {};
+  _timing: Record<string, number> = {};
 
-  constructor() {
-    this._running = {};
-    this._timing = {};
-  }
+  constructor() {}
 
   start(key: string) {
     const { _running, _timing } = this;

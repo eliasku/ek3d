@@ -15,20 +15,19 @@ import { Object3D } from "../core/Object3D";
  *
  */
 export class Bone extends Object3D {
-  isBone: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isBone: boolean = true;
 
   /**
    * Constructs a new bone.
    */
   constructor() {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isBone = true;
     this.type = "Bone";
   }
   clone(recursive?: boolean): Bone {

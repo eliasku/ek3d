@@ -29,9 +29,20 @@ import type { WebGLRenderTarget as RT } from "../../renderers/WebGLRenderTarget"
  *
  */
 export class TAARenderPass extends SSAARenderPass {
-  accumulate: boolean;
-  accumulateIndex: number;
-  _holdRenderTarget: WebGLRenderTarget | null;
+  /**
+   * Whether to accumulate frames or not. This enables
+   * the TAA.
+   *
+   * @default false
+   */
+  accumulate: boolean = false;
+  /**
+   * The accumulation index.
+   *
+   * @default -1
+   */
+  accumulateIndex: number = -1;
+  _holdRenderTarget: WebGLRenderTarget | null = null;
 
   /**
    * Constructs a new TAA render pass.
@@ -49,24 +60,9 @@ export class TAARenderPass extends SSAARenderPass {
      * @default 0
      */
     this.sampleLevel = 0;
-    /**
-     * Whether to accumulate frames or not. This enables
-     * the TAA.
-     *
-     * @default false
-     */
-    this.accumulate = false;
-    /**
-     * The accumulation index.
-     *
-     * @default -1
-     */
-    this.accumulateIndex = -1;
-
     // internals
 
     this._sampleRenderTarget = null;
-    this._holdRenderTarget = null;
   }
 
   /**

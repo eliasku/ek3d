@@ -40,14 +40,13 @@ export interface MD2CharacterComplexConfig {
 }
 export class MD2CharacterComplexPart extends MorphBlendMesh<MeshLambertMaterial> {
   materialTexture: MeshLambertMaterial;
-  materialWireframe: MeshLambertMaterial;
+  materialWireframe: MeshLambertMaterial = new MeshLambertMaterial({ color: 0xffaa00, wireframe: true });
   duration: number | undefined;
   baseDuration: number | undefined;
   constructor(geometry: BufferGeometry, skinMap: Texture | undefined) {
     const materialTexture = new MeshLambertMaterial({ color: 0xffffff, wireframe: false, map: skinMap ?? null });
     super(geometry, materialTexture);
     this.materialTexture = materialTexture;
-    this.materialWireframe = new MeshLambertMaterial({ color: 0xffaa00, wireframe: true });
     this.rotation.y = -Math.PI / 2;
   }
 }

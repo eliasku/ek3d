@@ -1832,11 +1832,10 @@ type GLTFLightDef = {
  */
 export class GLTFLightExtension {
   readonly writer: GLTFWriter;
-  readonly name: string;
+  readonly name: string = "KHR_lights_punctual";
 
   constructor(writer: GLTFWriter) {
     this.writer = writer;
-    this.name = "KHR_lights_punctual";
   }
 
   writeNode(object: Object3D, nodeDef: GLTFNodeDef): void {
@@ -1920,11 +1919,10 @@ export class GLTFLightExtension {
  */
 export class GLTFMaterialsUnlitExtension {
   readonly writer: GLTFWriter;
-  readonly name: string;
+  readonly name: string = "KHR_materials_unlit";
 
   constructor(writer: GLTFWriter) {
     this.writer = writer;
-    this.name = "KHR_materials_unlit";
   }
 
   async writeMaterialAsync(source: Material, materialDef: GLTFMaterialDef): Promise<void> {
@@ -1954,11 +1952,10 @@ export class GLTFMaterialsUnlitExtension {
  */
 export class GLTFMaterialsClearcoatExtension {
   readonly writer: GLTFWriter;
-  readonly name: string;
+  readonly name: string = "KHR_materials_clearcoat";
 
   constructor(writer: GLTFWriter) {
     this.writer = writer;
-    this.name = "KHR_materials_clearcoat";
   }
 
   async writeMaterialAsync(source: Material, materialDef: GLTFMaterialDef): Promise<void> {
@@ -2021,11 +2018,10 @@ export class GLTFMaterialsClearcoatExtension {
  */
 export class GLTFMaterialsDispersionExtension {
   readonly writer: GLTFWriter;
-  readonly name: string;
+  readonly name: string = "KHR_materials_dispersion";
 
   constructor(writer: GLTFWriter) {
     this.writer = writer;
-    this.name = "KHR_materials_dispersion";
   }
 
   async writeMaterialAsync(source: Material, materialDef: GLTFMaterialDef): Promise<void> {
@@ -2056,11 +2052,10 @@ export class GLTFMaterialsDispersionExtension {
  */
 export class GLTFMaterialsIridescenceExtension {
   readonly writer: GLTFWriter;
-  readonly name: string;
+  readonly name: string = "KHR_materials_iridescence";
 
   constructor(writer: GLTFWriter) {
     this.writer = writer;
-    this.name = "KHR_materials_iridescence";
   }
 
   async writeMaterialAsync(source: Material, materialDef: GLTFMaterialDef): Promise<void> {
@@ -2113,11 +2108,10 @@ export class GLTFMaterialsIridescenceExtension {
  */
 export class GLTFMaterialsTransmissionExtension {
   readonly writer: GLTFWriter;
-  readonly name: string;
+  readonly name: string = "KHR_materials_transmission";
 
   constructor(writer: GLTFWriter) {
     this.writer = writer;
-    this.name = "KHR_materials_transmission";
   }
 
   async writeMaterialAsync(source: Material, materialDef: GLTFMaterialDef): Promise<void> {
@@ -2157,11 +2151,10 @@ export class GLTFMaterialsTransmissionExtension {
  */
 export class GLTFMaterialsVolumeExtension {
   readonly writer: GLTFWriter;
-  readonly name: string;
+  readonly name: string = "KHR_materials_volume";
 
   constructor(writer: GLTFWriter) {
     this.writer = writer;
-    this.name = "KHR_materials_volume";
   }
 
   async writeMaterialAsync(source: Material, materialDef: GLTFMaterialDef): Promise<void> {
@@ -2207,11 +2200,10 @@ export class GLTFMaterialsVolumeExtension {
  */
 export class GLTFMaterialsIorExtension {
   readonly writer: GLTFWriter;
-  readonly name: string;
+  readonly name: string = "KHR_materials_ior";
 
   constructor(writer: GLTFWriter) {
     this.writer = writer;
-    this.name = "KHR_materials_ior";
   }
 
   async writeMaterialAsync(source: Material, materialDef: GLTFMaterialDef): Promise<void> {
@@ -2242,11 +2234,10 @@ export class GLTFMaterialsIorExtension {
  */
 export class GLTFMaterialsSpecularExtension {
   readonly writer: GLTFWriter;
-  readonly name: string;
+  readonly name: string = "KHR_materials_specular";
 
   constructor(writer: GLTFWriter) {
     this.writer = writer;
-    this.name = "KHR_materials_specular";
   }
 
   async writeMaterialAsync(source: Material, materialDef: GLTFMaterialDef): Promise<void> {
@@ -2303,11 +2294,10 @@ export class GLTFMaterialsSpecularExtension {
  */
 export class GLTFMaterialsSheenExtension {
   readonly writer: GLTFWriter;
-  readonly name: string;
+  readonly name: string = "KHR_materials_sheen";
 
   constructor(writer: GLTFWriter) {
     this.writer = writer;
-    this.name = "KHR_materials_sheen";
   }
 
   async writeMaterialAsync(source: Material, materialDef: GLTFMaterialDef): Promise<void> {
@@ -2357,11 +2347,10 @@ export class GLTFMaterialsSheenExtension {
  */
 export class GLTFMaterialsAnisotropyExtension {
   readonly writer: GLTFWriter;
-  readonly name: string;
+  readonly name: string = "KHR_materials_anisotropy";
 
   constructor(writer: GLTFWriter) {
     this.writer = writer;
-    this.name = "KHR_materials_anisotropy";
   }
 
   async writeMaterialAsync(source: Material, materialDef: GLTFMaterialDef): Promise<void> {
@@ -2402,11 +2391,10 @@ export class GLTFMaterialsAnisotropyExtension {
  */
 export class GLTFMaterialsEmissiveStrengthExtension {
   readonly writer: GLTFWriter;
-  readonly name: string;
+  readonly name: string = "KHR_materials_emissive_strength";
 
   constructor(writer: GLTFWriter) {
     this.writer = writer;
-    this.name = "KHR_materials_emissive_strength";
   }
 
   async writeMaterialAsync(source: Material, materialDef: GLTFMaterialDef): Promise<void> {
@@ -2437,11 +2425,10 @@ export class GLTFMaterialsEmissiveStrengthExtension {
  */
 export class GLTFMaterialsBumpExtension {
   readonly writer: GLTFWriter;
-  readonly name: string;
+  readonly name: string = "EXT_materials_bump";
 
   constructor(writer: GLTFWriter) {
     this.writer = writer;
-    this.name = "EXT_materials_bump";
   }
 
   async writeMaterialAsync(source: Material, materialDef: GLTFMaterialDef): Promise<void> {
@@ -2481,11 +2468,10 @@ export class GLTFMaterialsBumpExtension {
  */
 export class GLTFMeshGpuInstancing {
   readonly writer: GLTFWriter;
-  readonly name: string;
+  readonly name: string = "EXT_mesh_gpu_instancing";
 
   constructor(writer: GLTFWriter) {
     this.writer = writer;
-    this.name = "EXT_mesh_gpu_instancing";
   }
 
   writeNode(object: Object3D, nodeDef: GLTFNodeDef): void {

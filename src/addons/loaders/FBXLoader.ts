@@ -506,14 +506,14 @@ export class FBXLoader extends Loader<Group, string> {
    *
    * @default false
    */
-  trimAnimationClips: boolean;
+  trimAnimationClips: boolean = false;
 
   /**
    * Zlib runtime used for compressed array properties, supplied by the consumer.
    *
    * @default null
    */
-  zlibDecoder: FBXZlibRuntime | null;
+  zlibDecoder: FBXZlibRuntime | null = null;
 
   /**
    * Constructs a new FBX loader.
@@ -522,9 +522,6 @@ export class FBXLoader extends Loader<Group, string> {
    */
   constructor(manager?: LoadingManager) {
     super(manager);
-
-    this.trimAnimationClips = false;
-    this.zlibDecoder = null;
   }
 
   /**
@@ -1855,11 +1852,9 @@ class FBXTreeParser {
 
 // parse Geometry data from FBXTree and return map of BufferGeometries
 class GeometryParser {
-  negativeMaterialIndices: boolean;
+  negativeMaterialIndices: boolean = false;
 
-  constructor() {
-    this.negativeMaterialIndices = false;
-  }
+  constructor() {}
 
   // Parse nodes in FBXTree.Objects.Geometry
   parse(deformers: Deformers): Map<number, BufferGeometry | undefined> {
@@ -3384,15 +3379,11 @@ class AnimationParser {
 
 // parse an FBX file in ASCII format
 class TextParser {
-  currentIndent: number;
-  allNodes: FBXTree;
-  nodeStack: FBXDynamicNode[];
+  currentIndent: number = 0;
+  allNodes: FBXTree = new FBXTree();
+  nodeStack: FBXDynamicNode[] = [];
 
-  constructor() {
-    this.currentIndent = 0;
-    this.allNodes = new FBXTree();
-    this.nodeStack = [];
-  }
+  constructor() {}
 
   getPrevNode(): FBXDynamicNode {
     return this.nodeStack[this.currentIndent - 2];

@@ -33,8 +33,18 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  *
  */
 export class HalftonePass extends Pass {
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
-  material: ShaderMaterial;
+  /**
+   * The pass uniforms.
+   */
+  uniforms: Record<string, { value: any; needsUpdate?: boolean }> = cloneUniforms(HalftoneShader.uniforms);
+  /**
+   * The pass material.
+   */
+  material: ShaderMaterial = new ShaderMaterial({
+    uniforms: this.uniforms,
+    fragmentShader: HalftoneShader.fragmentShader,
+    vertexShader: HalftoneShader.vertexShader,
+  });
   _fsQuad: FullScreenQuad;
 
   /**
@@ -45,20 +55,6 @@ export class HalftonePass extends Pass {
    */
   constructor(params: Record<string, any> = {}) {
     super();
-    /**
-     * The pass uniforms.
-     */
-    this.uniforms = cloneUniforms(HalftoneShader.uniforms);
-
-    /**
-     * The pass material.
-     */
-    this.material = new ShaderMaterial({
-      uniforms: this.uniforms,
-      fragmentShader: HalftoneShader.fragmentShader,
-      vertexShader: HalftoneShader.vertexShader,
-    });
-
     for (const key in params) {
       if (
         Object.prototype.hasOwnProperty.call(params, key) &&

@@ -26,7 +26,7 @@ export class Controller {
    *
    * @default false
    */
-  _disabled: boolean;
+  _disabled: boolean = false;
 
   /**
    * Used to determine if the Controller is hidden.
@@ -34,7 +34,7 @@ export class Controller {
    *
    * @default false
    */
-  _hidden: boolean;
+  _hidden: boolean = false;
 
   /**
    * The value of `object[property]` when the controller was created.
@@ -96,9 +96,6 @@ export class Controller {
     this.parent = parent;
     this.object = object;
     this.property = property;
-
-    this._disabled = false;
-    this._hidden = false;
 
     this.initialValue = this.getValue();
 

@@ -64,29 +64,137 @@ const _childremovedEvent: any = { type: "childremoved", child: null };
  *
  */
 export class Object3D<TChild extends { clone(): TChild } & Object3D<any> = Object3D<any>> extends EventDispatcher {
-  isObject3D: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isObject3D: boolean = true;
   uuid: string;
-  name: string;
-  type: string;
-  parent: Object3D | null;
-  children: TChild[];
+  /**
+   * The name of the 3D object.
+   *
+   */
+  name: string = "";
+  /**
+   * The type property is used for detecting the object type
+   * in context of serialization/deserialization.
+   *
+   * @readonly
+   */
+  type: string = "Object3D";
+  /**
+   * A reference to the parent object.
+   *
+   * @default null
+   */
+  parent: Object3D | null = null;
+  /**
+   * An array holding the child 3D objects of this instance.
+   *
+   */
+  children: TChild[] = [];
   up: Vector3;
-  matrix: Matrix4;
-  matrixWorld: Matrix4;
+  /**
+   * Represents the object's transformation matrix in local space.
+   *
+   */
+  matrix: Matrix4 = new Matrix4();
+  /**
+   * Represents the object's transformation matrix in world space.
+   * If the 3D object has no parent, then it's identical to the local transformation matrix
+   *
+   */
+  matrixWorld: Matrix4 = new Matrix4();
   matrixAutoUpdate: boolean;
   matrixWorldAutoUpdate: boolean;
-  matrixWorldNeedsUpdate: boolean;
-  layers: Layers;
-  visible: boolean;
-  castShadow: boolean;
-  receiveShadow: boolean;
-  frustumCulled: boolean;
-  renderOrder: number;
-  animations: AnimationClip[];
-  customDepthMaterial: Material | undefined;
-  customDistanceMaterial: Material | undefined;
-  userData: any;
-  pivot: Vector3 | null;
+  /**
+   * When set to `true`, it calculates the world matrix in that frame and resets this property
+   * to `false`.
+   *
+   * @default false
+   */
+  matrixWorldNeedsUpdate: boolean = false;
+  /**
+   * The layer membership of the 3D object. The 3D object is only visible if it has
+   * at least one layer in common with the camera in use. This property can also be
+   * used to filter out unwanted objects in ray-intersection tests when using {@link Raycaster}.
+   *
+   */
+  layers: Layers = new Layers();
+  /**
+   * When set to `true`, the 3D object gets rendered.
+   *
+   * @default true
+   */
+  visible: boolean = true;
+  /**
+   * When set to `true`, the 3D object gets rendered into shadow maps.
+   *
+   * @default false
+   */
+  castShadow: boolean = false;
+  /**
+   * When set to `true`, the 3D object is affected by shadows in the scene.
+   *
+   * @default false
+   */
+  receiveShadow: boolean = false;
+  /**
+   * When set to `true`, the 3D object is honored by view frustum culling.
+   *
+   * @default true
+   */
+  frustumCulled: boolean = true;
+  /**
+   * This value allows the default rendering order of scene graph objects to be
+   * overridden although opaque and transparent objects remain sorted independently.
+   * When this property is set for an instance of {@link Group},all descendants
+   * objects will be sorted and rendered together. Sorting is from lowest to highest
+   * render order.
+   *
+   * @default 0
+   */
+  renderOrder: number = 0;
+  /**
+   * An array holding the animation clips of the 3D object.
+   *
+   */
+  animations: AnimationClip[] = [];
+  /**
+   * Custom depth material to be used when rendering to the depth map. Can only be used
+   * in context of meshes. When shadow-casting with a {@link DirectionalLight} or {@link SpotLight},
+   * if you are modifying vertex positions in the vertex shader you must specify a custom depth
+   * material for proper shadows.
+   *
+   * Only relevant in context of {@link WebGLRenderer}.
+   *
+   * @default undefined
+   */
+  customDepthMaterial: Material | undefined = undefined;
+  /**
+   * Same as {@link Object3D#customDepthMaterial}, but used with {@link PointLight}.
+   *
+   * Only relevant in context of {@link WebGLRenderer}.
+   *
+   * @default undefined
+   */
+  customDistanceMaterial: Material | undefined = undefined;
+  /**
+   * An object that can be used to store custom data about the 3D object. It
+   * should not hold references to functions as these will not be cloned.
+   *
+   */
+  userData: any = {};
+  /**
+   * The pivot point for rotation and scale transformations.
+   * When set, rotation and scale are applied around this point
+   * instead of the object's origin.
+   *
+   * @default null
+   */
+  pivot: Vector3 | null = null;
   id!: number;
   position!: Vector3;
   rotation!: Euler;
@@ -125,13 +233,6 @@ export class Object3D<TChild extends { clone(): TChild } & Object3D<any> = Objec
   constructor() {
     super();
     /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isObject3D = true;
-    /**
      * The ID of the 3D object.
      *
      * @name Object3D#id
@@ -149,29 +250,6 @@ export class Object3D<TChild extends { clone(): TChild } & Object3D<any> = Objec
      * @readonly
      */
     this.uuid = generateUUID();
-    /**
-     * The name of the 3D object.
-     *
-     */
-    this.name = "";
-    /**
-     * The type property is used for detecting the object type
-     * in context of serialization/deserialization.
-     *
-     * @readonly
-     */
-    this.type = "Object3D";
-    /**
-     * A reference to the parent object.
-     *
-     * @default null
-     */
-    this.parent = null;
-    /**
-     * An array holding the child 3D objects of this instance.
-     *
-     */
-    this.children = [];
     /**
      * Defines the `up` direction of the 3D object which influences
      * the orientation via methods like {@link Object3D#lookAt}.
@@ -234,17 +312,6 @@ export class Object3D<TChild extends { clone(): TChild } & Object3D<any> = Objec
       normalMatrix: { enumerable: false, configurable: false, writable: false, value: new Matrix3() },
     });
     /**
-     * Represents the object's transformation matrix in local space.
-     *
-     */
-    this.matrix = new Matrix4();
-    /**
-     * Represents the object's transformation matrix in world space.
-     * If the 3D object has no parent, then it's identical to the local transformation matrix
-     *
-     */
-    this.matrixWorld = new Matrix4();
-    /**
      * When set to `true`, the engine automatically computes the local matrix from position,
      * rotation and scale every frame. If set to `false`, the app is responsible for recomputing
      * the local matrix by calling `updateMatrix()`.
@@ -264,92 +331,6 @@ export class Object3D<TChild extends { clone(): TChild } & Object3D<any> = Objec
      * @default true
      */
     this.matrixWorldAutoUpdate = Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE; // checked by the renderer
-    /**
-     * When set to `true`, it calculates the world matrix in that frame and resets this property
-     * to `false`.
-     *
-     * @default false
-     */
-    this.matrixWorldNeedsUpdate = false;
-    /**
-     * The layer membership of the 3D object. The 3D object is only visible if it has
-     * at least one layer in common with the camera in use. This property can also be
-     * used to filter out unwanted objects in ray-intersection tests when using {@link Raycaster}.
-     *
-     */
-    this.layers = new Layers();
-    /**
-     * When set to `true`, the 3D object gets rendered.
-     *
-     * @default true
-     */
-    this.visible = true;
-    /**
-     * When set to `true`, the 3D object gets rendered into shadow maps.
-     *
-     * @default false
-     */
-    this.castShadow = false;
-    /**
-     * When set to `true`, the 3D object is affected by shadows in the scene.
-     *
-     * @default false
-     */
-    this.receiveShadow = false;
-    /**
-     * When set to `true`, the 3D object is honored by view frustum culling.
-     *
-     * @default true
-     */
-    this.frustumCulled = true;
-    /**
-     * This value allows the default rendering order of scene graph objects to be
-     * overridden although opaque and transparent objects remain sorted independently.
-     * When this property is set for an instance of {@link Group},all descendants
-     * objects will be sorted and rendered together. Sorting is from lowest to highest
-     * render order.
-     *
-     * @default 0
-     */
-    this.renderOrder = 0;
-    /**
-     * An array holding the animation clips of the 3D object.
-     *
-     */
-    this.animations = [];
-    /**
-     * Custom depth material to be used when rendering to the depth map. Can only be used
-     * in context of meshes. When shadow-casting with a {@link DirectionalLight} or {@link SpotLight},
-     * if you are modifying vertex positions in the vertex shader you must specify a custom depth
-     * material for proper shadows.
-     *
-     * Only relevant in context of {@link WebGLRenderer}.
-     *
-     * @default undefined
-     */
-    this.customDepthMaterial = undefined;
-    /**
-     * Same as {@link Object3D#customDepthMaterial}, but used with {@link PointLight}.
-     *
-     * Only relevant in context of {@link WebGLRenderer}.
-     *
-     * @default undefined
-     */
-    this.customDistanceMaterial = undefined;
-    /**
-     * An object that can be used to store custom data about the 3D object. It
-     * should not hold references to functions as these will not be cloned.
-     *
-     */
-    this.userData = {};
-    /**
-     * The pivot point for rotation and scale transformations.
-     * When set, rotation and scale are applied around this point
-     * instead of the object's origin.
-     *
-     * @default null
-     */
-    this.pivot = null;
   }
   /**
    * A callback that is executed immediately before a 3D object is rendered to a shadow map.

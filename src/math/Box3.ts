@@ -20,7 +20,13 @@ type BoundingBoxObject = Object3D & {
  * Represents an axis-aligned bounding box (AABB) in 3D space.
  */
 export class Box3 {
-  isBox3: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isBox3: boolean = true;
   min: Vector3;
   max: Vector3;
 
@@ -34,13 +40,6 @@ export class Box3 {
     min: Vector3 = new Vector3(+Infinity, +Infinity, +Infinity),
     max: Vector3 = new Vector3(-Infinity, -Infinity, -Infinity),
   ) {
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isBox3 = true;
     /**
      * The lower boundary of the box.
      *

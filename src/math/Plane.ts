@@ -13,7 +13,13 @@ const _normalMatrix = /*@__PURE__*/ new Matrix3();
  * by a unit length normal vector and a constant.
  */
 export class Plane {
-  isPlane: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isPlane: boolean = true;
   normal: Vector3;
   constant: number;
 
@@ -24,13 +30,6 @@ export class Plane {
    * @param [constant=0] - The signed distance from the origin to the plane.
    */
   constructor(normal: Vector3 = new Vector3(1, 0, 0), constant: number = 0) {
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isPlane = true;
     /**
      * A unit length vector defining the normal of the plane.
      *

@@ -1420,11 +1420,10 @@ class Face {
   a: number;
   b: number;
   c: number;
-  normal: Vector3;
+  normal: Vector3 = new Vector3();
   constructor(a: number, b: number, c: number) {
     this.a = a;
     this.b = b;
     this.c = c;
-    this.normal = new Vector3();
   }
 }

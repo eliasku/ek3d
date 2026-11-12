@@ -17,7 +17,13 @@ import { Light } from "./Light";
  *
  */
 export class AmbientLight extends Light {
-  isAmbientLight: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isAmbientLight: boolean = true;
 
   /**
    * Constructs a new ambient light.
@@ -27,13 +33,6 @@ export class AmbientLight extends Light {
    */
   constructor(color?: number | Color | string, intensity?: number) {
     super(color, intensity);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isAmbientLight = true;
     this.type = "AmbientLight";
   }
   clone(recursive?: boolean): AmbientLight {

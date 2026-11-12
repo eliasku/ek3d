@@ -475,13 +475,13 @@ class HTMLCanvasTexture extends CanvasTexture {
   observer: MutationObserver;
 
   /** Pending rerender timer handle, or `undefined` when no rerender is scheduled. */
-  scheduleUpdate: number | undefined;
+  scheduleUpdate: number | undefined = undefined;
 
   /** Bound rerender scheduler shared with the DOM event listeners. */
   _scheduleUpdate: () => void;
 
   /** Set by `dispose()` so a late timer callback cannot update a disposed texture. */
-  _disposed: boolean;
+  _disposed: boolean = false;
 
   /**
    * Constructs a new texture for the given element and its initial canvas.
@@ -499,9 +499,6 @@ class HTMLCanvasTexture extends CanvasTexture {
     this.minFilter = TextureFilter.Linear;
     this.magFilter = TextureFilter.Linear;
     this.generateMipmaps = false;
-
-    this.scheduleUpdate = undefined;
-    this._disposed = false;
 
     const scheduleUpdate = (): void => {
       if (this._disposed || this.scheduleUpdate !== undefined) return;

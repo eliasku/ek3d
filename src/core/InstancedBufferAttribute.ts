@@ -4,7 +4,13 @@ import { BufferAttribute } from "./BufferAttribute";
  *
  */
 export class InstancedBufferAttribute extends BufferAttribute {
-  isInstancedBufferAttribute: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isInstancedBufferAttribute: boolean = true;
   meshPerAttribute: number;
 
   /**
@@ -31,13 +37,6 @@ export class InstancedBufferAttribute extends BufferAttribute {
     meshPerAttribute: number = 1,
   ) {
     super(array, itemSize, normalized);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isInstancedBufferAttribute = true;
     /**
      * Defines how often a value of this buffer attribute should be repeated. A
      * value of one means that each value of the instanced attribute is used for

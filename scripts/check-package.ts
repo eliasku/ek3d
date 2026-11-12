@@ -94,15 +94,17 @@ try {
     "// @ts-expect-error Only defining-module subpaths are exported.\nimport type {} from 'ek3d';\n",
   );
   await cp(path.join(root, "index.html"), path.join(consumer, "index.html"));
-  const tsconfig = JSON.parse(await readFile(path.join(root, "tsconfig.json"), "utf8"));
+  await mkdir(path.join(consumer, "scripts"));
+  for (const file of ["tsconfig.base.json", "tsconfig.lib.json"])
+    await cp(path.join(root, "scripts", file), path.join(consumer, "scripts", file));
   await writeFile(
     path.join(consumer, "tsconfig.json"),
     JSON.stringify({
-      compilerOptions: { ...tsconfig.compilerOptions, types: [] },
-      include: [...directories.map((directory) => `${directory}/**/*.ts`), "tests/**/*.ts"],
+      files: [],
+      references: [{ path: "./scripts/tsconfig.lib.json" }],
     }),
   );
-  run(process.execPath, ["node_modules/typescript/bin/tsc", "--noEmit"]);
+  run(process.execPath, ["node_modules/typescript/bin/tsc", "-b"]);
   const entries = ["index.html", "testbed/index.html"];
   if (directories.includes("examples")) {
     for (const name of await readdir(path.join(consumer, "examples"), { recursive: true })) {

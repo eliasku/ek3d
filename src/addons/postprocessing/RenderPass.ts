@@ -30,11 +30,32 @@ export class RenderPass extends Pass {
   overrideMaterial: Material | null;
   clearColor: number | Color | string | null;
   clearAlpha: number | null;
-  clear: boolean;
-  clearDepth: boolean;
-  needsSwap: boolean;
-  isRenderPass: boolean;
-  _oldClearColor: Color;
+  /**
+   * Overwritten to perform a clear operation by default.
+   *
+   * @default true
+   */
+  clear: boolean = true;
+  /**
+   * If set to `true`, only the depth can be cleared when `clear` is to `false`.
+   *
+   * @default false
+   */
+  clearDepth: boolean = false;
+  /**
+   * Overwritten to disable the swap.
+   *
+   * @default false
+   */
+  needsSwap: boolean = false;
+  /**
+   * This flag indicates that this pass renders the scene itself.
+   *
+   * @readonly
+   * @default true
+   */
+  isRenderPass: boolean = true;
+  _oldClearColor: Color = new Color();
 
   /**
    * Constructs a new render pass.
@@ -81,33 +102,6 @@ export class RenderPass extends Pass {
      * @default null
      */
     this.clearAlpha = clearAlpha;
-    /**
-     * Overwritten to perform a clear operation by default.
-     *
-     * @default true
-     */
-    this.clear = true;
-    /**
-     * If set to `true`, only the depth can be cleared when `clear` is to `false`.
-     *
-     * @default false
-     */
-    this.clearDepth = false;
-    /**
-     * Overwritten to disable the swap.
-     *
-     * @default false
-     */
-    this.needsSwap = false;
-    /**
-     * This flag indicates that this pass renders the scene itself.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isRenderPass = true;
-
-    this._oldClearColor = new Color();
   }
 
   /**

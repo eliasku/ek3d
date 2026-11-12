@@ -75,7 +75,7 @@ export class DragControls<TObject extends Camera = Camera> extends Controls<TObj
    *
    * @default true
    */
-  recursive: boolean;
+  recursive: boolean = true;
 
   /**
    * This option only works if the `objects` array contains a single draggable  group object.
@@ -83,7 +83,7 @@ export class DragControls<TObject extends Camera = Camera> extends Controls<TObj
    *
    * @default false
    */
-  transformGroup: boolean;
+  transformGroup: boolean = false;
 
   /**
    * The speed at which the object will rotate when dragged in `rotate` mode.
@@ -91,17 +91,17 @@ export class DragControls<TObject extends Camera = Camera> extends Controls<TObj
    *
    * @default 1
    */
-  rotateSpeed: number;
+  rotateSpeed: number = 1;
 
   /**
    * The raycaster used for detecting 3D objects.
    */
-  raycaster: Raycaster;
+  raycaster: Raycaster = new Raycaster();
 
-  _onPointerMove: (event: PointerEvent) => void;
-  _onPointerDown: (event: PointerEvent) => void;
-  _onPointerCancel: () => void;
-  _onContextMenu: (event: Event) => void;
+  _onPointerMove: (event: PointerEvent) => void = onPointerMove.bind(this);
+  _onPointerDown: (event: PointerEvent) => void = onPointerDown.bind(this);
+  _onPointerCancel: () => void = onPointerCancel.bind(this);
+  _onContextMenu: (event: Event) => void = onContextMenu.bind(this);
 
   /**
    * Constructs a new controls instance.
@@ -114,18 +114,8 @@ export class DragControls<TObject extends Camera = Camera> extends Controls<TObj
     super(camera, domElement);
 
     this.objects = objects;
-    this.recursive = true;
-    this.transformGroup = false;
-    this.rotateSpeed = 1;
-    this.raycaster = new Raycaster();
-
     this.mouseButtons = { LEFT: MOUSE.PAN, MIDDLE: MOUSE.PAN, RIGHT: MOUSE.ROTATE };
     this.touches = { ONE: TOUCH.PAN, TWO: null };
-
-    this._onPointerMove = onPointerMove.bind(this);
-    this._onPointerDown = onPointerDown.bind(this);
-    this._onPointerCancel = onPointerCancel.bind(this);
-    this._onContextMenu = onContextMenu.bind(this);
 
     if (domElement !== null) {
       this.connect(domElement);

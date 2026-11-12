@@ -10,7 +10,13 @@ const _v2 = /*@__PURE__*/ new Vector3();
  * used as a Bounding Sphere for 3D objects.
  */
 export class Sphere {
-  isSphere: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isSphere: boolean = true;
   center: Vector3;
   radius: number;
 
@@ -21,13 +27,6 @@ export class Sphere {
    * @param [radius=-1] - The radius of the sphere.
    */
   constructor(center: Vector3 = new Vector3(), radius: number = -1) {
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isSphere = true;
     /**
      * The center of the sphere
      *

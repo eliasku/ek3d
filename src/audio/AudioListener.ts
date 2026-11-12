@@ -12,8 +12,8 @@ const up = new Vector3();
 
 /** A scene listener, usually attached to the camera. */
 export class AudioListener extends Object3D {
-  context: globalThis.AudioContext;
-  gain: GainNode;
+  context: globalThis.AudioContext = AudioContext.getContext();
+  gain: GainNode = this.context.createGain();
   filter: AudioNode | null = null;
   timeDelta: number = 0;
   _timer: Timer;
@@ -21,8 +21,6 @@ export class AudioListener extends Object3D {
   constructor() {
     super();
     this.type = "AudioListener";
-    this.context = AudioContext.getContext();
-    this.gain = this.context.createGain();
     this.gain.connect(this.context.destination);
     this._timer = new Timer();
   }

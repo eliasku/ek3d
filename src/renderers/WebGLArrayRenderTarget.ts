@@ -6,7 +6,13 @@ import { DataArrayTexture } from "../textures/DataArrayTexture";
  *
  */
 export class WebGLArrayRenderTarget extends WebGLRenderTarget {
-  isWebGLArrayRenderTarget: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isWebGLArrayRenderTarget: boolean = true;
 
   /**
    * Constructs a new array render target.
@@ -18,13 +24,6 @@ export class WebGLArrayRenderTarget extends WebGLRenderTarget {
    */
   constructor(width: number = 1, height: number = 1, depth: number = 1, options: RenderTargetOptions = {}) {
     super(width, height, options);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isWebGLArrayRenderTarget = true;
     this.depth = depth;
     /**
      * Overwritten with a different texture type.

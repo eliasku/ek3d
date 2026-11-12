@@ -6,7 +6,13 @@ import { Data3DTexture } from "../textures/Data3DTexture";
  *
  */
 export class RenderTarget3D extends RenderTarget {
-  isRenderTarget3D: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isRenderTarget3D: boolean = true;
 
   /**
    * Constructs a new 3D render target.
@@ -18,13 +24,6 @@ export class RenderTarget3D extends RenderTarget {
    */
   constructor(width: number = 1, height: number = 1, depth: number = 1, options: RenderTargetOptions = {}) {
     super(width, height, options);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isRenderTarget3D = true;
     this.depth = depth;
     // overwrite attachments with 3D textures
     for (let i = 0; i < this.textures.length; i++) {

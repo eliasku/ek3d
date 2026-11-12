@@ -46,35 +46,24 @@ export class InteractionManager {
   /**
    * The registered interactive objects.
    */
-  objects: Object3D[];
+  objects: Object3D[] = [];
 
   /**
    * The canvas element.
    *
    * @default null
    */
-  element: HTMLCanvasElement | OffscreenCanvas | null;
+  element: HTMLCanvasElement | OffscreenCanvas | null = null;
 
   /**
    * The camera used for computing the element transforms.
    *
    * @default null
    */
-  camera: Camera | null;
+  camera: Camera | null = null;
 
-  private _cachedCssW: number;
-  private _cachedCssH: number;
-
-  constructor() {
-    this.objects = [];
-
-    this.element = null;
-
-    this.camera = null;
-
-    this._cachedCssW = -1;
-    this._cachedCssH = -1;
-  }
+  private _cachedCssW: number = -1;
+  private _cachedCssH: number = -1;
 
   /**
    * Adds one or more objects to the manager.

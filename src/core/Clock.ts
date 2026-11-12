@@ -6,10 +6,31 @@ import { warn } from "../utils";
  */
 export class Clock {
   autoStart: boolean;
-  startTime: number;
-  oldTime: number;
-  elapsedTime: number;
-  running: boolean;
+  /**
+   * Holds the time at which the clock's `start()` method was last called.
+   *
+   * @default 0
+   */
+  startTime: number = 0;
+  /**
+   * Holds the time at which the clock's `start()`, `getElapsedTime()` or
+   * `getDelta()` methods were last called.
+   *
+   * @default 0
+   */
+  oldTime: number = 0;
+  /**
+   * Keeps track of the total time that the clock has been running.
+   *
+   * @default 0
+   */
+  elapsedTime: number = 0;
+  /**
+   * Whether the clock is running or not.
+   *
+   * @default false
+   */
+  running: boolean = false;
 
   /**
    * Constructs a new clock.
@@ -26,31 +47,6 @@ export class Clock {
      * @default true
      */
     this.autoStart = autoStart;
-    /**
-     * Holds the time at which the clock's `start()` method was last called.
-     *
-     * @default 0
-     */
-    this.startTime = 0;
-    /**
-     * Holds the time at which the clock's `start()`, `getElapsedTime()` or
-     * `getDelta()` methods were last called.
-     *
-     * @default 0
-     */
-    this.oldTime = 0;
-    /**
-     * Keeps track of the total time that the clock has been running.
-     *
-     * @default 0
-     */
-    this.elapsedTime = 0;
-    /**
-     * Whether the clock is running or not.
-     *
-     * @default false
-     */
-    this.running = false;
     warn("Clock: This module has been deprecated. Please use THREE.Timer instead."); // @deprecated, r183
   }
   /**

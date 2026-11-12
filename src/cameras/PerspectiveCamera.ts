@@ -35,11 +35,28 @@ export class PerspectiveCamera extends Camera {
   isPerspectiveCamera: boolean = true;
 
   fov: number;
-  zoom: number;
+  /**
+   * The zoom factor of the camera.
+   *
+   * @default 1
+   */
+  zoom: number = 1;
   near: number;
   far: number;
-  focus: number;
+  /**
+   * Object distance used for depth-of-field effects. This
+   * parameter does not influence the projection matrix.
+   *
+   * @default 10
+   */
+  focus: number = 10;
   aspect: number;
+  /**
+   * Represents the frustum window specification. This property should not be edited
+   * directly but via {@link PerspectiveCamera#setViewOffset} and {@link PerspectiveCamera#clearViewOffset}.
+   *
+   * @default null
+   */
   view: {
     enabled: boolean;
     fullWidth: number;
@@ -48,9 +65,21 @@ export class PerspectiveCamera extends Camera {
     offsetY: number;
     width: number;
     height: number;
-  } | null;
-  filmGauge: number;
-  filmOffset: number;
+  } | null = null;
+  /**
+   * Film size used for the larger axis. Default is `35` (millimeters). This
+   * parameter does not influence the projection matrix unless {@link PerspectiveCamera#filmOffset}
+   * is set to a nonzero value.
+   *
+   * @default 35
+   */
+  filmGauge: number = 35;
+  /**
+   * Horizontal off-center offset in the same unit as {@link PerspectiveCamera#filmGauge}.
+   *
+   * @default 0
+   */
+  filmOffset: number = 0;
   /** Assigned when this camera is configured as an ArrayCamera subcamera. */
   viewport!: Vector4;
 
@@ -73,12 +102,6 @@ export class PerspectiveCamera extends Camera {
      */
     this.fov = fov;
     /**
-     * The zoom factor of the camera.
-     *
-     * @default 1
-     */
-    this.zoom = 1;
-    /**
      * The camera's near plane. The valid range is greater than `0`
      * and less than the current value of {@link PerspectiveCamera#far}.
      *
@@ -96,39 +119,11 @@ export class PerspectiveCamera extends Camera {
      */
     this.far = far;
     /**
-     * Object distance used for depth-of-field effects. This
-     * parameter does not influence the projection matrix.
-     *
-     * @default 10
-     */
-    this.focus = 10;
-    /**
      * The aspect ratio, usually the canvas width / canvas height.
      *
      * @default 1
      */
     this.aspect = aspect;
-    /**
-     * Represents the frustum window specification. This property should not be edited
-     * directly but via {@link PerspectiveCamera#setViewOffset} and {@link PerspectiveCamera#clearViewOffset}.
-     *
-     * @default null
-     */
-    this.view = null;
-    /**
-     * Film size used for the larger axis. Default is `35` (millimeters). This
-     * parameter does not influence the projection matrix unless {@link PerspectiveCamera#filmOffset}
-     * is set to a nonzero value.
-     *
-     * @default 35
-     */
-    this.filmGauge = 35;
-    /**
-     * Horizontal off-center offset in the same unit as {@link PerspectiveCamera#filmGauge}.
-     *
-     * @default 0
-     */
-    this.filmOffset = 0;
     this.updateProjectionMatrix();
   }
   copy(source: any, recursive?: any): this {

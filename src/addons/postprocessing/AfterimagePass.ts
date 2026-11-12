@@ -23,7 +23,18 @@ import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
  *
  */
 export class AfterimagePass extends Pass {
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+  /**
+   * The pass uniforms. Use this object if you want to update the
+   * `damp` value at runtime.
+   * ```typescript
+   * import type { AfterimagePass } from 'ek3d/addons/postprocessing/AfterimagePass';
+   *
+   * function setDamping( pass: AfterimagePass ): void {
+   *   pass.uniforms.damp.value = 0.9;
+   * }
+   * ```
+   */
+  uniforms: Record<string, { value: any; needsUpdate?: boolean }> = cloneUniforms(AfterimageShader.uniforms);
   compFsMaterial: ShaderMaterial;
   copyFsMaterial: ShaderMaterial;
   _compFsQuad: FullScreenQuad;
@@ -38,19 +49,6 @@ export class AfterimagePass extends Pass {
    */
   constructor(damp: number = 0.96) {
     super();
-    /**
-     * The pass uniforms. Use this object if you want to update the
-     * `damp` value at runtime.
-     * ```typescript
-     * import type { AfterimagePass } from 'ek3d/addons/postprocessing/AfterimagePass';
-     *
-     * function setDamping( pass: AfterimagePass ): void {
-     *   pass.uniforms.damp.value = 0.9;
-     * }
-     * ```
-     */
-    this.uniforms = cloneUniforms(AfterimageShader.uniforms);
-
     this.damp = damp;
 
     /**

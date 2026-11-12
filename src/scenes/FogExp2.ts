@@ -13,8 +13,18 @@ import { Color } from "../math/Color";
  * ```
  */
 export class FogExp2 {
-  isFogExp2: boolean;
-  name: string;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isFogExp2: boolean = true;
+  /**
+   * The name of the fog.
+   *
+   */
+  name: string = "";
   color: Color;
   density: number;
 
@@ -25,18 +35,6 @@ export class FogExp2 {
    * @param [density=0.00025] - Defines how fast the fog will grow dense.
    */
   constructor(color: Color | number | string, density: number = 0.00025) {
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isFogExp2 = true;
-    /**
-     * The name of the fog.
-     *
-     */
-    this.name = "";
     /**
      * The fog's color.
      *

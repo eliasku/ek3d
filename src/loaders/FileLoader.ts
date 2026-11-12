@@ -26,9 +26,24 @@ class HttpError extends Error {
  *
  */
 export class FileLoader extends Loader<unknown, string> {
-  mimeType: string;
-  responseType: string;
-  _abortController: AbortController;
+  /**
+   * The expected mime type. Valid values can be found
+   * [here](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString#mimetype)
+   *
+   */
+  mimeType: string = "";
+  /**
+   * The expected response type.
+   *
+   * @default ''
+   */
+  responseType: string = "";
+  /**
+   * Used for aborting requests.
+   *
+   * @private
+   */
+  _abortController: AbortController = new AbortController();
 
   /**
    * Constructs a new file loader.
@@ -37,24 +52,6 @@ export class FileLoader extends Loader<unknown, string> {
    */
   constructor(manager?: LoadingManager) {
     super(manager);
-    /**
-     * The expected mime type. Valid values can be found
-     * [here](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString#mimetype)
-     *
-     */
-    this.mimeType = "";
-    /**
-     * The expected response type.
-     *
-     * @default ''
-     */
-    this.responseType = "";
-    /**
-     * Used for aborting requests.
-     *
-     * @private
-     */
-    this._abortController = new AbortController();
   }
   /**
    * Starts loading from the given URL and pass the loaded response to the `onLoad()` callback.

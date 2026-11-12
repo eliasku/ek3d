@@ -97,20 +97,99 @@ const _vector = /*@__PURE__*/ new Vector3();
  *
  */
 export class BufferGeometry extends EventDispatcher {
-  isBufferGeometry: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isBufferGeometry: boolean = true;
   uuid: string;
-  name: string;
-  type: string;
-  index: BufferAttribute | null;
-  attributes: Record<string, BufferAttribute | InterleavedBufferAttribute | GLBufferAttribute>;
-  morphAttributes: Record<string, (BufferAttribute | InterleavedBufferAttribute)[]>;
-  morphTargetsRelative: boolean;
-  groups: { start: number; count: number; materialIndex: number }[];
-  boundingBox: Box3 | null;
-  boundingSphere: Sphere | null;
-  drawRange: { start: number; count: number };
-  userData: any;
-  _transformed: boolean;
+  /**
+   * The name of the geometry.
+   *
+   */
+  name: string = "";
+  type: string = "BufferGeometry";
+  /**
+   * Allows for vertices to be re-used across multiple triangles; this is
+   * called using "indexed triangles". Each triangle is associated with the
+   * indices of three vertices. This attribute therefore stores the index of
+   * each vertex for each triangular face. If this attribute is not set, the
+   * renderer assumes that each three contiguous positions represent a single triangle.
+   *
+   * @default null
+   */
+  index: BufferAttribute | null = null;
+  /**
+   * This dictionary has as id the name of the attribute to be set and as value
+   * the buffer attribute to set it to. Rather than accessing this property directly,
+   * use `setAttribute()` and `getAttribute()` to access attributes of this geometry.
+   *
+   */
+  attributes: Record<string, BufferAttribute | InterleavedBufferAttribute | GLBufferAttribute> = {};
+  /**
+   * This dictionary holds the morph targets of the geometry.
+   *
+   * Note: Once the geometry has been rendered, the morph attribute data cannot
+   * be changed. You will have to call `dispose()`, and create a new geometry instance.
+   *
+   */
+  morphAttributes: Record<string, (BufferAttribute | InterleavedBufferAttribute)[]> = {};
+  /**
+   * Used to control the morph target behavior; when set to `true`, the morph
+   * target data is treated as relative offsets, rather than as absolute
+   * positions/normals.
+   *
+   * @default false
+   */
+  morphTargetsRelative: boolean = false;
+  /**
+   * Split the geometry into groups, each of which will be rendered in a
+   * separate draw call. This allows an array of materials to be used with the geometry.
+   *
+   * Use `addGroup()` and `clearGroups()` to edit groups, rather than modifying this array directly.
+   *
+   * Every vertex and index must belong to exactly one group — groups must not share vertices or
+   * indices, and must not leave vertices or indices unused.
+   *
+   */
+  groups: { start: number; count: number; materialIndex: number }[] = [];
+  /**
+   * Bounding box for the geometry which can be calculated with `computeBoundingBox()`.
+   *
+   * @default null
+   */
+  boundingBox: Box3 | null = null;
+  /**
+   * Bounding sphere for the geometry which can be calculated with `computeBoundingSphere()`.
+   *
+   * @default null
+   */
+  boundingSphere: Sphere | null = null;
+  /**
+   * Determines the part of the geometry to render. This should not be set directly,
+   * instead use `setDrawRange()`.
+   *
+   */
+  drawRange: { start: number; count: number } = { start: 0, count: Infinity };
+  /**
+   * An object that can be used to store custom data about the geometry.
+   * It should not hold references to functions as these will not be cloned.
+   *
+   */
+  userData: any = {};
+  /**
+   * `true` when the geometry has been transformed since construction
+   * (e.g. via {@link BufferGeometry#applyMatrix4}). Only relevant for
+   * geometry generators (subclasses that populate `parameters`): when set,
+   * {@link BufferGeometry#toJSON} omits `parameters` since they no longer
+   * describe the geometry.
+   *
+   * @private
+   * @default false
+   */
+  _transformed: boolean = false;
   id!: number;
 
   /**
@@ -118,13 +197,6 @@ export class BufferGeometry extends EventDispatcher {
    */
   constructor() {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isBufferGeometry = true;
     /**
      * The ID of the geometry.
      *
@@ -138,91 +210,6 @@ export class BufferGeometry extends EventDispatcher {
      * @readonly
      */
     this.uuid = generateUUID();
-    /**
-     * The name of the geometry.
-     *
-     */
-    this.name = "";
-    this.type = "BufferGeometry";
-    /**
-     * Allows for vertices to be re-used across multiple triangles; this is
-     * called using "indexed triangles". Each triangle is associated with the
-     * indices of three vertices. This attribute therefore stores the index of
-     * each vertex for each triangular face. If this attribute is not set, the
-     * renderer assumes that each three contiguous positions represent a single triangle.
-     *
-     * @default null
-     */
-    this.index = null;
-    /**
-     * This dictionary has as id the name of the attribute to be set and as value
-     * the buffer attribute to set it to. Rather than accessing this property directly,
-     * use `setAttribute()` and `getAttribute()` to access attributes of this geometry.
-     *
-     */
-    this.attributes = {};
-    /**
-     * This dictionary holds the morph targets of the geometry.
-     *
-     * Note: Once the geometry has been rendered, the morph attribute data cannot
-     * be changed. You will have to call `dispose()`, and create a new geometry instance.
-     *
-     */
-    this.morphAttributes = {};
-    /**
-     * Used to control the morph target behavior; when set to `true`, the morph
-     * target data is treated as relative offsets, rather than as absolute
-     * positions/normals.
-     *
-     * @default false
-     */
-    this.morphTargetsRelative = false;
-    /**
-     * Split the geometry into groups, each of which will be rendered in a
-     * separate draw call. This allows an array of materials to be used with the geometry.
-     *
-     * Use `addGroup()` and `clearGroups()` to edit groups, rather than modifying this array directly.
-     *
-     * Every vertex and index must belong to exactly one group — groups must not share vertices or
-     * indices, and must not leave vertices or indices unused.
-     *
-     */
-    this.groups = [];
-    /**
-     * Bounding box for the geometry which can be calculated with `computeBoundingBox()`.
-     *
-     * @default null
-     */
-    this.boundingBox = null;
-    /**
-     * Bounding sphere for the geometry which can be calculated with `computeBoundingSphere()`.
-     *
-     * @default null
-     */
-    this.boundingSphere = null;
-    /**
-     * Determines the part of the geometry to render. This should not be set directly,
-     * instead use `setDrawRange()`.
-     *
-     */
-    this.drawRange = { start: 0, count: Infinity };
-    /**
-     * An object that can be used to store custom data about the geometry.
-     * It should not hold references to functions as these will not be cloned.
-     *
-     */
-    this.userData = {};
-    /**
-     * `true` when the geometry has been transformed since construction
-     * (e.g. via {@link BufferGeometry#applyMatrix4}). Only relevant for
-     * geometry generators (subclasses that populate `parameters`): when set,
-     * {@link BufferGeometry#toJSON} omits `parameters` since they no longer
-     * describe the geometry.
-     *
-     * @private
-     * @default false
-     */
-    this._transformed = false;
   }
   /**
    * Returns the index of this geometry.

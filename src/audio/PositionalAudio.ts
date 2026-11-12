@@ -10,10 +10,9 @@ const orientation = new Vector3();
 
 /** Audio whose position and directional cone follow its world transform. */
 export class PositionalAudio extends Audio {
-  panner: PannerNode;
+  panner: PannerNode = this.context.createPanner();
   constructor(listener: AudioListener) {
     super(listener);
-    this.panner = this.context.createPanner();
     this.panner.panningModel = "HRTF";
     this.panner.connect(this.gain);
   }

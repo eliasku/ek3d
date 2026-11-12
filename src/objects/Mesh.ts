@@ -44,12 +44,32 @@ const _intersectionPointWorld = /*@__PURE__*/ new Vector3();
  *
  */
 export class Mesh<TMaterial extends Material | Material[] = Material | Material[]> extends Object3D {
-  isMesh: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isMesh: boolean = true;
 
   geometry: BufferGeometry;
   material: TMaterial;
-  morphTargetDictionary: Record<string, number> | undefined;
-  morphTargetInfluences: number[] | undefined;
+  /**
+   * A dictionary representing the morph targets in the geometry. The key is the
+   * morph targets name, the value its attribute index. This member is `undefined`
+   * by default and only set when morph targets are detected in the geometry.
+   *
+   * @default undefined
+   */
+  morphTargetDictionary: Record<string, number> | undefined = undefined;
+  /**
+   * An array of weights typically in the range `[0,1]` that specify how much of the morph
+   * is applied. This member is `undefined` by default and only set when morph targets are
+   * detected in the geometry.
+   *
+   * @default undefined
+   */
+  morphTargetInfluences: number[] | undefined = undefined;
 
   /**
    * Constructs a new mesh.
@@ -61,13 +81,6 @@ export class Mesh<TMaterial extends Material | Material[] = Material | Material[
     super();
     if (geometry === undefined || material === undefined)
       throw new Error("Mesh requires explicit geometry and material.");
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isMesh = true;
     this.type = "Mesh";
     /**
      * The mesh geometry.
@@ -80,22 +93,6 @@ export class Mesh<TMaterial extends Material | Material[] = Material | Material[
      * @default MeshBasicMaterial
      */
     this.material = material;
-    /**
-     * A dictionary representing the morph targets in the geometry. The key is the
-     * morph targets name, the value its attribute index. This member is `undefined`
-     * by default and only set when morph targets are detected in the geometry.
-     *
-     * @default undefined
-     */
-    this.morphTargetDictionary = undefined;
-    /**
-     * An array of weights typically in the range `[0,1]` that specify how much of the morph
-     * is applied. This member is `undefined` by default and only set when morph targets are
-     * detected in the geometry.
-     *
-     * @default undefined
-     */
-    this.morphTargetInfluences = undefined;
     this.updateMorphTargets();
   }
   clone(recursive: boolean = true): Mesh<TMaterial> {

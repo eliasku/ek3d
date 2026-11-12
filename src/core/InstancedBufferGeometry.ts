@@ -3,29 +3,27 @@ import { BufferGeometry } from "./BufferGeometry";
  * An instanced version of a geometry.
  */
 export class InstancedBufferGeometry extends BufferGeometry {
-  isInstancedBufferGeometry: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isInstancedBufferGeometry: boolean = true;
 
-  instanceCount: number;
+  /**
+   * The instance count.
+   *
+   * @default Infinity
+   */
+  instanceCount: number = Infinity;
 
   /**
    * Constructs a new instanced buffer geometry.
    */
   constructor() {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isInstancedBufferGeometry = true;
     this.type = "InstancedBufferGeometry";
-    /**
-     * The instance count.
-     *
-     * @default Infinity
-     */
-    this.instanceCount = Infinity;
   }
   override clone(): InstancedBufferGeometry {
     return new InstancedBufferGeometry().copy(this);

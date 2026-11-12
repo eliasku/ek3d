@@ -29,7 +29,13 @@ import { Vector2 } from "../../math/Vector2";
  *
  */
 export class EllipseCurve extends Curve<Vector2> {
-  isEllipseCurve: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isEllipseCurve: boolean = true;
 
   aX: number;
   aY: number;
@@ -63,13 +69,6 @@ export class EllipseCurve extends Curve<Vector2> {
     aRotation: number = 0,
   ) {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isEllipseCurve = true;
     this.type = "EllipseCurve";
     /**
      * The X center of the ellipse.

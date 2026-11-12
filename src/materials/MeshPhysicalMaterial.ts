@@ -169,45 +169,244 @@ export type MeshPhysicalMaterialParameters = Omit<
  * @demo scenes/material-browser.html#MeshPhysicalMaterial
  */
 export class MeshPhysicalMaterial extends MeshStandardMaterial {
-  isMeshPhysicalMaterial: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isMeshPhysicalMaterial: boolean = true;
 
-  ior: number;
+  /**
+   * Index-of-refraction for non-metallic materials, from `1.0` to `2.333`.
+   *
+   * @default 1.5
+   */
+  ior: number = 1.5;
   attenuationColor: Color;
   specularColor: Color;
-  _anisotropy: number;
-  _clearcoat: number;
-  _diffuseRoughness: number;
-  _dispersion: number;
-  _iridescence: number;
-  _retroreflectivity: number;
-  _sheen: number;
-  _transmission: number;
-  anisotropyRotation: number;
-  anisotropyMap: Texture | null;
-  clearcoatMap: Texture | null;
-  clearcoatRoughness: number;
-  clearcoatRoughnessMap: Texture | null;
-  clearcoatNormalScale: Vector2;
-  clearcoatNormalMap: Texture | null;
-  diffuseRoughnessMap: Texture | null;
+  _anisotropy: number = 0;
+  _clearcoat: number = 0;
+  _diffuseRoughness: number = 0;
+  _dispersion: number = 0;
+  _iridescence: number = 0;
+  _retroreflectivity: number = 0;
+  _sheen: number = 0.0;
+  _transmission: number = 0;
+  /**
+   * The rotation of the anisotropy in tangent, bitangent space, measured in radians
+   * counter-clockwise from the tangent. When `anisotropyMap` is present, this
+   * property provides additional rotation to the vectors in the texture.
+   *
+   * @default 0
+   */
+  anisotropyRotation: number = 0;
+  /**
+   * Red and green channels represent the anisotropy direction in `[-1, 1]` tangent,
+   * bitangent space, to be rotated by `anisotropyRotation`. The blue channel
+   * contains strength as `[0, 1]` to be multiplied by `anisotropy`.
+   *
+   * `anisotropyMap` represents non-color data. Any texture assigned must have
+   * `texture.colorSpace = ColorSpace.No` (default).
+   *
+   * @default null
+   */
+  anisotropyMap: Texture | null = null;
+  /**
+   * The red channel of this texture is multiplied against `clearcoat`,
+   * for per-pixel control over a coating's intensity.
+   *
+   * `clearcoatMap` represents non-color data. Any texture assigned must have
+   * `texture.colorSpace = ColorSpace.No` (default).
+   *
+   * @default null
+   */
+  clearcoatMap: Texture | null = null;
+  /**
+   * Roughness of the clear coat layer, from `0.0` to `1.0`.
+   *
+   * @default 0
+   */
+  clearcoatRoughness: number = 0.0;
+  /**
+   * The green channel of this texture is multiplied against
+   * `clearcoatRoughness`, for per-pixel control over a coating's roughness.
+   *
+   * `clearcoatRoughnessMap` represents non-color data. Any texture assigned must have
+   * `texture.colorSpace = ColorSpace.No` (default).
+   *
+   * @default null
+   */
+  clearcoatRoughnessMap: Texture | null = null;
+  /**
+   * How much `clearcoatNormalMap` affects the clear coat layer, from
+   * `(0,0)` to `(1,1)`.
+   *
+   * @default (1,1)
+   */
+  clearcoatNormalScale: Vector2 = new Vector2(1, 1);
+  /**
+   * Can be used to enable independent normals for the clear coat layer.
+   *
+   * `clearcoatNormalMap` represents non-color data. Any texture assigned must have
+   * `texture.colorSpace = ColorSpace.No` (default).
+   *
+   * @default null
+   */
+  clearcoatNormalMap: Texture | null = null;
+  /**
+   * The red channel of this texture is multiplied against `diffuseRoughness`,
+   * for per-pixel control over the diffuse roughness.
+   *
+   * `diffuseRoughnessMap` represents non-color data. Any texture assigned must have
+   * `texture.colorSpace = ColorSpace.No` (default).
+   *
+   * @default null
+   */
+  diffuseRoughnessMap: Texture | null = null;
   // The constructor installs this own accessor with Object.defineProperty.
   reflectivity!: number;
-  iridescenceMap: Texture | null;
-  iridescenceIOR: number;
-  iridescenceThicknessMinimum: number;
-  iridescenceThicknessMaximum: number;
-  iridescenceThicknessMap: Texture | null;
-  sheenColor: Color;
-  sheenColorMap: Texture | null;
-  sheenRoughness: number;
-  sheenRoughnessMap: Texture | null;
-  transmissionMap: Texture | null;
-  thickness: number;
-  thicknessMap: Texture | null;
-  attenuationDistance: number;
-  specularIntensity: number;
-  specularIntensityMap: Texture | null;
-  specularColorMap: Texture | null;
+  /**
+   * The red channel of this texture is multiplied against `iridescence`, for per-pixel
+   * control over iridescence.
+   *
+   * `iridescenceMap` represents non-color data. Any texture assigned must have
+   * `texture.colorSpace = ColorSpace.No` (default).
+   *
+   * @default null
+   */
+  iridescenceMap: Texture | null = null;
+  /**
+   * Strength of the iridescence RGB color shift effect, represented by an index-of-refraction.
+   * Between `1.0` to `2.333`.
+   *
+   * @default 1.3
+   */
+  iridescenceIOR: number = 1.3;
+  /**
+   * The minimum thickness of the iridescence layer in nanometers.
+   *
+   * @default 100
+   */
+  iridescenceThicknessMinimum: number = 100;
+  /**
+   * The maximum thickness of the iridescence layer in nanometers. If no
+   * `iridescenceThicknessMap` is defined, this value is used as the thickness.
+   *
+   * @default 400
+   */
+  iridescenceThicknessMaximum: number = 400;
+  /**
+   * A texture that defines the thickness of the iridescence layer, stored in the green channel.
+   * Minimum and maximum values of thickness are defined by `iridescenceThicknessMinimum` and
+   * `iridescenceThicknessMaximum`:
+   * - `0.0` in the green channel will result in thickness equal to `iridescenceThicknessMinimum`.
+   * - `1.0` in the green channel will result in thickness equal to `iridescenceThicknessMaximum`.
+   * - Values in-between will linearly interpolate between both values.
+   *
+   * `iridescenceThicknessMap` represents non-color data. Any texture assigned must have
+   * `texture.colorSpace = ColorSpace.No` (default).
+   *
+   * @default null
+   */
+  iridescenceThicknessMap: Texture | null = null;
+  /**
+   * The sheen tint.
+   *
+   * @default (0,0,0)
+   */
+  sheenColor: Color = new Color(0x000000);
+  /**
+   * The RGB channels of this texture are multiplied against  `sheenColor`, for per-pixel control
+   * over sheen tint.
+   *
+   * `sheenColorMap` represents color data, and the texture must be assigned a
+   * {@link Texture#colorSpace}. Most `sheenColorMap` textures set
+   * `texture.colorSpace = ColorSpace.SRGB`.
+   *
+   * @default null
+   */
+  sheenColorMap: Texture | null = null;
+  /**
+   * Roughness of the sheen layer, from `0.0` to `1.0`.
+   *
+   * @default 1
+   */
+  sheenRoughness: number = 1.0;
+  /**
+   * The alpha channel of this texture is multiplied against `sheenRoughness`, for per-pixel control
+   * over sheen roughness.
+   *
+   * `sheenRoughnessMap` represents non-color data. Any texture assigned must have
+   * `texture.colorSpace = ColorSpace.No` (default).
+   *
+   * @default null
+   */
+  sheenRoughnessMap: Texture | null = null;
+  /**
+   * The red channel of this texture is multiplied against `transmission`, for per-pixel control over
+   * optical transparency.
+   *
+   * `transmissionMap` represents non-color data. Any texture assigned must have
+   * `texture.colorSpace = ColorSpace.No` (default).
+   *
+   * @default null
+   */
+  transmissionMap: Texture | null = null;
+  /**
+   * The thickness of the volume beneath the surface. The value is given in the
+   * coordinate space of the mesh. If the value is `0` the material is
+   * thin-walled. Otherwise the material is a volume boundary.
+   *
+   * @default 0
+   */
+  thickness: number = 0;
+  /**
+   * A texture that defines the thickness, stored in the green channel. This will
+   * be multiplied by `thickness`.
+   *
+   * `thicknessMap` represents non-color data. Any texture assigned must have
+   * `texture.colorSpace = ColorSpace.No` (default).
+   *
+   * @default null
+   */
+  thicknessMap: Texture | null = null;
+  /**
+   * Density of the medium given as the average distance that light travels in
+   * the medium before interacting with a particle. The value is given in world
+   * space units, and must be greater than zero.
+   *
+   * @default Infinity
+   */
+  attenuationDistance: number = Infinity;
+  /**
+   * A float that scales the amount of specular reflection for non-metals only.
+   * When set to zero, the model is effectively Lambertian. From `0.0` to `1.0`.
+   *
+   * @default 1
+   */
+  specularIntensity: number = 1.0;
+  /**
+   * The alpha channel of this texture is multiplied against `specularIntensity`,
+   * for per-pixel control over specular intensity.
+   *
+   * `specularIntensityMap` represents non-color data. Any texture assigned must have
+   * `texture.colorSpace = ColorSpace.No` (default).
+   *
+   * @default null
+   */
+  specularIntensityMap: Texture | null = null;
+  /**
+   * The RGB channels of this texture are multiplied against `specularColor`,
+   * for per-pixel control over specular color.
+   *
+   * `specularColorMap` represents color data, and the texture must be assigned a
+   * {@link Texture#colorSpace}. Most `specularColorMap` textures set
+   * `texture.colorSpace = ColorSpace.SRGB`.
+   *
+   * @default null
+   */
+  specularColorMap: Texture | null = null;
 
   /**
    * Constructs a new mesh physical material.
@@ -220,95 +419,11 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
    */
   constructor(parameters?: MeshPhysicalMaterialParameters) {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isMeshPhysicalMaterial = true;
     this.defines = {
       STANDARD: "",
       PHYSICAL: "",
     };
     this.type = "MeshPhysicalMaterial";
-    /**
-     * The rotation of the anisotropy in tangent, bitangent space, measured in radians
-     * counter-clockwise from the tangent. When `anisotropyMap` is present, this
-     * property provides additional rotation to the vectors in the texture.
-     *
-     * @default 0
-     */
-    this.anisotropyRotation = 0;
-    /**
-     * Red and green channels represent the anisotropy direction in `[-1, 1]` tangent,
-     * bitangent space, to be rotated by `anisotropyRotation`. The blue channel
-     * contains strength as `[0, 1]` to be multiplied by `anisotropy`.
-     *
-     * `anisotropyMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = ColorSpace.No` (default).
-     *
-     * @default null
-     */
-    this.anisotropyMap = null;
-    /**
-     * The red channel of this texture is multiplied against `clearcoat`,
-     * for per-pixel control over a coating's intensity.
-     *
-     * `clearcoatMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = ColorSpace.No` (default).
-     *
-     * @default null
-     */
-    this.clearcoatMap = null;
-    /**
-     * Roughness of the clear coat layer, from `0.0` to `1.0`.
-     *
-     * @default 0
-     */
-    this.clearcoatRoughness = 0.0;
-    /**
-     * The green channel of this texture is multiplied against
-     * `clearcoatRoughness`, for per-pixel control over a coating's roughness.
-     *
-     * `clearcoatRoughnessMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = ColorSpace.No` (default).
-     *
-     * @default null
-     */
-    this.clearcoatRoughnessMap = null;
-    /**
-     * How much `clearcoatNormalMap` affects the clear coat layer, from
-     * `(0,0)` to `(1,1)`.
-     *
-     * @default (1,1)
-     */
-    this.clearcoatNormalScale = new Vector2(1, 1);
-    /**
-     * Can be used to enable independent normals for the clear coat layer.
-     *
-     * `clearcoatNormalMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = ColorSpace.No` (default).
-     *
-     * @default null
-     */
-    this.clearcoatNormalMap = null;
-    /**
-     * The red channel of this texture is multiplied against `diffuseRoughness`,
-     * for per-pixel control over the diffuse roughness.
-     *
-     * `diffuseRoughnessMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = ColorSpace.No` (default).
-     *
-     * @default null
-     */
-    this.diffuseRoughnessMap = null;
-    /**
-     * Index-of-refraction for non-metallic materials, from `1.0` to `2.333`.
-     *
-     * @default 1.5
-     */
-    this.ior = 1.5;
     /**
      * Degree of reflectivity, from `0.0` to `1.0`. Default is `0.5`, which
      * corresponds to an index-of-refraction of `1.5`.
@@ -330,119 +445,6 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
       },
     });
     /**
-     * The red channel of this texture is multiplied against `iridescence`, for per-pixel
-     * control over iridescence.
-     *
-     * `iridescenceMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = ColorSpace.No` (default).
-     *
-     * @default null
-     */
-    this.iridescenceMap = null;
-    /**
-     * Strength of the iridescence RGB color shift effect, represented by an index-of-refraction.
-     * Between `1.0` to `2.333`.
-     *
-     * @default 1.3
-     */
-    this.iridescenceIOR = 1.3;
-    /**
-     * The minimum thickness of the iridescence layer in nanometers.
-     *
-     * @default 100
-     */
-    this.iridescenceThicknessMinimum = 100;
-    /**
-     * The maximum thickness of the iridescence layer in nanometers. If no
-     * `iridescenceThicknessMap` is defined, this value is used as the thickness.
-     *
-     * @default 400
-     */
-    this.iridescenceThicknessMaximum = 400;
-    /**
-     * A texture that defines the thickness of the iridescence layer, stored in the green channel.
-     * Minimum and maximum values of thickness are defined by `iridescenceThicknessMinimum` and
-     * `iridescenceThicknessMaximum`:
-     * - `0.0` in the green channel will result in thickness equal to `iridescenceThicknessMinimum`.
-     * - `1.0` in the green channel will result in thickness equal to `iridescenceThicknessMaximum`.
-     * - Values in-between will linearly interpolate between both values.
-     *
-     * `iridescenceThicknessMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = ColorSpace.No` (default).
-     *
-     * @default null
-     */
-    this.iridescenceThicknessMap = null;
-    /**
-     * The sheen tint.
-     *
-     * @default (0,0,0)
-     */
-    this.sheenColor = new Color(0x000000);
-    /**
-     * The RGB channels of this texture are multiplied against  `sheenColor`, for per-pixel control
-     * over sheen tint.
-     *
-     * `sheenColorMap` represents color data, and the texture must be assigned a
-     * {@link Texture#colorSpace}. Most `sheenColorMap` textures set
-     * `texture.colorSpace = ColorSpace.SRGB`.
-     *
-     * @default null
-     */
-    this.sheenColorMap = null;
-    /**
-     * Roughness of the sheen layer, from `0.0` to `1.0`.
-     *
-     * @default 1
-     */
-    this.sheenRoughness = 1.0;
-    /**
-     * The alpha channel of this texture is multiplied against `sheenRoughness`, for per-pixel control
-     * over sheen roughness.
-     *
-     * `sheenRoughnessMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = ColorSpace.No` (default).
-     *
-     * @default null
-     */
-    this.sheenRoughnessMap = null;
-    /**
-     * The red channel of this texture is multiplied against `transmission`, for per-pixel control over
-     * optical transparency.
-     *
-     * `transmissionMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = ColorSpace.No` (default).
-     *
-     * @default null
-     */
-    this.transmissionMap = null;
-    /**
-     * The thickness of the volume beneath the surface. The value is given in the
-     * coordinate space of the mesh. If the value is `0` the material is
-     * thin-walled. Otherwise the material is a volume boundary.
-     *
-     * @default 0
-     */
-    this.thickness = 0;
-    /**
-     * A texture that defines the thickness, stored in the green channel. This will
-     * be multiplied by `thickness`.
-     *
-     * `thicknessMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = ColorSpace.No` (default).
-     *
-     * @default null
-     */
-    this.thicknessMap = null;
-    /**
-     * Density of the medium given as the average distance that light travels in
-     * the medium before interacting with a particle. The value is given in world
-     * space units, and must be greater than zero.
-     *
-     * @default Infinity
-     */
-    this.attenuationDistance = Infinity;
-    /**
      * The color that white light turns into due to absorption when reaching the
      * attenuation distance.
      *
@@ -450,47 +452,11 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
      */
     this.attenuationColor = new Color(1, 1, 1);
     /**
-     * A float that scales the amount of specular reflection for non-metals only.
-     * When set to zero, the model is effectively Lambertian. From `0.0` to `1.0`.
-     *
-     * @default 1
-     */
-    this.specularIntensity = 1.0;
-    /**
-     * The alpha channel of this texture is multiplied against `specularIntensity`,
-     * for per-pixel control over specular intensity.
-     *
-     * `specularIntensityMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = ColorSpace.No` (default).
-     *
-     * @default null
-     */
-    this.specularIntensityMap = null;
-    /**
      * Tints the specular reflection at normal incidence for non-metals only.
      *
      * @default (1,1,1)
      */
     this.specularColor = new Color(1, 1, 1);
-    /**
-     * The RGB channels of this texture are multiplied against `specularColor`,
-     * for per-pixel control over specular color.
-     *
-     * `specularColorMap` represents color data, and the texture must be assigned a
-     * {@link Texture#colorSpace}. Most `specularColorMap` textures set
-     * `texture.colorSpace = ColorSpace.SRGB`.
-     *
-     * @default null
-     */
-    this.specularColorMap = null;
-    this._anisotropy = 0;
-    this._clearcoat = 0;
-    this._diffuseRoughness = 0;
-    this._dispersion = 0;
-    this._iridescence = 0;
-    this._retroreflectivity = 0;
-    this._sheen = 0.0;
-    this._transmission = 0;
     this.setValues(parameters);
   }
   /**

@@ -131,10 +131,9 @@ export class IFFParser {
   currentFormEnd!: number;
   currentPoints!: number[];
   parser!: LWO2Parser | LWO3Parser;
-  debugger: Debugger;
+  debugger: Debugger = new Debugger();
 
   constructor() {
-    this.debugger = new Debugger();
     // this.debugger.enable(); // un-comment to log IFF hierarchy.
   }
 
@@ -1030,29 +1029,17 @@ export class DataViewReader {
 // ************** DEBUGGER  **************
 
 class Debugger {
-  active: boolean;
-  depth: number;
-  formList: number[];
-  offset: number;
-  node: number;
-  nodeID: string;
-  dataOffset: number;
-  length: number;
-  skipped: boolean;
+  active: boolean = false;
+  depth: number = 0;
+  formList: number[] = [];
+  offset: number = 0;
+  node: number = 0; // 0 = FORM, 1 = CHUNK, 2 = SUBNODE
+  nodeID: string = "FORM";
+  dataOffset: number = 0;
+  length: number = 0;
+  skipped: boolean = false;
 
-  constructor() {
-    this.active = false;
-    this.depth = 0;
-    this.formList = [];
-    this.offset = 0;
-
-    this.node = 0; // 0 = FORM, 1 = CHUNK, 2 = SUBNODE
-    this.nodeID = "FORM";
-
-    this.dataOffset = 0;
-    this.length = 0;
-    this.skipped = false;
-  }
+  constructor() {}
 
   enable() {
     this.active = true;

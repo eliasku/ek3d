@@ -17,34 +17,24 @@ const _closestPoint = new Vector3();
 const _triangle = new Triangle();
 
 export class ConvexHull {
-  tolerance: number;
-  faces: Face[];
-  newFaces: Face[];
-  assigned: VertexList;
-  unassigned: VertexList;
-  vertices: VertexNode[];
+  tolerance: number = -1;
+  faces: Face[] = []; // the generated faces of the convex hull
+  newFaces: Face[] = []; // this array holds the faces that are generated within a single iteration
+  // the vertex lists work as follows:
+  //
+  // let 'a' and 'b' be 'Face' instances
+  // let 'v' be points wrapped as instance of 'Vertex'
+  //
+  //     [v, v, ..., v, v, v, ...]
+  //      ^             ^
+  //      |             |
+  //  a.outside     b.outside
+  //
+  assigned: VertexList = new VertexList();
+  unassigned: VertexList = new VertexList();
+  vertices: VertexNode[] = []; // vertices of the hull (internal representation of given geometry data)
 
-  constructor() {
-    this.tolerance = -1;
-
-    this.faces = []; // the generated faces of the convex hull
-    this.newFaces = []; // this array holds the faces that are generated within a single iteration
-
-    // the vertex lists work as follows:
-    //
-    // let 'a' and 'b' be 'Face' instances
-    // let 'v' be points wrapped as instance of 'Vertex'
-    //
-    //     [v, v, ..., v, v, v, ...]
-    //      ^             ^
-    //      |             |
-    //  a.outside     b.outside
-    //
-    this.assigned = new VertexList();
-    this.unassigned = new VertexList();
-
-    this.vertices = []; // vertices of the hull (internal representation of given geometry data)
-  }
+  constructor() {}
 
   setFromPoints(points: Vector3[]) {
     // The algorithm needs at least four points.
@@ -687,28 +677,15 @@ export class ConvexHull {
 }
 
 export class Face {
-  normal: Vector3;
-  midpoint: Vector3;
-  area: number;
-  constant: number;
-  outside: VertexNode | null;
-  mark: number;
-  edge: HalfEdge;
+  normal: Vector3 = new Vector3();
+  midpoint: Vector3 = new Vector3();
+  area: number = 0;
+  constant: number = 0;
+  outside: VertexNode | null = null; // reference to a vertex in a vertex list this face can see
+  mark: number = Visible;
+  edge: HalfEdge = null!;
 
-  constructor() {
-    this.normal = new Vector3();
-
-    this.midpoint = new Vector3();
-
-    this.area = 0;
-
-    this.constant = 0;
-
-    this.outside = null; // reference to a vertex in a vertex list this face can see
-    this.mark = Visible;
-
-    this.edge = null!;
-  }
+  constructor() {}
 
   static create(a: VertexNode, b: VertexNode, c: VertexNode) {
     const face = new Face();
@@ -769,19 +746,13 @@ export class Face {
 
 export class HalfEdge {
   vertex: VertexNode;
-  prev: HalfEdge;
-  next: HalfEdge;
-  twin: HalfEdge;
+  prev: HalfEdge = null!;
+  next: HalfEdge = null!;
+  twin: HalfEdge = null!;
   face: Face;
 
   constructor(vertex: VertexNode, face: Face) {
     this.vertex = vertex;
-
-    this.prev = null!;
-
-    this.next = null!;
-
-    this.twin = null!;
 
     this.face = face;
   }
@@ -826,30 +797,20 @@ export class HalfEdge {
 
 export class VertexNode {
   point: Vector3;
-  prev: VertexNode | null;
-  next: VertexNode | null;
-  face: Face;
+  prev: VertexNode | null = null!;
+  next: VertexNode | null = null!;
+  face: Face = null!;
 
   constructor(point: Vector3) {
     this.point = point;
-
-    this.prev = null!;
-
-    this.next = null!;
-
-    this.face = null!;
   }
 }
 
 export class VertexList {
-  head: VertexNode | null;
-  tail: VertexNode | null;
+  head: VertexNode | null = null;
+  tail: VertexNode | null = null;
 
-  constructor() {
-    this.head = null;
-
-    this.tail = null;
-  }
+  constructor() {}
 
   first() {
     return this.head;

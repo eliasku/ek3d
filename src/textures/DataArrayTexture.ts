@@ -5,7 +5,13 @@ import { Wrapping, TextureFilter } from "../constants";
  *
  */
 export class DataArrayTexture extends Texture {
-  isDataArrayTexture: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isDataArrayTexture: boolean = true;
   wrapR: Wrapping;
   layerUpdates: Set<number>;
 
@@ -36,13 +42,6 @@ export class DataArrayTexture extends Texture {
     depth: number = 1,
   ) {
     super(null);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isDataArrayTexture = true;
     /**
      * The image definition of a data texture.
      *

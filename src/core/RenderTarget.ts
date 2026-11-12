@@ -70,14 +70,31 @@ export type RenderTargetOptions = { wrapR?: Wrapping; mapping?: Mapping; flipY?:
  *
  */
 export class RenderTarget extends EventDispatcher {
-  isRenderTarget: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isRenderTarget: boolean = true;
   width: number;
   height: number;
   depth: number;
   scissor: Vector4;
-  scissorTest: boolean;
+  /**
+   * Indicates whether the scissor test should be enabled when rendering into
+   * this render target or not.
+   *
+   * @default false
+   */
+  scissorTest: boolean = false;
   viewport: Vector4;
-  textures: Texture[];
+  /**
+   * An array of textures. Each color attachment is represented as a separate texture.
+   * Has at least a single entry for the default color attachment.
+   *
+   */
+  textures: Texture[] = [];
   depthBuffer: boolean;
   stencilBuffer: boolean;
   resolveColorBuffer: boolean;
@@ -123,13 +140,6 @@ export class RenderTarget extends EventDispatcher {
       options,
     );
     /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isRenderTarget = true;
-    /**
      * The width of the render target.
      *
      * @default 1
@@ -155,24 +165,11 @@ export class RenderTarget extends EventDispatcher {
      */
     this.scissor = new Vector4(0, 0, width, height);
     /**
-     * Indicates whether the scissor test should be enabled when rendering into
-     * this render target or not.
-     *
-     * @default false
-     */
-    this.scissorTest = false;
-    /**
      * A rectangular area representing the render target's viewport.
      *
      * @default (0,0,width,height)
      */
     this.viewport = new Vector4(0, 0, width, height);
-    /**
-     * An array of textures. Each color attachment is represented as a separate texture.
-     * Has at least a single entry for the default color attachment.
-     *
-     */
-    this.textures = [];
     const count = options.count!;
     for (let i = 0; i < count; i++) {
       this.textures[i] = new Texture({ width: width, height: height, depth: this.depth });

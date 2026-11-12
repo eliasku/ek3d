@@ -37,7 +37,11 @@ import { LineCurve } from "../curves/LineCurve";
  *
  */
 export class Path extends CurvePath<Vector2> {
-  currentPoint: Vector2;
+  /**
+   * The current offset of the path. Any new curve added will start here.
+   *
+   */
+  currentPoint: Vector2 = new Vector2();
 
   /**
    * Constructs a new path.
@@ -47,11 +51,6 @@ export class Path extends CurvePath<Vector2> {
   constructor(points?: Vector2[]) {
     super();
     this.type = "Path";
-    /**
-     * The current offset of the path. Any new curve added will start here.
-     *
-     */
-    this.currentPoint = new Vector2();
     if (points!) {
       this.setFromPoints(points!);
     }

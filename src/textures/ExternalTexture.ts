@@ -8,7 +8,13 @@ import { Texture } from "./Texture";
  */
 export class ExternalTexture extends Texture {
   sourceTexture: (WebGLTexture & object) | null;
-  isExternalTexture: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isExternalTexture: boolean = true;
 
   /**
    * Creates a new raw texture.
@@ -23,13 +29,6 @@ export class ExternalTexture extends Texture {
      * @default null
      */
     this.sourceTexture = sourceTexture;
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isExternalTexture = true;
   }
   clone(): ExternalTexture {
     return new ExternalTexture().copy(this);

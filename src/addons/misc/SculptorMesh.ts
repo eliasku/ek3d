@@ -295,20 +295,15 @@ function buildTriangleBuffers(
 class OctreeCell {
   _parent: OctreeCell | null;
   _depth: number;
-  _children: OctreeCell[];
-  _aabbLoose: number[];
-  _aabbSplit: number[];
-  _iFaces: number[];
-  _queuedForUpdate: boolean;
+  _children: OctreeCell[] = [];
+  _aabbLoose: number[] = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
+  _aabbSplit: number[] = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
+  _iFaces: number[] = [];
+  _queuedForUpdate: boolean = false;
 
   constructor(parent?: OctreeCell) {
     this._parent = parent ?? null;
     this._depth = parent ? parent._depth + 1 : 0;
-    this._children = [];
-    this._aabbLoose = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
-    this._aabbSplit = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
-    this._iFaces = [];
-    this._queuedForUpdate = false;
   }
 
   resetNbFaces(nbFaces: number) {
@@ -618,61 +613,29 @@ class OctreeCell {
 // Mesh topology and spatial queries
 
 export class SculptorMesh {
-  _nbVertices: number;
-  _nbFaces: number;
-  _verticesXYZ: Float32Array | null;
-  _normalsXYZ: Float32Array | null;
-  _renderNormalsXYZ: Float32Array | null;
-  _facesABCD: Uint32Array | null;
-  _trianglesABC: Uint32Array | null;
-  _vertRingVert: number[][];
-  _vertRingFace: number[][];
-  _vertOnEdge: Uint8Array | null;
-  _faceNormals: Float32Array | null;
-  _faceBoxes: Float32Array | null;
-  _faceCenters: Float32Array | null;
-  _facePosInLeaf: Uint32Array | null;
-  _faceLeaf: (OctreeCell | null)[];
-  _vertTagFlags: Int32Array | null;
-  _vertSculptFlags: Int32Array | null;
-  _facesTagFlags: Int32Array | null;
-  _octree: OctreeCell | null;
-  _leavesToUpdate: OctreeCell[];
-  _topologyVersion: number;
-  _tagFlag: number;
-  _sculptFlag: number;
-
-  constructor() {
-    this._nbVertices = 0;
-    this._nbFaces = 0;
-
-    this._verticesXYZ = null;
-    this._normalsXYZ = null;
-    this._renderNormalsXYZ = null;
-
-    this._facesABCD = null;
-    this._trianglesABC = null;
-
-    this._vertRingVert = [];
-    this._vertRingFace = [];
-    this._vertOnEdge = null;
-
-    this._faceNormals = null;
-    this._faceBoxes = null;
-    this._faceCenters = null;
-    this._facePosInLeaf = null;
-    this._faceLeaf = [];
-
-    this._vertTagFlags = null;
-    this._vertSculptFlags = null;
-    this._facesTagFlags = null;
-
-    this._octree = null;
-    this._leavesToUpdate = [];
-    this._topologyVersion = 0;
-    this._tagFlag = 1;
-    this._sculptFlag = 1;
-  }
+  _nbVertices: number = 0;
+  _nbFaces: number = 0;
+  _verticesXYZ: Float32Array | null = null;
+  _normalsXYZ: Float32Array | null = null;
+  _renderNormalsXYZ: Float32Array | null = null;
+  _facesABCD: Uint32Array | null = null;
+  _trianglesABC: Uint32Array | null = null;
+  _vertRingVert: number[][] = [];
+  _vertRingFace: number[][] = [];
+  _vertOnEdge: Uint8Array | null = null;
+  _faceNormals: Float32Array | null = null;
+  _faceBoxes: Float32Array | null = null;
+  _faceCenters: Float32Array | null = null;
+  _facePosInLeaf: Uint32Array | null = null;
+  _faceLeaf: (OctreeCell | null)[] = [];
+  _vertTagFlags: Int32Array | null = null;
+  _vertSculptFlags: Int32Array | null = null;
+  _facesTagFlags: Int32Array | null = null;
+  _octree: OctreeCell | null = null;
+  _leavesToUpdate: OctreeCell[] = [];
+  _topologyVersion: number = 0;
+  _tagFlag: number = 1;
+  _sculptFlag: number = 1;
 
   getNbVertices() {
     return this._nbVertices;

@@ -413,7 +413,13 @@ Use `./node_modules/.bin/vp toolchain` to inspect the actual bundled engines. Re
 
 `typescript@7.0.2` is the primary compiler and native language server. `typescript6` aliases `typescript@6.0.2` for the stable JavaScript Compiler API used by AST-based package checks and graph analysis; it remains required after removal of the converter. Typecheck commands use the primary package's explicit CLI path rather than depending on two packages competing for the `tsc` bin link.
 
-Maintained scripts are TypeScript executed by `tsx`. One root `tsconfig.json` checks the port, example, consumer/browser contracts, scripts, Node tests and build config under the same strict settings. Imported upstream JavaScript is allowed for differential tests, but is not itself checked or modified. `tsx` executes code without type checking.
+Shared strict options live in `scripts/tsconfig.base.json`. Root `tsconfig.json` contains only an empty `files` list and references to:
+
+- `scripts/tsconfig.test.json`: Vitest `tests/**/*.test.ts`, with Node and DOM types.
+- `scripts/tsconfig.node.json`: maintained `scripts/**/*.ts` and `vite.config.ts`, with Node types. DOM declarations also type Playwright callbacks executed in the browser.
+- `scripts/tsconfig.lib.json`: library sources, testbed, examples, browser scenarios and compile-only fixtures, without ambient Node types. The production transformer and isolated consumer checks use this config.
+
+`npm run typecheck` runs `tsc -b`, writing only build metadata under `node_modules/.cache/`. Imported upstream JavaScript is allowed for differential tests, but is not itself checked or modified. Maintained scripts run through `tsx`, which does not check types.
 
 Vite builds the default `index.html` entry. Development dependency scanning uses that page and the browser fixtures explicitly; it does not crawl the vendored upstream example pages. The library still packages raw TypeScript with canonical subpath exports: no library bundling or declaration emit was added.
 
@@ -444,7 +450,7 @@ renderer.render(scene, camera);
 
 The package contains raw `src/**/*.ts`. `exports` maps `ek3d/*` directly to `src/*.ts`; the package root is intentionally unavailable. There are no root entry points, barrels, declaration-only facades or runtime upstream bridges. A module may export multiple declarations, but every declaration is imported from its defining module. Internal paths are extensionless too. Use a TypeScript-capable bundler with `moduleResolution: "bundler"`; Vite 8 resolves the package exports without aliases. Plain Node ESM does not resolve these extensionless source imports unaided.
 
-For TypeScript 7 with an ES2022 target, include `ES2025.Float16` alongside `ES2022`, `DOM` and `DOM.Iterable` in `lib` (or use ES2025/ESNext declarations). The native Float16 attribute path is runtime-feature-detected, but its name must be typed when checking raw source. Browser consumers need no ambient Node types. A minimal consumer configuration, matching the relevant settings of this repository's root `tsconfig.json`, is:
+For TypeScript 7 with an ES2022 target, include `ES2025.Float16` alongside `ES2022`, `DOM` and `DOM.Iterable` in `lib` (or use ES2025/ESNext declarations). The native Float16 attribute path is runtime-feature-detected, but its name must be typed when checking raw source. Browser consumers need no ambient Node types. A minimal consumer configuration, matching the relevant settings of `scripts/tsconfig.lib.json`, is:
 
 ```json
 {

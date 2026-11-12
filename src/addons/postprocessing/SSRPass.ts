@@ -62,16 +62,49 @@ export class SSRPass extends Pass {
   camera: PerspectiveCamera;
   width: number;
   height: number;
-  clear: boolean;
+  /**
+   * Overwritten to perform a clear operation by default.
+   *
+   * @default true
+   */
+  clear: boolean = true;
   renderer: WebGLRenderer;
   groundReflector: ReflectorForSSRPass | null;
-  opacity: number;
-  output: number;
-  maxDistance: number;
-  thickness: number;
-  tempColor: Color;
+  /**
+   * The opacity.
+   *
+   * @default 0.5
+   */
+  opacity: number = SSRShader.uniforms.opacity.value;
+  /**
+   * The output configuration.
+   *
+   * @default 0
+   */
+  output: number = 0;
+  /**
+   * Controls how far a fragment can reflect.
+   *
+   * @default 180
+   */
+  maxDistance: number = SSRShader.uniforms.maxDistance.value;
+  /**
+   * Controls the cutoff between what counts as a
+   * possible reflection hit and what does not.
+   *
+   * @default .018
+   */
+  thickness: number = SSRShader.uniforms.thickness.value;
+  tempColor: Color = new Color();
   selective: boolean;
-  blur: boolean;
+  // internals
+
+  /**
+   * Whether to blur reflections or not.
+   *
+   * @default true
+   */
+  blur: boolean = true;
   beautyRenderTarget: WebGLRenderTarget;
   prevRenderTarget: WebGLRenderTarget;
   normalRenderTarget: WebGLRenderTarget;
@@ -90,11 +123,11 @@ export class SSRPass extends Pass {
   fsQuad: FullScreenQuad;
   originalClearColor: Color;
   _selects: Object3D[] | null;
-  _resolutionScale: number;
+  _resolutionScale: number = 1;
   _bouncing: boolean = false;
-  _distanceAttenuation: boolean;
-  _fresnel: boolean;
-  _infiniteThick: boolean;
+  _distanceAttenuation: boolean = SSRShader.defines.DISTANCE_ATTENUATION;
+  _fresnel: boolean = SSRShader.defines.FRESNEL;
+  _infiniteThick: boolean = SSRShader.defines.INFINITE_THICK;
 
   /** Output modes. */
   static OUTPUT: { Default: number; SSR: number; Beauty: number; Depth: number; Normal: number; Metalness: number } = {
@@ -138,13 +171,6 @@ export class SSRPass extends Pass {
     this.height = height;
 
     /**
-     * Overwritten to perform a clear operation by default.
-     *
-     * @default true
-     */
-    this.clear = true;
-
-    /**
      * The renderer.
      */
     this.renderer = renderer;
@@ -166,40 +192,7 @@ export class SSRPass extends Pass {
      */
     this.groundReflector = groundReflector;
 
-    /**
-     * The opacity.
-     *
-     * @default 0.5
-     */
-    this.opacity = SSRShader.uniforms.opacity.value;
-
-    /**
-     * The output configuration.
-     *
-     * @default 0
-     */
-    this.output = 0;
-
-    /**
-     * Controls how far a fragment can reflect.
-     *
-     * @default 180
-     */
-    this.maxDistance = SSRShader.uniforms.maxDistance.value;
-
-    /**
-     * Controls the cutoff between what counts as a
-     * possible reflection hit and what does not.
-     *
-     * @default .018
-     */
-    this.thickness = SSRShader.uniforms.thickness.value;
-
-    this.tempColor = new Color();
-
     this._selects = selects;
-
-    this._resolutionScale = 1;
 
     /**
      * Whether the pass is selective or not.
@@ -209,19 +202,6 @@ export class SSRPass extends Pass {
     this.selective = Array.isArray(this._selects);
 
     this._selects = selects;
-
-    // internals
-
-    /**
-     * Whether to blur reflections or not.
-     *
-     * @default true
-     */
-    this.blur = true;
-
-    this._distanceAttenuation = SSRShader.defines.DISTANCE_ATTENUATION;
-    this._fresnel = SSRShader.defines.FRESNEL;
-    this._infiniteThick = SSRShader.defines.INFINITE_THICK;
 
     // beauty render target with depth buffer
 

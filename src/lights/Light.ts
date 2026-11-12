@@ -7,7 +7,13 @@ import { Color } from "../math/Color";
  * @abstract
  */
 export class Light extends Object3D {
-  isLight: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isLight: boolean = true;
 
   color: Color;
   intensity: number;
@@ -20,13 +26,6 @@ export class Light extends Object3D {
    */
   constructor(color?: number | Color | string, intensity: number = 1) {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isLight = true;
     this.type = "Light";
     /**
      * The light's color.

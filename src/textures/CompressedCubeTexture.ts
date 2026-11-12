@@ -9,8 +9,20 @@ import { CompressedTexture } from "./CompressedTexture";
  *
  */
 export class CompressedCubeTexture extends CompressedTexture {
-  isCompressedCubeTexture: boolean;
-  isCubeTexture: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isCompressedCubeTexture: boolean = true;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isCubeTexture: boolean = true;
 
   /**
    * Constructs a new compressed texture.
@@ -21,20 +33,6 @@ export class CompressedCubeTexture extends CompressedTexture {
    */
   constructor(images: CompressedTextureFace[], format?: PixelFormat, type?: TextureType) {
     super(undefined, images[0].width, images[0].height, format, type, Mapping.CubeReflection);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isCompressedCubeTexture = true;
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isCubeTexture = true;
     this.image = images;
   }
   clone(): CompressedCubeTexture {

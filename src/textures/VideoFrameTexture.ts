@@ -17,7 +17,13 @@ import { VideoTexture } from "./VideoTexture";
  *
  */
 export class VideoFrameTexture extends VideoTexture {
-  isVideoFrameTexture: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isVideoFrameTexture: boolean = true;
 
   /**
    * Constructs a new video frame texture.
@@ -42,13 +48,6 @@ export class VideoFrameTexture extends VideoTexture {
     anisotropy?: number,
   ) {
     super({} as HTMLVideoElement, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isVideoFrameTexture = true;
   }
   /**
    * This method overwritten with an empty implementation since

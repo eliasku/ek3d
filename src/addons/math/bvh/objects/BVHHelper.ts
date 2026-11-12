@@ -19,11 +19,11 @@ const vec = /* @__PURE__ */ new Vector3();
 
 class BVHRootHelper extends Object3D {
   material: LineBasicMaterial | MeshBasicMaterial;
-  geometry: BufferGeometry;
+  geometry: BufferGeometry = new BufferGeometry();
   depth: number;
-  displayParents: boolean;
+  displayParents: boolean = false;
   bvh: GeometryBVH | null;
-  displayEdges: boolean;
+  displayEdges: boolean = true;
   _group: number;
 
   get isMesh() {
@@ -46,12 +46,9 @@ class BVHRootHelper extends Object3D {
     super();
 
     this.material = material;
-    this.geometry = new BufferGeometry();
     this.name = "BVHRootHelper";
     this.depth = depth;
-    this.displayParents = false;
     this.bvh = bvh;
-    this.displayEdges = true;
     this._group = group;
   }
 
@@ -205,10 +202,10 @@ export class BVHHelper extends Group {
   depth: number;
   mesh: Object3D | null;
   bvh: GeometryBVH | null;
-  displayParents: boolean;
-  displayEdges: boolean;
-  instanceId: number;
-  _roots: BVHRootHelper[];
+  displayParents: boolean = false;
+  displayEdges: boolean = true;
+  instanceId: number = 0;
+  _roots: BVHRootHelper[] = [];
   edgeMaterial: LineBasicMaterial;
   meshMaterial: MeshBasicMaterial;
 
@@ -264,14 +261,6 @@ export class BVHHelper extends Group {
     this.mesh = mesh;
 
     this.bvh = bvh;
-
-    this.displayParents = false;
-
-    this.displayEdges = true;
-
-    this.instanceId = 0;
-
-    this._roots = [];
 
     const edgeMaterial = new LineBasicMaterial({
       color: 0x00ff88,

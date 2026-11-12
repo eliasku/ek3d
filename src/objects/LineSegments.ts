@@ -13,7 +13,13 @@ const _end = /*@__PURE__*/ new Vector3();
  *
  */
 export class LineSegments<TMaterial extends Material | Material[] = Material | Material[]> extends Line<TMaterial> {
-  isLineSegments: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isLineSegments: boolean = true;
 
   /**
    * Constructs a new line segments.
@@ -23,13 +29,6 @@ export class LineSegments<TMaterial extends Material | Material[] = Material | M
    */
   constructor(geometry: BufferGeometry, material: NoInfer<TMaterial>) {
     super(geometry, material);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isLineSegments = true;
     this.type = "LineSegments";
   }
   clone(recursive: boolean = true): LineSegments<TMaterial> {

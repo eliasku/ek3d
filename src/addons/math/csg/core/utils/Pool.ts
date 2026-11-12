@@ -1,13 +1,11 @@
 // class for getting reusable object instances and releasing them for reuse
 export class Pool<T> {
   createFn: () => T;
-  _pool: T[];
-  _index: number;
+  _pool: T[] = [];
+  _index: number = 0;
 
   constructor(createFn: () => T) {
     this.createFn = createFn;
-    this._pool = [];
-    this._index = 0;
   }
 
   getInstance() {

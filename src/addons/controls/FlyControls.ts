@@ -40,28 +40,28 @@ export class FlyControls<TObject extends Object3D = Object3D> extends Controls<T
    *
    * @default 1
    */
-  movementSpeed: number;
+  movementSpeed: number = 1.0;
 
   /**
    * The rotation speed.
    *
    * @default 0.005
    */
-  rollSpeed: number;
+  rollSpeed: number = 0.005;
 
   /**
    * If set to `true`, you can only look around by performing a drag interaction.
    *
    * @default false
    */
-  dragToLook: boolean;
+  dragToLook: boolean = false;
 
   /**
    * If set to `true`, the camera automatically moves forward (and does not stop) when initially translated.
    *
    * @default false
    */
-  autoForward: boolean;
+  autoForward: boolean = false;
 
   /**
    * Multiplier applied while a Shift key is held. Upstream keeps the field dormant:
@@ -69,24 +69,37 @@ export class FlyControls<TObject extends Object3D = Object3D> extends Controls<T
    *
    * @default 1
    */
-  movementSpeedMultiplier: number;
+  movementSpeedMultiplier: number = 1;
 
   // internals
 
-  _moveState: MoveState;
-  _moveVector: Vector3;
-  _rotationVector: Vector3;
-  _lastQuaternion: Quaternion;
-  _lastPosition: Vector3;
-  _status: number;
+  _moveState: MoveState = {
+    up: 0,
+    down: 0,
+    left: 0,
+    right: 0,
+    forward: 0,
+    back: 0,
+    pitchUp: 0,
+    pitchDown: 0,
+    yawLeft: 0,
+    yawRight: 0,
+    rollLeft: 0,
+    rollRight: 0,
+  };
+  _moveVector: Vector3 = new Vector3(0, 0, 0);
+  _rotationVector: Vector3 = new Vector3(0, 0, 0);
+  _lastQuaternion: Quaternion = new Quaternion();
+  _lastPosition: Vector3 = new Vector3();
+  _status: number = 0;
 
-  _onKeyDown: (event: KeyboardEvent) => void;
-  _onKeyUp: (event: KeyboardEvent) => void;
-  _onPointerMove: (event: PointerEvent) => void;
-  _onPointerDown: (event: PointerEvent) => void;
-  _onPointerUp: (event: PointerEvent) => void;
-  _onPointerCancel: () => void;
-  _onContextMenu: (event: Event) => void;
+  _onKeyDown: (event: KeyboardEvent) => void = onKeyDown.bind(this);
+  _onKeyUp: (event: KeyboardEvent) => void = onKeyUp.bind(this);
+  _onPointerMove: (event: PointerEvent) => void = onPointerMove.bind(this);
+  _onPointerDown: (event: PointerEvent) => void = onPointerDown.bind(this);
+  _onPointerUp: (event: PointerEvent) => void = onPointerUp.bind(this);
+  _onPointerCancel: () => void = onPointerCancel.bind(this);
+  _onContextMenu: (event: Event) => void = onContextMenu.bind(this);
 
   /**
    * Constructs a new controls instance.
@@ -96,40 +109,6 @@ export class FlyControls<TObject extends Object3D = Object3D> extends Controls<T
    */
   constructor(object: TObject, domElement: HTMLElement | Document | null = null) {
     super(object, domElement as HTMLElement | null);
-
-    this.movementSpeed = 1.0;
-    this.rollSpeed = 0.005;
-    this.dragToLook = false;
-    this.autoForward = false;
-    this.movementSpeedMultiplier = 1;
-
-    this._moveState = {
-      up: 0,
-      down: 0,
-      left: 0,
-      right: 0,
-      forward: 0,
-      back: 0,
-      pitchUp: 0,
-      pitchDown: 0,
-      yawLeft: 0,
-      yawRight: 0,
-      rollLeft: 0,
-      rollRight: 0,
-    };
-    this._moveVector = new Vector3(0, 0, 0);
-    this._rotationVector = new Vector3(0, 0, 0);
-    this._lastQuaternion = new Quaternion();
-    this._lastPosition = new Vector3();
-    this._status = 0;
-
-    this._onKeyDown = onKeyDown.bind(this);
-    this._onKeyUp = onKeyUp.bind(this);
-    this._onPointerMove = onPointerMove.bind(this);
-    this._onPointerDown = onPointerDown.bind(this);
-    this._onPointerUp = onPointerUp.bind(this);
-    this._onPointerCancel = onPointerCancel.bind(this);
-    this._onContextMenu = onContextMenu.bind(this);
 
     if (domElement !== null) {
       this.connect(domElement as HTMLElement);

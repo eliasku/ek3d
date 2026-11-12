@@ -6,21 +6,14 @@ import { Brush } from "../Brush";
 import { ADDITION } from "../constants";
 
 export class Operation extends Brush {
-  isOperation: boolean;
-  operation: CSGOperation;
-  _cachedGeometry: BufferGeometry;
-  _cachedMaterials: Material | Material[] | null;
-  _previousOperation: CSGOperation | null;
+  isOperation: boolean = true;
+  operation: CSGOperation = ADDITION;
+  _cachedGeometry: BufferGeometry = new BufferGeometry();
+  _cachedMaterials: Material | Material[] | null = null;
+  _previousOperation: CSGOperation | null = null;
 
   constructor(...args: ConstructorParameters<typeof Brush>) {
     super(...args);
-
-    this.isOperation = true;
-    this.operation = ADDITION;
-
-    this._cachedGeometry = new BufferGeometry();
-    this._cachedMaterials = null;
-    this._previousOperation = null;
   }
 
   markUpdated() {

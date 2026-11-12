@@ -13,8 +13,8 @@ export class WebGLObjects {
   private attributes: WebGLAttributes;
   private bindingStates: WebGLBindingStates;
   private info: WebGLInfoState;
-  private updateMap: WeakMap<BufferGeometry | InstancedMesh | Skeleton, number>;
-  private instancedMeshes: Set<InstancedMesh>;
+  private updateMap: WeakMap<BufferGeometry | InstancedMesh | Skeleton, number> = new WeakMap();
+  private instancedMeshes: Set<InstancedMesh> = new Set();
 
   constructor(
     gl: WebGL2RenderingContext,
@@ -27,8 +27,6 @@ export class WebGLObjects {
     this.attributes = attributes;
     this.bindingStates = bindingStates;
     this.info = info;
-    this.updateMap = new WeakMap();
-    this.instancedMeshes = new Set();
     this.update = this.update.bind(this);
     this.dispose = this.dispose.bind(this);
     this.onInstancedMeshDispose = this.onInstancedMeshDispose.bind(this);

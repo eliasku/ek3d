@@ -26,13 +26,43 @@ const _sphere = /*@__PURE__*/ new Sphere();
  *
  */
 export class InstancedMesh extends Mesh {
-  isInstancedMesh: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isInstancedMesh: boolean = true;
   instanceMatrix: InstancedBufferAttribute;
-  instanceColor: InstancedBufferAttribute | null;
-  morphTexture: DataTexture | null;
+  /**
+   * Represents the color of all instances. You have to set its
+   * {@link BufferAttribute#needsUpdate} flag to true if you modify instanced data
+   * via {@link InstancedMesh#setColorAt}.
+   *
+   * @default null
+   */
+  instanceColor: InstancedBufferAttribute | null = null;
+  /**
+   * Represents the morph target weights of all instances. You have to set its
+   * {@link Texture#needsUpdate} flag to true if you modify instanced data
+   * via {@link InstancedMesh#setMorphAt}.
+   *
+   * @default null
+   */
+  morphTexture: DataTexture | null = null;
   count: number;
-  boundingBox: Box3 | null;
-  boundingSphere: Sphere | null;
+  /**
+   * The bounding box of the instanced mesh. Can be computed via {@link InstancedMesh#computeBoundingBox}.
+   *
+   * @default null
+   */
+  boundingBox: Box3 | null = null;
+  /**
+   * The bounding sphere of the instanced mesh. Can be computed via {@link InstancedMesh#computeBoundingSphere}.
+   *
+   * @default null
+   */
+  boundingSphere: Sphere | null = null;
 
   /**
    * Constructs a new instanced mesh.
@@ -44,13 +74,6 @@ export class InstancedMesh extends Mesh {
   constructor(geometry: BufferGeometry, material: Material | Material[], count: number) {
     super(geometry, material);
     /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isInstancedMesh = true;
-    /**
      * Represents the local transformation of all instances. You have to set its
      * {@link BufferAttribute#needsUpdate} flag to true if you modify instanced data
      * via {@link InstancedMesh#setMatrixAt}.
@@ -58,38 +81,10 @@ export class InstancedMesh extends Mesh {
      */
     this.instanceMatrix = new InstancedBufferAttribute(new Float32Array(count * 16), 16);
     /**
-     * Represents the color of all instances. You have to set its
-     * {@link BufferAttribute#needsUpdate} flag to true if you modify instanced data
-     * via {@link InstancedMesh#setColorAt}.
-     *
-     * @default null
-     */
-    this.instanceColor = null;
-    /**
-     * Represents the morph target weights of all instances. You have to set its
-     * {@link Texture#needsUpdate} flag to true if you modify instanced data
-     * via {@link InstancedMesh#setMorphAt}.
-     *
-     * @default null
-     */
-    this.morphTexture = null;
-    /**
      * The number of instances.
      *
      */
     this.count = count;
-    /**
-     * The bounding box of the instanced mesh. Can be computed via {@link InstancedMesh#computeBoundingBox}.
-     *
-     * @default null
-     */
-    this.boundingBox = null;
-    /**
-     * The bounding sphere of the instanced mesh. Can be computed via {@link InstancedMesh#computeBoundingSphere}.
-     *
-     * @default null
-     */
-    this.boundingSphere = null;
     for (let i = 0; i < count; i++) {
       this.setMatrixAt(i, _identity);
     }

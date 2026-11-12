@@ -85,8 +85,8 @@ export class Flow<T extends { clone(): T } & Mesh = Mesh> {
   object3D: T;
   splineTexture: DataTexture;
   uniforms: FlowUniforms;
-  curveArray: (Curve<Vector3> | undefined)[];
-  curveLengthArray: number[];
+  curveArray: (Curve<Vector3> | undefined)[] = [];
+  curveLengthArray: number[] = [];
 
   constructor(mesh: T, numberOfCurves = 1) {
     const texture = new DataTexture(
@@ -118,9 +118,7 @@ export class Flow<T extends { clone(): T } & Mesh = Mesh> {
       };
       child.material = Array.isArray(child.material) ? child.material.map(clone) : clone(child.material);
     });
-    this.curveArray = [];
     this.curveArray.length = numberOfCurves;
-    this.curveLengthArray = [];
     this.curveLengthArray.length = numberOfCurves;
   }
 
@@ -159,17 +157,15 @@ export class Flow<T extends { clone(): T } & Mesh = Mesh> {
 
 const matrix = new Matrix4();
 export class InstancedFlow extends Flow<InstancedMesh> {
-  offsets: number[];
-  whichCurve: number[];
+  offsets: number[] = [];
+  whichCurve: number[] = [];
   constructor(count: number, curveCount: number, geometry: BufferGeometry, material: Material | Material[]) {
     const mesh = new InstancedMesh(geometry, material, count);
     mesh.instanceMatrix.setUsage(BufferUsage.DynamicDraw);
     mesh.frustumCulled = false;
     super(mesh, curveCount);
-    this.offsets = [];
     this.offsets.length = count;
     this.offsets.fill(0);
-    this.whichCurve = [];
     this.whichCurve.length = count;
     this.whichCurve.fill(0);
   }

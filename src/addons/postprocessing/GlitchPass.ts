@@ -24,9 +24,24 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  *
  */
 export class GlitchPass extends Pass {
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
-  material: ShaderMaterial;
-  goWild: boolean;
+  /**
+   * The pass uniforms.
+   */
+  uniforms: Record<string, { value: any; needsUpdate?: boolean }> = cloneUniforms(DigitalGlitch.uniforms);
+  /**
+   * The pass material.
+   */
+  material: ShaderMaterial = new ShaderMaterial({
+    uniforms: this.uniforms,
+    vertexShader: DigitalGlitch.vertexShader,
+    fragmentShader: DigitalGlitch.fragmentShader,
+  });
+  /**
+   * Whether to noticeably increase the effect intensity or not.
+   *
+   * @default false
+   */
+  goWild: boolean = false;
   _fsQuad: FullScreenQuad;
   _curF: number;
   _randX: number;
@@ -40,27 +55,6 @@ export class GlitchPass extends Pass {
    */
   constructor(dtSize: number = 64) {
     super();
-    /**
-     * The pass uniforms.
-     */
-    this.uniforms = cloneUniforms(DigitalGlitch.uniforms);
-
-    /**
-     * The pass material.
-     */
-    this.material = new ShaderMaterial({
-      uniforms: this.uniforms,
-      vertexShader: DigitalGlitch.vertexShader,
-      fragmentShader: DigitalGlitch.fragmentShader,
-    });
-
-    /**
-     * Whether to noticeably increase the effect intensity or not.
-     *
-     * @default false
-     */
-    this.goWild = false;
-
     // internals
 
     this._heightMap = this._generateHeightmap(dtSize);

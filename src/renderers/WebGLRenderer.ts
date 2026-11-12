@@ -169,7 +169,13 @@ export interface WebGLRendererOptions {
  * ```
  */
 export class WebGLRenderer {
-  isWebGLRenderer: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isWebGLRenderer: boolean = true;
   shaders: NonNullable<WebGLRendererOptions["shaders"]>;
   shaderChunks: Record<string, string>;
   domElement: HTMLCanvasElement | OffscreenCanvas;
@@ -309,13 +315,6 @@ export class WebGLRenderer {
       reversedDepthBuffer = false,
       outputBufferType = TextureType.UnsignedByte,
     } = parameters;
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isWebGLRenderer = true;
     this.shaders = parameters.shaders ?? {};
     this.shaderChunks = parameters.shaderChunks ?? {};
     let _alpha: any;

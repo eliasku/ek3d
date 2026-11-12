@@ -37,22 +37,20 @@ class RendererRecorder {
   state: {
     buffers: { depth: { setMask: (value: boolean) => void } };
     viewport: (value: Vector4) => void;
-  };
-
-  constructor() {
-    this.state = {
-      buffers: {
-        depth: {
-          setMask: (value: boolean) => {
-            this.depthMasks.push(value);
-          },
+  } = {
+    buffers: {
+      depth: {
+        setMask: (value: boolean) => {
+          this.depthMasks.push(value);
         },
       },
-      viewport: (value: Vector4) => {
-        this.viewports.push(value.clone());
-      },
-    };
-  }
+    },
+    viewport: (value: Vector4) => {
+      this.viewports.push(value.clone());
+    },
+  };
+
+  constructor() {}
 
   getRenderTarget(): WebGLRenderTarget | null {
     return this.currentTarget;

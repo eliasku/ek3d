@@ -3,13 +3,10 @@ import type { ShaderMaterial } from "../../materials/ShaderMaterial";
 
 let _id = 0;
 export class WebGLShaderCache {
-  shaderCache: Map<string, WebGLShaderStage>;
-  materialCache: Map<Material, Set<WebGLShaderStage>>;
+  shaderCache: Map<string, WebGLShaderStage> = new Map();
+  materialCache: Map<Material, Set<WebGLShaderStage>> = new Map();
 
-  constructor() {
-    this.shaderCache = new Map();
-    this.materialCache = new Map();
-  }
+  constructor() {}
   update(material: Material, vertexShaderStage: WebGLShaderStage, fragmentShaderStage: WebGLShaderStage) {
     const materialShaders = this._getShaderCacheForMaterial(material);
     if (materialShaders.has(vertexShaderStage) === false) {
@@ -61,13 +58,11 @@ export class WebGLShaderCache {
   }
 }
 class WebGLShaderStage {
-  id: number;
+  id: number = _id++;
   code: string;
-  usedTimes: number;
+  usedTimes: number = 0;
 
   constructor(code: string) {
-    this.id = _id++;
     this.code = code;
-    this.usedTimes = 0;
   }
 }

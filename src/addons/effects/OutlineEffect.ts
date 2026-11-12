@@ -53,7 +53,7 @@ type SourceMaterial = Material & {
 type OutlineScene = Object3D & { background?: Color | Texture | null };
 
 export class OutlineEffect {
-  enabled: boolean;
+  enabled: boolean = true;
   autoClear: boolean;
   render: (scene: OutlineScene, camera: Camera) => void;
   renderOutline: (scene: OutlineScene, camera: Camera) => void;
@@ -68,7 +68,6 @@ export class OutlineEffect {
       defaultKeepAlive?: boolean;
     } = {},
   ) {
-    this.enabled = true;
     this.autoClear = renderer.autoClear;
 
     const defaultThickness = parameters.defaultThickness !== undefined ? parameters.defaultThickness : 0.003;

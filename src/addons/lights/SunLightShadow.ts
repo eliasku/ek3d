@@ -47,28 +47,19 @@ const _cascadeCount = 2;
 const _cascadeFade = 0.1;
 
 export class SunLightShadow extends LightShadow<OrthographicCamera> {
-  isSunLightShadow: boolean;
-  _cameras: OrthographicCamera[];
-  _matrices: Matrix4[];
-  _frustums: Frustum[];
-  _cascadeSplits: number[];
-  _cascadeData: Vector4[];
+  isSunLightShadow: boolean = true;
+  _cameras: OrthographicCamera[] = [];
+  _matrices: Matrix4[] = [];
+  _frustums: Frustum[] = [];
+  _cascadeSplits: number[] = Array.from({ length: _cascadeCount + 1 }, () => 0);
+  // per cascade ( begin, end, fade start ) view depths, consumed by the renderer
+
+  _cascadeData: Vector4[] = [];
 
   constructor() {
     super(new OrthographicCamera(-5, 5, 5, -5, 0.5, 500));
 
-    this.isSunLightShadow = true;
-
     this.mapSize.set(1024, 1024);
-
-    this._cameras = [];
-    this._matrices = [];
-    this._frustums = [];
-    this._cascadeSplits = Array.from({ length: _cascadeCount + 1 }, () => 0);
-
-    // per cascade ( begin, end, fade start ) view depths, consumed by the renderer
-
-    this._cascadeData = [];
 
     this._viewportCount = _cascadeCount;
     this._frameExtents.set(2, 1);

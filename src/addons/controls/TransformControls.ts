@@ -961,14 +961,12 @@ interface TaggedObject extends Object3D {
 }
 
 class TransformControlsRoot extends Object3D {
-  isTransformControlsRoot: boolean;
+  isTransformControlsRoot: boolean = true;
 
   controls: TransformControls;
 
   constructor(controls: TransformControls) {
     super();
-
-    this.isTransformControlsRoot = true;
 
     this.controls = controls;
     this.visible = false;
@@ -1029,7 +1027,7 @@ class TransformControlsRoot extends Object3D {
 }
 
 class TransformControlsGizmo extends Object3D {
-  isTransformControlsGizmo: boolean;
+  isTransformControlsGizmo: boolean = true;
 
   // control state mirrored from TransformControls via defineProperty
   mode: "translate" | "rotate" | "scale" = "translate";
@@ -1074,8 +1072,6 @@ class TransformControlsGizmo extends Object3D {
 
   constructor() {
     super();
-
-    this.isTransformControlsGizmo = true;
 
     this.type = "TransformControlsGizmo";
 
@@ -1625,7 +1621,7 @@ class TransformControlsGizmo extends Object3D {
 }
 
 class TransformControlsPlane extends Mesh<MeshBasicMaterial> {
-  isTransformControlsPlane: boolean;
+  isTransformControlsPlane: boolean = true;
 
   // control state mirrored from TransformControls via defineProperty
   mode: "translate" | "rotate" | "scale" = "translate";
@@ -1648,8 +1644,6 @@ class TransformControlsPlane extends Mesh<MeshBasicMaterial> {
         toneMapped: false,
       }),
     );
-
-    this.isTransformControlsPlane = true;
 
     this.type = "TransformControlsPlane";
   }

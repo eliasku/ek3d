@@ -7,35 +7,32 @@ import { PerspectiveCamera } from "../cameras/PerspectiveCamera";
  *
  */
 export class SpotLightShadow extends LightShadow<PerspectiveCamera> {
-  isSpotLightShadow: boolean;
-  focus: number;
-  aspect: number;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isSpotLightShadow: boolean = true;
+  /**
+   * Used to focus the shadow camera. The camera's field of view is set as a
+   * percentage of the spotlight's field-of-view. Range is `[0, 1]`.
+   *
+   * @default 1
+   */
+  focus: number = 1;
+  /**
+   * Texture aspect ratio.
+   *
+   * @default 1
+   */
+  aspect: number = 1;
 
   /**
    * Constructs a new spot light shadow.
    */
   constructor() {
     super(new PerspectiveCamera(50, 1, 0.5, 500));
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isSpotLightShadow = true;
-    /**
-     * Used to focus the shadow camera. The camera's field of view is set as a
-     * percentage of the spotlight's field-of-view. Range is `[0, 1]`.
-     *
-     * @default 1
-     */
-    this.focus = 1;
-    /**
-     * Texture aspect ratio.
-     *
-     * @default 1
-     */
-    this.aspect = 1;
   }
   updateMatrices(light: SpotLight) {
     const camera = this.camera;

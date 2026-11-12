@@ -39,45 +39,40 @@ export type CurveFactory<T extends Vector2 | Vector3 = Vector2 | Vector3> = (jso
  * @abstract
  */
 export class Curve<T extends Vector2 | Vector3 | null = Vector2 | Vector3> {
-  type: string;
-  arcLengthDivisions: number;
-  needsUpdate: boolean;
-  cacheArcLengths: number[] | null;
+  /**
+   * The type property is used for detecting the object type
+   * in context of serialization/deserialization.
+   *
+   * @readonly
+   */
+  type: string = "Curve";
+  /**
+   * This value determines the amount of divisions when calculating the
+   * cumulative segment lengths of a curve via {@link Curve#getLengths}. To ensure
+   * precision when using methods like {@link Curve#getSpacedPoints}, it is
+   * recommended to increase the value of this property if the curve is very large.
+   *
+   * @default 200
+   */
+  arcLengthDivisions: number = 200;
+  /**
+   * Must be set to `true` if the curve parameters have changed.
+   *
+   * @default false
+   */
+  needsUpdate: boolean = false;
+  /**
+   * An internal cache that holds precomputed curve length values.
+   *
+   * @private
+   * @default null
+   */
+  cacheArcLengths: number[] | null = null;
 
   /**
    * Constructs a new curve.
    */
-  constructor() {
-    /**
-     * The type property is used for detecting the object type
-     * in context of serialization/deserialization.
-     *
-     * @readonly
-     */
-    this.type = "Curve";
-    /**
-     * This value determines the amount of divisions when calculating the
-     * cumulative segment lengths of a curve via {@link Curve#getLengths}. To ensure
-     * precision when using methods like {@link Curve#getSpacedPoints}, it is
-     * recommended to increase the value of this property if the curve is very large.
-     *
-     * @default 200
-     */
-    this.arcLengthDivisions = 200;
-    /**
-     * Must be set to `true` if the curve parameters have changed.
-     *
-     * @default false
-     */
-    this.needsUpdate = false;
-    /**
-     * An internal cache that holds precomputed curve length values.
-     *
-     * @private
-     * @default null
-     */
-    this.cacheArcLengths = null;
-  }
+  constructor() {}
   /**
    * This method returns a vector in 2D or 3D space (depending on the curve definition)
    * for the given interpolation factor.

@@ -89,14 +89,12 @@ export interface MeshoptSimplifierLike {
  *
  */
 export class SimplifyModifier {
-  simplifier: MeshoptSimplifierLike | null;
+  simplifier: MeshoptSimplifierLike | null = null;
 
   /**
    * Constructs a new simplify modifier without a simplifier runtime.
    */
-  constructor() {
-    this.simplifier = null;
-  }
+  constructor() {}
 
   /**
    * Sets the meshoptimizer simplifier runtime used for `modify()`.

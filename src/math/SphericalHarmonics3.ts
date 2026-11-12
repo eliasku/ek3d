@@ -7,25 +7,23 @@ import { Vector3 } from "./Vector3";
  * - Secondary reference: {@link https://www.ppsloan.org/publications/StupidSH36.pdf}
  */
 export class SphericalHarmonics3 {
-  isSphericalHarmonics3: boolean;
-  coefficients: Vector3[];
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isSphericalHarmonics3: boolean = true;
+  /**
+   * An array holding the (9) SH coefficients.
+   *
+   */
+  coefficients: Vector3[] = [];
 
   /**
    * Constructs a new spherical harmonics.
    */
   constructor() {
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isSphericalHarmonics3 = true;
-    /**
-     * An array holding the (9) SH coefficients.
-     *
-     */
-    this.coefficients = [];
     for (let i = 0; i < 9; i++) {
       this.coefficients.push(new Vector3());
     }

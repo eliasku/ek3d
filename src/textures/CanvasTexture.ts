@@ -8,7 +8,13 @@ import { Texture } from "./Texture";
  *
  */
 export class CanvasTexture extends Texture {
-  isCanvasTexture: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isCanvasTexture: boolean = true;
 
   /**
    * Constructs a new texture.
@@ -35,13 +41,6 @@ export class CanvasTexture extends Texture {
     anisotropy?: number,
   ) {
     super(canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isCanvasTexture = true;
     this.needsUpdate = true;
   }
   clone(): CanvasTexture {

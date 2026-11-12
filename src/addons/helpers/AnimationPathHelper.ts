@@ -10,7 +10,7 @@ import type { KeyframeTrack } from "../../animation/KeyframeTrack";
 import type { Color } from "../../math/Color";
 
 export class AnimationPathHelper extends Object3D {
-  isAnimationPathHelper: boolean;
+  isAnimationPathHelper: boolean = true;
   root: Object3D;
   clip: AnimationClip;
   object: Object3D;
@@ -34,8 +34,6 @@ export class AnimationPathHelper extends Object3D {
     super();
 
     const { color = 0x00ff00, markerColor = 0xff0000, divisions = 100, showMarkers = true, markerSize = 5 } = options;
-
-    this.isAnimationPathHelper = true;
 
     this.type = "AnimationPathHelper";
 

@@ -24,7 +24,13 @@ const _quaternion = /*@__PURE__*/ new Quaternion();
  * ```
  */
 export class Euler {
-  isEuler: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isEuler: boolean = true;
   _x: number;
   _y: number;
   _z: number;
@@ -46,13 +52,6 @@ export class Euler {
    * @param [order=Euler.DEFAULT_ORDER] - A string representing the order that the rotations are applied.
    */
   constructor(x: number = 0, y: number = 0, z: number = 0, order: string = Euler.DEFAULT_ORDER) {
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isEuler = true;
     this._x = x;
     this._y = y;
     this._z = z;

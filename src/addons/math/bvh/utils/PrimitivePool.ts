@@ -1,10 +1,9 @@
 export class PrimitivePool<T> {
   _getNewPrimitive: () => T;
-  _primitives: T[];
+  _primitives: T[] = [];
 
   constructor(getNewPrimitive: () => T) {
     this._getNewPrimitive = getNewPrimitive;
-    this._primitives = [];
   }
 
   getPrimitive() {

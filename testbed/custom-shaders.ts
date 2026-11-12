@@ -12,9 +12,23 @@ import { GLSL, Side } from "ek3d/constants";
 export class CustomShaders {
   mesh: Mesh;
   private object: Mesh;
-  private geometry: PlaneGeometry;
-  private uniforms: { time: { value: number }; tint: { value: Vector3 } };
-  private material: ShaderMaterial;
+  private geometry: PlaneGeometry = new PlaneGeometry(1.6, 1.6);
+  private uniforms: { time: { value: number }; tint: { value: Vector3 } } = {
+    time: { value: 0 },
+    tint: { value: new Vector3(0.2, 0.65, 1) },
+  };
+  private material: ShaderMaterial = new ShaderMaterial({
+    glslVersion: GLSL.GLSL3,
+    uniforms: this.uniforms,
+    side: Side.Double,
+    vertexShader: `out vec2 sampleUV;
+      void main() { sampleUV = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: `uniform float time; uniform vec3 tint; in vec2 sampleUV; out vec4 result;
+      void main() {
+        float rings = 0.5 + 0.5 * sin(length(sampleUV - 0.5) * 36.0 - time * 4.0);
+        result = vec4(mix(tint, tint.brg, rings) * (0.4 + rings * 0.6), 1.0);
+      }`,
+  });
   private statusText: string;
   private diagnosticResult: {
     kind: "compile" | "link";
@@ -24,20 +38,6 @@ export class CustomShaders {
   } | null;
 
   constructor() {
-    this.geometry = new PlaneGeometry(1.6, 1.6);
-    this.uniforms = { time: { value: 0 }, tint: { value: new Vector3(0.2, 0.65, 1) } };
-    this.material = new ShaderMaterial({
-      glslVersion: GLSL.GLSL3,
-      uniforms: this.uniforms,
-      side: Side.Double,
-      vertexShader: `out vec2 sampleUV;
-      void main() { sampleUV = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-      fragmentShader: `uniform float time; uniform vec3 tint; in vec2 sampleUV; out vec4 result;
-      void main() {
-        float rings = 0.5 + 0.5 * sin(length(sampleUV - 0.5) * 36.0 - time * 4.0);
-        result = vec4(mix(tint, tint.brg, rings) * (0.4 + rings * 0.6), 1.0);
-      }`,
-    });
     this.object = new Mesh(this.geometry, this.material);
     this.object.name = "Custom GLSL rings";
     this.object.position.set(0, 2.4, 0);

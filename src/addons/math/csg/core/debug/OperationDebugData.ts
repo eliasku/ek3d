@@ -4,11 +4,10 @@ import { setDebugContext } from "../operations/operationsUtils";
 
 class TriangleIntersectData {
   triangle: Triangle;
-  intersects: Record<string, Triangle>;
+  intersects: Record<string, Triangle> = {};
 
   constructor(tri: Triangle) {
     this.triangle = new Triangle().copy(tri);
-    this.intersects = {};
   }
 
   addTriangle(index: number, tri: Triangle): void {
@@ -26,11 +25,9 @@ class TriangleIntersectData {
 }
 
 class TriangleIntersectionSets {
-  data: Record<string, TriangleIntersectData>;
+  data: Record<string, TriangleIntersectData> = {};
 
-  constructor() {
-    this.data = {};
-  }
+  constructor() {}
 
   addTriangleIntersection(ia: number, triA: Triangle, ib: number, triB: Triangle): void {
     const { data } = this;
@@ -103,17 +100,12 @@ class TriangleIntersectionSets {
 }
 
 export class OperationDebugData {
-  enabled: boolean;
-  triangleIntersectsA: TriangleIntersectionSets;
-  triangleIntersectsB: TriangleIntersectionSets;
-  intersectionEdges: Line3[];
+  enabled: boolean = false;
+  triangleIntersectsA: TriangleIntersectionSets = new TriangleIntersectionSets();
+  triangleIntersectsB: TriangleIntersectionSets = new TriangleIntersectionSets();
+  intersectionEdges: Line3[] = [];
 
-  constructor() {
-    this.enabled = false;
-    this.triangleIntersectsA = new TriangleIntersectionSets();
-    this.triangleIntersectsB = new TriangleIntersectionSets();
-    this.intersectionEdges = [];
-  }
+  constructor() {}
 
   addIntersectingTriangles(ia: number, triA: Triangle, ib: number, triB: Triangle): void {
     this.triangleIntersectsA.addTriangleIntersection(ia, triA, ib, triB);

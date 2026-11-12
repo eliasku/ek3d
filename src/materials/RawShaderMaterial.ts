@@ -9,7 +9,13 @@ import { ShaderMaterial } from "./ShaderMaterial";
  *
  */
 export class RawShaderMaterial extends ShaderMaterial {
-  isRawShaderMaterial: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isRawShaderMaterial: boolean = true;
 
   /**
    * Constructs a new raw shader material.
@@ -22,13 +28,6 @@ export class RawShaderMaterial extends ShaderMaterial {
    */
   constructor(parameters?: ShaderMaterialParameters) {
     super(parameters);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isRawShaderMaterial = true;
     this.type = "RawShaderMaterial";
   }
   clone(): RawShaderMaterial {

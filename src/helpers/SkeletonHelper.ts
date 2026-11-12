@@ -31,7 +31,13 @@ const _matrixWorldInv = /*@__PURE__*/ new Matrix4();
  *
  */
 export class SkeletonHelper extends LineSegments<LineBasicMaterial> {
-  isSkeletonHelper: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isSkeletonHelper: boolean = true;
 
   root: Object3D;
   bones: Bone[];
@@ -66,13 +72,6 @@ export class SkeletonHelper extends LineSegments<LineBasicMaterial> {
       transparent: true,
     });
     super(geometry, material);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isSkeletonHelper = true;
     this.type = "SkeletonHelper";
     /**
      * The object being visualized.

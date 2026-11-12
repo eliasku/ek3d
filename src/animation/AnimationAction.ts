@@ -18,25 +18,97 @@ export class AnimationAction {
   _interpolantSettings: InterpolantSettings;
   _interpolants: Interpolant<AnimationBuffer>[];
   _propertyBindings: PropertyMixer[];
-  _cacheIndex: number | null;
-  _byClipCacheIndex: number | null;
-  _timeScaleInterpolant: LinearInterpolant | null;
-  _restoreTimeScale: number | null;
-  _weightInterpolant: LinearInterpolant | null;
-  loop: Loop;
-  _loopCount: number;
-  _startTime: number | null;
-  time: number;
-  timeScale: number;
-  _effectiveTimeScale: number;
-  weight: number;
-  _effectiveWeight: number;
-  repetitions: number;
-  paused: boolean;
-  enabled: boolean;
-  clampWhenFinished: boolean;
-  zeroSlopeAtStart: boolean;
-  zeroSlopeAtEnd: boolean;
+  _cacheIndex: number | null = null; // for the memory manager
+  _byClipCacheIndex: number | null = null; // for the memory manager
+  _timeScaleInterpolant: LinearInterpolant | null = null;
+  _restoreTimeScale: number | null = null;
+  _weightInterpolant: LinearInterpolant | null = null;
+  /**
+   * The loop mode, set via {@link AnimationAction#setLoop}.
+   *
+   * @default Loop.Repeat
+   */
+  loop: Loop = Loop.Repeat;
+  _loopCount: number = -1;
+  // global mixer time when the action is to be started
+  // it's set back to 'null' upon start of the action
+  _startTime: number | null = null;
+  /**
+   * The local time of this action (in seconds, starting with `0`).
+   *
+   * The value gets clamped or wrapped to `[0,clip.duration]` (according to the
+   * loop state).
+   *
+   * @default 0
+   */
+  time: number = 0;
+  /**
+   * Scaling factor for the {@link AnimationAction#time}. A value of `0` causes the
+   * animation to pause. Negative values cause the animation to play backwards.
+   *
+   * @default 1
+   */
+  timeScale: number = 1;
+  _effectiveTimeScale: number = 1;
+  /**
+   * The degree of influence of this action (in the interval `[0, 1]`). Values
+   * between `0` (no impact) and `1` (full impact) can be used to blend between
+   * several actions.
+   *
+   * @default 1
+   */
+  weight: number = 1;
+  _effectiveWeight: number = 1;
+  /**
+   * The number of repetitions of the performed clip over the course of this action.
+   * Can be set via {@link AnimationAction#setLoop}.
+   *
+   * Setting this number has no effect if {@link AnimationAction#loop} is set to
+   * `THREE:Loop.Once`.
+   *
+   * @default Infinity
+   */
+  repetitions: number = Infinity;
+  /**
+   * If set to `true`, the playback of the action is paused.
+   *
+   * @default false
+   */
+  paused: boolean = false;
+  /**
+   * If set to `false`, the action is disabled so it has no impact.
+   *
+   * When the action is re-enabled, the animation continues from its current
+   * time (setting `enabled` to `false` doesn't reset the action).
+   *
+   * @default true
+   */
+  enabled: boolean = true;
+  /**
+   * If set to true the animation will automatically be paused on its last frame.
+   *
+   * If set to false, {@link AnimationAction#enabled} will automatically be switched
+   * to `false` when the last loop of the action has finished, so that this action has
+   * no further impact.
+   *
+   * Note: This member has no impact if the action is interrupted (it
+   * has only an effect if its last loop has really finished).
+   *
+   * @default false
+   */
+  clampWhenFinished: boolean = false;
+  /**
+   * Enables smooth interpolation without separate clips for start, loop and end.
+   *
+   * @default true
+   */
+  zeroSlopeAtStart: boolean = true;
+  /**
+   * Enables smooth interpolation without separate clips for start, loop and end.
+   *
+   * @default true
+   */
+  zeroSlopeAtEnd: boolean = true;
 
   /**
    * Constructs a new animation action.
@@ -76,97 +148,6 @@ export class AnimationAction {
     this._interpolantSettings = interpolantSettings;
     this._interpolants = interpolants; // bound by the mixer
     this._propertyBindings = Array<PropertyMixer>(nTracks);
-    this._cacheIndex = null; // for the memory manager
-    this._byClipCacheIndex = null; // for the memory manager
-    this._timeScaleInterpolant = null;
-    this._restoreTimeScale = null;
-    this._weightInterpolant = null;
-    /**
-     * The loop mode, set via {@link AnimationAction#setLoop}.
-     *
-     * @default Loop.Repeat
-     */
-    this.loop = Loop.Repeat;
-    this._loopCount = -1;
-    // global mixer time when the action is to be started
-    // it's set back to 'null' upon start of the action
-    this._startTime = null;
-    /**
-     * The local time of this action (in seconds, starting with `0`).
-     *
-     * The value gets clamped or wrapped to `[0,clip.duration]` (according to the
-     * loop state).
-     *
-     * @default 0
-     */
-    this.time = 0;
-    /**
-     * Scaling factor for the {@link AnimationAction#time}. A value of `0` causes the
-     * animation to pause. Negative values cause the animation to play backwards.
-     *
-     * @default 1
-     */
-    this.timeScale = 1;
-    this._effectiveTimeScale = 1;
-    /**
-     * The degree of influence of this action (in the interval `[0, 1]`). Values
-     * between `0` (no impact) and `1` (full impact) can be used to blend between
-     * several actions.
-     *
-     * @default 1
-     */
-    this.weight = 1;
-    this._effectiveWeight = 1;
-    /**
-     * The number of repetitions of the performed clip over the course of this action.
-     * Can be set via {@link AnimationAction#setLoop}.
-     *
-     * Setting this number has no effect if {@link AnimationAction#loop} is set to
-     * `THREE:Loop.Once`.
-     *
-     * @default Infinity
-     */
-    this.repetitions = Infinity;
-    /**
-     * If set to `true`, the playback of the action is paused.
-     *
-     * @default false
-     */
-    this.paused = false;
-    /**
-     * If set to `false`, the action is disabled so it has no impact.
-     *
-     * When the action is re-enabled, the animation continues from its current
-     * time (setting `enabled` to `false` doesn't reset the action).
-     *
-     * @default true
-     */
-    this.enabled = true;
-    /**
-     * If set to true the animation will automatically be paused on its last frame.
-     *
-     * If set to false, {@link AnimationAction#enabled} will automatically be switched
-     * to `false` when the last loop of the action has finished, so that this action has
-     * no further impact.
-     *
-     * Note: This member has no impact if the action is interrupted (it
-     * has only an effect if its last loop has really finished).
-     *
-     * @default false
-     */
-    this.clampWhenFinished = false;
-    /**
-     * Enables smooth interpolation without separate clips for start, loop and end.
-     *
-     * @default true
-     */
-    this.zeroSlopeAtStart = true;
-    /**
-     * Enables smooth interpolation without separate clips for start, loop and end.
-     *
-     * @default true
-     */
-    this.zeroSlopeAtEnd = true;
   }
   /**
    * Starts the playback of the animation.

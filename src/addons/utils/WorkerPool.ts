@@ -44,13 +44,13 @@ export class WorkerPool {
   pool: number;
 
   /** A message queue. */
-  queue: WorkerPoolQueueEntry[];
+  queue: WorkerPoolQueueEntry[] = [];
 
   /** An array of Workers. */
-  workers: (Worker | null)[];
+  workers: (Worker | null)[] = [];
 
   /** An array with resolve functions for messages. */
-  workersResolve: ((value: MessageEvent<unknown>) => void)[];
+  workersResolve: ((value: MessageEvent<unknown>) => void)[] = [];
 
   /**
    * The current worker status.
@@ -58,10 +58,10 @@ export class WorkerPool {
    * The status is a bit mask of the pool's size, with all ones representing
    * idle workers and zero representing busy workers.
    */
-  workerStatus: number;
+  workerStatus: number = 0;
 
   /** A factory function for creating workers. */
-  workerCreator: (() => Worker) | null;
+  workerCreator: (() => Worker) | null = null;
 
   /**
    * Constructs a new Worker pool.
@@ -70,11 +70,6 @@ export class WorkerPool {
    */
   constructor(pool: number = 4) {
     this.pool = pool;
-    this.queue = [];
-    this.workers = [];
-    this.workersResolve = [];
-    this.workerStatus = 0;
-    this.workerCreator = null;
   }
 
   _initWorker(workerId: number): void {

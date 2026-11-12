@@ -24,7 +24,13 @@ import { warn } from "../utils";
  * ```
  */
 export class Quaternion {
-  isQuaternion: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isQuaternion: boolean = true;
   _x: number;
   _y: number;
   _z: number;
@@ -39,13 +45,6 @@ export class Quaternion {
    * @param [w=1] - The w value of this quaternion.
    */
   constructor(x: number = 0, y: number = 0, z: number = 0, w: number = 1) {
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isQuaternion = true;
     this._x = x;
     this._y = y;
     this._z = z;

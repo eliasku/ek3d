@@ -28,7 +28,12 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
 export class TexturePass extends Pass {
   map: Texture;
   opacity: number;
-  needsSwap: boolean;
+  /**
+   * Overwritten to disable the swap.
+   *
+   * @default false
+   */
+  needsSwap: boolean = false;
   uniforms: typeof CopyShader.uniforms;
   material: ShaderMaterial;
   _fsQuad: FullScreenQuad;
@@ -53,12 +58,6 @@ export class TexturePass extends Pass {
      * @default 1
      */
     this.opacity = opacity;
-    /**
-     * Overwritten to disable the swap.
-     *
-     * @default false
-     */
-    this.needsSwap = false;
     /**
      * The pass uniforms.
      */

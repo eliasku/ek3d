@@ -21,11 +21,21 @@ import { PointLightShadow } from "./PointLightShadow";
  *
  */
 export class PointLight extends Light {
-  isPointLight: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isPointLight: boolean = true;
 
   distance: number;
   decay: number;
-  shadow: PointLightShadow;
+  /**
+   * This property holds the light's shadow configuration.
+   *
+   */
+  shadow: PointLightShadow = new PointLightShadow();
 
   /**
    * Constructs a new point light.
@@ -37,13 +47,6 @@ export class PointLight extends Light {
    */
   constructor(color?: number | Color | string, intensity?: number, distance: number = 0, decay: number = 2) {
     super(color, intensity);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isPointLight = true;
     this.type = "PointLight";
     /**
      * When distance is zero, light will attenuate according to inverse-square
@@ -62,11 +65,6 @@ export class PointLight extends Light {
      * @default 2
      */
     this.decay = decay;
-    /**
-     * This property holds the light's shadow configuration.
-     *
-     */
-    this.shadow = new PointLightShadow();
   }
   /**
    * The light's power. Power is the luminous power of the light measured in lumens (lm).

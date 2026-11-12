@@ -30,7 +30,11 @@
  * transpose of any matrices outlined here to make sense of the calculations.
  */
 export class Matrix2 {
-  elements: number[];
+  /**
+   * A column-major list of matrix values.
+   *
+   */
+  elements: number[] = [1, 0, 0, 1];
   /**
    * This flag can be used for type testing.
    *
@@ -52,11 +56,6 @@ export class Matrix2 {
    * @param [n22] - 2-2 matrix element.
    */
   constructor(n11?: number, n12?: number, n21?: number, n22?: number) {
-    /**
-     * A column-major list of matrix values.
-     *
-     */
-    this.elements = [1, 0, 0, 1];
     if (n11! !== undefined) {
       this.set(n11!, n12!, n21!, n22!);
     }

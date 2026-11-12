@@ -11,9 +11,26 @@ import { Curve } from "./Curve";
  *
  */
 export class CurvePath<T extends Vector2 | Vector3 = Vector2 | Vector3> extends Curve<T | null> {
-  curves: Curve<T | null>[];
-  autoClose: boolean;
-  cacheLengths: number[] | null;
+  /**
+   * An array of curves defining the
+   * path.
+   *
+   */
+  curves: Curve<T | null>[] = [];
+  /**
+   * Whether the path should automatically be closed
+   * by a line curve.
+   *
+   * @default false
+   */
+  autoClose: boolean = false;
+  /**
+   * An internal cache that holds precomputed curve length values.
+   *
+   * @private
+   * @default null
+   */
+  cacheLengths: number[] | null = null;
 
   /**
    * Constructs a new curve path.
@@ -21,26 +38,6 @@ export class CurvePath<T extends Vector2 | Vector3 = Vector2 | Vector3> extends 
   constructor() {
     super();
     this.type = "CurvePath";
-    /**
-     * An array of curves defining the
-     * path.
-     *
-     */
-    this.curves = [];
-    /**
-     * Whether the path should automatically be closed
-     * by a line curve.
-     *
-     * @default false
-     */
-    this.autoClose = false;
-    /**
-     * An internal cache that holds precomputed curve length values.
-     *
-     * @private
-     * @default null
-     */
-    this.cacheLengths = null;
   }
   /**
    * Adds a curve to this curve path.

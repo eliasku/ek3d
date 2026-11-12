@@ -37,13 +37,44 @@ const _ray = /*@__PURE__*/ new Ray();
  * @demo scenes/bones-browser.html
  */
 export class SkinnedMesh extends Mesh {
-  isSkinnedMesh: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isSkinnedMesh: boolean = true;
 
-  bindMode: BindMode.Attached | BindMode.Detached;
-  bindMatrix: Matrix4;
-  bindMatrixInverse: Matrix4;
-  boundingBox: Box3 | null;
-  boundingSphere: Sphere | null;
+  /**
+   * `BindMode.Attached` means the skinned mesh shares the same world space as the skeleton.
+   * This is not true when using `BindMode.Detached` which is useful when sharing a skeleton
+   * across multiple skinned meshes.
+   *
+   * @default BindMode.Attached
+   */
+  bindMode: BindMode.Attached | BindMode.Detached = BindMode.Attached;
+  /**
+   * The base matrix that is used for the bound bone transforms.
+   *
+   */
+  bindMatrix: Matrix4 = new Matrix4();
+  /**
+   * The base matrix that is used for resetting the bound bone transforms.
+   *
+   */
+  bindMatrixInverse: Matrix4 = new Matrix4();
+  /**
+   * The bounding box of the skinned mesh. Can be computed via {@link SkinnedMesh#computeBoundingBox}.
+   *
+   * @default null
+   */
+  boundingBox: Box3 | null = null;
+  /**
+   * The bounding sphere of the skinned mesh. Can be computed via {@link SkinnedMesh#computeBoundingSphere}.
+   *
+   * @default null
+   */
+  boundingSphere: Sphere | null = null;
   /** Assigned by bind() or copy() before skeletal animation is used. */
   skeleton!: Skeleton;
 
@@ -55,44 +86,7 @@ export class SkinnedMesh extends Mesh {
    */
   constructor(geometry: BufferGeometry, material: Material | Material[]) {
     super(geometry, material);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isSkinnedMesh = true;
     this.type = "SkinnedMesh";
-    /**
-     * `BindMode.Attached` means the skinned mesh shares the same world space as the skeleton.
-     * This is not true when using `BindMode.Detached` which is useful when sharing a skeleton
-     * across multiple skinned meshes.
-     *
-     * @default BindMode.Attached
-     */
-    this.bindMode = BindMode.Attached;
-    /**
-     * The base matrix that is used for the bound bone transforms.
-     *
-     */
-    this.bindMatrix = new Matrix4();
-    /**
-     * The base matrix that is used for resetting the bound bone transforms.
-     *
-     */
-    this.bindMatrixInverse = new Matrix4();
-    /**
-     * The bounding box of the skinned mesh. Can be computed via {@link SkinnedMesh#computeBoundingBox}.
-     *
-     * @default null
-     */
-    this.boundingBox = null;
-    /**
-     * The bounding sphere of the skinned mesh. Can be computed via {@link SkinnedMesh#computeBoundingSphere}.
-     *
-     * @default null
-     */
-    this.boundingSphere = null;
   }
   /**
    * Computes the bounding box of the skinned mesh, and updates {@link SkinnedMesh#boundingBox}.

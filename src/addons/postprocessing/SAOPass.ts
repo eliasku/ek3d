@@ -38,6 +38,9 @@ import type { WebGLRenderTarget as RT } from "../../renderers/WebGLRenderTarget"
 export class SAOPass extends Pass {
   scene: Scene;
   camera: PerspectiveCamera;
+  /**
+   * The SAO parameter.
+   */
   params: {
     output: number;
     saoBias: number;
@@ -49,6 +52,17 @@ export class SAOPass extends Pass {
     saoBlurRadius: number;
     saoBlurStdDev: number;
     saoBlurDepthCutoff: number;
+  } = {
+    output: 0,
+    saoBias: 0.5,
+    saoIntensity: 0.18,
+    saoScale: 1,
+    saoKernelRadius: 100,
+    saoMinResolution: 0,
+    saoBlur: true,
+    saoBlurRadius: 8,
+    saoBlurStdDev: 4,
+    saoBlurDepthCutoff: 0.01,
   };
   resolution: Vector2;
   saoRenderTarget: WebGLRenderTarget;
@@ -60,9 +74,11 @@ export class SAOPass extends Pass {
   hBlurMaterial: ShaderMaterial;
   materialCopy: ShaderMaterial;
   fsQuad: FullScreenQuad;
-  _originalClearColor: Color;
-  _oldClearColor: Color;
-  _oldClearAlpha: number;
+  // internals
+
+  _originalClearColor: Color = new Color();
+  _oldClearColor: Color = new Color();
+  _oldClearAlpha: number = 1;
   prevStdDev: number = NaN;
   prevNumSamples: number = NaN;
 
@@ -105,28 +121,6 @@ export class SAOPass extends Pass {
      * @default false
      */
     this.needsSwap = false;
-
-    // internals
-
-    this._originalClearColor = new Color();
-    this._oldClearColor = new Color();
-    this._oldClearAlpha = 1;
-
-    /**
-     * The SAO parameter.
-     */
-    this.params = {
-      output: 0,
-      saoBias: 0.5,
-      saoIntensity: 0.18,
-      saoScale: 1,
-      saoKernelRadius: 100,
-      saoMinResolution: 0,
-      saoBlur: true,
-      saoBlurRadius: 8,
-      saoBlurStdDev: 4,
-      saoBlurDepthCutoff: 0.01,
-    };
 
     /**
      * The effect's resolution.

@@ -10,15 +10,15 @@ export class NumberController extends Controller {
   $slider: HTMLDivElement | undefined;
   $fill: HTMLDivElement | undefined;
 
-  _hasSlider: boolean;
+  _hasSlider: boolean = false;
 
-  _inputFocused: boolean;
+  _inputFocused: boolean = false;
 
-  _min: number | undefined;
-  _max: number | undefined;
-  _step: number;
-  _stepExplicit: boolean;
-  _decimals: number | undefined;
+  _min: number | undefined = undefined;
+  _max: number | undefined = undefined;
+  _step: number = 0.1;
+  _stepExplicit: boolean = false;
+  _decimals: number | undefined = undefined;
 
   /**
    * Constructs a number controller.
@@ -39,14 +39,6 @@ export class NumberController extends Controller {
     step?: number,
   ) {
     super(parent, object, property, "number");
-
-    this._hasSlider = false;
-    this._inputFocused = false;
-    this._min = undefined;
-    this._max = undefined;
-    this._step = 0.1;
-    this._stepExplicit = false;
-    this._decimals = undefined;
 
     this._initInput();
 

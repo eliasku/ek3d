@@ -135,16 +135,16 @@ export class ColladaComposer {
   collada: Element;
   textureLoader: TextureLoader;
   tgaLoader: TGALoader | undefined;
-  tempColor: Color;
+  tempColor: Color = new Color();
   _fallbackMaterial?: MeshBasicMaterial;
-  animations: AnimationClip[];
-  kinematics: ColladaKinematics;
-  position: Vector3;
-  scale: Vector3;
-  quaternion: Quaternion;
-  matrix: Matrix4;
-  deferredPivotAnimations: Record<string, Record<string, Record<string, AnimationComponent>>>;
-  transformNodes: Record<string, Record<string, Object3D>>;
+  animations: AnimationClip[] = [];
+  kinematics: ColladaKinematics = {};
+  position: Vector3 = new Vector3();
+  scale: Vector3 = new Vector3();
+  quaternion: Quaternion = new Quaternion();
+  matrix: Matrix4 = new Matrix4();
+  deferredPivotAnimations: Record<string, Record<string, Record<string, AnimationComponent>>> = {};
+  transformNodes: Record<string, Record<string, Object3D>> = {};
 
   constructor(
     library: ColladaLibrary,
@@ -157,24 +157,14 @@ export class ColladaComposer {
     this.textureLoader = textureLoader;
     this.tgaLoader = tgaLoader;
 
-    this.tempColor = new Color();
-    this.animations = [];
-    this.kinematics = {};
-
     // Reusable objects for animation
-    this.position = new Vector3();
-    this.scale = new Vector3();
-    this.quaternion = new Quaternion();
-    this.matrix = new Matrix4();
 
     // Storage for deferred pivot animation data
     // Nodes with pivot transforms need all their animation channels collected
     // before building tracks, as channels may be split across animation elements
-    this.deferredPivotAnimations = {};
 
     // Storage for transform node hierarchy
     // Maps nodeId -> transformSid -> Object3D for animation targeting
-    this.transformNodes = {};
   }
 
   compose() {

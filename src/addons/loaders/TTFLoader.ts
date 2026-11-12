@@ -37,12 +37,11 @@ export interface TTFParser {
 /** Converts a TrueType font to the typeface data consumed by Font. The parser is supplied by the consumer. */
 export class TTFLoader extends Loader<FontData> {
   parser: TTFParser;
-  reversed: boolean;
+  reversed: boolean = false;
 
   constructor(parser: TTFParser, manager?: LoadingManager) {
     super(manager);
     this.parser = parser;
-    this.reversed = false;
   }
 
   load(

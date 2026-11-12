@@ -106,36 +106,22 @@ function edgesToIndices(edges: Line3[], outputVertices: Vector3[], outputIndices
 }
 
 export class CDTTriangleSplitter {
-  trianglePool: Pool<ExtendedTriangle>;
-  linePool: Pool<Line3>;
-  triangles: ExtendedTriangle[];
-  triangleIndices: (number | string | null)[][];
-  constrainedEdges: Line3[];
-  triangleConnectivity: number[][];
-  normal: Vector3;
-  projOrigin: Vector3;
-  projU: Vector3;
-  projV: Vector3;
-  baseTri: ExtendedTriangle;
-  baseIndices: (number | null)[];
+  trianglePool: Pool<ExtendedTriangle> = new Pool(() => new ExtendedTriangle());
+  linePool: Pool<Line3> = new Pool(() => new Line3());
+  // TODO: use array pool
 
-  constructor() {
-    this.trianglePool = new Pool(() => new ExtendedTriangle());
-    this.linePool = new Pool(() => new Line3());
-    // TODO: use array pool
+  triangles: ExtendedTriangle[] = [];
+  triangleIndices: (number | string | null)[][] = [];
+  constrainedEdges: Line3[] = [];
+  triangleConnectivity: number[][] = [];
+  normal: Vector3 = new Vector3();
+  projOrigin: Vector3 = new Vector3();
+  projU: Vector3 = new Vector3();
+  projV: Vector3 = new Vector3();
+  baseTri: ExtendedTriangle = new ExtendedTriangle();
+  baseIndices: (number | null)[] = [null, null, null];
 
-    this.triangles = [];
-    this.triangleIndices = [];
-    this.constrainedEdges = [];
-    this.triangleConnectivity = [];
-
-    this.normal = new Vector3();
-    this.projOrigin = new Vector3();
-    this.projU = new Vector3();
-    this.projV = new Vector3();
-    this.baseTri = new ExtendedTriangle();
-    this.baseIndices = [null, null, null];
-  }
+  constructor() {}
 
   // initialize the class with a triangle to be split
   initialize(tri: Triangle, i0: number | null = null, i1: number | null = null, i2: number | null = null) {

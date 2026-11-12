@@ -45,10 +45,29 @@ const _v2 = /*@__PURE__*/ new Vector3();
  *
  */
 export class LOD extends Object3D {
-  isLOD: boolean;
-  _currentLevel: number;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isLOD: boolean = true;
+  /**
+   * The current LOD index.
+   *
+   * @private
+   * @default 0
+   */
+  _currentLevel: number = 0;
 
-  autoUpdate: boolean;
+  /**
+   * Whether the LOD object is updated automatically by the renderer per frame
+   * or not. If set to `false`, you have to call {@link LOD#update} in the
+   * render loop by yourself.
+   *
+   * @default true
+   */
+  autoUpdate: boolean = true;
   readonly levels: LODLevel[] = [];
 
   /**
@@ -56,20 +75,6 @@ export class LOD extends Object3D {
    */
   constructor() {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isLOD = true;
-    /**
-     * The current LOD index.
-     *
-     * @private
-     * @default 0
-     */
-    this._currentLevel = 0;
     this.type = "LOD";
     Object.defineProperties(this, {
       /**
@@ -84,14 +89,6 @@ export class LOD extends Object3D {
         configurable: false,
       },
     });
-    /**
-     * Whether the LOD object is updated automatically by the renderer per frame
-     * or not. If set to `false`, you have to call {@link LOD#update} in the
-     * render loop by yourself.
-     *
-     * @default true
-     */
-    this.autoUpdate = true;
   }
   clone(_recursive?: boolean): LOD {
     return new LOD().copy(this);

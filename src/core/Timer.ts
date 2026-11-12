@@ -17,28 +17,19 @@
  * @class-crasher-ignore Resource lists call dispose through a structural type.
  */
 export class Timer {
-  _previousTime: number;
-  _currentTime: number;
-  _startTime: number;
-  _delta: number;
-  _elapsed: number;
-  _timescale: number;
-  _document: Document | null;
-  _pageVisibilityHandler: (() => void) | null;
+  _previousTime: number = 0;
+  _currentTime: number = 0;
+  _startTime: number = performance.now();
+  _delta: number = 0;
+  _elapsed: number = 0;
+  _timescale: number = 1;
+  _document: Document | null = null;
+  _pageVisibilityHandler: (() => void) | null = null;
 
   /**
    * Constructs a new timer.
    */
-  constructor() {
-    this._previousTime = 0;
-    this._currentTime = 0;
-    this._startTime = performance.now();
-    this._delta = 0;
-    this._elapsed = 0;
-    this._timescale = 1;
-    this._document = null;
-    this._pageVisibilityHandler = null;
-  }
+  constructor() {}
   /**
    * Connect the timer to the given document.Calling this method is not mandatory to
    * use the timer but enables the usage of the Page Visibility API to avoid large time

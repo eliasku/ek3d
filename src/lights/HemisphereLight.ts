@@ -19,7 +19,13 @@ import { Object3D } from "../core/Object3D";
  *
  */
 export class HemisphereLight extends Light {
-  isHemisphereLight: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isHemisphereLight: boolean = true;
 
   groundColor: Color;
 
@@ -32,13 +38,6 @@ export class HemisphereLight extends Light {
    */
   constructor(skyColor?: number | Color | string, groundColor?: number | Color | string, intensity?: number) {
     super(skyColor, intensity);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isHemisphereLight = true;
     this.type = "HemisphereLight";
     this.position.copy(Object3D.DEFAULT_UP);
     this.updateMatrix();

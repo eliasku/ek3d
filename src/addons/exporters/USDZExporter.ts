@@ -50,7 +50,7 @@ class USDNode {
   type: string;
   metadata: { key: string; value: string | string[] }[];
   properties: { property: string; metadata: string[] }[];
-  children: USDNode[];
+  children: USDNode[] = [];
 
   constructor(
     name: string,
@@ -62,7 +62,6 @@ class USDNode {
     this.type = type;
     this.metadata = metadata;
     this.properties = properties;
-    this.children = [];
   }
 
   addMetadata(key: string, value: string | string[]) {
@@ -150,16 +149,14 @@ class USDNode {
  */
 export class USDZExporter {
   zip: USDZZipRuntime;
-  textureUtils: USDZTextureUtils | null;
+  /** Texture decompression runtime, required for compressed textures. */
+  textureUtils: USDZTextureUtils | null = null;
 
   /**
    * Constructs a new USDZ exporter.
    */
   constructor(zip: USDZZipRuntime) {
     this.zip = zip;
-
-    /** Texture decompression runtime, required for compressed textures. */
-    this.textureUtils = null;
   }
 
   /**

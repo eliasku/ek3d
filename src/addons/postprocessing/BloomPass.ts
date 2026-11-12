@@ -26,11 +26,21 @@ import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
  *
  */
 export class BloomPass extends Pass {
-  combineUniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+  // combine material
+
+  /**
+   * The combine pass uniforms.
+   */
+  combineUniforms: Record<string, { value: any; needsUpdate?: boolean }> = cloneUniforms(CombineShader.uniforms);
   materialCombine: ShaderMaterial;
   convolutionUniforms: Record<string, { value: any; needsUpdate?: boolean }>;
   materialConvolution: ShaderMaterial;
-  needsSwap: boolean;
+  /**
+   * Overwritten to disable the swap.
+   *
+   * @default false
+   */
+  needsSwap: boolean = false;
   _fsQuad: FullScreenQuad;
   _renderTargetX: WebGLRenderTarget;
   _renderTargetY: WebGLRenderTarget;
@@ -51,12 +61,6 @@ export class BloomPass extends Pass {
   constructor(strength: number = 1, kernelSize: number = 25, sigma: number = 4) {
     super();
 
-    // combine material
-
-    /**
-     * The combine pass uniforms.
-     */
-    this.combineUniforms = cloneUniforms(CombineShader.uniforms);
     this.combineUniforms["strength"].value = strength;
 
     /**
@@ -96,13 +100,6 @@ export class BloomPass extends Pass {
         KERNEL_SIZE_INT: kernelSize.toFixed(0),
       },
     });
-
-    /**
-     * Overwritten to disable the swap.
-     *
-     * @default false
-     */
-    this.needsSwap = false;
 
     // internals
 

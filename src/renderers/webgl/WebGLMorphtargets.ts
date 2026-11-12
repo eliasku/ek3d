@@ -22,16 +22,14 @@ interface MorphTargetObject {
 }
 
 export class WebGLMorphtargets {
-  private morphTextures: WeakMap<BufferGeometry, MorphTextureEntry>;
-  private morph: Vector4;
+  private morphTextures: WeakMap<BufferGeometry, MorphTextureEntry> = new WeakMap();
+  private morph: Vector4 = new Vector4();
 
   constructor(
     private gl: WebGL2RenderingContext,
     private capabilities: WebGLCapabilitiesState,
     private textures: WebGLTextures,
   ) {
-    this.morphTextures = new WeakMap();
-    this.morph = new Vector4();
     this.update = this.update.bind(this);
   }
 

@@ -23,7 +23,18 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  *
  */
 export class DotScreenPass extends Pass {
-  uniforms: typeof DotScreenShader.uniforms;
+  /**
+   * The pass uniforms. Use this object if you want to update the
+   * `center`, `angle` or `scale` value at runtime.
+   * ```typescript
+   * import type { DotScreenPass } from 'ek3d/addons/postprocessing/DotScreenPass';
+   *
+   * function setDotCenter( pass: DotScreenPass ): void {
+   *   pass.uniforms.center.value.set( 0.25, 0.25 );
+   * }
+   * ```
+   */
+  uniforms: typeof DotScreenShader.uniforms = cloneUniforms(DotScreenShader.uniforms);
   material: ShaderMaterial;
   _fsQuad: FullScreenQuad;
 
@@ -36,19 +47,6 @@ export class DotScreenPass extends Pass {
    */
   constructor(center?: Vector2, angle?: number, scale?: number) {
     super();
-    /**
-     * The pass uniforms. Use this object if you want to update the
-     * `center`, `angle` or `scale` value at runtime.
-     * ```typescript
-     * import type { DotScreenPass } from 'ek3d/addons/postprocessing/DotScreenPass';
-     *
-     * function setDotCenter( pass: DotScreenPass ): void {
-     *   pass.uniforms.center.value.set( 0.25, 0.25 );
-     * }
-     * ```
-     */
-    this.uniforms = cloneUniforms(DotScreenShader.uniforms);
-
     if (center !== undefined) this.uniforms["center"].value.copy(center);
     if (angle !== undefined) this.uniforms["angle"].value = angle;
     if (scale !== undefined) this.uniforms["scale"].value = scale;

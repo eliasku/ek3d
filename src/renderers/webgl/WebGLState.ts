@@ -9,17 +9,13 @@ import { error, ReversedDepthFuncs } from "../../utils";
 import type { WebGLExtensions } from "./WebGLExtensions";
 class ColorBuffer {
   private gl: WebGL2RenderingContext;
-  private locked: boolean;
-  private color: Vector4;
-  private currentColorMask: boolean | null;
-  private currentColorClear: Vector4;
+  private locked: boolean = false;
+  private color: Vector4 = new Vector4();
+  private currentColorMask: boolean | null = null;
+  private currentColorClear: Vector4 = new Vector4(0, 0, 0, 0);
 
   constructor(gl: WebGL2RenderingContext) {
     this.gl = gl;
-    this.locked = false;
-    this.color = new Vector4();
-    this.currentColorMask = null;
-    this.currentColorClear = new Vector4(0, 0, 0, 0);
     this.setMask = this.setMask.bind(this);
     this.setLocked = this.setLocked.bind(this);
     this.setClear = this.setClear.bind(this);
@@ -56,21 +52,16 @@ class DepthBuffer {
   private gl: WebGL2RenderingContext;
   private extensions: WebGLExtensions;
   private state: WebGLState;
-  private locked: boolean;
-  private currentReversed: boolean;
-  private currentDepthMask: boolean | null;
-  private currentDepthFunc: DepthFunc | null;
-  private currentDepthClear: number | null;
+  private locked: boolean = false;
+  private currentReversed: boolean = false;
+  private currentDepthMask: boolean | null = null;
+  private currentDepthFunc: DepthFunc | null = null;
+  private currentDepthClear: number | null = null;
 
   constructor(gl: WebGL2RenderingContext, extensions: WebGLExtensions, state: WebGLState) {
     this.gl = gl;
     this.extensions = extensions;
     this.state = state;
-    this.locked = false;
-    this.currentReversed = false;
-    this.currentDepthMask = null;
-    this.currentDepthFunc = null;
-    this.currentDepthClear = null;
     this.getReversed = this.getReversed.bind(this);
     this.setTest = this.setTest.bind(this);
     this.setMask = this.setMask.bind(this);
@@ -166,28 +157,19 @@ class DepthBuffer {
 class StencilBuffer {
   private gl: WebGL2RenderingContext;
   private state: WebGLState;
-  private locked: boolean;
-  private currentStencilMask: number | null;
-  private currentStencilFunc: GLenum | null;
-  private currentStencilRef: number | null;
-  private currentStencilFuncMask: number | null;
-  private currentStencilFail: GLenum | null;
-  private currentStencilZFail: GLenum | null;
-  private currentStencilZPass: GLenum | null;
-  private currentStencilClear: number | null;
+  private locked: boolean = false;
+  private currentStencilMask: number | null = null;
+  private currentStencilFunc: GLenum | null = null;
+  private currentStencilRef: number | null = null;
+  private currentStencilFuncMask: number | null = null;
+  private currentStencilFail: GLenum | null = null;
+  private currentStencilZFail: GLenum | null = null;
+  private currentStencilZPass: GLenum | null = null;
+  private currentStencilClear: number | null = null;
 
   constructor(gl: WebGL2RenderingContext, state: WebGLState) {
     this.gl = gl;
     this.state = state;
-    this.locked = false;
-    this.currentStencilMask = null;
-    this.currentStencilFunc = null;
-    this.currentStencilRef = null;
-    this.currentStencilFuncMask = null;
-    this.currentStencilFail = null;
-    this.currentStencilZFail = null;
-    this.currentStencilZPass = null;
-    this.currentStencilClear = null;
     this.setTest = this.setTest.bind(this);
     this.setMask = this.setMask.bind(this);
     this.setFunc = this.setFunc.bind(this);

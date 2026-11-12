@@ -48,8 +48,45 @@ export class Raycaster {
   ray: Ray;
   near: number;
   far: number;
-  camera: Camera | null;
-  layers: Layers;
+  /**
+   * The camera to use when raycasting against view-dependent objects such as
+   * billboarded objects like sprites. This field can be set manually or
+   * is set when calling `setFromCamera()`.
+   *
+   * @default null
+   */
+  camera: Camera | null = null;
+  /**
+   * Allows to selectively ignore 3D objects when performing intersection tests.
+   * The following code example ensures that only 3D objects on layer `1` will be
+   * honored by raycaster.
+   * ```typescript
+   * import { Raycaster } from 'ek3d/core/Raycaster';
+   * import { Object3D } from 'ek3d/core/Object3D';
+   *
+   * const raycaster = new Raycaster();
+   * const object = new Object3D();
+   * raycaster.layers.set( 1 );
+   * object.layers.enable( 1 );
+   * ```
+   *
+   */
+  layers: Layers = new Layers();
+  /**
+   * A parameter object that configures the raycasting. It has the structure:
+   *
+   * ```typescript
+   * const params = {
+   * 	Mesh: {},
+   * 	Line: { threshold: 1 },
+   * 	LOD: {},
+   * 	Points: { threshold: 1 },
+   * 	Sprite: {}
+   * };
+   * ```
+   * Where `threshold` is the precision of the raycaster when intersecting objects, in world units.
+   *
+   */
   params: {
     Mesh: Record<string, unknown>;
     Line: { threshold: number };
@@ -57,6 +94,12 @@ export class Raycaster {
     LOD: Record<string, unknown>;
     Points: { threshold: number };
     Sprite: Record<string, unknown>;
+  } = {
+    Mesh: {},
+    Line: { threshold: 1 },
+    LOD: {},
+    Points: { threshold: 1 },
+    Sprite: {},
   };
 
   /**
@@ -85,52 +128,6 @@ export class Raycaster {
      * @default Infinity
      */
     this.far = far;
-    /**
-     * The camera to use when raycasting against view-dependent objects such as
-     * billboarded objects like sprites. This field can be set manually or
-     * is set when calling `setFromCamera()`.
-     *
-     * @default null
-     */
-    this.camera = null;
-    /**
-     * Allows to selectively ignore 3D objects when performing intersection tests.
-     * The following code example ensures that only 3D objects on layer `1` will be
-     * honored by raycaster.
-     * ```typescript
-     * import { Raycaster } from 'ek3d/core/Raycaster';
-     * import { Object3D } from 'ek3d/core/Object3D';
-     *
-     * const raycaster = new Raycaster();
-     * const object = new Object3D();
-     * raycaster.layers.set( 1 );
-     * object.layers.enable( 1 );
-     * ```
-     *
-     */
-    this.layers = new Layers();
-    /**
-     * A parameter object that configures the raycasting. It has the structure:
-     *
-     * ```typescript
-     * const params = {
-     * 	Mesh: {},
-     * 	Line: { threshold: 1 },
-     * 	LOD: {},
-     * 	Points: { threshold: 1 },
-     * 	Sprite: {}
-     * };
-     * ```
-     * Where `threshold` is the precision of the raycaster when intersecting objects, in world units.
-     *
-     */
-    this.params = {
-      Mesh: {},
-      Line: { threshold: 1 },
-      LOD: {},
-      Points: { threshold: 1 },
-      Sprite: {},
-    };
   }
   /**
    * Updates the ray with a new origin and direction by copying the values from the arguments.

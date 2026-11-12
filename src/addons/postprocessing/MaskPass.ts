@@ -31,9 +31,24 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
 export class MaskPass extends Pass {
   scene: Scene;
   camera: Camera;
-  clear: boolean;
-  needsSwap: boolean;
-  inverse: boolean;
+  /**
+   * Overwritten to perform a clear operation by default.
+   *
+   * @default true
+   */
+  clear: boolean = true;
+  /**
+   * Overwritten to disable the swap.
+   *
+   * @default false
+   */
+  needsSwap: boolean = false;
+  /**
+   * Whether to inverse the mask or not.
+   *
+   * @default false
+   */
+  inverse: boolean = false;
 
   /**
    * Constructs a new mask pass.
@@ -51,24 +66,6 @@ export class MaskPass extends Pass {
      * The camera.
      */
     this.camera = camera;
-    /**
-     * Overwritten to perform a clear operation by default.
-     *
-     * @default true
-     */
-    this.clear = true;
-    /**
-     * Overwritten to disable the swap.
-     *
-     * @default false
-     */
-    this.needsSwap = false;
-    /**
-     * Whether to inverse the mask or not.
-     *
-     * @default false
-     */
-    this.inverse = false;
   }
 
   /**
@@ -162,19 +159,18 @@ export class MaskPass extends Pass {
  *
  */
 export class ClearMaskPass extends Pass {
-  needsSwap: boolean;
+  /**
+   * Overwritten to disable the swap.
+   *
+   * @default false
+   */
+  needsSwap: boolean = false;
 
   /**
    * Constructs a new clear mask pass.
    */
   constructor() {
     super();
-    /**
-     * Overwritten to disable the swap.
-     *
-     * @default false
-     */
-    this.needsSwap = false;
   }
 
   /**

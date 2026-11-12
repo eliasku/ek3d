@@ -21,13 +21,13 @@ export interface GPUComputationVariable {
 
 /** Computes variables in float textures using ping-pong render targets. */
 export class GPUComputationRenderer {
-  variables: GPUComputationVariable[];
-  currentTextureIndex: number;
+  variables: GPUComputationVariable[] = [];
+  currentTextureIndex: number = 0;
   private sizeX: number;
   private sizeY: number;
   private renderer: WebGLRenderer;
-  private dataType: TextureType;
-  private passThruUniforms: { passThruTexture: { value: Texture | null } };
+  private dataType: TextureType = TextureType.Float;
+  private passThruUniforms: { passThruTexture: { value: Texture | null } } = { passThruTexture: { value: null } };
   private passThruShader: ShaderMaterial;
   private quad: FullScreenQuad;
 
@@ -35,10 +35,6 @@ export class GPUComputationRenderer {
     this.sizeX = sizeX;
     this.sizeY = sizeY;
     this.renderer = renderer;
-    this.variables = [];
-    this.currentTextureIndex = 0;
-    this.dataType = TextureType.Float;
-    this.passThruUniforms = { passThruTexture: { value: null } };
     this.passThruShader = this.createShaderMaterial(
       `
 uniform sampler2D passThruTexture;

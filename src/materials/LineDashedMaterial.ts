@@ -22,11 +22,32 @@ export type LineDashedMaterialParameters = Omit<Partial<LineDashedMaterial>, "co
  *
  */
 export class LineDashedMaterial extends LineBasicMaterial {
-  isLineDashedMaterial: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isLineDashedMaterial: boolean = true;
 
-  scale: number;
-  dashSize: number;
-  gapSize: number;
+  /**
+   * The scale of the dashed part of a line.
+   *
+   * @default 1
+   */
+  scale: number = 1;
+  /**
+   * The size of the dash. This is both the gap with the stroke.
+   *
+   * @default 3
+   */
+  dashSize: number = 3;
+  /**
+   * The size of the gap.
+   *
+   * @default 1
+   */
+  gapSize: number = 1;
 
   /**
    * Constructs a new line dashed material.
@@ -39,32 +60,7 @@ export class LineDashedMaterial extends LineBasicMaterial {
    */
   constructor(parameters?: LineDashedMaterialParameters) {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isLineDashedMaterial = true;
     this.type = "LineDashedMaterial";
-    /**
-     * The scale of the dashed part of a line.
-     *
-     * @default 1
-     */
-    this.scale = 1;
-    /**
-     * The size of the dash. This is both the gap with the stroke.
-     *
-     * @default 3
-     */
-    this.dashSize = 3;
-    /**
-     * The size of the gap.
-     *
-     * @default 1
-     */
-    this.gapSize = 1;
     this.setValues(parameters);
   }
   clone(): LineDashedMaterial {

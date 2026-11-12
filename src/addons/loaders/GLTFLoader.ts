@@ -251,10 +251,10 @@ export interface GLTF {
  *
  */
 export class GLTFLoader extends Loader<GLTF, string> {
-  dracoLoader: DRACOLoaderLike | null;
-  ktx2Loader: GLTFTextureLoaderLike | null;
-  meshoptDecoder: MeshoptDecoderLike | null;
-  pluginCallbacks: ((parser: GLTFParser) => GLTFLoaderPlugin)[];
+  dracoLoader: DRACOLoaderLike | null = null;
+  ktx2Loader: GLTFTextureLoaderLike | null = null;
+  meshoptDecoder: MeshoptDecoderLike | null = null;
+  pluginCallbacks: ((parser: GLTFParser) => GLTFLoaderPlugin)[] = [];
 
   /**
    * Constructs a new glTF loader.
@@ -263,12 +263,6 @@ export class GLTFLoader extends Loader<GLTF, string> {
    */
   constructor(manager?: LoadingManager) {
     super(manager);
-
-    this.dracoLoader = null;
-    this.ktx2Loader = null;
-    this.meshoptDecoder = null;
-
-    this.pluginCallbacks = [];
 
     this.register(function (parser) {
       return new GLTFMaterialsClearcoatExtension(parser);
@@ -694,15 +688,13 @@ const EXTENSIONS = {
  */
 class GLTFLightsExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
-  cache: Object3DCache;
+  name: string = EXTENSIONS.KHR_LIGHTS_PUNCTUAL;
+  cache: Object3DCache = { refs: {}, uses: {} };
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.KHR_LIGHTS_PUNCTUAL;
 
     // Object3D instance caches
-    this.cache = { refs: {}, uses: {} };
   }
 
   _markDefs(): void {
@@ -814,11 +806,9 @@ class GLTFLightsExtension implements GLTFLoaderPlugin {
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_unlit
  */
 class GLTFMaterialsUnlitExtension {
-  name: string;
+  name: string = EXTENSIONS.KHR_MATERIALS_UNLIT;
 
-  constructor() {
-    this.name = EXTENSIONS.KHR_MATERIALS_UNLIT;
-  }
+  constructor() {}
 
   getMaterialType(): MaterialConstructor {
     return MeshBasicMaterial;
@@ -856,11 +846,10 @@ class GLTFMaterialsUnlitExtension {
  */
 class GLTFMaterialsEmissiveStrengthExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
+  name: string = EXTENSIONS.KHR_MATERIALS_EMISSIVE_STRENGTH;
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.KHR_MATERIALS_EMISSIVE_STRENGTH;
   }
 
   extendMaterialParams(materialIndex: number, materialParams: MaterialParams): Promise<any> {
@@ -883,11 +872,10 @@ class GLTFMaterialsEmissiveStrengthExtension implements GLTFLoaderPlugin {
  */
 class GLTFMaterialsClearcoatExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
+  name: string = EXTENSIONS.KHR_MATERIALS_CLEARCOAT;
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.KHR_MATERIALS_CLEARCOAT;
   }
 
   getMaterialType(materialIndex: number): MaterialConstructor | null {
@@ -942,11 +930,10 @@ class GLTFMaterialsClearcoatExtension implements GLTFLoaderPlugin {
  */
 class GLTFMaterialsDiffuseRoughnessExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
+  name: string = EXTENSIONS.KHR_MATERIALS_DIFFUSE_ROUGHNESS;
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.KHR_MATERIALS_DIFFUSE_ROUGHNESS;
   }
 
   getMaterialType(materialIndex: number): MaterialConstructor | null {
@@ -980,11 +967,10 @@ class GLTFMaterialsDiffuseRoughnessExtension implements GLTFLoaderPlugin {
  */
 class GLTFMaterialsDispersionExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
+  name: string = EXTENSIONS.KHR_MATERIALS_DISPERSION;
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.KHR_MATERIALS_DISPERSION;
   }
 
   getMaterialType(materialIndex: number): MaterialConstructor | null {
@@ -1011,11 +997,10 @@ class GLTFMaterialsDispersionExtension implements GLTFLoaderPlugin {
  */
 class GLTFMaterialsIridescenceExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
+  name: string = EXTENSIONS.KHR_MATERIALS_IRIDESCENCE;
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.KHR_MATERIALS_IRIDESCENCE;
   }
 
   getMaterialType(materialIndex: number): MaterialConstructor | null {
@@ -1068,11 +1053,10 @@ class GLTFMaterialsIridescenceExtension implements GLTFLoaderPlugin {
  */
 class GLTFMaterialsSheenExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
+  name: string = EXTENSIONS.KHR_MATERIALS_SHEEN;
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.KHR_MATERIALS_SHEEN;
   }
 
   getMaterialType(materialIndex: number): MaterialConstructor | null {
@@ -1123,11 +1107,10 @@ class GLTFMaterialsSheenExtension implements GLTFLoaderPlugin {
  */
 class GLTFMaterialsTransmissionExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
+  name: string = EXTENSIONS.KHR_MATERIALS_TRANSMISSION;
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.KHR_MATERIALS_TRANSMISSION;
   }
 
   getMaterialType(materialIndex: number): MaterialConstructor | null {
@@ -1162,11 +1145,10 @@ class GLTFMaterialsTransmissionExtension implements GLTFLoaderPlugin {
  */
 class GLTFMaterialsVolumeExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
+  name: string = EXTENSIONS.KHR_MATERIALS_VOLUME;
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.KHR_MATERIALS_VOLUME;
   }
 
   getMaterialType(materialIndex: number): MaterialConstructor | null {
@@ -1209,11 +1191,10 @@ class GLTFMaterialsVolumeExtension implements GLTFLoaderPlugin {
  */
 class GLTFMaterialsIorExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
+  name: string = EXTENSIONS.KHR_MATERIALS_IOR;
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.KHR_MATERIALS_IOR;
   }
 
   getMaterialType(materialIndex: number): MaterialConstructor | null {
@@ -1242,11 +1223,10 @@ class GLTFMaterialsIorExtension implements GLTFLoaderPlugin {
  */
 class GLTFMaterialsSpecularExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
+  name: string = EXTENSIONS.KHR_MATERIALS_SPECULAR;
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.KHR_MATERIALS_SPECULAR;
   }
 
   getMaterialType(materialIndex: number): MaterialConstructor | null {
@@ -1293,11 +1273,10 @@ class GLTFMaterialsSpecularExtension implements GLTFLoaderPlugin {
  */
 class GLTFMaterialsBumpExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
+  name: string = EXTENSIONS.EXT_MATERIALS_BUMP;
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.EXT_MATERIALS_BUMP;
   }
 
   getMaterialType(materialIndex: number): MaterialConstructor | null {
@@ -1330,11 +1309,10 @@ class GLTFMaterialsBumpExtension implements GLTFLoaderPlugin {
  */
 class GLTFMaterialsAnisotropyExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
+  name: string = EXTENSIONS.KHR_MATERIALS_ANISOTROPY;
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.KHR_MATERIALS_ANISOTROPY;
   }
 
   getMaterialType(materialIndex: number): MaterialConstructor | null {
@@ -1373,11 +1351,10 @@ class GLTFMaterialsAnisotropyExtension implements GLTFLoaderPlugin {
  */
 class GLTFTextureBasisUExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
+  name: string = EXTENSIONS.KHR_TEXTURE_BASISU;
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.KHR_TEXTURE_BASISU;
   }
 
   loadTexture(textureIndex: number): Promise<Texture | null> | null {
@@ -1413,11 +1390,10 @@ class GLTFTextureBasisUExtension implements GLTFLoaderPlugin {
  */
 class GLTFTextureWebPExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
+  name: string = EXTENSIONS.EXT_TEXTURE_WEBP;
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.EXT_TEXTURE_WEBP;
   }
 
   loadTexture(textureIndex: number): Promise<Texture | null> | null {
@@ -1451,11 +1427,10 @@ class GLTFTextureWebPExtension implements GLTFLoaderPlugin {
  */
 class GLTFTextureAVIFExtension implements GLTFLoaderPlugin {
   parser: GLTFParser;
-  name: string;
+  name: string = EXTENSIONS.EXT_TEXTURE_AVIF;
 
   constructor(parser: GLTFParser) {
     this.parser = parser;
-    this.name = EXTENSIONS.EXT_TEXTURE_AVIF;
   }
 
   loadTexture(textureIndex: number): Promise<Texture | null> | null {
@@ -1558,11 +1533,10 @@ class GLTFMeshoptCompression implements GLTFLoaderPlugin {
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_mesh_gpu_instancing
  */
 class GLTFMeshGpuInstancing implements GLTFLoaderPlugin {
-  name: string;
+  name: string = EXTENSIONS.EXT_MESH_GPU_INSTANCING;
   parser: GLTFParser;
 
   constructor(parser: GLTFParser) {
-    this.name = EXTENSIONS.EXT_MESH_GPU_INSTANCING;
     this.parser = parser;
   }
 
@@ -1715,16 +1689,12 @@ const BINARY_EXTENSION_HEADER_LENGTH = 12;
 const BINARY_EXTENSION_CHUNK_TYPES = { JSON: 0x4e4f534a, BIN: 0x004e4942 };
 
 class GLTFBinaryExtension {
-  name: string;
-  content: string | null;
-  body: ArrayBuffer | null;
+  name: string = EXTENSIONS.KHR_BINARY_GLTF;
+  content: string | null = null;
+  body: ArrayBuffer | null = null;
   header: { magic: string; version: number; length: number };
 
   constructor(data: ArrayBuffer) {
-    this.name = EXTENSIONS.KHR_BINARY_GLTF;
-    this.content = null;
-    this.body = null;
-
     const headerView = new DataView(data, 0, BINARY_EXTENSION_HEADER_LENGTH);
     const textDecoder = new TextDecoder();
 
@@ -1849,11 +1819,9 @@ class GLTFDracoMeshCompressionExtension {
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_texture_transform
  */
 class GLTFTextureTransformExtension {
-  name: string;
+  name: string = EXTENSIONS.KHR_TEXTURE_TRANSFORM;
 
-  constructor() {
-    this.name = EXTENSIONS.KHR_TEXTURE_TRANSFORM;
-  }
+  constructor() {}
 
   extendTexture(texture: Texture, transform: GLTFJson): Texture {
     if (
@@ -1921,11 +1889,9 @@ class GLTFTextureTransformExtension {
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_mesh_quantization
  */
 class GLTFMeshQuantizationExtension {
-  name: string;
+  name: string = EXTENSIONS.KHR_MESH_QUANTIZATION;
 
-  constructor() {
-    this.name = EXTENSIONS.KHR_MESH_QUANTIZATION;
-  }
+  constructor() {}
 }
 
 /*********************************/
@@ -2303,40 +2269,38 @@ const _identityMatrix = new Matrix4();
 
 export class GLTFParser {
   json: GLTFJson;
-  extensions: Record<string, any>;
-  plugins: Record<string, GLTFLoaderPlugin>;
+  extensions: Record<string, any> = {};
+  plugins: Record<string, GLTFLoaderPlugin> = {};
   options: GLTFParserOptions;
 
   // loader object cache
-  cache: GLTFRegistry;
+  cache: GLTFRegistry = new GLTFRegistry();
 
   // associations between Three.js objects and glTF elements
-  associations: Map<object, GLTFJson>;
+  associations: Map<object, GLTFJson> = new Map();
 
   // BufferGeometry caching
-  primitiveCache: Record<string, { primitive: GLTFJson; promise: Promise<BufferGeometry> }>;
+  primitiveCache: Record<string, { primitive: GLTFJson; promise: Promise<BufferGeometry> }> = {};
 
   // Node cache
-  nodeCache: Record<number, Promise<Object3D>>;
+  nodeCache: Record<number, Promise<Object3D>> = {};
 
   // Object3D instance caches
-  meshCache: Object3DCache;
-  cameraCache: Object3DCache;
-  lightCache: Object3DCache;
+  meshCache: Object3DCache = { refs: {}, uses: {} };
+  cameraCache: Object3DCache = { refs: {}, uses: {} };
+  lightCache: Object3DCache = { refs: {}, uses: {} };
 
-  sourceCache: Record<number, Promise<Texture>>;
-  textureCache: Record<string, Promise<Texture | null>>;
+  sourceCache: Record<number, Promise<Texture>> = {};
+  textureCache: Record<string, Promise<Texture | null>> = {};
 
   // Track node names, to ensure no duplicates
-  nodeNamesUsed: Record<string, number>;
+  nodeNamesUsed: Record<string, number> = {};
 
   textureLoader: Loader;
   fileLoader: FileLoader;
 
   constructor(json: GLTFJson = {}, options?: GLTFParserOptions) {
     this.json = json;
-    this.extensions = {};
-    this.plugins = {};
     this.options = options ?? {
       manager: new LoadingManager(),
       path: "",
@@ -2350,27 +2314,16 @@ export class GLTFParser {
     };
 
     // loader object cache
-    this.cache = new GLTFRegistry();
 
     // associations between Three.js objects and glTF elements
-    this.associations = new Map();
 
     // BufferGeometry caching
-    this.primitiveCache = {};
 
     // Node cache
-    this.nodeCache = {};
 
     // Object3D instance caches
-    this.meshCache = { refs: {}, uses: {} };
-    this.cameraCache = { refs: {}, uses: {} };
-    this.lightCache = { refs: {}, uses: {} };
-
-    this.sourceCache = {};
-    this.textureCache = {};
 
     // Track node names, to ensure no duplicates
-    this.nodeNamesUsed = {};
 
     // Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
     // expensive work of uploading a texture to the GPU off the main thread.

@@ -20,7 +20,7 @@ export type MaterialConstructors = Readonly<Record<string, new () => Material>>;
  *
  */
 export class MaterialLoader extends Loader<Material> {
-  textures: Record<string, Texture>;
+  textures: Record<string, Texture> = {};
   constructors: MaterialConstructors;
 
   /**
@@ -30,7 +30,6 @@ export class MaterialLoader extends Loader<Material> {
    */
   constructor(manager?: LoadingManager, constructors: MaterialConstructors = {}) {
     super(manager);
-    this.textures = {};
     this.constructors = constructors;
   }
   /**

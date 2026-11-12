@@ -7,8 +7,19 @@ import { TextureFilter, TextureType, PixelFormat, Mapping, Wrapping } from "../c
  *
  */
 export class DepthTexture extends Texture {
-  isDepthTexture: boolean;
-  compareFunction: number | null;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isDepthTexture: boolean = true;
+  /**
+   * Code corresponding to the depth compare function.
+   *
+   * @default null
+   */
+  compareFunction: number | null = null;
 
   /**
    * Constructs a new depth texture.
@@ -44,13 +55,6 @@ export class DepthTexture extends Texture {
     const image: any = { width: width, height: height, depth: depth };
     super(image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy);
     /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isDepthTexture = true;
-    /**
      * If set to `true`, the texture is flipped along the vertical axis when
      * uploaded to the GPU.
      *
@@ -67,12 +71,6 @@ export class DepthTexture extends Texture {
      * @default false
      */
     this.generateMipmaps = false;
-    /**
-     * Code corresponding to the depth compare function.
-     *
-     * @default null
-     */
-    this.compareFunction = null;
   }
   clone(): DepthTexture {
     const image = this.image;

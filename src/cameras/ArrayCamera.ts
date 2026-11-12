@@ -9,10 +9,31 @@ import { PerspectiveCamera } from "./PerspectiveCamera";
  *
  */
 export class ArrayCamera extends PerspectiveCamera {
-  isArrayCamera: boolean;
-  isMultiViewCamera: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isArrayCamera: boolean = true;
+  /**
+   * Whether this camera is used with multiview rendering or not.
+   *
+   * @readonly
+   * @default false
+   */
+  isMultiViewCamera: boolean = false;
   cameras: PerspectiveCamera[];
-  perCameraFrustumCulled: boolean;
+  /**
+   * Whether 3D objects are frustum culled per sub camera or not.
+   *
+   * Since this requires an additional frustum test per sub camera, it should only be
+   * enabled when the frustums of the sub cameras barely overlap. The property has
+   * no effect with multiview rendering.
+   *
+   * @default false
+   */
+  perCameraFrustumCulled: boolean = false;
 
   /**
    * Constructs a new array camera.
@@ -22,34 +43,10 @@ export class ArrayCamera extends PerspectiveCamera {
   constructor(array: PerspectiveCamera[] = []) {
     super();
     /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isArrayCamera = true;
-    /**
-     * Whether this camera is used with multiview rendering or not.
-     *
-     * @readonly
-     * @default false
-     */
-    this.isMultiViewCamera = false;
-    /**
      * An array of perspective sub cameras.
      *
      */
     this.cameras = array;
-    /**
-     * Whether 3D objects are frustum culled per sub camera or not.
-     *
-     * Since this requires an additional frustum test per sub camera, it should only be
-     * enabled when the frustums of the sub cameras barely overlap. The property has
-     * no effect with multiview rendering.
-     *
-     * @default false
-     */
-    this.perCameraFrustumCulled = false;
   }
   copy(source: ArrayCamera, recursive?: boolean): this {
     super.copy(source, recursive);

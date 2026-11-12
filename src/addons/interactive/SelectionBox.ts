@@ -69,27 +69,27 @@ export class SelectionBox {
   /**
    * The start point of the selection.
    */
-  startPoint: Vector3;
+  startPoint: Vector3 = new Vector3();
 
   /**
    * The end point of the selection.
    */
-  endPoint: Vector3;
+  endPoint: Vector3 = new Vector3();
 
   /**
    * The selected 3D objects.
    */
-  collection: Object3D[];
+  collection: Object3D[] = [];
 
   /**
    * The selected instance IDs of instanced meshes.
    */
-  instances: Record<string, number[]>;
+  instances: Record<string, number[]> = {};
 
   /**
    * The selected batches of batched meshes.
    */
-  batches: Record<string, number[]>;
+  batches: Record<string, number[]> = {};
 
   /**
    * How deep the selection frustum of perspective cameras should extend.
@@ -106,11 +106,6 @@ export class SelectionBox {
   constructor(camera: SelectionCamera, scene: Scene, deep: number = Number.MAX_VALUE) {
     this.camera = camera;
     this.scene = scene;
-    this.startPoint = new Vector3();
-    this.endPoint = new Vector3();
-    this.collection = [];
-    this.instances = {};
-    this.batches = {};
     this.deep = deep;
   }
 

@@ -28,7 +28,13 @@ import { Object3D } from "../core/Object3D";
  *
  */
 export class SpotLight extends Light {
-  isSpotLight: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isSpotLight: boolean = true;
 
   target: Object3D;
   distance: number;
@@ -57,13 +63,6 @@ export class SpotLight extends Light {
     decay: number = 2,
   ) {
     super(color, intensity);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isSpotLight = true;
     this.type = "SpotLight";
     this.position.copy(Object3D.DEFAULT_UP);
     this.updateMatrix();

@@ -8,7 +8,13 @@ import { Line } from "./Line";
  *
  */
 export class LineLoop<TMaterial extends Material | Material[] = Material | Material[]> extends Line<TMaterial> {
-  isLineLoop: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isLineLoop: boolean = true;
 
   /**
    * Constructs a new line loop.
@@ -18,13 +24,6 @@ export class LineLoop<TMaterial extends Material | Material[] = Material | Mater
    */
   constructor(geometry: BufferGeometry, material: NoInfer<TMaterial>) {
     super(geometry, material);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isLineLoop = true;
     this.type = "LineLoop";
   }
   clone(recursive: boolean = true): LineLoop<TMaterial> {

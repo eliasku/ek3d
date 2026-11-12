@@ -450,11 +450,10 @@ class OBJParserState implements ParserState {
 /** The loaded OBJ container, carrying the referenced material library file names. */
 export class OBJGroup extends Group {
   /** The material library files referenced by `mtllib` statements. */
-  materialLibraries: string[];
+  materialLibraries: string[] = [];
 
   constructor() {
     super();
-    this.materialLibraries = [];
   }
 }
 
@@ -484,7 +483,7 @@ export class OBJLoader extends Loader<Group, string> {
    *
    * @default null
    */
-  materials: { create(materialName: string): Material | undefined } | null;
+  materials: { create(materialName: string): Material | undefined } | null = null;
 
   /**
    * Constructs a new OBJ loader.
@@ -493,8 +492,6 @@ export class OBJLoader extends Loader<Group, string> {
    */
   constructor(manager?: LoadingManager) {
     super(manager);
-
-    this.materials = null;
   }
 
   /**

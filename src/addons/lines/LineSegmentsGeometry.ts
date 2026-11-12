@@ -16,11 +16,10 @@ const _vector = new Vector3();
 
 /** A series of vertex pairs forming line segments for LineSegments2. */
 export class LineSegmentsGeometry extends InstancedBufferGeometry {
-  isLineSegmentsGeometry: boolean;
+  isLineSegmentsGeometry: boolean = true;
 
   constructor() {
     super();
-    this.isLineSegmentsGeometry = true;
     this.type = "LineSegmentsGeometry";
     this.setIndex([0, 2, 1, 2, 3, 1, 2, 4, 3, 4, 5, 3, 4, 6, 5, 6, 7, 5]);
     this.setAttribute(

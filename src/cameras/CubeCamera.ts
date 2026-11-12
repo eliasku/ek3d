@@ -53,8 +53,18 @@ const aspect = 1;
  */
 export class CubeCamera extends Object3D<PerspectiveCamera> {
   renderTarget: WebGLCubeRenderTarget;
-  coordinateSystem: CoordinateSystem | null;
-  activeMipmapLevel: number;
+  /**
+   * The current active coordinate system.
+   *
+   * @default null
+   */
+  coordinateSystem: CoordinateSystem | null = null;
+  /**
+   * The current active mipmap level
+   *
+   * @default 0
+   */
+  activeMipmapLevel: number = 0;
 
   /**
    * Constructs a new cube camera.
@@ -71,18 +81,6 @@ export class CubeCamera extends Object3D<PerspectiveCamera> {
      *
      */
     this.renderTarget = renderTarget;
-    /**
-     * The current active coordinate system.
-     *
-     * @default null
-     */
-    this.coordinateSystem = null;
-    /**
-     * The current active mipmap level
-     *
-     * @default 0
-     */
-    this.activeMipmapLevel = 0;
     const cameraPX = new PerspectiveCamera(fov, aspect, near, far);
     cameraPX.layers = this.layers;
     this.add(cameraPX);

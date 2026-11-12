@@ -224,6 +224,12 @@ test("explicit-material mesh cloning preserves shared assets and independently c
   child.position.set(1, 2, 3);
   mesh.add(child);
   mesh.position.set(2, 0, -1);
+  mesh.rotation.z = Math.PI / 2;
+  mesh.scale.set(2, 1, 1);
+  const parent = new Object3D();
+  parent.position.x = 10;
+  parent.add(mesh);
+  parent.updateMatrixWorld(true);
   const clone = mesh.clone();
   assert.equal(clone.geometry, geometry);
   assert.equal(clone.material, material);
@@ -232,8 +238,54 @@ test("explicit-material mesh cloning preserves shared assets and independently c
   assert.notEqual(clone.children[0], child);
   assert.equal(clone.children[0].parent, clone);
   assert.deepEqual(clone.children[0].position.toArray(), [1, 2, 3]);
+  assert.notEqual(clone.id, mesh.id);
+  assert.equal(Reflect.set(clone, "id", mesh.id), false);
+  assert.notEqual(clone.rotation, mesh.rotation);
+  assert.notEqual(clone.quaternion, mesh.quaternion);
+  assert.ok(Math.abs(clone.quaternion.z - Math.SQRT1_2) < 1e-12);
+  assert.ok(child.getWorldPosition(new Vector3()).distanceTo(new Vector3(10, 2, 2)) < 1e-12);
+  assert.ok(clone.children[0].getWorldPosition(new Vector3()).distanceTo(new Vector3(0, 2, 2)) < 1e-12);
+  clone.rotation.z = 0;
+  assert.equal(clone.quaternion.z, 0);
+  assert.ok(Math.abs(mesh.quaternion.z - Math.SQRT1_2) < 1e-12);
   assert.deepEqual(mesh.clone(false).children, []);
   assert.throws(() => Reflect.construct(Mesh, [geometry]), /explicit geometry and material/);
+});
+
+test("camera copies retain inherited matrices through parent updates and projection round trips", () => {
+  const parent = new Object3D();
+  parent.position.set(10, 2, -3);
+  parent.rotation.y = Math.PI / 2;
+  const camera = new PerspectiveCamera(90, 1, 1, 101);
+  camera.position.z = 5;
+  parent.add(camera);
+  camera.updateWorldMatrix(true, false);
+  const copy = new PerspectiveCamera();
+  const id = copy.id;
+  const keys = ["matrixWorld", "matrixWorldInverse", "projectionMatrix", "projectionMatrixInverse"] as const;
+  const matrices = keys.map((key) => copy[key]);
+  copy.copy(camera);
+  assert.equal(copy.id, id);
+  assert.equal(Reflect.set(copy, "id", camera.id), false);
+  for (const [index, key] of keys.entries()) {
+    assert.equal(copy[key], matrices[index]);
+    assert.notEqual(copy[key], camera[key]);
+  }
+  const clone = camera.clone();
+  parent.add(copy, clone);
+  parent.position.x = 20;
+  parent.updateMatrixWorld(true);
+  const point = new Vector3(15, 2, -5);
+  for (const current of [camera, copy, clone]) {
+    assert.ok(current.getWorldPosition(new Vector3()).distanceTo(new Vector3(25, 2, -3)) < 1e-12);
+    const projected = point.clone().project(current);
+    assert.ok(projected.distanceTo(new Vector3(0.2, 0, 0.818)) < 1e-12);
+    assert.ok(projected.unproject(current).distanceTo(point) < 1e-12);
+    const serialized = current.toJSON().object;
+    assert.equal(serialized.type, "PerspectiveCamera");
+    assert.equal(serialized.fov, 90);
+    assert.deepEqual(serialized.matrix, camera.matrix.toArray());
+  }
 });
 
 test("selected shader uniform instances do not leak state between materials", () => {

@@ -32,8 +32,19 @@ import { warn } from "../utils";
  *
  */
 export class ImageBitmapLoader extends Loader<ImageBitmap, string> {
-  isImageBitmapLoader: boolean;
-  options: ImageBitmapOptions;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isImageBitmapLoader: boolean = true;
+  /**
+   * Represents the loader options.
+   *
+   * @default {premultiplyAlpha:'none'}
+   */
+  options: ImageBitmapOptions = { premultiplyAlpha: "none" };
   _abortController: AbortController;
 
   /**
@@ -43,25 +54,12 @@ export class ImageBitmapLoader extends Loader<ImageBitmap, string> {
    */
   constructor(manager?: LoadingManager) {
     super(manager);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isImageBitmapLoader = true;
     if (typeof createImageBitmap === "undefined") {
       warn("ImageBitmapLoader: createImageBitmap() not supported.");
     }
     if (typeof fetch === "undefined") {
       warn("ImageBitmapLoader: fetch() not supported.");
     }
-    /**
-     * Represents the loader options.
-     *
-     * @default {premultiplyAlpha:'none'}
-     */
-    this.options = { premultiplyAlpha: "none" };
     /**
      * Used for aborting requests.
      *

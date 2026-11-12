@@ -87,7 +87,12 @@ export class CubeTexturePass extends Pass {
   camera: PerspectiveCamera;
   tCube: CubeTexture | null;
   opacity: number;
-  needsSwap: boolean;
+  /**
+   * Overwritten to disable the swap.
+   *
+   * @default false
+   */
+  needsSwap: boolean = false;
   _cubeMesh: Mesh<ShaderMaterial>;
   _cubeScene: Scene;
   _cubeCamera: PerspectiveCamera;
@@ -117,13 +122,6 @@ export class CubeTexturePass extends Pass {
      * @default 1
      */
     this.opacity = opacity;
-
-    /**
-     * Overwritten to disable the swap.
-     *
-     * @default false
-     */
-    this.needsSwap = false;
 
     // internals
 

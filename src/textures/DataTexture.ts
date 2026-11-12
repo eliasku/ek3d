@@ -29,7 +29,13 @@ export interface DataTextureImage {
  *
  */
 export class DataTexture extends Texture {
-  isDataTexture: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isDataTexture: boolean = true;
 
   /**
    * Constructs a new data texture.
@@ -62,13 +68,6 @@ export class DataTexture extends Texture {
     colorSpace?: string,
   ) {
     super(null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isDataTexture = true;
     /**
      * The image definition of a data texture.
      *

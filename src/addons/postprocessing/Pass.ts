@@ -14,49 +14,43 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  * @abstract
  */
 export class Pass {
-  isPass: boolean;
-  enabled: boolean;
-  needsSwap: boolean;
-  clear: boolean;
-  renderToScreen: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isPass: boolean = true;
+  /**
+   * If set to `true`, the pass is processed by the composer.
+   *
+   * @default true
+   */
+  enabled: boolean = true;
+  /**
+   * If set to `true`, the pass indicates to swap read and write buffer after rendering.
+   *
+   * @default true
+   */
+  needsSwap: boolean = true;
+  /**
+   * If set to `true`, the pass clears its buffer before rendering
+   *
+   * @default false
+   */
+  clear: boolean = false;
+  /**
+   * If set to `true`, the result of the pass is rendered to screen. The last pass in the composers
+   * pass chain gets automatically rendered to screen, no matter how this property is configured.
+   *
+   * @default false
+   */
+  renderToScreen: boolean = false;
 
   /**
    * Constructs a new pass.
    */
-  constructor() {
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isPass = true;
-    /**
-     * If set to `true`, the pass is processed by the composer.
-     *
-     * @default true
-     */
-    this.enabled = true;
-    /**
-     * If set to `true`, the pass indicates to swap read and write buffer after rendering.
-     *
-     * @default true
-     */
-    this.needsSwap = true;
-    /**
-     * If set to `true`, the pass clears its buffer before rendering
-     *
-     * @default false
-     */
-    this.clear = false;
-    /**
-     * If set to `true`, the result of the pass is rendered to screen. The last pass in the composers
-     * pass chain gets automatically rendered to screen, no matter how this property is configured.
-     *
-     * @default false
-     */
-    this.renderToScreen = false;
-  }
+  constructor() {}
 
   /**
    * Sets the size of the pass.

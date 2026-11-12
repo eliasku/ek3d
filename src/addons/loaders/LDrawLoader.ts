@@ -41,7 +41,7 @@ const _tempVec0 = new Vector3();
 const _tempVec1 = new Vector3();
 
 class ConditionalLineSegments extends LineSegments {
-  isConditionalLine: true;
+  isConditionalLine: true = true;
 
   constructor(
     geometry: import("../../core/BufferGeometry").BufferGeometry,
@@ -50,8 +50,6 @@ class ConditionalLineSegments extends LineSegments {
       | import("../../materials/LineBasicMaterial").LineBasicMaterial[],
   ) {
     super(geometry as never, material as never);
-
-    this.isConditionalLine = true;
   }
 }
 
@@ -383,15 +381,13 @@ function isPrimitiveType(type: string): boolean {
 class LineParser {
   line: string;
   lineLength: number;
-  currentCharIndex: number;
-  currentChar: string;
+  currentCharIndex: number = 0;
+  currentChar: string = " ";
   lineNumber: number;
 
   constructor(line: string, lineNumber: number = -1) {
     this.line = line;
     this.lineLength = line.length;
-    this.currentCharIndex = 0;
-    this.currentChar = " ";
     this.lineNumber = lineNumber;
   }
 
@@ -452,11 +448,10 @@ class LineParser {
 // Fetches and parses an intermediate representation of LDraw parts files.
 class LDrawParsedCache {
   loader: LDrawLoader;
-  _cache: Record<string, LDrawData | Promise<LDrawData>>;
+  _cache: Record<string, LDrawData | Promise<LDrawData>> = {};
 
   constructor(loader: LDrawLoader) {
     this.loader = loader;
-    this._cache = {};
   }
 
   cloneResult(original: LDrawData): LDrawData {
@@ -998,12 +993,11 @@ function getMaterialFromCode(
 class LDrawPartsGeometryCache {
   loader: LDrawLoader;
   parseCache: LDrawParsedCache;
-  _cache: Record<string, Promise<Group>>;
+  _cache: Record<string, Promise<Group>> = {};
 
   constructor(loader: LDrawLoader) {
     this.loader = loader;
     this.parseCache = new LDrawParsedCache(loader);
-    this._cache = {};
   }
 
   // Convert the given file information into a mesh by processing subobjects.
@@ -1512,18 +1506,26 @@ interface LDrawMaterialLike {
 
 export class LDrawLoader extends Loader<Group, string> {
   /** Array of materials. */
-  materials: LDrawMaterialLike[];
-  materialLibrary: Record<string, LDrawMaterialLike>;
-  edgeMaterialCache: WeakMap<LDrawMaterialLike, LDrawMaterialLike>;
-  conditionalEdgeMaterialCache: WeakMap<LDrawMaterialLike, LDrawMaterialLike | null>;
-  partsCache: LDrawPartsGeometryCache;
-  fileMap: Record<string, string>;
-  smoothNormals: boolean;
-  partsLibraryPath: string;
-  ConditionalLineMaterial: (new (parameters?: Record<string, unknown>) => LDrawMaterialLike) | null;
-  missingColorMaterial: MeshStandardMaterial;
-  missingEdgeColorMaterial: LineBasicMaterial;
-  missingConditionalEdgeColorMaterial: LDrawMaterialLike | null;
+  materials: LDrawMaterialLike[] = [];
+  materialLibrary: Record<string, LDrawMaterialLike> = {};
+  edgeMaterialCache: WeakMap<LDrawMaterialLike, LDrawMaterialLike> = new WeakMap();
+  conditionalEdgeMaterialCache: WeakMap<LDrawMaterialLike, LDrawMaterialLike | null> = new WeakMap();
+  partsCache: LDrawPartsGeometryCache = new LDrawPartsGeometryCache(this);
+  fileMap: Record<string, string> = {};
+  smoothNormals: boolean = true;
+  partsLibraryPath: string = "";
+  ConditionalLineMaterial: (new (parameters?: Record<string, unknown>) => LDrawMaterialLike) | null = null;
+  missingColorMaterial: MeshStandardMaterial = new MeshStandardMaterial({
+    name: Loader.DEFAULT_MATERIAL_NAME,
+    color: 0xff00ff,
+    roughness: 0.3,
+    metalness: 0,
+  });
+  missingEdgeColorMaterial: LineBasicMaterial = new LineBasicMaterial({
+    name: Loader.DEFAULT_MATERIAL_NAME,
+    color: 0xff00ff,
+  });
+  missingConditionalEdgeColorMaterial: LDrawMaterialLike | null = null;
 
   /**
    * Constructs a new LDraw loader.
@@ -1534,35 +1536,18 @@ export class LDrawLoader extends Loader<Group, string> {
     super(manager);
 
     // Array of materials
-    this.materials = [];
-    this.materialLibrary = {};
-    this.edgeMaterialCache = new WeakMap();
-    this.conditionalEdgeMaterialCache = new WeakMap();
 
     // This also allows to handle the embedded text files ("0 FILE" lines)
-    this.partsCache = new LDrawPartsGeometryCache(this);
 
     // This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
-    this.fileMap = {};
 
     // If this flag is set to true the vertex normals will be smoothed.
-    this.smoothNormals = true;
 
     // The path to load parts from the LDraw parts library from.
-    this.partsLibraryPath = "";
 
     // this material type must be injected via setConditionalLineMaterial()
-    this.ConditionalLineMaterial = null;
 
     // Material assigned to not available colors for meshes and edges
-    this.missingColorMaterial = new MeshStandardMaterial({
-      name: Loader.DEFAULT_MATERIAL_NAME,
-      color: 0xff00ff,
-      roughness: 0.3,
-      metalness: 0,
-    });
-    this.missingEdgeColorMaterial = new LineBasicMaterial({ name: Loader.DEFAULT_MATERIAL_NAME, color: 0xff00ff });
-    this.missingConditionalEdgeColorMaterial = null;
     this.edgeMaterialCache.set(this.missingColorMaterial, this.missingEdgeColorMaterial);
     this.conditionalEdgeMaterialCache.set(this.missingEdgeColorMaterial, this.missingConditionalEdgeColorMaterial);
   }

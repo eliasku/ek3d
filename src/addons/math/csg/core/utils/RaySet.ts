@@ -4,11 +4,9 @@ const DIST_EPSILON = 1e-5;
 const ANGLE_EPSILON = 1e-4;
 
 export class RaySet {
-  _rays: Ray[];
+  _rays: Ray[] = [];
 
-  constructor() {
-    this._rays = [];
-  }
+  constructor() {}
 
   addRay(ray: Ray) {
     this._rays.push(ray);

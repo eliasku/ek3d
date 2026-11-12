@@ -64,23 +64,22 @@ const ATLAS_PADDING = 1;
 
 /** An irradiance volume with one probe at each cell center, half a cell inside its bounds. */
 export class LightProbeGridWebGL extends Light {
-  isLightProbeGrid: boolean;
+  isLightProbeGrid: boolean = true;
   width: number;
   height: number;
   depth: number;
   resolution: Vector3;
-  boundingBox: Box3;
+  boundingBox: Box3 = new Box3();
   /** Higher priority wins overlaps; creation order breaks ties. */
-  priority: number;
-  texture: Data3DTexture | null;
-  _renderTarget: WebGL3DRenderTarget | null;
-  _bounceTarget: WebGL3DRenderTarget | null;
-  _bouncePass: number;
+  priority: number = 0;
+  texture: Data3DTexture | null = null;
+  _renderTarget: WebGL3DRenderTarget | null = null;
+  // Indirect captures read a snapshot while the live atlas is updated in place.
+  _bounceTarget: WebGL3DRenderTarget | null = null;
+  _bouncePass: number = -1;
 
   constructor(width = 1, height = 1, depth = 1, widthProbes?: number, heightProbes?: number, depthProbes?: number) {
     super(0xffffff, 1);
-
-    this.isLightProbeGrid = true;
 
     this.type = "LightProbeGridWebGL";
 
@@ -95,17 +94,6 @@ export class LightProbeGridWebGL extends Light {
       heightProbes !== undefined ? heightProbes : Math.max(1, Math.round(height)),
       depthProbes !== undefined ? depthProbes : Math.max(1, Math.round(depth)),
     );
-
-    this.boundingBox = new Box3();
-    this.priority = 0;
-
-    this.texture = null;
-
-    this._renderTarget = null;
-
-    // Indirect captures read a snapshot while the live atlas is updated in place.
-    this._bounceTarget = null;
-    this._bouncePass = -1;
 
     this.updateBoundingBox();
   }

@@ -37,7 +37,11 @@ import { warnOnce, ensureTypeFlag } from "../utils";
  * transpose of any matrices outlined here to make sense of the calculations.
  */
 export class Matrix3 {
-  elements: number[];
+  /**
+   * A column-major list of matrix values.
+   *
+   */
+  elements: number[] = [1, 0, 0, 0, 1, 0, 0, 0, 1];
   /**
    * This flag can be used for type testing.
    *
@@ -75,11 +79,6 @@ export class Matrix3 {
     n33?: number,
   ) {
     ensureTypeFlag(this, "isMatrix3");
-    /**
-     * A column-major list of matrix values.
-     *
-     */
-    this.elements = [1, 0, 0, 0, 1, 0, 0, 0, 1];
     if (n11! !== undefined) {
       this.set(n11!, n12!, n13!, n21!, n22!, n23!, n31!, n32!, n33!);
     }

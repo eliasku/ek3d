@@ -48,12 +48,32 @@ const _intersectPointOnSegment = /*@__PURE__*/ new Vector3();
  *
  */
 export class Line<TMaterial extends Material | Material[] = Material | Material[]> extends Object3D {
-  isLine: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isLine: boolean = true;
 
   geometry: BufferGeometry;
   material: TMaterial;
-  morphTargetDictionary: Record<string, number> | undefined;
-  morphTargetInfluences: number[] | undefined;
+  /**
+   * A dictionary representing the morph targets in the geometry. The key is the
+   * morph targets name, the value its attribute index. This member is `undefined`
+   * by default and only set when morph targets are detected in the geometry.
+   *
+   * @default undefined
+   */
+  morphTargetDictionary: Record<string, number> | undefined = undefined;
+  /**
+   * An array of weights typically in the range `[0,1]` that specify how much of the morph
+   * is applied. This member is `undefined` by default and only set when morph targets are
+   * detected in the geometry.
+   *
+   * @default undefined
+   */
+  morphTargetInfluences: number[] | undefined = undefined;
 
   /**
    * Constructs a new line.
@@ -65,13 +85,6 @@ export class Line<TMaterial extends Material | Material[] = Material | Material[
     super();
     if (geometry === undefined || material === undefined)
       throw new Error("Line requires explicit geometry and material.");
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isLine = true;
     this.type = "Line";
     /**
      * The line geometry.
@@ -84,22 +97,6 @@ export class Line<TMaterial extends Material | Material[] = Material | Material[
      * Supplied explicitly by the caller.
      */
     this.material = material;
-    /**
-     * A dictionary representing the morph targets in the geometry. The key is the
-     * morph targets name, the value its attribute index. This member is `undefined`
-     * by default and only set when morph targets are detected in the geometry.
-     *
-     * @default undefined
-     */
-    this.morphTargetDictionary = undefined;
-    /**
-     * An array of weights typically in the range `[0,1]` that specify how much of the morph
-     * is applied. This member is `undefined` by default and only set when morph targets are
-     * detected in the geometry.
-     *
-     * @default undefined
-     */
-    this.morphTargetInfluences = undefined;
     this.updateMorphTargets();
   }
   clone(recursive: boolean = true): Line<TMaterial> {

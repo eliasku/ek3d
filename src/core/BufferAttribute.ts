@@ -21,8 +21,18 @@ let _id = 0;
  * helper methods on vector and color class might be helpful. E.g. {@link Vector3#fromBufferAttribute}.
  */
 export class BufferAttribute extends EventDispatcher {
-  isBufferAttribute: boolean;
-  name: string;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isBufferAttribute: boolean = true;
+  /**
+   * The name of the buffer attribute.
+   *
+   */
+  name: string = "";
   array:
     | Int8Array
     | Uint8Array
@@ -36,10 +46,35 @@ export class BufferAttribute extends EventDispatcher {
   itemSize: number;
   count: number;
   normalized: boolean;
-  usage: BufferUsage;
-  updateRanges: { start: number; count: number }[];
-  gpuType: TextureType;
-  version: number;
+  /**
+   * Defines the intended usage pattern of the data store for optimization purposes.
+   *
+   * Note: After the initial use of a buffer, its usage cannot be changed. Instead,
+   * instantiate a new one and set the desired usage before the next render.
+   *
+   * @default BufferUsage.StaticDraw
+   */
+  usage: BufferUsage = BufferUsage.StaticDraw;
+  /**
+   * This can be used to only update some components of stored vectors (for example, just the
+   * component related to color). Use the `addUpdateRange()` function to add ranges to this array.
+   *
+   */
+  updateRanges: { start: number; count: number }[] = [];
+  /**
+   * Configures the bound GPU type for use in shaders.
+   *
+   * Note: this only has an effect for integer arrays and is not configurable for float arrays.
+   * For lower precision float types, use `Float16BufferAttribute`.
+   *
+   * @default TextureType.Float
+   */
+  gpuType: TextureType = TextureType.Float;
+  /**
+   * A version number, incremented every time the `needsUpdate` is set to `true`.
+   *
+   */
+  version: number = 0;
   _normalizationScale: number | undefined;
   id!: number;
 
@@ -69,24 +104,12 @@ export class BufferAttribute extends EventDispatcher {
       throw new TypeError("THREE.BufferAttribute: array should be a Typed Array.");
     }
     /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isBufferAttribute = true;
-    /**
      * The ID of the buffer attribute.
      *
      * @name BufferAttribute#id
      * @readonly
      */
     Object.defineProperty(this, "id", { enumerable: false, configurable: false, writable: false, value: _id++ });
-    /**
-     * The name of the buffer attribute.
-     *
-     */
-    this.name = "";
     /**
      * The array holding the attribute data. It should have `itemSize * numVertices`
      * elements, where `numVertices` is the number of vertices in the associated geometry.
@@ -116,35 +139,6 @@ export class BufferAttribute extends EventDispatcher {
      *
      */
     this.normalized = normalized;
-    /**
-     * Defines the intended usage pattern of the data store for optimization purposes.
-     *
-     * Note: After the initial use of a buffer, its usage cannot be changed. Instead,
-     * instantiate a new one and set the desired usage before the next render.
-     *
-     * @default BufferUsage.StaticDraw
-     */
-    this.usage = BufferUsage.StaticDraw;
-    /**
-     * This can be used to only update some components of stored vectors (for example, just the
-     * component related to color). Use the `addUpdateRange()` function to add ranges to this array.
-     *
-     */
-    this.updateRanges = [];
-    /**
-     * Configures the bound GPU type for use in shaders.
-     *
-     * Note: this only has an effect for integer arrays and is not configurable for float arrays.
-     * For lower precision float types, use `Float16BufferAttribute`.
-     *
-     * @default TextureType.Float
-     */
-    this.gpuType = TextureType.Float;
-    /**
-     * A version number, incremented every time the `needsUpdate` is set to `true`.
-     *
-     */
-    this.version = 0;
     /**
      * Cached normalization factor, see {@link MathUtils#getNormalizationScale}.
      *
@@ -717,7 +711,7 @@ export class Uint32BufferAttribute extends BufferAttribute {
  *
  */
 export class Float16BufferAttribute extends BufferAttribute {
-  isFloat16BufferAttribute: boolean;
+  isFloat16BufferAttribute: boolean = true;
 
   /**
    * Constructs a new buffer attribute.
@@ -728,7 +722,6 @@ export class Float16BufferAttribute extends BufferAttribute {
    */
   constructor(array: number | ArrayLike<number>, itemSize: number, normalized?: boolean) {
     super(new (Uint16Array as TypedArrayConstructor<Uint16Array>)(array), itemSize, normalized);
-    this.isFloat16BufferAttribute = true;
   }
   override clone(): Float16BufferAttribute {
     return new Float16BufferAttribute(this.array, this.itemSize, this.normalized)._copyMetadata(this);

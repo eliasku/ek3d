@@ -11,7 +11,7 @@ export class NURBSVolume {
   knots1: number[];
   knots2: number[];
   knots3: number[];
-  controlPoints: Vector4[][][];
+  controlPoints: Vector4[][][] = [];
 
   constructor(
     degree1: number,
@@ -28,7 +28,6 @@ export class NURBSVolume {
     this.knots1 = knots1;
     this.knots2 = knots2;
     this.knots3 = knots3;
-    this.controlPoints = [];
     const len1 = knots1.length - degree1 - 1;
     const len2 = knots2.length - degree2 - 1;
     const len3 = knots3.length - degree3 - 1;

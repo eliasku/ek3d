@@ -226,9 +226,51 @@ function shadowCastingAndTexturingLightsFirst(
 export class WebGLLights {
   private readonly extensions: WebGLExtensions;
   private readonly ltcTextures: LTCTextures | null;
-  private readonly cache: UniformsCache;
-  private readonly shadowCache: ShadowUniformsCache;
-  private readonly lightState: WebGLLightsState;
+  private readonly cache: UniformsCache = new UniformsCache();
+  private readonly shadowCache: ShadowUniformsCache = new ShadowUniformsCache();
+  private readonly lightState: WebGLLightsState = {
+    version: 0,
+    hash: {
+      sunLength: -1,
+      directionalLength: -1,
+      pointLength: -1,
+      spotLength: -1,
+      rectAreaLength: -1,
+      hemiLength: -1,
+      numSunShadows: -1,
+      numDirectionalShadows: -1,
+      numPointShadows: -1,
+      numSpotShadows: -1,
+      numSpotMaps: -1,
+      numLightProbes: -1,
+    },
+    ambient: [0, 0, 0],
+    probe: [] as Vector3[],
+    sun: [] as DirectionalUniforms[],
+    sunShadow: [] as ShadowUniforms[],
+    sunShadowMap: [] as (Texture | null)[],
+    sunShadowMatrix: [] as Matrix4[],
+    sunShadowCascade: [] as Vector4[],
+    directional: [] as DirectionalUniforms[],
+    directionalShadow: [] as ShadowUniforms[],
+    directionalShadowMap: [] as (Texture | null)[],
+    directionalShadowMatrix: [] as Matrix4[],
+    spot: [] as SpotUniforms[],
+    spotLightMap: [] as Texture[],
+    spotShadow: [] as ShadowUniforms[],
+    spotShadowMap: [] as (Texture | null)[],
+    spotLightMatrix: [] as Matrix4[],
+    rectArea: [] as RectAreaUniforms[],
+    rectAreaLTC1: null as Texture | null,
+    rectAreaLTC2: null as Texture | null,
+    point: [] as PointUniforms[],
+    pointShadow: [] as ShadowUniforms[],
+    pointShadowMap: [] as (Texture | null)[],
+    pointShadowMatrix: [] as Matrix4[],
+    hemi: [] as HemisphereUniforms[],
+    numSpotLightShadowsWithMaps: 0,
+    numLightProbes: 0,
+  };
   private readonly vector3: Vector3;
   private readonly matrix4: Matrix4;
   private readonly matrix42: Matrix4;
@@ -237,51 +279,6 @@ export class WebGLLights {
   constructor(extensions: WebGLExtensions, ltcTextures: LTCTextures | null = null) {
     this.extensions = extensions;
     this.ltcTextures = ltcTextures;
-    this.cache = new UniformsCache();
-    this.shadowCache = new ShadowUniformsCache();
-    this.lightState = {
-      version: 0,
-      hash: {
-        sunLength: -1,
-        directionalLength: -1,
-        pointLength: -1,
-        spotLength: -1,
-        rectAreaLength: -1,
-        hemiLength: -1,
-        numSunShadows: -1,
-        numDirectionalShadows: -1,
-        numPointShadows: -1,
-        numSpotShadows: -1,
-        numSpotMaps: -1,
-        numLightProbes: -1,
-      },
-      ambient: [0, 0, 0],
-      probe: [] as Vector3[],
-      sun: [] as DirectionalUniforms[],
-      sunShadow: [] as ShadowUniforms[],
-      sunShadowMap: [] as (Texture | null)[],
-      sunShadowMatrix: [] as Matrix4[],
-      sunShadowCascade: [] as Vector4[],
-      directional: [] as DirectionalUniforms[],
-      directionalShadow: [] as ShadowUniforms[],
-      directionalShadowMap: [] as (Texture | null)[],
-      directionalShadowMatrix: [] as Matrix4[],
-      spot: [] as SpotUniforms[],
-      spotLightMap: [] as Texture[],
-      spotShadow: [] as ShadowUniforms[],
-      spotShadowMap: [] as (Texture | null)[],
-      spotLightMatrix: [] as Matrix4[],
-      rectArea: [] as RectAreaUniforms[],
-      rectAreaLTC1: null as Texture | null,
-      rectAreaLTC2: null as Texture | null,
-      point: [] as PointUniforms[],
-      pointShadow: [] as ShadowUniforms[],
-      pointShadowMap: [] as (Texture | null)[],
-      pointShadowMatrix: [] as Matrix4[],
-      hemi: [] as HemisphereUniforms[],
-      numSpotLightShadowsWithMaps: 0,
-      numLightProbes: 0,
-    };
     for (let i = 0; i < 9; i++) this.lightState.probe.push(new Vector3());
     this.vector3 = new Vector3();
     this.matrix4 = new Matrix4();

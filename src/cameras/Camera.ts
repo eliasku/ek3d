@@ -13,13 +13,35 @@ const _scale = /*@__PURE__*/ new Vector3();
  * @abstract
  */
 export class Camera extends Object3D {
-  isCamera: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isCamera: boolean = true;
 
-  matrixWorldInverse: Matrix4;
-  projectionMatrix: Matrix4;
-  projectionMatrixInverse: Matrix4;
-  coordinateSystem: CoordinateSystem;
-  _reversedDepth: boolean;
+  /**
+   * The inverse of the camera's world matrix.
+   *
+   */
+  matrixWorldInverse: Matrix4 = new Matrix4();
+  /**
+   * The camera's projection matrix.
+   *
+   */
+  projectionMatrix: Matrix4 = new Matrix4();
+  /**
+   * The inverse of the camera's projection matrix.
+   *
+   */
+  projectionMatrixInverse: Matrix4 = new Matrix4();
+  /**
+   * The coordinate system in which the camera is used.
+   *
+   */
+  coordinateSystem: CoordinateSystem = CoordinateSystem.WebGL;
+  _reversedDepth: boolean = false;
   isPerspectiveCamera?: boolean;
 
   /**
@@ -27,35 +49,7 @@ export class Camera extends Object3D {
    */
   constructor() {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isCamera = true;
     this.type = "Camera";
-    /**
-     * The inverse of the camera's world matrix.
-     *
-     */
-    this.matrixWorldInverse = new Matrix4();
-    /**
-     * The camera's projection matrix.
-     *
-     */
-    this.projectionMatrix = new Matrix4();
-    /**
-     * The inverse of the camera's projection matrix.
-     *
-     */
-    this.projectionMatrixInverse = new Matrix4();
-    /**
-     * The coordinate system in which the camera is used.
-     *
-     */
-    this.coordinateSystem = CoordinateSystem.WebGL;
-    this._reversedDepth = false;
   }
   /**
    * The flag that indicates whether the camera uses a reversed depth buffer.

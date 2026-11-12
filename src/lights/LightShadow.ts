@@ -18,22 +18,102 @@ const _lookTarget = /*@__PURE__*/ new Vector3();
  */
 export class LightShadow<TCamera extends { clone(): TCamera } & Camera = Camera> {
   camera: TCamera;
-  intensity: number;
-  bias: number;
-  normalBias: number;
-  radius: number;
-  blurSamples: number;
-  mapSize: Vector2;
-  mapType: TextureType;
-  map: RenderTarget | null;
-  mapPass: RenderTarget | null;
-  matrix: Matrix4;
-  autoUpdate: boolean;
-  needsUpdate: boolean;
-  _frustum: Frustum;
-  _frameExtents: Vector2;
-  _viewportCount: number;
-  _viewports: Vector4[];
+  /**
+   * The intensity of the shadow. The default is `1`.
+   * Valid values are in the range `[0, 1]`.
+   *
+   * @default 1
+   */
+  intensity: number = 1;
+  /**
+   * Shadow map bias, how much to add or subtract from the normalized depth
+   * when deciding whether a surface is in shadow.
+   *
+   * The default is `0`. Very tiny adjustments here (in the order of `0.0001`)
+   * may help reduce artifacts in shadows.
+   *
+   * @default 0
+   */
+  bias: number = 0;
+  /**
+   * Defines how much the position used to query the shadow map is offset along
+   * the object normal. The default is `0`. Increasing this value can be used to
+   * reduce shadow acne especially in large scenes where light shines onto
+   * geometry at a shallow angle. The cost is that shadows may appear distorted.
+   *
+   * @default 0
+   */
+  normalBias: number = 0;
+  /**
+   * Setting this to values greater than 1 will blur the edges of the shadow.
+   * High values will cause unwanted banding effects in the shadows - a greater
+   * map size will allow for a higher value to be used here before these effects
+   * become visible.
+   *
+   * The property has no effect when the shadow map type is `ShadowMap.Basic`.
+   *
+   * @default 1
+   */
+  radius: number = 1;
+  /**
+   * The amount of samples to use when blurring a VSM shadow map.
+   *
+   * @default 8
+   */
+  blurSamples: number = 8;
+  /**
+   * Defines the width and height of the shadow map. Higher values give better quality
+   * shadows at the cost of computation time. Values must be powers of two.
+   *
+   * @default (512,512)
+   */
+  mapSize: Vector2 = new Vector2(512, 512);
+  /**
+   * The type of shadow texture. The default is `TextureType.UnsignedByte`.
+   *
+   * @default TextureType.UnsignedByte
+   */
+  mapType: TextureType = TextureType.UnsignedByte;
+  /**
+   * The depth map generated using the internal camera; a location beyond a
+   * pixel's depth is in shadow. Computed internally during rendering.
+   *
+   * @default null
+   */
+  map: RenderTarget | null = null;
+  /**
+   * The distribution map generated using the internal camera; an occlusion is
+   * calculated based on the distribution of depths. Computed internally during
+   * rendering.
+   *
+   * @default null
+   */
+  mapPass: RenderTarget | null = null;
+  /**
+   * Model to shadow camera space, to compute location and depth in shadow map.
+   * This is computed internally during rendering.
+   *
+   */
+  matrix: Matrix4 = new Matrix4();
+  /**
+   * Enables automatic updates of the light's shadow. If you do not require dynamic
+   * lighting / shadows, you may set this to `false`.
+   *
+   * @default true
+   */
+  autoUpdate: boolean = true;
+  /**
+   * When set to `true`, shadow maps will be updated in the next `render` call.
+   * If you have set {@link LightShadow#autoUpdate} to `false`, you will need to
+   * set this property to `true` and then make a render call to update the light's shadow.
+   *
+   * @default false
+   */
+  needsUpdate: boolean = false;
+  _frustum: Frustum = new Frustum();
+  _frameExtents: Vector2 = new Vector2(1, 1);
+  _viewportCount: number = 1;
+  _viewports: Vector4[] = [new Vector4(0, 0, 1, 1)];
 
   /**
    * Constructs a new light shadow.
@@ -46,102 +126,6 @@ export class LightShadow<TCamera extends { clone(): TCamera } & Camera = Camera>
      *
      */
     this.camera = camera;
-    /**
-     * The intensity of the shadow. The default is `1`.
-     * Valid values are in the range `[0, 1]`.
-     *
-     * @default 1
-     */
-    this.intensity = 1;
-    /**
-     * Shadow map bias, how much to add or subtract from the normalized depth
-     * when deciding whether a surface is in shadow.
-     *
-     * The default is `0`. Very tiny adjustments here (in the order of `0.0001`)
-     * may help reduce artifacts in shadows.
-     *
-     * @default 0
-     */
-    this.bias = 0;
-    /**
-     * Defines how much the position used to query the shadow map is offset along
-     * the object normal. The default is `0`. Increasing this value can be used to
-     * reduce shadow acne especially in large scenes where light shines onto
-     * geometry at a shallow angle. The cost is that shadows may appear distorted.
-     *
-     * @default 0
-     */
-    this.normalBias = 0;
-    /**
-     * Setting this to values greater than 1 will blur the edges of the shadow.
-     * High values will cause unwanted banding effects in the shadows - a greater
-     * map size will allow for a higher value to be used here before these effects
-     * become visible.
-     *
-     * The property has no effect when the shadow map type is `ShadowMap.Basic`.
-     *
-     * @default 1
-     */
-    this.radius = 1;
-    /**
-     * The amount of samples to use when blurring a VSM shadow map.
-     *
-     * @default 8
-     */
-    this.blurSamples = 8;
-    /**
-     * Defines the width and height of the shadow map. Higher values give better quality
-     * shadows at the cost of computation time. Values must be powers of two.
-     *
-     * @default (512,512)
-     */
-    this.mapSize = new Vector2(512, 512);
-    /**
-     * The type of shadow texture. The default is `TextureType.UnsignedByte`.
-     *
-     * @default TextureType.UnsignedByte
-     */
-    this.mapType = TextureType.UnsignedByte;
-    /**
-     * The depth map generated using the internal camera; a location beyond a
-     * pixel's depth is in shadow. Computed internally during rendering.
-     *
-     * @default null
-     */
-    this.map = null;
-    /**
-     * The distribution map generated using the internal camera; an occlusion is
-     * calculated based on the distribution of depths. Computed internally during
-     * rendering.
-     *
-     * @default null
-     */
-    this.mapPass = null;
-    /**
-     * Model to shadow camera space, to compute location and depth in shadow map.
-     * This is computed internally during rendering.
-     *
-     */
-    this.matrix = new Matrix4();
-    /**
-     * Enables automatic updates of the light's shadow. If you do not require dynamic
-     * lighting / shadows, you may set this to `false`.
-     *
-     * @default true
-     */
-    this.autoUpdate = true;
-    /**
-     * When set to `true`, shadow maps will be updated in the next `render` call.
-     * If you have set {@link LightShadow#autoUpdate} to `false`, you will need to
-     * set this property to `true` and then make a render call to update the light's shadow.
-     *
-     * @default false
-     */
-    this.needsUpdate = false;
-    this._frustum = new Frustum();
-    this._frameExtents = new Vector2(1, 1);
-    this._viewportCount = 1;
-    this._viewports = [new Vector4(0, 0, 1, 1)];
   }
   /**
    * Used internally by the renderer to get the number of viewports that need

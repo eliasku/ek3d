@@ -18,11 +18,16 @@ import type { Camera } from "../../cameras/Camera";
 import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
 
 export class ViewHelper extends Object3D {
-  isViewHelper: boolean;
+  isViewHelper: boolean = true;
   camera: Camera;
-  animating: boolean;
-  center: Vector3;
-  location: { top: number | null; right: number; bottom: number; left: number | null };
+  animating: boolean = false;
+  center: Vector3 = new Vector3();
+  location: { top: number | null; right: number; bottom: number; left: number | null } = {
+    top: null,
+    right: 0,
+    bottom: 0,
+    left: null,
+  };
   render: (renderer: WebGLRenderer) => void;
   handleClick: (event: PointerEvent) => boolean;
   setLabels: (x?: string, y?: string, z?: string) => void;
@@ -33,20 +38,7 @@ export class ViewHelper extends Object3D {
   constructor(camera: Camera, domElement: HTMLElement) {
     super();
 
-    this.isViewHelper = true;
-
     this.camera = camera;
-
-    this.animating = false;
-
-    this.center = new Vector3();
-
-    this.location = {
-      top: null,
-      right: 0,
-      bottom: 0,
-      left: null,
-    };
 
     const color1 = new Color("#ff4466");
     const color2 = new Color("#88ff44");

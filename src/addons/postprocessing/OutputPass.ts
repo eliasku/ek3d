@@ -28,45 +28,37 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  *
  */
 export class OutputPass extends Pass {
-  isOutputPass: boolean;
-  uniforms: typeof OutputShader.uniforms;
-  material: RawShaderMaterial;
-  _fsQuad: FullScreenQuad;
-  _outputColorSpace: string | null;
-  _toneMapping: number | null;
+  /**
+   * This flag indicates that this is an output pass.
+   *
+   * @readonly
+   * @default true
+   */
+  isOutputPass: boolean = true;
+  /**
+   * The pass uniforms.
+   */
+  uniforms: typeof OutputShader.uniforms = cloneUniforms(OutputShader.uniforms);
+  /**
+   * The pass material.
+   */
+  material: RawShaderMaterial = new RawShaderMaterial({
+    name: OutputShader.name,
+    uniforms: this.uniforms,
+    vertexShader: OutputShader.vertexShader,
+    fragmentShader: OutputShader.fragmentShader,
+  });
+  // internals
+
+  _fsQuad: FullScreenQuad = new FullScreenQuad(this.material);
+  _outputColorSpace: string | null = null;
+  _toneMapping: number | null = null;
 
   /**
    * Constructs a new output pass.
    */
   constructor() {
     super();
-    /**
-     * This flag indicates that this is an output pass.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isOutputPass = true;
-    /**
-     * The pass uniforms.
-     */
-    this.uniforms = cloneUniforms(OutputShader.uniforms);
-    /**
-     * The pass material.
-     */
-    this.material = new RawShaderMaterial({
-      name: OutputShader.name,
-      uniforms: this.uniforms,
-      vertexShader: OutputShader.vertexShader,
-      fragmentShader: OutputShader.fragmentShader,
-    });
-
-    // internals
-
-    this._fsQuad = new FullScreenQuad(this.material);
-
-    this._outputColorSpace = null;
-    this._toneMapping = null;
   }
 
   /**

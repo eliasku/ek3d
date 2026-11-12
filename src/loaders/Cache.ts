@@ -4,13 +4,10 @@
  * Each LoadingManager owns a cache. Enable it with `manager.cache.enabled = true`; clear it explicitly when releasing assets. Clearing does not close shared ImageBitmaps.
  */
 export class Cache {
-  enabled: boolean;
-  files: Record<string, unknown>;
+  enabled: boolean = false;
+  files: Record<string, unknown> = Object.create(null);
 
-  constructor() {
-    this.enabled = false;
-    this.files = Object.create(null);
-  }
+  constructor() {}
   add(key: string, file: unknown): void {
     if (this.enabled === false) return;
     if (isBlobURL(key)) return;

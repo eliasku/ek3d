@@ -20,15 +20,11 @@ const _splittingTriangle = new ExtendedTriangle();
 
 // Utility class for splitting triangles
 export class LegacyTriangleSplitter {
-  trianglePool: Pool<Triangle & { coplanarCount?: number }>;
-  triangles: (Triangle & { coplanarCount?: number })[];
-  normal: Vector3;
+  trianglePool: Pool<Triangle & { coplanarCount?: number }> = new Pool(() => new Triangle());
+  triangles: (Triangle & { coplanarCount?: number })[] = [];
+  normal: Vector3 = new Vector3();
 
-  constructor() {
-    this.trianglePool = new Pool(() => new Triangle());
-    this.triangles = [];
-    this.normal = new Vector3();
-  }
+  constructor() {}
 
   // initialize the class with a triangle
   initialize(tri: Triangle | Triangle[]) {

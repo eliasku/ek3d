@@ -43,25 +43,19 @@ export type CSGGeometry = BufferGeometry & {
 };
 
 export class Brush extends Mesh {
-  isBrush: boolean;
-  _previousMatrix: Matrix4;
-  _halfEdges: HalfEdgeMap | null;
-  _boundsTree: MeshBVH | null;
-  _groupIndices: Uint16Array | null;
-  _hash: string | null;
+  isBrush: boolean = true;
+  _previousMatrix: Matrix4 = new Matrix4();
+  _halfEdges: HalfEdgeMap | null = null;
+  _boundsTree: MeshBVH | null = null;
+  _groupIndices: Uint16Array | null = null;
+  _hash: string | null = null;
 
   constructor(
     geometry: BufferGeometry = new BufferGeometry(),
     material: Material | Material[] = new MeshBasicMaterial(),
   ) {
     super(geometry, material);
-    this.isBrush = true;
-    this._previousMatrix = new Matrix4();
     this._previousMatrix.elements.fill(0);
-    this._halfEdges = null;
-    this._boundsTree = null;
-    this._groupIndices = null;
-    this._hash = null;
   }
 
   markUpdated(): void {

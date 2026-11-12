@@ -50,8 +50,16 @@ export class EffectComposer {
   renderTarget2: WebGLRenderTarget;
   writeBuffer: WebGLRenderTarget;
   readBuffer: WebGLRenderTarget;
-  renderToScreen: boolean;
-  passes: Pass[];
+  /**
+   * Whether the final pass is rendered to the screen (default framebuffer) or not.
+   *
+   * @default true
+   */
+  renderToScreen: boolean = true;
+  /**
+   * An array representing the (ordered) chain of post-processing passes.
+   */
+  passes: Pass[] = [];
   copyPass: ShaderPass;
   timer: Timer;
 
@@ -100,18 +108,6 @@ export class EffectComposer {
      * the previous render result from this buffer.
      */
     this.readBuffer = this.renderTarget2;
-
-    /**
-     * Whether the final pass is rendered to the screen (default framebuffer) or not.
-     *
-     * @default true
-     */
-    this.renderToScreen = true;
-
-    /**
-     * An array representing the (ordered) chain of post-processing passes.
-     */
-    this.passes = [];
 
     /**
      * A copy pass used for internal swap operations.

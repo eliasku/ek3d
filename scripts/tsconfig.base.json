@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "ES2025.Float16"],
+    "rootDir": "..",
+    "noEmit": true,
+    "allowJs": true,
+    "checkJs": false,
+    "strict": true,
+    "useDefineForClassFields": true,
+    "isolatedModules": false,
+    "skipLibCheck": false,
+    "types": []
+  }
+}

@@ -103,12 +103,34 @@ function lineToLineClosestPoints(
  */
 export class Octree {
   box: Box3 | null | undefined;
-  bounds: Box3;
-  layers: Layers;
-  trianglesPerLeaf: number;
-  maxLevel: number;
-  subTrees: Octree[];
-  triangles: Triangle[];
+  /**
+   * The bounds of the Octree. Compared to {@link Octree#box}, no
+   * margin is applied.
+   *
+   */
+  bounds: Box3 = new Box3();
+  /**
+   * Can by used for layers configuration for refine testing.
+   *
+   */
+  layers: Layers = new Layers();
+  /**
+   * The number of triangles a leaf can store before it is split.
+   *
+   * @default 8
+   */
+  trianglesPerLeaf: number = 8;
+  /**
+   * The maximum level of the Octree. It defines the maximum
+   * hierarchical depth of the data structure.
+   *
+   * @default 16
+   */
+  maxLevel: number = 16;
+  // private
+
+  subTrees: Octree[] = [];
+  triangles: Triangle[] = [];
 
   /**
    * Constructs a new Octree.
@@ -121,39 +143,6 @@ export class Octree {
      *
      */
     this.box = box;
-
-    /**
-     * The bounds of the Octree. Compared to {@link Octree#box}, no
-     * margin is applied.
-     *
-     */
-    this.bounds = new Box3();
-
-    /**
-     * Can by used for layers configuration for refine testing.
-     *
-     */
-    this.layers = new Layers();
-
-    /**
-     * The number of triangles a leaf can store before it is split.
-     *
-     * @default 8
-     */
-    this.trianglesPerLeaf = 8;
-
-    /**
-     * The maximum level of the Octree. It defines the maximum
-     * hierarchical depth of the data structure.
-     *
-     * @default 16
-     */
-    this.maxLevel = 16;
-
-    // private
-
-    this.subTrees = [];
-    this.triangles = [];
   }
 
   /**

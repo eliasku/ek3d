@@ -13,13 +13,71 @@ export type MeshDistanceMaterialParameters = Partial<MeshDistanceMaterial>;
  *
  */
 export class MeshDistanceMaterial extends Material {
-  isMeshDistanceMaterial: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isMeshDistanceMaterial: boolean = true;
 
-  map: Texture | null;
-  alphaMap: Texture | null;
-  displacementMap: Texture | null;
-  displacementScale: number;
-  displacementBias: number;
+  /**
+   * The color map. May optionally include an alpha channel, typically combined
+   * with {@link Material#transparent} or {@link Material#alphaTest}.
+   *
+   * `map` represents color data, and the texture must be assigned a
+   * {@link Texture#colorSpace}. Most `map` textures set
+   * `texture.colorSpace = ColorSpace.SRGB`.
+   *
+   * @default null
+   */
+  map: Texture | null = null;
+  /**
+   * The alpha map is a grayscale texture that controls the opacity across the
+   * surface (black: fully transparent; white: fully opaque).
+   *
+   * Only the color of the texture is used, ignoring the alpha channel if one
+   * exists. For RGB and RGBA textures, the renderer will use the green channel
+   * when sampling this texture due to the extra bit of precision provided for
+   * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
+   * luminance/alpha textures will also still work as expected.
+   *
+   * `alphaMap` represents non-color data. Any texture assigned must have
+   * `texture.colorSpace = ColorSpace.No` (default).
+   *
+   * @default null
+   */
+  alphaMap: Texture | null = null;
+  /**
+   * The displacement map affects the position of the mesh's vertices. Unlike
+   * other maps which only affect the light and shade of the material the
+   * displaced vertices can cast shadows, block other objects, and otherwise
+   * act as real geometry. The displacement texture is an image where the value
+   * of each pixel (white being the highest) is mapped against, and
+   * repositions, the vertices of the mesh.
+   *
+   * `displacementMap` represents non-color data. Any texture assigned must have
+   * `texture.colorSpace = ColorSpace.No` (default).
+   *
+   * @default null
+   */
+  displacementMap: Texture | null = null;
+  /**
+   * How much the displacement map affects the mesh (where black is no
+   * displacement, and white is maximum displacement). Without a displacement
+   * map set, this value is not applied.
+   *
+   * @default 1
+   */
+  displacementScale: number = 1;
+  /**
+   * The offset of the displacement map's values on the mesh's vertices.
+   * The bias is added to the scaled sample of the displacement map.
+   * Without a displacement map set, this value is not applied.
+   *
+   * @default 0
+   */
+  displacementBias: number = 0;
 
   /**
    * Constructs a new mesh distance material.
@@ -32,71 +90,7 @@ export class MeshDistanceMaterial extends Material {
    */
   constructor(parameters?: MeshDistanceMaterialParameters) {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isMeshDistanceMaterial = true;
     this.type = "MeshDistanceMaterial";
-    /**
-     * The color map. May optionally include an alpha channel, typically combined
-     * with {@link Material#transparent} or {@link Material#alphaTest}.
-     *
-     * `map` represents color data, and the texture must be assigned a
-     * {@link Texture#colorSpace}. Most `map` textures set
-     * `texture.colorSpace = ColorSpace.SRGB`.
-     *
-     * @default null
-     */
-    this.map = null;
-    /**
-     * The alpha map is a grayscale texture that controls the opacity across the
-     * surface (black: fully transparent; white: fully opaque).
-     *
-     * Only the color of the texture is used, ignoring the alpha channel if one
-     * exists. For RGB and RGBA textures, the renderer will use the green channel
-     * when sampling this texture due to the extra bit of precision provided for
-     * green in DXT-compressed and uncompressed RGB 565 formats. Luminance-only and
-     * luminance/alpha textures will also still work as expected.
-     *
-     * `alphaMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = ColorSpace.No` (default).
-     *
-     * @default null
-     */
-    this.alphaMap = null;
-    /**
-     * The displacement map affects the position of the mesh's vertices. Unlike
-     * other maps which only affect the light and shade of the material the
-     * displaced vertices can cast shadows, block other objects, and otherwise
-     * act as real geometry. The displacement texture is an image where the value
-     * of each pixel (white being the highest) is mapped against, and
-     * repositions, the vertices of the mesh.
-     *
-     * `displacementMap` represents non-color data. Any texture assigned must have
-     * `texture.colorSpace = ColorSpace.No` (default).
-     *
-     * @default null
-     */
-    this.displacementMap = null;
-    /**
-     * How much the displacement map affects the mesh (where black is no
-     * displacement, and white is maximum displacement). Without a displacement
-     * map set, this value is not applied.
-     *
-     * @default 1
-     */
-    this.displacementScale = 1;
-    /**
-     * The offset of the displacement map's values on the mesh's vertices.
-     * The bias is added to the scaled sample of the displacement map.
-     * Without a displacement map set, this value is not applied.
-     *
-     * @default 0
-     */
-    this.displacementBias = 0;
     this.setValues(parameters);
   }
   clone(): MeshDistanceMaterial {

@@ -25,7 +25,7 @@ export class HTMLTexture extends Texture {
    * @readonly
    * @default true
    */
-  isHTMLTexture: true;
+  isHTMLTexture: true = true;
 
   /**
    * Constructs a new texture.
@@ -53,7 +53,6 @@ export class HTMLTexture extends Texture {
   ) {
     super(element, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy);
 
-    this.isHTMLTexture = true;
     this.generateMipmaps = false;
 
     this.needsUpdate = true;

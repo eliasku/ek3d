@@ -25,8 +25,14 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  */
 export class ShaderPass extends Pass {
   textureID: string;
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }> | null;
-  material: ShaderMaterial | null;
+  /**
+   * The pass uniforms.
+   */
+  uniforms: Record<string, { value: any; needsUpdate?: boolean }> | null = null;
+  /**
+   * The pass material.
+   */
+  material: ShaderMaterial | null = null;
   _fsQuad: FullScreenQuad;
 
   /**
@@ -56,15 +62,6 @@ export class ShaderPass extends Pass {
      * @default 'tDiffuse'
      */
     this.textureID = textureID;
-    /**
-     * The pass uniforms.
-     */
-    this.uniforms = null;
-    /**
-     * The pass material.
-     */
-    this.material = null;
-
     if (shader instanceof ShaderMaterial) {
       this.uniforms = shader.uniforms;
       this.material = shader;

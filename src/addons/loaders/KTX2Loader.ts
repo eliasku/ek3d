@@ -182,7 +182,7 @@ export class KTX2Loader extends Loader<
   string
 > {
   /** Loader flag for type testing. */
-  isKTX2Loader: true;
+  isKTX2Loader: true = true;
 
   static BasisFormat: typeof KTX2Loader_BasisFormat | undefined = KTX2Loader_BasisFormat;
   static TranscoderFormat: typeof KTX2Loader_TranscoderFormat | undefined = KTX2Loader_TranscoderFormat;
@@ -190,11 +190,11 @@ export class KTX2Loader extends Loader<
   static EngineType: typeof KTX2Loader_EngineType | undefined = KTX2Loader_EngineType;
   static BasisWorker: (() => void) | undefined = KTX2Loader_BasisWorker;
 
-  transcoderPath: string;
-  transcoderBinary: ArrayBuffer | null;
-  transcoderPending: Promise<void> | null;
-  workerPool: WorkerPool;
-  workerSourceURL: string;
+  transcoderPath: string = WASM_JS_URL.slice(0, WASM_JS_URL.lastIndexOf("/") + 1);
+  transcoderBinary: ArrayBuffer | null = null;
+  transcoderPending: Promise<void> | null = null;
+  workerPool: WorkerPool = new WorkerPool();
+  workerSourceURL: string = "";
   workerConfig: {
     astcSupported: boolean;
     astcHDRSupported: boolean;
@@ -203,9 +203,9 @@ export class KTX2Loader extends Loader<
     dxtSupported: boolean;
     bptcSupported: boolean;
     pvrtcSupported: boolean;
-  } | null;
+  } | null = null;
 
-  zstdDecoder: ZSTDDecoderLike | null;
+  zstdDecoder: ZSTDDecoderLike | null = null;
 
   /**
    * Constructs a new KTX2 loader.
@@ -214,18 +214,6 @@ export class KTX2Loader extends Loader<
    */
   constructor(manager?: import("../../loaders/LoadingManager").LoadingManager) {
     super(manager);
-
-    this.isKTX2Loader = true;
-
-    this.transcoderPath = WASM_JS_URL.slice(0, WASM_JS_URL.lastIndexOf("/") + 1);
-    this.transcoderBinary = null;
-    this.transcoderPending = null;
-
-    this.workerPool = new WorkerPool();
-    this.workerSourceURL = "";
-    this.workerConfig = null;
-
-    this.zstdDecoder = null;
 
     // Upstream ships the transcoder assets next to the loader; this port serves them from the
     // examples' public assets, so the default path is pre-populated instead of empty.

@@ -26,9 +26,9 @@ type BufferedUniformsGroup = UniformsGroup & {
 };
 
 export class WebGLUniformsGroups {
-  private buffers: Record<string, WebGLBuffer | null>;
-  private groups: Record<string, UniformsGroup>;
-  private updateList: Record<string, number>;
+  private buffers: Record<string, WebGLBuffer | null> = {};
+  private groups: Record<string, UniformsGroup> = {};
+  private updateList: Record<string, number> = {};
 
   constructor(
     private gl: WebGL2RenderingContext,
@@ -36,9 +36,6 @@ export class WebGLUniformsGroups {
     capabilities: WebGLCapabilitiesState,
     private state: WebGLState,
   ) {
-    this.buffers = {};
-    this.groups = {};
-    this.updateList = {};
     this.onUniformsGroupsDispose = this.onUniformsGroupsDispose.bind(this);
     this.bind = this.bind.bind(this);
     this.update = this.update.bind(this);

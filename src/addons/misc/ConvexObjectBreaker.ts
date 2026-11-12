@@ -37,24 +37,24 @@ const _v1 = new Vector3();
 export class ConvexObjectBreaker {
   minSizeForBreak: number;
   smallDelta: number;
-  tempLine1: Line3;
-  tempPlane1: Plane;
-  tempPlane2: Plane;
-  tempPlane_Cut: Plane;
-  tempCM1: Vector3;
-  tempCM2: Vector3;
-  tempVector3: Vector3;
-  tempVector3_2: Vector3;
-  tempVector3_3: Vector3;
-  tempVector3_P0: Vector3;
-  tempVector3_P1: Vector3;
-  tempVector3_P2: Vector3;
-  tempVector3_N0: Vector3;
-  tempVector3_N1: Vector3;
-  tempVector3_AB: Vector3;
-  tempVector3_CB: Vector3;
-  tempResultObjects: ConvexObjectBreakerOutput;
-  segments: boolean[];
+  tempLine1: Line3 = new Line3();
+  tempPlane1: Plane = new Plane();
+  tempPlane2: Plane = new Plane();
+  tempPlane_Cut: Plane = new Plane();
+  tempCM1: Vector3 = new Vector3();
+  tempCM2: Vector3 = new Vector3();
+  tempVector3: Vector3 = new Vector3();
+  tempVector3_2: Vector3 = new Vector3();
+  tempVector3_3: Vector3 = new Vector3();
+  tempVector3_P0: Vector3 = new Vector3();
+  tempVector3_P1: Vector3 = new Vector3();
+  tempVector3_P2: Vector3 = new Vector3();
+  tempVector3_N0: Vector3 = new Vector3();
+  tempVector3_N1: Vector3 = new Vector3();
+  tempVector3_AB: Vector3 = new Vector3();
+  tempVector3_CB: Vector3 = new Vector3();
+  tempResultObjects: ConvexObjectBreakerOutput = { object1: null, object2: null };
+  segments: boolean[] = [];
 
   /**
    * Constructs a new convex object breaker.
@@ -66,25 +66,6 @@ export class ConvexObjectBreaker {
     this.minSizeForBreak = minSizeForBreak;
     this.smallDelta = smallDelta;
 
-    this.tempLine1 = new Line3();
-    this.tempPlane1 = new Plane();
-    this.tempPlane2 = new Plane();
-    this.tempPlane_Cut = new Plane();
-    this.tempCM1 = new Vector3();
-    this.tempCM2 = new Vector3();
-    this.tempVector3 = new Vector3();
-    this.tempVector3_2 = new Vector3();
-    this.tempVector3_3 = new Vector3();
-    this.tempVector3_P0 = new Vector3();
-    this.tempVector3_P1 = new Vector3();
-    this.tempVector3_P2 = new Vector3();
-    this.tempVector3_N0 = new Vector3();
-    this.tempVector3_N1 = new Vector3();
-    this.tempVector3_AB = new Vector3();
-    this.tempVector3_CB = new Vector3();
-    this.tempResultObjects = { object1: null, object2: null };
-
-    this.segments = [];
     const n = 30 * 30;
     for (let i = 0; i < n; i++) this.segments[i] = false;
   }

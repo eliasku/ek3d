@@ -54,15 +54,11 @@ function sortTransparent(a: BatchedMeshDrawRange, b: BatchedMeshDrawRange) {
   return b.z - a.z;
 }
 class MultiDrawRenderList {
-  index: number;
-  pool: BatchedMeshDrawRange[];
-  list: BatchedMeshDrawRange[];
+  index: number = 0;
+  pool: BatchedMeshDrawRange[] = [];
+  list: BatchedMeshDrawRange[] = [];
 
-  constructor() {
-    this.index = 0;
-    this.pool = [];
-    this.list = [];
-  }
+  constructor() {}
   push(start: number, count: number, z: number, index: number) {
     const pool = this.pool;
     const list = this.list;
@@ -219,31 +215,71 @@ function copyArrayContents(
  *
  */
 export class BatchedMesh extends Mesh {
-  isBatchedMesh: boolean;
-  perObjectFrustumCulled: boolean;
-  sortObjects: boolean;
-  boundingBox: Box3 | null;
-  boundingSphere: Sphere | null;
-  customSort: BatchedMeshSortFunction | null;
-  _instanceInfo: { visible: boolean; active: boolean; geometryIndex: number }[];
-  _geometryInfo: BatchedMeshGeometryInfo[];
-  _availableInstanceIds: number[];
-  _availableGeometryIds: number[];
-  _nextIndexStart: number;
-  _nextVertexStart: number;
-  _geometryCount: number;
-  _visibilityChanged: boolean;
-  _geometryInitialized: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isBatchedMesh: boolean = true;
+  /**
+   * When set ot `true`, the individual objects of a batch are frustum culled.
+   *
+   * @default true
+   */
+  perObjectFrustumCulled: boolean = true;
+  /**
+   * When set to `true`, the individual objects of a batch are sorted to improve overdraw-related artifacts.
+   * If the material is marked as "transparent" objects are rendered back to front and if not then they are
+   * rendered front to back.
+   *
+   * @default true
+   */
+  sortObjects: boolean = true;
+  /**
+   * The bounding box of the batched mesh. Can be computed via {@link BatchedMesh#computeBoundingBox}.
+   *
+   * @default null
+   */
+  boundingBox: Box3 | null = null;
+  /**
+   * The bounding sphere of the batched mesh. Can be computed via {@link BatchedMesh#computeBoundingSphere}.
+   *
+   * @default null
+   */
+  boundingSphere: Sphere | null = null;
+  /**
+   * Takes a sort a function that is run before render. The function takes a list of instances to
+   * sort and a camera. The objects in the list include a "z" field to perform a depth-ordered
+   * sort with.
+   *
+   * @default null
+   */
+  customSort: BatchedMeshSortFunction | null = null;
+  // stores visible, active, and geometry id per instance and reserved buffer ranges for geometries
+  _instanceInfo: { visible: boolean; active: boolean; geometryIndex: number }[] = [];
+  _geometryInfo: BatchedMeshGeometryInfo[] = [];
+  // instance, geometry ids that have been set as inactive, and are available to be overwritten
+  _availableInstanceIds: number[] = [];
+  _availableGeometryIds: number[] = [];
+  // used to track where the next point is that geometry should be inserted
+  _nextIndexStart: number = 0;
+  _nextVertexStart: number = 0;
+  _geometryCount: number = 0;
+  // flags
+  _visibilityChanged: boolean = true;
+  _geometryInitialized: boolean = false;
   _maxInstanceCount: number;
   _maxVertexCount: number;
   _maxIndexCount: number;
   _multiDrawCounts: Int32Array;
   _multiDrawStarts: Int32Array;
-  _multiDrawCount: number;
-  _multiDrawBytesPerElement: number;
-  _matricesTexture: DataTexture | null;
-  _indirectTexture: DataTexture | null;
-  _colorsTexture: DataTexture | null;
+  _multiDrawCount: number = 0;
+  _multiDrawBytesPerElement: number = 1;
+  // Local matrix per geometry by using data texture
+  _matricesTexture: DataTexture | null = null;
+  _indirectTexture: DataTexture | null = null;
+  _colorsTexture: DataTexture | null = null;
 
   /**
    * Constructs a new batched mesh.
@@ -261,60 +297,6 @@ export class BatchedMesh extends Mesh {
   ) {
     super(new BufferGeometry(), material);
     if (material === undefined) throw new Error("BatchedMesh requires explicit material.");
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isBatchedMesh = true;
-    /**
-     * When set ot `true`, the individual objects of a batch are frustum culled.
-     *
-     * @default true
-     */
-    this.perObjectFrustumCulled = true;
-    /**
-     * When set to `true`, the individual objects of a batch are sorted to improve overdraw-related artifacts.
-     * If the material is marked as "transparent" objects are rendered back to front and if not then they are
-     * rendered front to back.
-     *
-     * @default true
-     */
-    this.sortObjects = true;
-    /**
-     * The bounding box of the batched mesh. Can be computed via {@link BatchedMesh#computeBoundingBox}.
-     *
-     * @default null
-     */
-    this.boundingBox = null;
-    /**
-     * The bounding sphere of the batched mesh. Can be computed via {@link BatchedMesh#computeBoundingSphere}.
-     *
-     * @default null
-     */
-    this.boundingSphere = null;
-    /**
-     * Takes a sort a function that is run before render. The function takes a list of instances to
-     * sort and a camera. The objects in the list include a "z" field to perform a depth-ordered
-     * sort with.
-     *
-     * @default null
-     */
-    this.customSort = null;
-    // stores visible, active, and geometry id per instance and reserved buffer ranges for geometries
-    this._instanceInfo = [];
-    this._geometryInfo = [];
-    // instance, geometry ids that have been set as inactive, and are available to be overwritten
-    this._availableInstanceIds = [];
-    this._availableGeometryIds = [];
-    // used to track where the next point is that geometry should be inserted
-    this._nextIndexStart = 0;
-    this._nextVertexStart = 0;
-    this._geometryCount = 0;
-    // flags
-    this._visibilityChanged = true;
-    this._geometryInitialized = false;
     // cached user options
     this._maxInstanceCount = maxInstanceCount;
     this._maxVertexCount = maxVertexCount;
@@ -322,12 +304,6 @@ export class BatchedMesh extends Mesh {
     // buffers for multi draw
     this._multiDrawCounts = new Int32Array(maxInstanceCount);
     this._multiDrawStarts = new Int32Array(maxInstanceCount);
-    this._multiDrawCount = 0;
-    this._multiDrawBytesPerElement = 1;
-    // Local matrix per geometry by using data texture
-    this._matricesTexture = null;
-    this._indirectTexture = null;
-    this._colorsTexture = null;
     this._initMatricesTexture();
     this._initIndirectTexture();
   }

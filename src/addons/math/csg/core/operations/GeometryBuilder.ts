@@ -65,8 +65,8 @@ function pushItemSize(vec: Vector4, itemSize: number, target: TypeBackedArray) {
 }
 
 class AttributeData extends TypeBackedArray {
-  itemSize: number;
-  normalized: boolean;
+  itemSize: number = 1;
+  normalized: boolean = false;
 
   get count() {
     return this.length / this.itemSize;
@@ -74,25 +74,17 @@ class AttributeData extends TypeBackedArray {
 
   constructor(type: NumericArrayConstructor) {
     super(type);
-    this.itemSize = 1;
-    this.normalized = false;
   }
 }
 
 export class GeometryBuilder {
-  attributeData: Record<string, AttributeData>;
-  groupIndices: AttributeData[];
-  forwardIndexMap: Map<number | string | null, number>;
-  invertedIndexMap: Map<number | string | null, number>;
-  interpolatedFields: Record<string, [Vector4, Vector4, Vector4]>;
+  attributeData: Record<string, AttributeData> = {};
+  groupIndices: AttributeData[] = [];
+  forwardIndexMap: Map<number | string | null, number> = new Map();
+  invertedIndexMap: Map<number | string | null, number> = new Map();
+  interpolatedFields: Record<string, [Vector4, Vector4, Vector4]> = {};
 
-  constructor() {
-    this.attributeData = {};
-    this.groupIndices = [];
-    this.forwardIndexMap = new Map();
-    this.invertedIndexMap = new Map();
-    this.interpolatedFields = {};
-  }
+  constructor() {}
 
   initFromGeometry(referenceGeometry: BufferGeometry, relevantAttributes: string[]) {
     this.clear();

@@ -30,7 +30,7 @@ const _normalMatrix = new Matrix3();
 export class VertexNormalsHelper extends LineSegments<LineBasicMaterial> {
   object: Object3D & { geometry: BufferGeometry };
   size: number;
-  readonly isVertexNormalsHelper: boolean;
+  readonly isVertexNormalsHelper: boolean = true;
 
   /**
    * @param object - The object for which to visualize vertex normals.
@@ -46,7 +46,6 @@ export class VertexNormalsHelper extends LineSegments<LineBasicMaterial> {
     this.size = size;
     this.type = "VertexNormalsHelper";
     this.matrixAutoUpdate = false;
-    this.isVertexNormalsHelper = true;
     this.update();
   }
 

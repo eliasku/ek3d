@@ -19,7 +19,13 @@ import { Mapping, Wrapping, TextureFilter, PixelFormat, TextureType } from "../c
  *
  */
 export class CubeTexture extends Texture {
-  isCubeTexture: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isCubeTexture: boolean = true;
 
   /**
    * Constructs a new cube texture.
@@ -48,13 +54,6 @@ export class CubeTexture extends Texture {
     colorSpace?: string,
   ) {
     super(images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isCubeTexture = true;
     /**
      * If set to `true`, the texture is flipped along the vertical axis when
      * uploaded to the GPU.

@@ -63,12 +63,40 @@ export class CSM {
   lightFar: number;
   lightMargin: number;
   customSplitsCallback: CSMData["customSplitsCallback"];
-  fade: boolean;
-  mainFrustum: CSMFrustum;
-  frustums: CSMFrustum[];
-  breaks: number[];
-  lights: DirectionalLight[];
-  shaders: Map<CSMMaterial, WebGLShaderDescriptor | null>;
+  /**
+   * Whether to fade between cascades or not.
+   *
+   * @default false
+   */
+  fade: boolean = false;
+  /**
+   * The main frustum.
+   *
+   */
+  mainFrustum: CSMFrustum = new CSMFrustum({ webGL: true });
+  /**
+   * An array of frustums representing the cascades.
+   *
+   */
+  frustums: CSMFrustum[] = [];
+  /**
+   * An array of numbers in the range `[0,1]` the defines how the
+   * mainCSM frustum should be split up.
+   *
+   */
+  breaks: number[] = [];
+  /**
+   * An array of directional lights which cast the shadows for
+   * the different cascades. There is one directional light for each
+   * cascade.
+   *
+   */
+  lights: DirectionalLight[] = [];
+  /**
+   * A Map holding enhanced material shaders.
+   *
+   */
+  shaders: Map<CSMMaterial, WebGLShaderDescriptor | null> = new Map();
   private readonly materialHooks: Map<
     CSMMaterial,
     { original: PropertyDescriptor | undefined; hook: Material["onBeforeCompile"] }
@@ -166,46 +194,6 @@ export class CSM {
      *
      */
     this.customSplitsCallback = data.customSplitsCallback;
-
-    /**
-     * Whether to fade between cascades or not.
-     *
-     * @default false
-     */
-    this.fade = false;
-
-    /**
-     * The main frustum.
-     *
-     */
-    this.mainFrustum = new CSMFrustum({ webGL: true });
-
-    /**
-     * An array of frustums representing the cascades.
-     *
-     */
-    this.frustums = [];
-
-    /**
-     * An array of numbers in the range `[0,1]` the defines how the
-     * mainCSM frustum should be split up.
-     *
-     */
-    this.breaks = [];
-
-    /**
-     * An array of directional lights which cast the shadows for
-     * the different cascades. There is one directional light for each
-     * cascade.
-     *
-     */
-    this.lights = [];
-
-    /**
-     * A Map holding enhanced material shaders.
-     *
-     */
-    this.shaders = new Map();
 
     this._createLights();
     this.updateFrustums();

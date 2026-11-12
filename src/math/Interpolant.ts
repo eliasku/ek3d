@@ -42,7 +42,13 @@ export interface InterpolantSettings {
  */
 export class Interpolant<B extends AnimationBuffer = NumericAnimationBuffer> {
   parameterPositions: NumericAnimationBuffer;
-  _cachedIndex: number;
+  /**
+   * A cache index.
+   *
+   * @private
+   * @default 0
+   */
+  _cachedIndex: number = 0;
   resultBuffer: B;
   sampleValues: B;
   valueSize: number;
@@ -68,13 +74,6 @@ export class Interpolant<B extends AnimationBuffer = NumericAnimationBuffer> {
      *
      */
     this.parameterPositions = parameterPositions;
-    /**
-     * A cache index.
-     *
-     * @private
-     * @default 0
-     */
-    this._cachedIndex = 0;
     /**
      * The result buffer.
      *

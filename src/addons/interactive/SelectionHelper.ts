@@ -10,7 +10,7 @@ export class SelectionHelper {
   /**
    * The visualization of the selection box.
    */
-  element: HTMLDivElement;
+  element: HTMLDivElement = document.createElement("div");
 
   /**
    * A reference to the renderer.
@@ -42,7 +42,6 @@ export class SelectionHelper {
    * @param cssClassName - The CSS class name of the `div`.
    */
   constructor(renderer: WebGLRenderer, cssClassName: string) {
-    this.element = document.createElement("div");
     this.element.classList.add(cssClassName);
     this.element.style.pointerEvents = "none";
 

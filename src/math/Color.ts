@@ -217,10 +217,31 @@ function hue2rgb(p?: number, q?: number, t?: number): number {
  * ```
  */
 export class Color {
-  isColor: boolean;
-  r: number;
-  g: number;
-  b: number;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isColor: boolean = true;
+  /**
+   * The red component.
+   *
+   * @default 1
+   */
+  r: number = 1;
+  /**
+   * The green component.
+   *
+   * @default 1
+   */
+  g: number = 1;
+  /**
+   * The blue component.
+   *
+   * @default 1
+   */
+  b: number = 1;
   /**
    * A dictionary with X11 color names.
    *
@@ -242,31 +263,6 @@ export class Color {
    * @param [b] - The blue component.
    */
   constructor(r?: number | string | Color, g?: number, b?: number) {
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isColor = true;
-    /**
-     * The red component.
-     *
-     * @default 1
-     */
-    this.r = 1;
-    /**
-     * The green component.
-     *
-     * @default 1
-     */
-    this.g = 1;
-    /**
-     * The blue component.
-     *
-     * @default 1
-     */
-    this.b = 1;
     return this.set(r!, g!, b!);
   }
   /**

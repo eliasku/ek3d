@@ -32,7 +32,13 @@ import { Vector2 } from "../../math/Vector2";
  *
  */
 export class SplineCurve extends Curve<Vector2> {
-  isSplineCurve: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isSplineCurve: boolean = true;
 
   points: Vector2[];
 
@@ -43,13 +49,6 @@ export class SplineCurve extends Curve<Vector2> {
    */
   constructor(points: Vector2[] = []) {
     super();
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isSplineCurve = true;
     this.type = "SplineCurve";
     /**
      * An array of 2D points defining the curve.

@@ -21,15 +21,13 @@ import { Scene } from "ek3d/scenes/Scene";
 const canvas = document.querySelector<HTMLCanvasElement>("#scene")!;
 
 class FXScene {
-  camera: PerspectiveCamera;
-  scene: Scene;
+  camera: PerspectiveCamera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+  scene: Scene = new Scene();
   rotationSpeed: Vector3;
   mesh: InstancedMesh;
   constructor(geometry: BoxGeometry | IcosahedronGeometry, rotationSpeed: Vector3, backgroundColor: number) {
-    this.camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
     this.camera.position.z = 20;
 
-    this.scene = new Scene();
     this.scene.background = new Color(backgroundColor);
     this.scene.add(new AmbientLight(0xaaaaaa, 3));
 

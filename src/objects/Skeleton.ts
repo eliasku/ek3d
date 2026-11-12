@@ -35,11 +35,23 @@ const _identityMatrix = /*@__PURE__*/ new Matrix4();
  * @class-crasher-ignore Render and resource lists invoke skeleton methods through structural types.
  */
 export class Skeleton {
-  uuid: string;
+  uuid: string = generateUUID();
   bones: Bone[];
   boneInverses: Matrix4[];
-  boneMatrices: Float32Array;
-  boneTexture: DataTexture | null;
+  /**
+   * An array buffer holding the bone data.
+   * Input data for {@link Skeleton#boneTexture}.
+   *
+   * @default null
+   */
+  boneMatrices: Float32Array = null as unknown as Float32Array;
+  /**
+   * A texture holding the bone data for use
+   * in the vertex shader.
+   *
+   * @default null
+   */
+  boneTexture: DataTexture | null = null;
 
   /**
    * Constructs a new skeleton.
@@ -49,7 +61,6 @@ export class Skeleton {
    * If not provided, these matrices will be computed automatically via {@link Skeleton#calculateInverses}.
    */
   constructor(bones: Bone[] = [], boneInverses: Matrix4[] = []) {
-    this.uuid = generateUUID();
     /**
      * An array of bones defining the skeleton.
      *
@@ -60,20 +71,6 @@ export class Skeleton {
      *
      */
     this.boneInverses = boneInverses;
-    /**
-     * An array buffer holding the bone data.
-     * Input data for {@link Skeleton#boneTexture}.
-     *
-     * @default null
-     */
-    this.boneMatrices = null as unknown as Float32Array;
-    /**
-     * A texture holding the bone data for use
-     * in the vertex shader.
-     *
-     * @default null
-     */
-    this.boneTexture = null;
     this.init();
   }
   /**

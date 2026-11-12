@@ -6,7 +6,13 @@ import { InterleavedBuffer } from "./InterleavedBuffer";
  *
  */
 export class InstancedInterleavedBuffer extends InterleavedBuffer {
-  isInstancedInterleavedBuffer: boolean;
+  /**
+   * This flag can be used for type testing.
+   *
+   * @readonly
+   * @default true
+   */
+  isInstancedInterleavedBuffer: boolean = true;
   meshPerAttribute: number;
 
   /**
@@ -31,13 +37,6 @@ export class InstancedInterleavedBuffer extends InterleavedBuffer {
     meshPerAttribute: number = 1,
   ) {
     super(array, stride);
-    /**
-     * This flag can be used for type testing.
-     *
-     * @readonly
-     * @default true
-     */
-    this.isInstancedInterleavedBuffer = true;
     /**
      * Defines how often a value of this buffer attribute should be repeated,
      * see {@link InstancedBufferAttribute#meshPerAttribute}.

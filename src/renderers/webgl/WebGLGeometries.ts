@@ -11,9 +11,9 @@ export class WebGLGeometries {
   private attributes: WebGLAttributes;
   private info: WebGLInfoState;
   private bindingStates: WebGLBindingStates;
-  private geometries: Record<string, WeakRef<BufferGeometry>>;
-  private wireframeAttributes: WeakMap<BufferGeometry, Uint16BufferAttribute | Uint32BufferAttribute>;
-  private registry: FinalizationRegistry<number>;
+  private geometries: Record<string, WeakRef<BufferGeometry>> = {};
+  private wireframeAttributes: WeakMap<BufferGeometry, Uint16BufferAttribute | Uint32BufferAttribute> = new WeakMap();
+  private registry: FinalizationRegistry<number> = new FinalizationRegistry(this.onGeometryFinalized.bind(this));
 
   constructor(
     gl: WebGL2RenderingContext,
@@ -24,9 +24,6 @@ export class WebGLGeometries {
     this.attributes = attributes;
     this.info = info;
     this.bindingStates = bindingStates;
-    this.geometries = {};
-    this.wireframeAttributes = new WeakMap();
-    this.registry = new FinalizationRegistry(this.onGeometryFinalized.bind(this));
     this.get = this.get.bind(this);
     this.update = this.update.bind(this);
     this.getWireframeAttribute = this.getWireframeAttribute.bind(this);

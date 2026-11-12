@@ -252,26 +252,26 @@ export class EXRLoader extends DataTextureLoader {
    *
    * @default TextureType.HalfFloat
    */
-  type: TextureType;
+  type: TextureType = TextureType.HalfFloat;
 
   /**
    * Texture output format.
    *
    * @default PixelFormat.RGBA
    */
-  outputFormat: PixelFormat;
+  outputFormat: PixelFormat = PixelFormat.RGBA;
 
   /**
    * For multi-part EXR files, the index of the part to load.
    *
    * @default 0
    */
-  part: number;
+  part: number = 0;
 
   /**
    * The zlib runtime used by ZIP(S), PXR24 and DWA blocks, or `null` when unset.
    */
-  zlibDecoder: EXRZlibDecoder | null;
+  zlibDecoder: EXRZlibDecoder | null = null;
 
   /**
    * Constructs a new EXR loader.
@@ -280,11 +280,6 @@ export class EXRLoader extends DataTextureLoader {
    */
   constructor(manager?: LoadingManager) {
     super(manager);
-
-    this.type = TextureType.HalfFloat;
-    this.outputFormat = PixelFormat.RGBA;
-    this.part = 0;
-    this.zlibDecoder = null;
   }
 
   /**
