@@ -18,6 +18,9 @@ test("source-first consumers resolve canonical subpaths and cannot import the pa
     "renderers/webxr/WebXRDepthSensing",
     "renderers/webgpu/WebGPURenderer",
     "cameras/StereoCamera",
+    "addons/loaders/LDrawLoader",
+    "addons/materials/LDrawConditionalLineMaterial",
+    "addons/utils/LDrawUtils",
   ]) {
     // Wildcard exports may resolve a URL even when the target does not exist.
     assert.equal(existsSync(fileURLToPath(import.meta.resolve(`ek3d/${subpath}`))), false, subpath);

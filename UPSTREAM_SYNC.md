@@ -63,12 +63,16 @@ Five new browser fixtures are registered in the existing smoke runner. The packa
 
 | Current upstream inventory | Total | Native ports | Excluded |
 | -------------------------- | ----: | -----------: | -------: |
-| Addon modules              |   501 |          285 |      216 |
-| HTML pages                 |   622 |          329 |      293 |
+| Addon modules              |   501 |          282 |      219 |
+| HTML pages                 |   622 |          328 |      294 |
 
-There are no pending approved ports. The retained native VDB page brings the native upstream-derived page total to 330.
+There are no pending approved ports. The retained native VDB page brings the native upstream-derived page total to 329.
 
 New excluded modules are `RayTracedRadiosity`, `MeshletDrawingPipeline`, `VisibilityBufferDrawingPipeline` and `MeshletGeometryUtils`. Upstream removes the already-excluded `VXGIIrradiance`, `RecurrentDenoiseNode` and `TemporalReprojectNode`. New WebGPU color-grading, VDB, instance-material and meshlet pages remain excluded. Removed WebGPU rasterizer/proxy pages do not affect native pages. Detailed additions/removals are recorded in `examples/migration-scope.json`.
+
+The current totals include the 2026-11-12 user exclusion of LEGO/LDraw: its loader, conditional
+line materials, utilities, example and local model assets are outside the port. The LDraw
+adaptation and verification recorded here describe the earlier synchronization, not retained support.
 
 ## Verification
 

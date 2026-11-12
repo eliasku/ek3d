@@ -6,10 +6,10 @@
     "report": "../UPSTREAM_SYNC.md",
     "upstream_modules": 501,
     "upstream_pages": 622,
-    "ported_modules": 285,
-    "excluded_modules": 216,
-    "ported_upstream_pages": 329,
-    "excluded_upstream_pages": 293,
+    "ported_modules": 282,
+    "excluded_modules": 219,
+    "ported_upstream_pages": 328,
+    "excluded_upstream_pages": 294,
     "retained_native_pages": ["examples/webgl_loader_vdb.html"],
     "note": "Original entries and totals remain pinned to source.scope_snapshot; the report records the current delta."
   },
@@ -34,21 +34,23 @@
       "effects/AsciiEffect.js, AnaglyphEffect.js, ParallaxBarrierEffect.js, StereoEffect.js",
       "capabilities/WebGPU.js",
       "modules importing three/webgpu or three/tsl",
-      "loaders/GLTFGaussianSplatLoaderExtension.js (explicit user exclusion)"
+      "loaders/GLTFGaussianSplatLoaderExtension.js (explicit user exclusion)",
+      "loaders/LDrawLoader.js, materials/LDrawConditionalLine*.js, utils/LDrawUtils.js (LEGO/LDraw; explicit user exclusion)"
     ],
     "adaptation": {
       "review-before-removal": "excluded module still contains WebGL code; review for extractable WebGL behaviour instead of blind deletion",
       "strip-webgpu-branch": "candidate/WebGL-usable module branches on WebGPURenderer; adapt the branch, keep WebGL behaviour"
     },
     "dependency_edges": "direct edges only: relative imports plus three/addons/* specifiers mapped by importmap convention. No transitive exclusion; excluded modules are never removed transitively on a candidate's behalf.",
-    "page_rules": "group webgpu and webxr excluded; index.html, css2d_*, css3d_*, svg_*, stereo/ASCII-named pages and pages importing an excluded stereo/parallax/ASCII effect excluded; pages importing three/webgpu or three/tsl excluded; all other pages candidates, with dependency issues recorded.",
+    "page_rules": "group webgpu and webxr excluded; index.html, css2d_*, css3d_*, svg_*, stereo/ASCII-named pages and pages importing an excluded stereo/parallax/ASCII effect excluded; webgl_loader_ldraw.html excluded by user decision; pages importing three/webgpu or three/tsl excluded; all other pages candidates, with dependency issues recorded.",
     "vendor": "vendor libraries are consumer-provided runtime, not deleted implementation; recorded as excluded-vendor-runtime edges only",
     "excluded_areas": [
       "CSS/SVG/ASCII renderers and effects (user decision)",
       "DOM inspector (user decision)",
       "WebGPU/TSL backend (user decision)",
       "WebXR and stereo/parallax cameras (user decision)",
-      "3D Tiles example (user decision)"
+      "3D Tiles example (user decision)",
+      "LEGO/LDraw format and example (user decision)"
     ],
     "status_values": {
       "ported": "implemented in src/addons/ in this repository, iteration recorded",
@@ -65,21 +67,22 @@
     "modules": {
       "total": 500,
       "candidate": 0,
-      "ported": 285,
-      "excluded": 215,
+      "ported": 282,
+      "excluded": 218,
       "lines_total": 222616,
       "candidate_lines": 0,
-      "ported_lines": 138667,
-      "excluded_lines": 83949,
+      "ported_lines": 135770,
+      "excluded_lines": 86846,
       "by_category": {
         "excluded-aggregate": 1,
-        "ported": 285,
+        "ported": 282,
         "excluded-backend-capability": 1,
-        "excluded-backend": 52,
+        "excluded-backend": 51,
         "excluded-effect": 4,
         "excluded-directory": 133,
         "excluded-vendor-runtime": 18,
         "excluded-deprecated": 2,
+        "excluded-format": 4,
         "excluded-renderer": 4
       },
       "needs_adaptation": [
@@ -157,12 +160,12 @@
     "pages": {
       "total": 617,
       "candidate": 0,
-      "ported": 330,
-      "excluded": 287,
+      "ported": 329,
+      "excluded": 288,
       "lines_total": 157006,
       "candidate_lines": 0,
-      "ported_lines": 78976,
-      "excluded_lines": 78030,
+      "ported_lines": 78584,
+      "excluded_lines": 78422,
       "excluded_by_category": {
         "page-css2d": 1,
         "page-css3d": 7,
@@ -172,7 +175,7 @@
         "page-stereo-ascii": 4,
         "page-webgpu": 238,
         "page-webxr": 27,
-        "page-user-excluded": 1
+        "page-user-excluded": 2
       },
       "candidates_with_dependency_issues": 0,
       "candidate_dependency_issues": [],
@@ -198,7 +201,7 @@
         }
       ]
     },
-    "progress_note": "Iteration 37 completes the approved scope: 285 ported / 215 excluded addons and 330 ported / 287 excluded upstream pages, with no pending candidates. The user explicitly excludes GLTFGaussianSplatLoaderExtension, 3D Tiles, four catalog models and two progressive resources. The glTF catalog has all 146 approved models / 325 variants local; progressive has Knight and all 89 LODs local. Original excluded resource records remain in provenance, not runtime selection."
+    "progress_note": "After the LEGO/LDraw user exclusion, the approved original snapshot scope contains 282 ported / 218 excluded addons and 329 ported / 288 excluded upstream pages, with no pending candidates. User exclusions also cover GLTFGaussianSplatLoaderExtension, 3D Tiles, four catalog models and two progressive resources. The glTF catalog has all 146 approved models / 325 variants local; progressive has Knight and all 89 LODs local. Original excluded resource records remain in provenance, not runtime selection."
   },
   "module_dependency_review": [
     {
@@ -3290,9 +3293,9 @@
     },
     {
       "path": "examples/jsm/loaders/LDrawLoader.js",
-      "status": "ported",
-      "category": "ported",
-      "reason": "iteration 16: LDrawLoader port; parse cache clone semantics verified via car model (NaN mutation bug caught by differential debugging)"
+      "status": "excluded",
+      "category": "excluded-format",
+      "reason": "Explicit user exclusion: LEGO/LDraw format support is not part of the upstream port."
     },
     {
       "path": "examples/jsm/loaders/LUT3dlLoader.js",
@@ -3701,15 +3704,15 @@
     },
     {
       "path": "examples/jsm/materials/LDrawConditionalLineMaterial.js",
-      "status": "ported",
-      "category": "ported",
-      "reason": "iteration 16: conditional line ShaderMaterial typed with accessors; includes resolved via page shaderChunks"
+      "status": "excluded",
+      "category": "excluded-format",
+      "reason": "Explicit user exclusion: LEGO/LDraw conditional line materials are not part of the upstream port."
     },
     {
       "path": "examples/jsm/materials/LDrawConditionalLineNodeMaterial.js",
       "status": "excluded",
-      "category": "excluded-backend",
-      "reason": "direct import of three/tsl, three/webgpu"
+      "category": "excluded-format",
+      "reason": "Explicit user exclusion: LEGO/LDraw conditional line materials are outside scope; this variant also requires the excluded WebGPU/TSL backend."
     },
     {
       "path": "examples/jsm/materials/WoodNodeMaterial.js",
@@ -5415,9 +5418,9 @@
     },
     {
       "path": "examples/jsm/utils/LDrawUtils.js",
-      "status": "ported",
-      "category": "ported",
-      "reason": "iteration 16: LDrawUtils.mergeObject port for the ldraw page"
+      "status": "excluded",
+      "category": "excluded-format",
+      "reason": "Explicit user exclusion: LEGO/LDraw utilities are not part of the upstream port."
     },
     {
       "path": "examples/jsm/utils/SceneOptimizer.js",
@@ -7655,15 +7658,9 @@
     },
     {
       "path": "examples/webgl_loader_ldraw.html",
-      "status": "ported",
-      "category": "ported",
-      "excluded_dependencies": [
-        {
-          "module": "examples/jsm/libs/lil-gui.module.min.js",
-          "category": "excluded-vendor-runtime"
-        }
-      ],
-      "reason": "iteration 16: LDrawLoader page with 17-model GUI, building steps, conditional/display lines toggles, LDraw.org CC BY 2.0 attribution"
+      "status": "excluded",
+      "category": "page-user-excluded",
+      "reason": "Explicit user exclusion: LEGO/LDraw format support, its example and local model assets are not part of the upstream port."
     },
     {
       "path": "examples/webgl_loader_md2.html",
@@ -13496,5 +13493,5 @@
       "dependency_issue": true
     }
   ],
-  "progress_note": "Iteration 37 closes all approved migration candidates: 285 ported addons, 215 excluded addons, 330 ported pages and 287 excluded pages. User-approved exclusions cover GLTFGaussianSplatLoaderExtension, 3D Tiles, BrainStem/EnvironmentTest/Sponza/VirtualCity catalog resources and Mobile Home/Peachy Balloon progressive resources. The runtime catalog has 146 local models/325 variants; Knight has its complete 90-GLB progressive graph. Excluded resource provenance is retained, not silently removed. Full browser/device verification and remaining real-file/visual matrices remain release gates, not pending implementation ports."
+  "progress_note": "The approved original snapshot scope contains 282 ported addons, 218 excluded addons, 329 ported pages and 288 excluded pages, with no pending candidates. User-approved exclusions cover LEGO/LDraw, GLTFGaussianSplatLoaderExtension, 3D Tiles, BrainStem/EnvironmentTest/Sponza/VirtualCity catalog resources and Mobile Home/Peachy Balloon progressive resources. The runtime catalog has 146 local models/325 variants; Knight has its complete 90-GLB progressive graph. Excluded resource provenance is retained, not silently removed. Full browser/device verification and remaining real-file/visual matrices remain release gates, not pending implementation ports."
 }

@@ -43,7 +43,7 @@ renderer.render(scene, camera);
 The port includes controls, loaders, exporters, audio and WebGL postprocessing.
 It also includes tools for geometry, animation, water and reflections.
 It does not include the full Three.js addon catalog.
-WebGPU, TSL, WebXR and StereoCamera are not included.
+WebGPU, TSL, WebXR, StereoCamera and LEGO/LDraw are not included.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, commands, API details and checks.
 

@@ -330,7 +330,6 @@ const DEMOS: Array<{ group: string; items: string[] }> = [
       "webgl_loader_gltf_dispersion",
       "webgl_loader_gltf_sheen",
       "webgl_loader_texture_lottie",
-      "webgl_loader_ldraw",
       "webgl_loader_stl",
       "webgl_loader_ply",
       "webgl_loader_xyz",

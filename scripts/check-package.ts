@@ -5,15 +5,12 @@ import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import type { Browser } from "playwright";
 import type { ViteDevServer, PreviewServer } from "vite-plus";
 import type * as Vite from "vite-plus";
-import { launchBrowser, verifyBrowser } from "./browser-smoke";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const consumer = await mkdtemp(path.join(tmpdir(), "ek3d-consumer-"));
 const browserTool = process.argv.includes("--browser-tool");
-let browser: Browser | undefined;
 let dev: ViteDevServer | undefined;
 let production: PreviewServer | undefined;
 
@@ -50,6 +47,7 @@ try {
       private: true,
       type: "module",
       devDependencies: metadata.devDependencies,
+      overrides: metadata.overrides,
     }),
   );
   await writeFile(path.join(consumer, "package-lock.json"), JSON.stringify(lock));
@@ -86,7 +84,11 @@ try {
   }
   await mkdir(path.join(consumer, "tests"));
   for (const file of (await readdir(path.join(root, "tests"))).filter(
-    (file) => file === "types.ts" || file.endsWith("-types.ts") || /^browser(?:-[\w-]+)?\.ts$/.test(file),
+    (file) =>
+      file === "browser.html" ||
+      file === "types.ts" ||
+      file.endsWith("-types.ts") ||
+      /^browser(?:-[\w-]+)?\.ts$/.test(file),
   ))
     await cp(path.join(root, "tests", file), path.join(consumer, "tests", file));
   await writeFile(
@@ -131,44 +133,35 @@ export default defineConfig(({ command }) => ({
     if (path.isAbsolute(id)) assert(inside(consumer, id), `Bundle escaped consumer: ${id}`);
     assert.doesNotMatch(id, /(?:three\.js\/|renderers\/(?:webxr|webgpu|common)\/|\/nodes\/|\/tsl\/)/);
   }
-  const vite: typeof Vite = requireConsumer("vite-plus");
-  dev = await vite.createServer({
-    root: consumer,
-    configFile: false,
-    publicDir: "public",
-    // Runtime-selected smoke imports must join the initial dependency scan, not trigger reloads mid-lifecycle.
-    optimizeDeps: {
-      entries: [...entries, "tests/browser*.ts"],
-    },
-    server: { host: "127.0.0.1", port: 0, fs: { strict: true, allow: [consumer] } },
-  });
-  await dev.listen();
-  const devURL = dev.resolvedUrls?.local[0];
-  assert(devURL);
-  production = await vite.preview({ root: consumer, configFile: false, preview: { host: "127.0.0.1", port: 0 } });
-  const productionURL = production.resolvedUrls?.local[0];
-  assert(productionURL);
   if (browserTool) {
+    const vite: typeof Vite = requireConsumer("vite-plus");
+    dev = await vite.createServer({
+      root: consumer,
+      configFile: false,
+      publicDir: "public",
+      // Runtime-selected browser fixtures must not trigger dependency reloads mid-lifecycle.
+      optimizeDeps: {
+        entries: [...entries, "tests/browser*.ts"],
+      },
+      server: { host: "127.0.0.1", port: 0, fs: { strict: true, allow: [consumer] } },
+    });
+    await dev.listen();
+    const devURL = dev.resolvedUrls?.local[0];
+    assert(devURL);
+    production = await vite.preview({ root: consumer, configFile: false, preview: { host: "127.0.0.1", port: 0 } });
+    const productionURL = production.resolvedUrls?.local[0];
+    assert(productionURL);
     console.log(`Browser tool consumer ready: ${JSON.stringify({ devURL, productionURL })}`);
     console.log("Verify both URLs through browser, then press Enter to remove the temporary consumer.");
     process.stdin.resume();
     await new Promise<void>((resolve) => process.stdin.once("data", () => resolve()));
     process.stdin.pause();
-  } else {
-    browser = await launchBrowser("chromium");
-    const smoke = await verifyBrowser(devURL, browser, { lifecycles: true });
-    assert.deepEqual(smoke.failures, [], "Installed package development/lifecycle smoke failed");
-    const productionSmoke = await verifyBrowser(productionURL, browser, { lifecycles: false });
-    assert.deepEqual(productionSmoke.failures, [], "Installed package production smoke failed");
   }
 } finally {
-  await browser?.close();
   await dev?.close();
   await production?.close();
   await rm(consumer, { recursive: true, force: true });
 }
 console.log(
-  browserTool
-    ? "Packed source-first consumer and strict types passed; browser results belong to the browser-tool session."
-    : "Packed source-first consumer, strict types and development/production browser checks passed.",
+  "Packed source-first consumer, strict types, production build and dependency isolation passed. Browser checks are separate.",
 );

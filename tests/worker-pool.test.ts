@@ -1,4 +1,4 @@
-import { assert, test } from "vitest";
+import { assert, test } from "vite-plus/test";
 import { WorkerPool } from "../src/addons/utils/WorkerPool";
 import { Worker as NodeWorker } from "node:worker_threads";
 

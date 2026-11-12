@@ -66,6 +66,7 @@ before publishing assets, including on a free public website.
 - **WebGL for canvas games, mobile web rendering and lightweight 3D interactions.** XR applications and adopting the newest graphics API are not targets.
 - **No WebXR or WebGPU backend**, disabled manager or compatibility shim. Session/controller lifecycles, native XR types, backend-specific branches and their examples are outside the package.
 - **No `StereoCamera` or stereo example/picking mode.** Stereoscopic applications are excluded; ordinary perspective, orthographic, array and cube cameras remain. The former `ek3d/cameras/StereoCamera` import is intentionally removed without a compatibility shim.
+- **No LEGO/LDraw format support.** `LDrawLoader`, `LDrawConditionalLineMaterial`, `LDrawUtils`, the `webgl_loader_ldraw` example and its assets are explicitly excluded from the upstream port. Their former addon import paths are removed without compatibility shims.
 - **Keep the code relevant to the application:** raw TypeScript, direct imports from defining modules and explicit subsystems. Functional coverage and correctness take priority over recurring bundle-size comparisons.
 
 **WebGL-only cutover (D.0):** the earlier WebXR implementation and shared WebGPU-only APIs have been removed. This intentionally breaks clients of `createXR`, `renderer.xr`, XR module subpaths and WebGPU-only members. Ordinary WebGL, reversed-depth math and external GPU-resource ownership remain. The checked-in upstream reference is unchanged.
@@ -416,7 +417,7 @@ Use `./node_modules/.bin/vp toolchain` to inspect the actual bundled engines. Re
 Shared strict options live in `scripts/tsconfig.base.json`. Root `tsconfig.json` contains only an empty `files` list and references to:
 
 - `scripts/tsconfig.test.json`: Vitest `tests/**/*.test.ts`, with Node and DOM types.
-- `scripts/tsconfig.node.json`: maintained `scripts/**/*.ts` and `vite.config.ts`, with Node types. DOM declarations also type Playwright callbacks executed in the browser.
+- `scripts/tsconfig.node.json`: maintained `scripts/**/*.ts` and `vite.config.ts`, with Node types.
 - `scripts/tsconfig.lib.json`: library sources, testbed, examples, browser scenarios and compile-only fixtures, without ambient Node types. The production transformer and isolated consumer checks use this config.
 
 `npm run typecheck` runs `tsc -b`, writing only build metadata under `node_modules/.cache/`. Imported upstream JavaScript is allowed for differential tests, but is not itself checked or modified. Maintained scripts run through `tsx`, which does not check types.
@@ -983,22 +984,20 @@ backend migrations do not remove approved native WebGL functionality.
 
 ## Verification
 
-During porting, run browser verification **only in the standard available browser through the `browser` tool**: the shared example, GPU/lifecycle fixtures and installed-package consumer. Do not launch extra engines or separate Playwright browsers for each slice. Keep type, behavioral and package checks; defer the complete cross-browser matrix below until the whole package version is ready for release. A single-browser pass does not close that release gate.
+Run browser verification **only through the builtin `browser` tool**: the shared testbed, GPU/lifecycle fixtures and installed-package consumer. The repository has no browser automation dependency or standalone browser launcher. Keep type, behavioral and package checks; the full browser/device matrix remains a separate release gate.
 
 ```sh
 npm run verify
+npm run package:check
+# Optional installed-consumer browser verification:
 npm run package:check -- --browser-tool
 # Open the printed dev/production URLs through browser; press Enter afterward.
-# Full browser matrix before releasing the whole package version:
-npm run package:check
-npm run browser:smoke -- --browser chromium
-npm run browser:smoke -- --browser firefox
-npm run browser:smoke -- --browser webkit
-# Inspect the same production example manually:
+# Repository browser verification uses the development and production servers:
+npm run dev
 npm run preview -- --port 4173
 ```
 
-For the pre-release matrix, install the needed browser engines with `npx playwright install --with-deps chromium firefox webkit`. `browser:smoke` expects the single production build from `verify` or `npm run build`; no benchmark build or generated report is needed.
+Use the installed consumer's development URL for `/tests/browser.html` and focused fixtures; use its production URL for the testbed and examples. Browser checks are not part of the default `package:check` command and must be reported separately.
 
 Node tests cover differential matrix/geometry/camera behavior, normal/reversed-depth rays and projection, frustum and shadow matrices, normalized attributes, shared-buffer clone/serialization, instanced divisors, picking traversal/clipping, math boundaries, scene transforms, texture/material contracts, canonical exports and package boundaries. Consumer types cover the supported public APIs and rejected calls under strict TypeScript, including compilation without ambient Node types. Localized `any` annotations remain in dynamic WebGL caches and marker-based dispatch; `strict` alone is not a claim of complete semantic typing.
 
@@ -1010,7 +1009,7 @@ Import `ColorSpaceDefinition` from `ek3d/math/ColorManagement` for custom color 
 
 Geometry regressions additionally cover partial arcs/caps and segment clamping, flat/subdivided polyhedra, constructor JSON round-trips, independent clone/copy buffers and bounds, edge thresholds/degenerate faces, wireframe deduplication and ray hits versus holes. Curve/shape checks compare sampling, tangents, length-cache invalidation, recursive factory decoding and errors, fill rules/nested contours, open/closed tube frames, bevel/path extrusion, near-coincident vertices and custom UV generation with upstream.
 
-The maintained browser scenarios exercise the integrated dev/production scene: picking, both cameras, geometry/object/material/animation modes, lights/shadows, loading, fog, uniforms, resize, layers/slices, helpers and shader error recovery. There are 22 focused development fixtures: 20 GPU/lifecycle checks and two loader checks. During porting, invoke them through `browser`, for example `await (await import('/tests/browser-shaders.ts')).verifyCustomShaders()` in the served page; the pre-release `browser:smoke` command runs the same fixtures:
+Exercise the integrated dev/production testbed through `browser`: picking, both cameras, geometry/object/material/animation modes, lights/shadows, loading, fog, uniforms, resize, layers/slices, helpers and shader error recovery. The former standalone coordinate/hash-driven walkthrough is removed. Focused GPU/lifecycle, loader and addon fixtures remain under `tests/browser*.ts` without a browser automation dependency. Open `/tests/browser.html` on the development server and invoke an export through `browser`, for example `await (await import('/tests/browser-shaders.ts')).verifyCustomShaders()`. Reload the blank fixture page between checks so no example renderer remains alive.
 
 - Rendering boundaries: missing shader/factory errors, recovery pixels and render-stack cleanup, RAF stop/restart, disposal, context restoration and caller-owned external textures.
 - Textures: sRGB sampling, `needsUpdate`, UV changes, GPU deletion and reallocation.
@@ -1034,9 +1033,9 @@ The maintained browser scenarios exercise the integrated dev/production scene: p
 
 These are correctness checks, not separate user-facing examples or performance benchmarks. Helpers used only by lifecycle checks live under `tests/`.
 
-`package:check` creates a real `npm pack` archive, installs it in an OS temporary directory with the lockfile-pinned toolchain and removes the directory afterward. The consumer uses no aliases, upstream dependency or workspace symlinks. It verifies raw sources and exports, compiles browser-only consumer contracts, builds the same example and checks dependency isolation. During porting, `--browser-tool` starts dev/production servers without launching a browser, prints their URLs and waits for Enter after you exercise the scene and lifecycle fixtures through `browser`. Browser results must be recorded separately; this mode does not claim an automated browser pass. Without the flag, the pre-release command runs its Chromium smoke automatically. Nothing is published.
+`package:check` creates a real `npm pack` archive, installs it in an OS temporary directory with the lockfile-pinned toolchain and removes the directory afterward. The consumer uses no aliases, upstream dependency or workspace symlinks. It verifies raw sources and exports, compiles browser-only consumer contracts, builds the testbed and examples and checks dependency isolation. The optional `--browser-tool` flag starts dev/production servers, prints their URLs and waits for Enter after you exercise the scene and fixtures through `browser`. Neither mode launches a browser or claims a browser pass. Nothing is published.
 
-Browser verification results go to command output, not a persistent report directory. Chromium automation uses SwiftShader; that is not mobile/hardware acceptance. Desktop WebKit is not Safari-on-device acceptance. Browser capability failures remain failures, not skipped successes.
+Record browser verification results separately from package checks. Software rendering is not mobile/hardware acceptance, and desktop WebKit is not Safari-on-device acceptance. Browser capability failures remain failures, not skipped successes.
 
 ## Maintained scripts
 
@@ -1045,7 +1044,6 @@ Browser verification results go to command output, not a persistent report direc
 | `scripts/module-graph.ts`  | AST parsing and runtime dependency/cycle analysis |
 | `scripts/check-style.ts`   | Project-owned TypeScript source-convention checks |
 | `scripts/check-package.ts` | Isolated source-first package consumer            |
-| `scripts/browser-smoke.ts` | Integrated example and GPU lifecycle verification |
 
 Bundle-size comparisons are not a recurring development or acceptance step; dependency isolation and runtime behavior still matter. Maintain `src/` directly and compare changes against the pinned upstream baseline.
 

@@ -6,7 +6,7 @@ Version: 0.1.0
 
 Use a TypeScript-capable bundler and direct module imports without a file extension.
 There is no root package import. Supply shaders and optional runtimes explicitly.
-WebGPU, TSL, WebXR and StereoCamera are not included.
+WebGPU, TSL, WebXR, StereoCamera and LEGO/LDraw are not included.
 Use the maintained source as the API reference, not the upstream Three.js documentation.
 Repository paths in the README are relative to the repository root.
 
@@ -129,7 +129,6 @@ Repository paths in the README are relative to the repository root.
 - [ek3d/addons/loaders/KTX2Container](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/loaders/KTX2Container.ts)
 - [ek3d/addons/loaders/KTX2Loader](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/loaders/KTX2Loader.ts)
 - [ek3d/addons/loaders/KTXLoader](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/loaders/KTXLoader.ts)
-- [ek3d/addons/loaders/LDrawLoader](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/loaders/LDrawLoader.ts)
 - [ek3d/addons/loaders/LUT3dlLoader](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/loaders/LUT3dlLoader.ts)
 - [ek3d/addons/loaders/LUTCubeLoader](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/loaders/LUTCubeLoader.ts)
 - [ek3d/addons/loaders/LUTImageLoader](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/loaders/LUTImageLoader.ts)
@@ -180,7 +179,6 @@ Repository paths in the README are relative to the repository root.
 - [ek3d/addons/loaders/usd/USDComposer](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/loaders/usd/USDComposer.ts)
 - [ek3d/addons/loaders/vrml-geometry](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/loaders/vrml-geometry.ts)
 - [ek3d/addons/loaders/vrml-parser](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/loaders/vrml-parser.ts)
-- [ek3d/addons/materials/LDrawConditionalLineMaterial](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/materials/LDrawConditionalLineMaterial.ts)
 - [ek3d/addons/math/Capsule](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/math/Capsule.ts)
 - [ek3d/addons/math/ColorConverter](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/math/ColorConverter.ts)
 - [ek3d/addons/math/ColorSpaces](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/math/ColorSpaces.ts)
@@ -402,7 +400,6 @@ Repository paths in the README are relative to the repository root.
 - [ek3d/addons/utils/GaussianSplatUtils](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/utils/GaussianSplatUtils.ts)
 - [ek3d/addons/utils/GeometryCompressionUtils](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/utils/GeometryCompressionUtils.ts)
 - [ek3d/addons/utils/GeometryUtils](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/utils/GeometryUtils.ts)
-- [ek3d/addons/utils/LDrawUtils](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/utils/LDrawUtils.ts)
 - [ek3d/addons/utils/SVGStroke](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/utils/SVGStroke.ts)
 - [ek3d/addons/utils/SceneOptimizer](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/utils/SceneOptimizer.ts)
 - [ek3d/addons/utils/SceneUtils](https://github.com/eliasku/ek3d/blob/HEAD/src/addons/utils/SceneUtils.ts)
