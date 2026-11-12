@@ -12,7 +12,7 @@ import { BufferGeometry } from "../core/BufferGeometry";
 import { InterleavedBuffer } from "../core/InterleavedBuffer";
 import { InterleavedBufferAttribute } from "../core/InterleavedBufferAttribute";
 import { error } from "../utils";
-let _geometry: any;
+let _geometry: BufferGeometry | undefined;
 const _intersectPoint = /*@__PURE__*/ new Vector3();
 const _worldScale = /*@__PURE__*/ new Vector3();
 const _mvPosition = /*@__PURE__*/ new Vector3();
@@ -121,13 +121,13 @@ export class Sprite extends Object3D {
     }
     _worldScale.setFromMatrixScale(this.matrixWorld);
     _viewWorldMatrix.copy(raycaster.camera!.matrixWorld);
-    (this as any).modelViewMatrix.multiplyMatrices(raycaster.camera!.matrixWorldInverse, this.matrixWorld);
-    _mvPosition.setFromMatrixPosition((this as any).modelViewMatrix);
+    this.modelViewMatrix.multiplyMatrices(raycaster.camera!.matrixWorldInverse, this.matrixWorld);
+    _mvPosition.setFromMatrixPosition(this.modelViewMatrix);
     if (raycaster.camera!.isPerspectiveCamera && this.material.sizeAttenuation === false) {
       _worldScale.multiplyScalar(-_mvPosition.z);
     }
     const rotation = this.material.rotation;
-    let sin: any, cos: any;
+    let sin: number | undefined, cos: number | undefined;
     if (rotation !== 0) {
       cos = Math.cos(rotation);
       sin = Math.sin(rotation);
@@ -175,13 +175,20 @@ export class Sprite extends Object3D {
     return data;
   }
 }
-function transformVertex(vertexPosition?: any, mvPosition?: any, center?: any, scale?: any, sin?: any, cos?: any) {
+function transformVertex(
+  vertexPosition: Vector3,
+  mvPosition: Vector3,
+  center: Vector2,
+  scale: Vector3,
+  sin: number | undefined,
+  cos: number | undefined,
+): void {
   // compute position in camera space
   _alignedPosition.subVectors(vertexPosition, center).addScalar(0.5).multiply(scale);
   // to check if rotation is not zero
   if (sin !== undefined) {
-    _rotatedPosition.x = cos * _alignedPosition.x - sin * _alignedPosition.y;
-    _rotatedPosition.y = sin * _alignedPosition.x + cos * _alignedPosition.y;
+    _rotatedPosition.x = cos! * _alignedPosition.x - sin * _alignedPosition.y;
+    _rotatedPosition.y = sin * _alignedPosition.x + cos! * _alignedPosition.y;
   } else {
     _rotatedPosition.copy(_alignedPosition);
   }

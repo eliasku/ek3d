@@ -1,3 +1,4 @@
+import type { Uniforms } from "../../core/Uniform";
 import { Blending, Side, TextureType, DepthPacking } from "../../constants";
 import { Color } from "../../math/Color";
 import { Matrix4 } from "../../math/Matrix4";
@@ -135,7 +136,7 @@ export class OutlinePass extends Pass {
   separableBlurMaterial1: ShaderMaterial;
   separableBlurMaterial2: ShaderMaterial;
   overlayMaterial: ShaderMaterial;
-  copyUniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+  copyUniforms: Uniforms;
   materialCopy: ShaderMaterial;
   _oldClearColor: Color;
   oldClearAlpha: number;
@@ -258,7 +259,7 @@ export class OutlinePass extends Pass {
 
     const copyShader = CopyShader;
 
-    this.copyUniforms = cloneUniforms(copyShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>;
+    this.copyUniforms = cloneUniforms(copyShader.uniforms);
 
     this.materialCopy = new ShaderMaterial({
       uniforms: this.copyUniforms,

@@ -174,9 +174,11 @@ export class Line<TMaterial extends Material | Material[] = Material | Material[
     //
     _inverseMatrix.copy(matrixWorld).invert();
     _ray.copy(raycaster.ray).applyMatrix4(_inverseMatrix);
-    const localThreshold = threshold / (((this as any).scale.x + (this as any).scale.y + (this as any).scale.z) / 3);
+    const localThreshold = threshold / ((this.scale.x + this.scale.y + this.scale.z) / 3);
     const localThresholdSq = localThreshold * localThreshold;
-    const step = (this as any).isLineSegments ? 2 : 1;
+    // Derived line classes add these flags; base lines leave them undefined.
+    const line = this as this & { isLineSegments?: boolean; isLineLoop?: boolean };
+    const step = line.isLineSegments ? 2 : 1;
     const index = geometry.index;
     const attributes = geometry.attributes;
     const positionAttribute = attributes.position;
@@ -191,7 +193,7 @@ export class Line<TMaterial extends Material | Material[] = Material | Material[
           intersects.push(intersect);
         }
       }
-      if ((this as any).isLineLoop) {
+      if (line.isLineLoop) {
         const a = index.getX(end - 1);
         const b = index.getX(start);
         const intersect = checkIntersection(this, raycaster, _ray, localThresholdSq, a, b, end - 1);
@@ -208,7 +210,7 @@ export class Line<TMaterial extends Material | Material[] = Material | Material[
           intersects.push(intersect);
         }
       }
-      if ((this as any).isLineLoop) {
+      if (line.isLineLoop) {
         const intersect = checkIntersection(this, raycaster, _ray, localThresholdSq, end - 1, start, end - 1);
         if (intersect) {
           intersects.push(intersect);
@@ -238,8 +240,16 @@ export class Line<TMaterial extends Material | Material[] = Material | Material[
     }
   }
 }
-function checkIntersection(object?: any, raycaster?: any, ray?: any, thresholdSq?: any, a?: any, b?: any, i?: any) {
-  const positionAttribute = object.geometry.attributes.position;
+function checkIntersection(
+  object: Line,
+  raycaster: Raycaster,
+  ray: Ray,
+  thresholdSq: number,
+  a: number,
+  b: number,
+  i: number,
+): Intersection | undefined {
+  const positionAttribute = object.geometry.attributes.position as BufferAttribute | InterleavedBufferAttribute;
   _vStart.fromBufferAttribute(positionAttribute, a);
   _vEnd.fromBufferAttribute(positionAttribute, b);
   const distSq = ray.distanceSqToSegment(_vStart, _vEnd, _intersectPointOnRay, _intersectPointOnSegment);

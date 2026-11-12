@@ -1,3 +1,4 @@
+import type { Uniforms } from "../../core/Uniform";
 import { TextureType } from "../../constants";
 import { Color } from "../../math/Color";
 import { Matrix4 } from "../../math/Matrix4";
@@ -20,7 +21,7 @@ import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
 /** A shader definition accepted by {@link Refractor}. */
 export interface RefractorShader {
   name?: string;
-  uniforms: Record<string, { value: unknown }>;
+  uniforms: Uniforms<unknown>;
   vertexShader: string;
   fragmentShader: string;
 }

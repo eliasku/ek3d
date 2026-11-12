@@ -4,6 +4,14 @@ import { Matrix4 } from "../math/Matrix4";
 import { DataTexture } from "../textures/DataTexture";
 import { generateUUID } from "../math/MathUtils";
 import { warn } from "../utils";
+
+export interface SkeletonJSON {
+  metadata?: { version: number; type: string; generator: string };
+  uuid: string;
+  bones: string[];
+  boneInverses: number[][];
+}
+
 const _offsetMatrix = /*@__PURE__*/ new Matrix4();
 const _identityMatrix = /*@__PURE__*/ new Matrix4();
 /**
@@ -125,13 +133,13 @@ export class Skeleton {
     for (let i = 0, il = this.bones.length; i < il; i++) {
       const bone = this.bones[i];
       if (bone) {
-        if (bone.parent && (bone.parent as any).isBone) {
+        if (bone.parent && (bone.parent as Bone).isBone) {
           bone.matrix.copy(bone.parent.matrixWorld).invert();
           bone.matrix.multiply(bone.matrixWorld);
         } else {
           bone.matrix.copy(bone.matrixWorld);
         }
-        bone.matrix.decompose((bone as any).position, (bone as any).quaternion, (bone as any).scale);
+        bone.matrix.decompose(bone.position, bone.quaternion, bone.scale);
       }
     }
   }
@@ -215,10 +223,10 @@ export class Skeleton {
    * Setups the skeleton by the given JSON and bones.
    *
    * @param json - The skeleton as serialized JSON.
-   * @param bones - An array of bones.
+   * @param bones - Bones indexed by UUID.
    * @return A reference of this instance.
    */
-  fromJSON(json: any, bones: Record<string, Bone>): Skeleton {
+  fromJSON(json: SkeletonJSON, bones: Record<string, Bone>): Skeleton {
     this.uuid = json.uuid;
     for (let i = 0, l = json.bones.length; i < l; i++) {
       const uuid = json.bones[i];
@@ -239,8 +247,8 @@ export class Skeleton {
    * @return A JSON object representing the serialized skeleton.
    * @see {@link ObjectLoader#parse}
    */
-  toJSON() {
-    const data: any = {
+  toJSON(): SkeletonJSON {
+    const data: SkeletonJSON = {
       metadata: {
         version: 4.7,
         type: "Skeleton",
@@ -248,8 +256,8 @@ export class Skeleton {
       },
       bones: [],
       boneInverses: [],
+      uuid: this.uuid,
     };
-    (data as any).uuid = this.uuid;
     const bones = this.bones;
     const boneInverses = this.boneInverses;
     for (let i = 0, l = bones.length; i < l; i++) {

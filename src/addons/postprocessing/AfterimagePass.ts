@@ -1,3 +1,4 @@
+import type { Uniforms } from "../../core/Uniform";
 import { TextureType, TextureFilter, Blending } from "../../constants";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { cloneUniforms } from "../../renderers/shaders/UniformsUtils";
@@ -34,7 +35,7 @@ export class AfterimagePass extends Pass {
    * }
    * ```
    */
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }> = cloneUniforms(AfterimageShader.uniforms);
+  uniforms: Uniforms = cloneUniforms(AfterimageShader.uniforms);
   compFsMaterial: ShaderMaterial;
   copyFsMaterial: ShaderMaterial;
   _compFsQuad: FullScreenQuad;

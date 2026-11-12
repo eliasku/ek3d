@@ -52,7 +52,7 @@ export class DepthTexture extends Texture {
     if (format !== PixelFormat.Depth && format !== PixelFormat.DepthStencil) {
       throw new Error("THREE.DepthTexture: format must be either THREE.DepthFormat or THREE.DepthStencilFormat");
     }
-    const image: any = { width: width, height: height, depth: depth };
+    const image = { width: width, height: height, depth: depth };
     super(image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy);
     /**
      * If set to `true`, the texture is flipped along the vertical axis when

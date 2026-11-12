@@ -1,3 +1,4 @@
+import type { Uniforms } from "../../core/Uniform";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { cloneUniforms } from "../../renderers/shaders/UniformsUtils";
 
@@ -28,7 +29,7 @@ export class ShaderPass extends Pass {
   /**
    * The pass uniforms.
    */
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }> | null = null;
+  uniforms: Uniforms | null = null;
   /**
    * The pass material.
    */
@@ -49,7 +50,7 @@ export class ShaderPass extends Pass {
       | {
           name?: string;
           defines?: Record<string, string | number | boolean>;
-          uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+          uniforms: Uniforms;
           vertexShader: string;
           fragmentShader: string;
         },
@@ -66,7 +67,7 @@ export class ShaderPass extends Pass {
       this.uniforms = shader.uniforms;
       this.material = shader;
     } else if (shader) {
-      this.uniforms = cloneUniforms(shader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>;
+      this.uniforms = cloneUniforms(shader.uniforms);
       this.material = new ShaderMaterial({
         name: shader.name !== undefined ? shader.name : "unspecified",
         defines: { ...shader.defines },

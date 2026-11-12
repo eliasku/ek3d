@@ -75,8 +75,8 @@ export class HemisphereLightHelper extends Object3D {
    */
   dispose() {
     super.dispose();
-    (this.children[0] as Mesh & { material: MeshBasicMaterial } as any).geometry.dispose();
-    (this.children[0] as Mesh & { material: MeshBasicMaterial } as any).material.dispose();
+    (this.children[0] as Mesh & { material: MeshBasicMaterial }).geometry.dispose();
+    (this.children[0] as Mesh & { material: MeshBasicMaterial }).material.dispose();
   }
   /**
    * Updates the helper to match the position and direction of the
@@ -87,7 +87,7 @@ export class HemisphereLightHelper extends Object3D {
     if (this.color !== undefined) {
       this.material.color.set(this.color);
     } else {
-      const colors = (mesh as any).geometry.getAttribute("color") as BufferAttribute;
+      const colors = mesh.geometry.getAttribute("color") as BufferAttribute;
       _color1.copy(this.light.color);
       _color2.copy(this.light.groundColor);
       for (let i = 0, l = colors.count; i < l; i++) {

@@ -1,3 +1,12 @@
+/** A shader uniform value and its optional upload flag. */
+export interface IUniform<T = any> {
+  value: T;
+  needsUpdate?: boolean;
+}
+
+/** Shader uniforms indexed by their GLSL names. */
+export type Uniforms<T = any> = Record<string, IUniform<T>>;
+
 /**
  * Represents a uniform which is a global shader variable. They are passed to shader programs.
  *

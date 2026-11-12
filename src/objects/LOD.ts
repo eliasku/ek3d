@@ -95,7 +95,7 @@ export class LOD extends Object3D {
   }
   copy(source: LOD): this {
     super.copy(source, false);
-    const levels = (source as any).levels;
+    const levels = source.levels;
     for (let i = 0, l = levels.length; i < l; i++) {
       const level = levels[i];
       this.addLevel(level.object.clone(), level.distance, level.hysteresis);
@@ -114,8 +114,8 @@ export class LOD extends Object3D {
    */
   addLevel(object: Object3D, distance: number = 0, hysteresis: number = 0): this {
     distance = Math.abs(distance);
-    const levels = (this as any).levels;
-    let l: any;
+    const levels = this.levels;
+    let l: number;
     for (l = 0; l < levels.length; l++) {
       if (distance < levels[l].distance) {
         break;
@@ -133,7 +133,7 @@ export class LOD extends Object3D {
    * @return Whether the level has been removed or not.
    */
   removeLevel(distance: number): boolean {
-    const levels = (this as any).levels;
+    const levels = this.levels;
     for (let i = 0; i < levels.length; i++) {
       if (levels[i].distance === distance) {
         const removedElements = levels.splice(i, 1);
@@ -159,9 +159,9 @@ export class LOD extends Object3D {
    * @return The found 3D object. `null` if no 3D object has been found.
    */
   getObjectForDistance(distance: number): Object3D | null {
-    const levels = (this as any).levels;
+    const levels = this.levels;
     if (levels.length > 0) {
-      let i: any, l: any;
+      let i: number, l: number;
       for (i = 1, l = levels.length; i < l; i++) {
         let levelDistance = levels[i].distance;
         if (levels[i].object.visible) {
@@ -182,7 +182,7 @@ export class LOD extends Object3D {
    * @param intersects - The target array that holds the intersection points.
    */
   raycast(raycaster: Raycaster, intersects: Intersection[]) {
-    const levels = (this as any).levels;
+    const levels = this.levels;
     if (levels.length > 0) {
       _v1.setFromMatrixPosition(this.matrixWorld);
       const distance = raycaster.ray.origin.distanceTo(_v1);
@@ -196,13 +196,13 @@ export class LOD extends Object3D {
    * @param camera - The camera the scene is rendered with.
    */
   update(camera: Camera & { zoom: number }) {
-    const levels = (this as any).levels;
+    const levels = this.levels;
     if (levels.length > 1) {
       _v1.setFromMatrixPosition(camera.matrixWorld);
       _v2.setFromMatrixPosition(this.matrixWorld);
       const distance = _v1.distanceTo(_v2) / camera.zoom;
       levels[0].object.visible = true;
-      let i: any, l: any;
+      let i: number, l: number;
       for (i = 1, l = levels.length; i < l; i++) {
         let levelDistance = levels[i].distance;
         if (levels[i].object.visible) {
@@ -225,7 +225,7 @@ export class LOD extends Object3D {
     const data = super.toJSON(meta);
     data.object.autoUpdate = this.autoUpdate;
     data.object.levels = [];
-    const levels = (this as any).levels;
+    const levels = this.levels;
     for (let i = 0, l = levels.length; i < l; i++) {
       const level = levels[i];
       data.object.levels.push({

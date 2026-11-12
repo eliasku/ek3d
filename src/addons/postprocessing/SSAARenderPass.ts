@@ -1,3 +1,4 @@
+import type { Uniforms } from "../../core/Uniform";
 import { Blending, TextureType } from "../../constants";
 import { Color } from "../../math/Color";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
@@ -76,7 +77,7 @@ export class SSAARenderPass extends Pass {
 
   _sampleRenderTarget: WebGLRenderTarget | null = null;
   _oldClearColor: Color = new Color();
-  _copyUniforms: Record<string, { value: any; needsUpdate?: boolean }> = cloneUniforms(CopyShader.uniforms);
+  _copyUniforms: Uniforms = cloneUniforms(CopyShader.uniforms);
   _copyMaterial: ShaderMaterial = new ShaderMaterial({
     uniforms: this._copyUniforms,
     vertexShader: CopyShader.vertexShader,

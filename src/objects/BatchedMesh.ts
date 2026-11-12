@@ -446,8 +446,7 @@ export class BatchedMesh extends Mesh {
    * @param func - The custom sort function.
    * @return A reference to this batched mesh.
    */
-  setCustomSort(func: BatchedMeshSortFunction | null): this;
-  setCustomSort(func?: any): this {
+  setCustomSort(func: BatchedMeshSortFunction | null): this {
     this.customSort = func;
     return this;
   }
@@ -504,12 +503,12 @@ export class BatchedMesh extends Mesh {
     if (atCapacity && this._availableInstanceIds.length === 0) {
       throw new Error("THREE.BatchedMesh: Maximum item count reached.");
     }
-    const instanceInfo: any = {
+    const instanceInfo = {
       visible: true,
       active: true,
       geometryIndex: geometryId,
     };
-    let drawId: any = null;
+    let drawId: number;
     // Prioritize using previously freed instance ids
     if (this._availableInstanceIds.length > 0) {
       this._availableInstanceIds.sort(ascIdSort);
@@ -567,9 +566,7 @@ export class BatchedMesh extends Mesh {
     const geometryInfoList = this._geometryInfo;
     geometryInfo.vertexStart = this._nextVertexStart;
     geometryInfo.reservedVertexCount =
-      reservedVertexCount === -1
-        ? (geometry.getAttribute("position") as BufferAttribute | InterleavedBufferAttribute).count
-        : reservedVertexCount;
+      reservedVertexCount === -1 ? geometry.getAttribute("position")!.count : reservedVertexCount;
     const index = geometry.getIndex()!;
     const hasIndex = index !== null;
     if (hasIndex) {
@@ -584,7 +581,7 @@ export class BatchedMesh extends Mesh {
       throw new Error("THREE.BatchedMesh: Reserved space request exceeds the maximum buffer size.");
     }
     // update id
-    let geometryId: any;
+    let geometryId: number;
     if (this._availableGeometryIds.length > 0) {
       this._availableGeometryIds.sort(ascIdSort);
       geometryId = this._availableGeometryIds.shift()!;
@@ -622,16 +619,14 @@ export class BatchedMesh extends Mesh {
     const geometryInfo = this._geometryInfo[geometryId];
     if (
       (hasIndex && srcIndex!.count > geometryInfo.reservedIndexCount) ||
-      (geometry.attributes as any).position.count > geometryInfo.reservedVertexCount
+      geometry.attributes.position.count > geometryInfo.reservedVertexCount
     ) {
       throw new Error("THREE.BatchedMesh: Reserved space not large enough for provided geometry.");
     }
     // copy geometry buffer data over
     const vertexStart = geometryInfo.vertexStart;
     const reservedVertexCount = geometryInfo.reservedVertexCount;
-    geometryInfo.vertexCount = (
-      geometry.getAttribute("position") as BufferAttribute | InterleavedBufferAttribute
-    ).count;
+    geometryInfo.vertexCount = geometry.getAttribute("position")!.count;
     for (const attributeName in batchGeometry.attributes) {
       // copy attribute data
       const srcAttribute = geometry.getAttribute(attributeName) as BufferAttribute | InterleavedBufferAttribute;
@@ -730,7 +725,7 @@ export class BatchedMesh extends Mesh {
     // in the geometry buffer. Because draw range objects can be reused there is no guarantee of their order.
     const geometryInfoList = this._geometryInfo;
     const indices = geometryInfoList
-      .map((e: any, i: number) => i)
+      .map((e, i) => i)
       .sort((a: number, b: number) => {
         return geometryInfoList[a].vertexStart - geometryInfoList[b].vertexStart;
       });
@@ -1051,10 +1046,8 @@ export class BatchedMesh extends Mesh {
    */
   setGeometrySize(maxVertexCount: number, maxIndexCount: number) {
     // Check if we can shrink to the requested vertex attribute size
-    const validRanges = [...this._geometryInfo].filter((info?: any) => info.active);
-    const requiredVertexLength = Math.max(
-      ...validRanges.map((range?: any) => range.vertexStart + range.reservedVertexCount),
-    );
+    const validRanges = [...this._geometryInfo].filter((info) => info.active);
+    const requiredVertexLength = Math.max(...validRanges.map((range) => range.vertexStart + range.reservedVertexCount));
     if (requiredVertexLength > maxVertexCount) {
       throw new Error(
         `THREE.BatchedMesh: Geometry vertex values are being used outside the range ${maxVertexCount}. Cannot shrink further.`,
@@ -1062,9 +1055,7 @@ export class BatchedMesh extends Mesh {
     }
     // Check if we can shrink to the requested index attribute size
     if (this.geometry.index) {
-      const requiredIndexLength = Math.max(
-        ...validRanges.map((range?: any) => range.indexStart + range.reservedIndexCount),
-      );
+      const requiredIndexLength = Math.max(...validRanges.map((range) => range.indexStart + range.reservedIndexCount));
       if (requiredIndexLength > maxIndexCount) {
         throw new Error(
           `THREE.BatchedMesh: Geometry index values are being used outside the range ${maxIndexCount}. Cannot shrink further.`,
@@ -1157,12 +1148,12 @@ export class BatchedMesh extends Mesh {
     this.sortObjects = source.sortObjects;
     this.boundingBox = source.boundingBox !== null ? source.boundingBox.clone() : null;
     this.boundingSphere = source.boundingSphere !== null ? source.boundingSphere.clone() : null;
-    this._geometryInfo = source._geometryInfo.map((info?: any) => ({
+    this._geometryInfo = source._geometryInfo.map((info) => ({
       ...info,
       boundingBox: info.boundingBox !== null ? info.boundingBox.clone() : null,
       boundingSphere: info.boundingSphere !== null ? info.boundingSphere.clone() : null,
     }));
-    this._instanceInfo = source._instanceInfo.map((info?: any) => ({ ...info }));
+    this._instanceInfo = source._instanceInfo.map((info) => ({ ...info }));
     this._availableInstanceIds = source._availableInstanceIds.slice();
     this._availableGeometryIds = source._availableGeometryIds.slice();
     this._nextIndexStart = source._nextIndexStart;
@@ -1241,7 +1232,7 @@ export class BatchedMesh extends Mesh {
     let multiDrawMultiplier = 1;
     if ((material as Material & MaterialProperties).wireframe) {
       multiDrawMultiplier = 2;
-      bytesPerElement = (geometry.attributes as any).position.count > 65535 ? 4 : 2;
+      bytesPerElement = geometry.attributes.position.count > 65535 ? 4 : 2;
     }
     const instanceInfo = this._instanceInfo;
     const multiDrawStarts = this._multiDrawStarts;
@@ -1295,8 +1286,8 @@ export class BatchedMesh extends Mesh {
       }
       for (let i = 0, l = list.length; i < l; i++) {
         const item = list[i];
-        (multiDrawStarts as any)[multiDrawCount] = item.start * bytesPerElement * multiDrawMultiplier;
-        (multiDrawCounts as any)[multiDrawCount] = item.count * multiDrawMultiplier;
+        multiDrawStarts[multiDrawCount] = item.start * bytesPerElement * multiDrawMultiplier;
+        multiDrawCounts[multiDrawCount] = item.count * multiDrawMultiplier;
         indirectArray[multiDrawCount] = item.index;
         multiDrawCount++;
       }
@@ -1315,8 +1306,8 @@ export class BatchedMesh extends Mesh {
           }
           if (!culled) {
             const geometryInfo = geometryInfoList[geometryId];
-            (multiDrawStarts as any)[multiDrawCount] = geometryInfo.start * bytesPerElement * multiDrawMultiplier;
-            (multiDrawCounts as any)[multiDrawCount] = geometryInfo.count * multiDrawMultiplier;
+            multiDrawStarts[multiDrawCount] = geometryInfo.start * bytesPerElement * multiDrawMultiplier;
+            multiDrawCounts[multiDrawCount] = geometryInfo.count * multiDrawMultiplier;
             indirectArray[multiDrawCount] = i;
             multiDrawCount++;
           }

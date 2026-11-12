@@ -1,3 +1,4 @@
+import type { Uniforms } from "../../core/Uniform";
 import { TextureType, TextureFilter } from "../../constants";
 import { Texture } from "../../textures/Texture";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
@@ -37,11 +38,11 @@ export class SMAAPass extends Pass {
   });
   _areaTexture: Texture;
   _searchTexture: Texture;
-  _uniformsEdges: Record<string, { value: any; needsUpdate?: boolean }>;
+  _uniformsEdges: Uniforms;
   _materialEdges: ShaderMaterial;
-  _uniformsWeights: Record<string, { value: any; needsUpdate?: boolean }>;
+  _uniformsWeights: Uniforms;
   _materialWeights: ShaderMaterial;
-  _uniformsBlend: Record<string, { value: any; needsUpdate?: boolean }>;
+  _uniformsBlend: Uniforms;
   _materialBlend: ShaderMaterial;
   _fsQuad: FullScreenQuad;
 

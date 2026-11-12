@@ -8,6 +8,7 @@ import { HDRLoader } from "../src/addons/loaders/HDRLoader";
 import { PerspectiveCamera } from "../src/cameras/PerspectiveCamera";
 import { OrthographicCamera } from "../src/cameras/OrthographicCamera";
 import { Vector3 } from "../src/math/Vector3";
+import { BufferAttribute } from "../src/core/BufferAttribute";
 
 function close(actual: number, expected: number, message: string, epsilon = 1e-9): void {
   assert.ok(Math.abs(actual - expected) <= epsilon, `${message}: ${actual} vs ${expected}`);
@@ -205,4 +206,28 @@ test("ArcballControls: setCamera and FOV clamping", () => {
   controls.setFov(999);
   close(ortho.zoom, 1, "fov setter ignores ortho cameras via zoom untouched");
   assert.ok(controls._tbRadius > 0, "trackball radius derived from frustum");
+});
+
+test("Arcball gizmo rings follow radius, FOV and aspect changes", () => {
+  const camera = new PerspectiveCamera(45, 1, 0.01, 100);
+  camera.position.z = 10;
+  const controls = new ArcballControls(camera, null);
+  const checkRadius = (radius: number) => {
+    assert.equal(controls._gizmos.children.length, 3);
+    for (const gizmo of controls._gizmos.children) {
+      const position = gizmo.geometry.getAttribute("position");
+      assert(position instanceof BufferAttribute);
+      for (let i = 0; i < position.count; i++) {
+        close(Math.hypot(position.getX(i), position.getY(i)), radius, "gizmo radius", 1e-6);
+      }
+    }
+  };
+  controls.setTbRadius(0.5);
+  checkRadius(Math.tan(Math.PI / 8) * 5);
+  camera.fov = 60;
+  controls.update();
+  checkRadius(Math.tan(Math.PI / 6) * 5);
+  camera.aspect = 0.5;
+  controls._onWindowResize();
+  checkRadius(Math.tan(Math.PI / 6) * 2.5);
 });

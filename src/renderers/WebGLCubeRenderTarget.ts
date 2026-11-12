@@ -33,7 +33,7 @@ export class WebGLCubeRenderTarget extends WebGLRenderTarget {
    */
   constructor(size: number = 1, options: RenderTargetOptions = {}) {
     super(size, size, options);
-    const image: any = { width: size, height: size, depth: 1 };
+    const image = { width: size, height: size, depth: 1 };
     const images = [image, image, image, image, image, image];
     /**
      * Overwritten with a different texture type.

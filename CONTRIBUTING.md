@@ -48,6 +48,20 @@ renderable type before accessing its material or geometry. Morph animation seque
 require string names. Buffer usage accepts `BufferUsage`; half-float attribute indices and
 components are numeric. These contracts preserve the existing runtime behavior.
 
+Camera, light, scene and mesh `copy()` methods require compatible sources and boolean recursion flags.
+Raycast helpers use concrete rays, intersection arrays and numeric indices.
+Helper vertex/color buffers and LOD indices are numeric.
+`Vector2.subVectors()` and `Vector2.multiply()` accept numeric `x`/`y` components, including `Vector3`.
+
+`Group<TChild>` preserves child types through cloning. Arcball gizmos use
+`Line<LineBasicMaterial>` children; Trackball pointer positions keep numeric coordinates.
+`BatchedMesh` uses numeric instance/geometry IDs and typed draw buffers without erasing
+custom-sort callback types.
+
+`SkeletonJSON` from `ek3d/objects/Skeleton` describes UUID references and numeric inverse
+matrices. `ObjectLoader.parseSkeletons()` takes that data and an object hierarchy, returning
+skeletons indexed by UUID. Custom object/animation JSON and bindings remain dynamic.
+
 WebGL helpers use numeric counts and slots, boolean flags and native WebGL handle types.
 Extension and attribute lookups expose their existing nullable or missing results.
 Uniform/property values and texture image payloads remain explicitly dynamic where their schema is open.
@@ -56,6 +70,11 @@ Uniform/property values and texture image payloads remain explicitly dynamic whe
 Geometry groups contain numeric `start`, `count` and `materialIndex`; `addGroup()` defaults
 the material index to zero. Morph attributes are arrays of CPU-backed buffer attributes,
 including interleaved attributes.
+
+`ek3d/core/Uniform` exports `IUniform<T>` for a value and optional boolean `needsUpdate`,
+and `Uniforms<T>` for name-indexed uniform dictionaries. Specify `T` for numeric, string,
+math-object or texture values; the default keeps custom shader values dynamic.
+`HalftonePassParameters` follows the shader's numeric, boolean and nullable texture types.
 
 `cloneUniforms()` preserves uniform names and property types. Direct texture properties are
 nullable because render-target textures become null. Arrays of textures are cloned without

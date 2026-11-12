@@ -266,8 +266,8 @@ export class SSRPass extends Pass {
       defines: {
         ...SSRShader.defines,
         MAX_STEP: Math.sqrt(this.width * this.width + this.height * this.height),
-      } as Record<string, any>,
-      uniforms: cloneUniforms(SSRShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      },
+      uniforms: cloneUniforms(SSRShader.uniforms),
       vertexShader: SSRShader.vertexShader,
       fragmentShader: SSRShader.fragmentShader,
       blending: Blending.No,
@@ -302,7 +302,7 @@ export class SSRPass extends Pass {
     // blur material
 
     this.blurMaterial = new ShaderMaterial({
-      uniforms: cloneUniforms(SSRBlurShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(SSRBlurShader.uniforms),
       vertexShader: SSRBlurShader.vertexShader,
       fragmentShader: SSRBlurShader.fragmentShader,
     } as never);
@@ -312,7 +312,7 @@ export class SSRPass extends Pass {
     // blur material 2
 
     this.blurMaterial2 = new ShaderMaterial({
-      uniforms: cloneUniforms(SSRBlurShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(SSRBlurShader.uniforms),
       vertexShader: SSRBlurShader.vertexShader,
       fragmentShader: SSRBlurShader.fragmentShader,
     } as never);
@@ -322,8 +322,8 @@ export class SSRPass extends Pass {
     // material for rendering the depth
 
     this.depthRenderMaterial = new ShaderMaterial({
-      defines: { ...SSRDepthShader["defines"] } as Record<string, any>,
-      uniforms: cloneUniforms(SSRDepthShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      defines: { ...SSRDepthShader["defines"] },
+      uniforms: cloneUniforms(SSRDepthShader.uniforms),
       vertexShader: SSRDepthShader.vertexShader,
       fragmentShader: SSRDepthShader.fragmentShader,
       blending: Blending.No,
@@ -335,7 +335,7 @@ export class SSRPass extends Pass {
     // material for rendering the content of a render target
 
     this.copyMaterial = new ShaderMaterial({
-      uniforms: cloneUniforms(CopyShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(CopyShader.uniforms),
       vertexShader: CopyShader.vertexShader,
       fragmentShader: CopyShader.fragmentShader,
       transparent: true,

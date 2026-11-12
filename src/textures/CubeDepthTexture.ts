@@ -34,7 +34,7 @@ export class CubeDepthTexture extends DepthTexture {
     format: PixelFormat = PixelFormat.Depth,
   ) {
     // Create 6 identical image descriptors for the cube faces
-    const image: any = { width: size, height: size, depth: 1 };
+    const image = { width: size, height: size, depth: 1 };
     const images = [image, image, image, image, image, image];
     // Call DepthTexture constructor with width, height
     super(size, size, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format);

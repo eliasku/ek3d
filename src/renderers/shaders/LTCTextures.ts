@@ -2780,11 +2780,11 @@ export function createLTCTextures(): LTCTextures {
   LTC_FLOAT_2.needsUpdate = true;
   const ltc_half_1 = new Uint16Array(LTC_MAT_1.length);
   LTC_MAT_1.forEach(function (x: number, index: number) {
-    (ltc_half_1 as any)[index] = toHalfFloat(x);
+    ltc_half_1[index] = toHalfFloat(x);
   });
   const ltc_half_2 = new Uint16Array(LTC_MAT_2.length);
   LTC_MAT_2.forEach(function (x: number, index: number) {
-    (ltc_half_2 as any)[index] = toHalfFloat(x);
+    ltc_half_2[index] = toHalfFloat(x);
   });
   const LTC_HALF_1 = new DataTexture(
     ltc_half_1,

@@ -1,3 +1,4 @@
+import type { IUniform, Uniforms } from "../../core/Uniform";
 import { TextureType, TextureFilter } from "../../constants";
 import { Color } from "../../math/Color";
 import { Matrix4 } from "../../math/Matrix4";
@@ -45,8 +46,8 @@ export class ReflectorForSSRPass extends Mesh<ShaderMaterial> {
   /** The static reflector shader. */
   static ReflectorShader: {
     name?: string;
-    defines: Record<string, any>;
-    uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+    defines: ShaderMaterial["defines"] & { DISTANCE_ATTENUATION: boolean; FRESNEL: boolean };
+    uniforms: Uniforms;
     vertexShader: string;
     fragmentShader: string;
   } = {
@@ -177,8 +178,8 @@ ${chunk_packing}
     //
 
     this.needsUpdate = false;
-    this.maxDistance = (ReflectorForSSRPass.ReflectorShader.uniforms.maxDistance as { value: number }).value;
-    this.opacity = (ReflectorForSSRPass.ReflectorShader.uniforms.opacity as { value: number }).value;
+    this.maxDistance = (ReflectorForSSRPass.ReflectorShader.uniforms.maxDistance as IUniform<number>).value;
+    this.opacity = (ReflectorForSSRPass.ReflectorShader.uniforms.opacity as IUniform<number>).value;
     this.color = color;
     this.resolution = options.resolution || new Vector2(window.innerWidth, window.innerHeight);
 
@@ -396,8 +397,8 @@ export interface ReflectorForSSRPassOptions {
   /** Can be used to pass in a custom shader that defines how the reflective view is projected onto the reflector's geometry. */
   shader?: {
     name?: string;
-    defines?: Record<string, any>;
-    uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+    defines?: ShaderMaterial["defines"];
+    uniforms: Uniforms;
     vertexShader: string;
     fragmentShader: string;
   };

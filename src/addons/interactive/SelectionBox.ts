@@ -262,9 +262,7 @@ export class SelectionBox {
         this.batches[batched.uuid] = [];
 
         for (let instanceId = 0, count = 0; count < batched.instanceCount; instanceId++) {
-          // skip invalid instances in the batchedMesh
-
-          if ((batched.validateInstanceId(instanceId) as unknown as boolean) === false) continue;
+          batched.validateInstanceId(instanceId);
 
           count++;
 

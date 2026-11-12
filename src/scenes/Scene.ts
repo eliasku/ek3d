@@ -94,7 +94,7 @@ export class Scene extends Object3D {
     super();
     this.type = "Scene";
   }
-  copy(source: any, recursive?: any): this {
+  copy(source: Scene, recursive?: boolean): this {
     super.copy(source, recursive);
     this.background = source.background !== null ? source.background.clone() : null;
     this.environment = source.environment !== null ? source.environment.clone() : null;

@@ -44,8 +44,8 @@ export class PolarGridHelper extends LineSegments<LineBasicMaterial> {
   ) {
     color1 = new Color(color1);
     color2 = new Color(color2);
-    const vertices: any[] = [];
-    const colors: any[] = [];
+    const vertices: number[] = [];
+    const colors: number[] = [];
     // create the sectors
     if (sectors > 1) {
       for (let i = 0; i < sectors; i++) {

@@ -1,3 +1,4 @@
+import type { Uniforms } from "../../core/Uniform";
 import { TextureType, PixelFormat } from "../../constants";
 import { DataTexture } from "../../textures/DataTexture";
 import { randFloat, randInt } from "../../math/MathUtils";
@@ -27,7 +28,7 @@ export class GlitchPass extends Pass {
   /**
    * The pass uniforms.
    */
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }> = cloneUniforms(DigitalGlitch.uniforms);
+  uniforms: Uniforms = cloneUniforms(DigitalGlitch.uniforms);
   /**
    * The pass material.
    */

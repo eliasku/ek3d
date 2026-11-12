@@ -119,7 +119,7 @@ export class OrthographicCamera extends Camera {
     this.far = far;
     this.updateProjectionMatrix();
   }
-  copy(source: any, recursive?: any): this {
+  copy(source: OrthographicCamera, recursive?: boolean): this {
     super.copy(source, recursive);
     this.left = source.left;
     this.right = source.right;

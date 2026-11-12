@@ -164,7 +164,7 @@ export class SAOPass extends Pass {
       defines: { ...SAOShader.defines },
       fragmentShader: SAOShader.fragmentShader,
       vertexShader: SAOShader.vertexShader,
-      uniforms: cloneUniforms(SAOShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(SAOShader.uniforms),
     });
     this.saoMaterial.defines["PERSPECTIVE_CAMERA"] = this.camera.isPerspectiveCamera ? 1 : 0;
     this.saoMaterial.uniforms!["tDepth"].value = depthTexture;
@@ -175,7 +175,7 @@ export class SAOPass extends Pass {
     this.saoMaterial.blending = Blending.No;
 
     this.vBlurMaterial = new ShaderMaterial({
-      uniforms: cloneUniforms(DepthLimitedBlurShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(DepthLimitedBlurShader.uniforms),
       defines: { ...DepthLimitedBlurShader.defines },
       vertexShader: DepthLimitedBlurShader.vertexShader,
       fragmentShader: DepthLimitedBlurShader.fragmentShader,
@@ -188,7 +188,7 @@ export class SAOPass extends Pass {
     this.vBlurMaterial.blending = Blending.No;
 
     this.hBlurMaterial = new ShaderMaterial({
-      uniforms: cloneUniforms(DepthLimitedBlurShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(DepthLimitedBlurShader.uniforms),
       defines: { ...DepthLimitedBlurShader.defines },
       vertexShader: DepthLimitedBlurShader.vertexShader,
       fragmentShader: DepthLimitedBlurShader.fragmentShader,
@@ -201,7 +201,7 @@ export class SAOPass extends Pass {
     this.hBlurMaterial.blending = Blending.No;
 
     this.materialCopy = new ShaderMaterial({
-      uniforms: cloneUniforms(CopyShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(CopyShader.uniforms),
       vertexShader: CopyShader.vertexShader,
       fragmentShader: CopyShader.fragmentShader,
       blending: Blending.No,

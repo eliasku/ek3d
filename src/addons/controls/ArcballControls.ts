@@ -219,7 +219,7 @@ export class ArcballControls<TObject extends ArcballCamera = ArcballCamera> exte
   _gridPosition: Vector3 = new Vector3();
 
   //gizmos
-  _gizmos: Group = new Group();
+  _gizmos: Group<Line<LineBasicMaterial>> = new Group<Line<LineBasicMaterial>>();
   _curvePts: number = 128;
 
   //animations
@@ -1552,9 +1552,9 @@ export class ArcballControls<TObject extends ArcballCamera = ArcballCamera> exte
    * @param isActive - If set to `true`, gizmos are more visible.
    */
   activateGizmos(isActive: boolean): void {
-    const gizmoX = this._gizmos.children[0] as unknown as { material: LineBasicMaterial };
-    const gizmoY = this._gizmos.children[1] as unknown as { material: LineBasicMaterial };
-    const gizmoZ = this._gizmos.children[2] as unknown as { material: LineBasicMaterial };
+    const gizmoX = this._gizmos.children[0];
+    const gizmoY = this._gizmos.children[1];
+    const gizmoZ = this._gizmos.children[2];
 
     if (isActive) {
       gizmoX.material.setValues({ opacity: 1 });
@@ -1663,11 +1663,10 @@ export class ArcballControls<TObject extends ArcballCamera = ArcballCamera> exte
     const points = curve.getPoints(this._curvePts);
     const curveGeometry = new BufferGeometry().setFromPoints(points);
 
-    // The children map is keyed by index, so the `for..in` iteration behaves like a plain loop.
-    const gizmos = this._gizmos.children as unknown as Record<string, { geometry: BufferGeometry }>;
+    const gizmos = this._gizmos.children;
 
-    for (const gizmo in gizmos) {
-      gizmos[gizmo].geometry = curveGeometry;
+    for (const gizmo of gizmos) {
+      gizmo.geometry = curveGeometry;
     }
 
     this.dispatchEvent(_changeEvent);
@@ -1692,9 +1691,9 @@ export class ArcballControls<TObject extends ArcballCamera = ArcballCamera> exte
     const curveMaterialZ = new LineBasicMaterial({ color: 0x8080ff, fog: false, transparent: true, opacity: 0.6 });
 
     //line
-    const gizmoX = new Line(curveGeometry, curveMaterialX);
-    const gizmoY = new Line(curveGeometry, curveMaterialY);
-    const gizmoZ = new Line(curveGeometry, curveMaterialZ);
+    const gizmoX = new Line<LineBasicMaterial>(curveGeometry, curveMaterialX);
+    const gizmoY = new Line<LineBasicMaterial>(curveGeometry, curveMaterialY);
+    const gizmoZ = new Line<LineBasicMaterial>(curveGeometry, curveMaterialZ);
 
     const rotation = Math.PI * 0.5;
     gizmoX.rotation.y = rotation;
@@ -1720,7 +1719,7 @@ export class ArcballControls<TObject extends ArcballCamera = ArcballCamera> exte
     //
 
     this._gizmos.traverse(function (object) {
-      const withGeometry = object as unknown as { geometry?: { dispose(): void }; material?: { dispose(): void } };
+      const withGeometry = object as typeof object & { geometry?: { dispose(): void }; material?: { dispose(): void } };
       if (withGeometry.geometry) withGeometry.geometry.dispose();
       if (withGeometry.material) withGeometry.material.dispose();
     });
@@ -2462,11 +2461,10 @@ export class ArcballControls<TObject extends ArcballCamera = ArcballCamera> exte
         const points = curve.getPoints(this._curvePts);
         const curveGeometry = new BufferGeometry().setFromPoints(points);
 
-        // The children map is keyed by index, so the `for..in` iteration behaves like a plain loop.
-        const gizmos = this._gizmos.children as unknown as Record<string, { geometry: BufferGeometry }>;
+        const gizmos = this._gizmos.children;
 
-        for (const gizmo in gizmos) {
-          gizmos[gizmo].geometry = curveGeometry;
+        for (const gizmo of gizmos) {
+          gizmo.geometry = curveGeometry;
         }
       }
     }
@@ -2541,11 +2539,10 @@ function onWindowResize(this: ArcballControls): void {
   const points = curve.getPoints(this._curvePts);
   const curveGeometry = new BufferGeometry().setFromPoints(points);
 
-  // The children map is keyed by index, so the `for..in` iteration behaves like a plain loop.
-  const gizmos = this._gizmos.children as unknown as Record<string, { geometry: BufferGeometry }>;
+  const gizmos = this._gizmos.children;
 
-  for (const gizmo in gizmos) {
-    gizmos[gizmo].geometry = curveGeometry;
+  for (const gizmo of gizmos) {
+    gizmo.geometry = curveGeometry;
   }
 
   this.dispatchEvent(_changeEvent);

@@ -1,9 +1,15 @@
+import type { Uniforms } from "../../core/Uniform";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { cloneUniforms } from "../../renderers/shaders/UniformsUtils";
 import { HalftoneShader } from "../shaders/HalftoneShader";
 import { Pass, FullScreenQuad } from "./Pass";
 import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
 import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
+
+/** Optional values for the halftone shader's numeric, boolean and texture uniforms. */
+export type HalftonePassParameters = {
+  [Name in keyof typeof HalftoneShader.uniforms]?: (typeof HalftoneShader.uniforms)[Name]["value"];
+};
 
 /**
  * Pass for creating a RGB halftone effect.
@@ -36,7 +42,7 @@ export class HalftonePass extends Pass {
   /**
    * The pass uniforms.
    */
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }> = cloneUniforms(HalftoneShader.uniforms);
+  uniforms: Uniforms = cloneUniforms(HalftoneShader.uniforms);
   /**
    * The pass material.
    */
@@ -53,14 +59,14 @@ export class HalftonePass extends Pass {
    * @param params - The halftone shader parameters; keys matching uniform
    * names overwrite their default values.
    */
-  constructor(params: Record<string, any> = {}) {
+  constructor(params: HalftonePassParameters = {}) {
     super();
     for (const key in params) {
       if (
         Object.prototype.hasOwnProperty.call(params, key) &&
         Object.prototype.hasOwnProperty.call(this.uniforms, key)
       ) {
-        this.uniforms[key].value = params[key];
+        this.uniforms[key].value = params[key as keyof HalftonePassParameters];
       }
     }
 

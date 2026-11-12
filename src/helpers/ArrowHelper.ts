@@ -9,7 +9,7 @@ import { Mesh } from "../objects/Mesh";
 import { Line } from "../objects/Line";
 import { Vector3 } from "../math/Vector3";
 const _axis = /*@__PURE__*/ new Vector3();
-let _lineGeometry: any, _coneGeometry: any;
+let _lineGeometry: BufferGeometry, _coneGeometry: ConeGeometry;
 /**
  * An 3D arrow object for visualizing directions.
  *
@@ -94,13 +94,13 @@ export class ArrowHelper extends Object3D {
   setDirection(dir: Vector3) {
     // dir is assumed to be normalized
     if (dir.y > 0.99999) {
-      (this as any).quaternion.set(0, 0, 0, 1);
+      this.quaternion.set(0, 0, 0, 1);
     } else if (dir.y < -0.99999) {
-      (this as any).quaternion.set(1, 0, 0, 0);
+      this.quaternion.set(1, 0, 0, 0);
     } else {
       _axis.set(dir.z, 0, -dir.x).normalize();
       const radians = Math.acos(dir.y);
-      (this as any).quaternion.setFromAxisAngle(_axis, radians);
+      this.quaternion.setFromAxisAngle(_axis, radians);
     }
   }
   /**

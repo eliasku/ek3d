@@ -84,7 +84,7 @@ export class PointLight extends Light {
     super.dispose();
     this.shadow.dispose();
   }
-  copy(source: any, recursive?: any): this {
+  copy(source: PointLight, recursive?: boolean): this {
     super.copy(source, recursive);
     this.distance = source.distance;
     this.decay = source.decay;

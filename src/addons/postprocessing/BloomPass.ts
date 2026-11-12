@@ -1,3 +1,4 @@
+import type { Uniforms } from "../../core/Uniform";
 import { Blending, TextureType } from "../../constants";
 import { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { cloneUniforms } from "../../renderers/shaders/UniformsUtils";
@@ -31,9 +32,9 @@ export class BloomPass extends Pass {
   /**
    * The combine pass uniforms.
    */
-  combineUniforms: Record<string, { value: any; needsUpdate?: boolean }> = cloneUniforms(CombineShader.uniforms);
+  combineUniforms: Uniforms = cloneUniforms(CombineShader.uniforms);
   materialCombine: ShaderMaterial;
-  convolutionUniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+  convolutionUniforms: Uniforms;
   materialConvolution: ShaderMaterial;
   /**
    * Overwritten to disable the swap.

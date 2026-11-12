@@ -1,3 +1,4 @@
+import type { ShaderMaterial } from "../../materials/ShaderMaterial";
 import { Vector2 } from "../../math/Vector2";
 import chunk_common from "../../renderers/shaders/ShaderChunk/common.glsl";
 import chunk_packing from "../../renderers/shaders/ShaderChunk/packing.glsl";
@@ -176,11 +177,7 @@ export const BlurShaderUtils = {
    * @param uvIncrement - The UV increment.
    */
   configure(
-    material: {
-      defines: Record<string, any>;
-      uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
-      needsUpdate: boolean;
-    },
+    material: Pick<ShaderMaterial, "defines" | "uniforms" | "needsUpdate">,
     kernelRadius: number,
     stdDev: number,
     uvIncrement: Vector2,

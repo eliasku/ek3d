@@ -1,3 +1,4 @@
+import type { IUniform } from "../../core/Uniform";
 import type { Camera } from "../../cameras/Camera";
 import { BufferGeometry } from "../../core/BufferGeometry";
 import { Object3D } from "../../core/Object3D";
@@ -158,7 +159,7 @@ function* textureSlots(
 ): Generator<{ name: string; texture: Texture; target: Record<string, unknown>; key: string }> {
   if (material instanceof ShaderMaterial) {
     for (const name of Object.keys(material.uniforms)) {
-      const target: Record<string, unknown> = material.uniforms[name];
+      const target: Pick<IUniform<unknown>, "value"> = material.uniforms[name];
       if (target.value instanceof Texture) yield { name, texture: target.value, target, key: "value" };
     }
   } else {

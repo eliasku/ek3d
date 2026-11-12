@@ -1,3 +1,4 @@
+import type { Uniforms } from "../../core/Uniform";
 import { TextureType, TextureFilter, Blending, DepthPacking } from "../../constants";
 import { Color } from "../../math/Color";
 import { MeshDepthMaterial } from "../../materials/MeshDepthMaterial";
@@ -45,7 +46,7 @@ export interface BokehPassOptions {
 export class BokehPass extends Pass {
   scene: Scene;
   camera: PerspectiveCamera;
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+  uniforms: Uniforms;
   materialBokeh: ShaderMaterial;
   _fsQuad: FullScreenQuad;
   _renderTargetDepth: WebGLRenderTarget;
@@ -94,7 +95,7 @@ export class BokehPass extends Pass {
 
     // bokeh material
 
-    const bokehUniforms = cloneUniforms(BokehShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>;
+    const bokehUniforms: Uniforms = cloneUniforms(BokehShader.uniforms);
 
     bokehUniforms["tDepth"].value = this._renderTargetDepth.texture;
 

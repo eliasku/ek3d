@@ -46,8 +46,8 @@ export class CameraHelper extends LineSegments<LineBasicMaterial> {
   constructor(camera: Camera & { updateProjectionMatrix?: () => void }) {
     const geometry = new BufferGeometry();
     const material = new LineBasicMaterial({ color: 0xffffff, vertexColors: true, toneMapped: false });
-    const vertices: any[] = [];
-    const colors: any[] = [];
+    const vertices: number[] = [];
+    const colors: number[] = [];
     const pointMap: Record<string, number[]> = {};
     // near
     addLine("n1", "n2");
@@ -81,17 +81,17 @@ export class CameraHelper extends LineSegments<LineBasicMaterial> {
     addLine("cn3", "cn4");
     addLine("cf1", "cf2");
     addLine("cf3", "cf4");
-    function addLine(a: any, b?: any) {
+    function addLine(a: string, b: string) {
       addPoint(a);
       addPoint(b);
     }
-    function addPoint(id?: any) {
+    function addPoint(id: string) {
       vertices.push(0, 0, 0);
       colors.push(0, 0, 0);
-      if ((pointMap as any)[id] === undefined) {
-        (pointMap as any)[id] = [];
+      if (pointMap[id] === undefined) {
+        pointMap[id] = [];
       }
-      (pointMap as any)[id].push(vertices.length / 3 - 1);
+      pointMap[id].push(vertices.length / 3 - 1);
     }
     geometry.setAttribute("position", new Float32BufferAttribute(vertices, 3));
     geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
@@ -102,7 +102,7 @@ export class CameraHelper extends LineSegments<LineBasicMaterial> {
      *
      */
     this.camera = camera;
-    if ((this.camera as any).updateProjectionMatrix) (this.camera as any).updateProjectionMatrix();
+    if (this.camera.updateProjectionMatrix) this.camera.updateProjectionMatrix();
     this.matrix = camera.matrixWorld;
     this.matrixAutoUpdate = false;
     /**
@@ -200,7 +200,7 @@ export class CameraHelper extends LineSegments<LineBasicMaterial> {
     const pointMap = this.pointMap;
     const w = 1,
       h = 1;
-    let nearZ: any, farZ: any;
+    let nearZ: number, farZ: number;
     // we need just camera projection matrix inverse
     // world matrix must be identity
     _camera.projectionMatrixInverse.copy(this.camera.projectionMatrixInverse);
@@ -257,7 +257,15 @@ export class CameraHelper extends LineSegments<LineBasicMaterial> {
     return new CameraHelper(this.camera).copy(this, recursive);
   }
 }
-function setPoint(point?: any, pointMap?: any, geometry?: any, camera?: any, x?: any, y?: any, z?: any) {
+function setPoint(
+  point: string,
+  pointMap: Record<string, number[]>,
+  geometry: BufferGeometry,
+  camera: Camera,
+  x: number,
+  y: number,
+  z: number,
+) {
   _vector.set(x, y, z).unproject(camera);
   const points = pointMap[point];
   if (points !== undefined) {

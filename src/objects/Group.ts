@@ -28,7 +28,7 @@ import { Object3D } from "../core/Object3D";
  * ```
  *
  */
-export class Group extends Object3D {
+export class Group<TChild extends { clone(): TChild } & Object3D = Object3D> extends Object3D<TChild> {
   /**
    * This flag can be used for type testing.
    *
@@ -41,7 +41,7 @@ export class Group extends Object3D {
     super();
     this.type = "Group";
   }
-  clone(recursive?: boolean): Group {
-    return new Group().copy(this, recursive);
+  clone(recursive?: boolean): Group<TChild> {
+    return new Group<TChild>().copy(this, recursive);
   }
 }

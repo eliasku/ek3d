@@ -98,7 +98,7 @@ export class Mesh<TMaterial extends Material | Material[] = Material | Material[
   clone(recursive: boolean = true): Mesh<TMaterial> {
     return new Mesh<TMaterial>(this.geometry, this.material).copy(this, recursive);
   }
-  copy(source: any, recursive?: any): this {
+  copy(source: Mesh<TMaterial>, recursive?: boolean): this {
     super.copy(source, recursive);
     if (source.morphTargetInfluences !== undefined) {
       this.morphTargetInfluences = source.morphTargetInfluences.slice();
@@ -110,7 +110,7 @@ export class Mesh<TMaterial extends Material | Material[] = Material | Material[
     } else {
       this.morphTargetDictionary = undefined;
     }
-    this.material = Array.isArray(source.material) ? source.material.slice() : source.material;
+    this.material = (Array.isArray(source.material) ? source.material.slice() : source.material) as TMaterial;
     this.geometry = source.geometry;
     return this;
   }
@@ -209,15 +209,15 @@ export class Mesh<TMaterial extends Material | Material[] = Material | Material[
     // test for intersections with geometry
     this._computeIntersections(raycaster, intersects, _ray);
   }
-  _computeIntersections(raycaster: any, intersects: any, rayLocalSpace?: any) {
-    let intersection: any;
+  _computeIntersections(raycaster: Raycaster, intersects: Intersection[], rayLocalSpace: Ray): void {
+    let intersection: Intersection | null;
     const geometry = this.geometry;
     const material = this.material;
     const index = geometry.index;
     const position = geometry.attributes.position;
-    const uv = geometry.attributes.uv;
-    const uv1 = geometry.attributes.uv1;
-    const normal = geometry.attributes.normal;
+    const uv = geometry.attributes.uv as BufferAttribute | InterleavedBufferAttribute | undefined;
+    const uv1 = geometry.attributes.uv1 as BufferAttribute | InterleavedBufferAttribute | undefined;
+    const normal = geometry.attributes.normal as BufferAttribute | InterleavedBufferAttribute | undefined;
     const groups = geometry.groups;
     const drawRange = geometry.drawRange;
     if (index !== null) {
@@ -245,8 +245,8 @@ export class Mesh<TMaterial extends Material | Material[] = Material | Material[
               c,
             );
             if (intersection) {
-              (intersection as any).faceIndex = Math.floor(j / 3); // triangle number in indexed buffer semantics
-              (intersection as any).face.materialIndex = group.materialIndex;
+              intersection.faceIndex = Math.floor(j / 3); // triangle number in indexed buffer semantics
+              intersection.face!.materialIndex = group.materialIndex;
               intersects.push(intersection);
             }
           }
@@ -260,7 +260,7 @@ export class Mesh<TMaterial extends Material | Material[] = Material | Material[
           const c = index.getX(i + 2);
           intersection = checkGeometryIntersection(this, material, raycaster, rayLocalSpace, uv, uv1, normal, a, b, c);
           if (intersection) {
-            (intersection as any).faceIndex = Math.floor(i / 3); // triangle number in indexed buffer semantics
+            intersection.faceIndex = Math.floor(i / 3); // triangle number in indexed buffer semantics
             intersects.push(intersection);
           }
         }
@@ -290,8 +290,8 @@ export class Mesh<TMaterial extends Material | Material[] = Material | Material[
               c,
             );
             if (intersection) {
-              (intersection as any).faceIndex = Math.floor(j / 3); // triangle number in non-indexed buffer semantics
-              (intersection as any).face.materialIndex = group.materialIndex;
+              intersection.faceIndex = Math.floor(j / 3); // triangle number in non-indexed buffer semantics
+              intersection.face!.materialIndex = group.materialIndex;
               intersects.push(intersection);
             }
           }
@@ -305,7 +305,7 @@ export class Mesh<TMaterial extends Material | Material[] = Material | Material[
           const c = i + 2;
           intersection = checkGeometryIntersection(this, material, raycaster, rayLocalSpace, uv, uv1, normal, a, b, c);
           if (intersection) {
-            (intersection as any).faceIndex = Math.floor(i / 3); // triangle number in non-indexed buffer semantics
+            intersection.faceIndex = Math.floor(i / 3); // triangle number in non-indexed buffer semantics
             intersects.push(intersection);
           }
         }
@@ -314,16 +314,16 @@ export class Mesh<TMaterial extends Material | Material[] = Material | Material[
   }
 }
 function checkIntersection(
-  object?: any,
-  material?: any,
-  raycaster?: any,
-  ray?: any,
-  pA?: any,
-  pB?: any,
-  pC?: any,
-  point?: any,
-) {
-  let intersect: any;
+  object: Mesh,
+  material: Material,
+  raycaster: Raycaster,
+  ray: Ray,
+  pA: Vector3,
+  pB: Vector3,
+  pC: Vector3,
+  point: Vector3,
+): Intersection | null {
+  let intersect: Vector3 | null;
   if (material.side === Side.Back) {
     intersect = ray.intersectTriangle(pC, pB, pA, true, point);
   } else {
@@ -341,17 +341,17 @@ function checkIntersection(
   };
 }
 function checkGeometryIntersection(
-  object?: any,
-  material?: any,
-  raycaster?: any,
-  ray?: any,
-  uv?: any,
-  uv1?: any,
-  normal?: any,
-  a?: any,
-  b?: any,
-  c?: any,
-) {
+  object: Mesh,
+  material: Material,
+  raycaster: Raycaster,
+  ray: Ray,
+  uv: BufferAttribute | InterleavedBufferAttribute | undefined,
+  uv1: BufferAttribute | InterleavedBufferAttribute | undefined,
+  normal: BufferAttribute | InterleavedBufferAttribute | undefined,
+  a: number,
+  b: number,
+  c: number,
+): Intersection | null {
   object.getVertexPosition(a, _vA);
   object.getVertexPosition(b, _vB);
   object.getVertexPosition(c, _vC);
@@ -360,18 +360,18 @@ function checkGeometryIntersection(
     const barycoord = new Vector3();
     Triangle.getBarycoord(_intersectionPoint, _vA, _vB, _vC, barycoord);
     if (uv) {
-      (intersection as any).uv = Triangle.getInterpolatedAttribute(uv, a, b, c, barycoord, new Vector2());
+      intersection.uv = Triangle.getInterpolatedAttribute(uv, a, b, c, barycoord, new Vector2());
     }
     if (uv1) {
-      (intersection as any).uv1 = Triangle.getInterpolatedAttribute(uv1, a, b, c, barycoord, new Vector2());
+      intersection.uv1 = Triangle.getInterpolatedAttribute(uv1, a, b, c, barycoord, new Vector2());
     }
     if (normal) {
-      (intersection as any).normal = Triangle.getInterpolatedAttribute(normal, a, b, c, barycoord, new Vector3());
-      if ((intersection as any).normal.dot(ray.direction) > 0) {
-        (intersection as any).normal.multiplyScalar(-1);
+      intersection.normal = Triangle.getInterpolatedAttribute(normal, a, b, c, barycoord, new Vector3());
+      if (intersection.normal.dot(ray.direction) > 0) {
+        intersection.normal.multiplyScalar(-1);
       }
     }
-    const face: any = {
+    const face = {
       a: a,
       b: b,
       c: c,
@@ -379,8 +379,8 @@ function checkGeometryIntersection(
       materialIndex: 0,
     };
     Triangle.getNormal(_vA, _vB, _vC, face.normal);
-    (intersection as any).face = face;
-    (intersection as any).barycoord = barycoord;
+    intersection.face = face;
+    intersection.barycoord = barycoord;
   }
   return intersection;
 }

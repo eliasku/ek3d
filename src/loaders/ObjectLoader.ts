@@ -2,6 +2,8 @@ import type { MaterialConstructors } from "./MaterialLoader";
 import type { CurveFactory } from "../extras/core/Curve";
 import type { Vector2 } from "../math/Vector2";
 import type { BufferGeometry } from "../core/BufferGeometry";
+import type { Bone } from "../objects/Bone";
+import type { SkeletonJSON } from "../objects/Skeleton";
 import { Mapping, Wrapping, TextureFilter } from "../constants";
 import { InstancedBufferAttribute } from "../core/InstancedBufferAttribute";
 import { Color } from "../math/Color";
@@ -229,18 +231,18 @@ export class ObjectLoader extends Loader<Object3D> {
     }
     return shapes;
   }
-  parseSkeletons(json: any, object?: any) {
-    const skeletons: any = {};
-    const bones: any = {};
+  parseSkeletons(json: readonly SkeletonJSON[] | undefined, object: Object3D): Record<string, Skeleton> {
+    const skeletons: Record<string, Skeleton> = {};
+    const bones: Record<string, Bone> = {};
     // generate bone lookup table
-    object.traverse(function (child?: any) {
-      if (child.isBone) (bones as any)[child.uuid] = child;
+    object.traverse(function (child) {
+      if ((child as Bone).isBone) bones[child.uuid] = child as Bone;
     });
     // create skeletons
     if (json !== undefined) {
       for (let i = 0, l = json.length; i < l; i++) {
         const skeleton = new Skeleton().fromJSON(json[i], bones);
-        (skeletons as any)[skeleton.uuid] = skeleton;
+        skeletons[skeleton.uuid] = skeleton;
       }
     }
     return skeletons;

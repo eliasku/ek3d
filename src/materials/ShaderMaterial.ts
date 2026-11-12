@@ -1,3 +1,4 @@
+import type { IUniform, Uniforms } from "../core/Uniform";
 import type { UniformsGroup } from "../core/UniformsGroup";
 import { Material } from "./Material";
 import { cloneUniforms, cloneUniformsGroups } from "../renderers/shaders/UniformsUtils";
@@ -91,7 +92,7 @@ export class ShaderMaterial extends Material {
    * update the value available to the GLSL code.
    *
    */
-  uniforms: Record<string, { value: any; needsUpdate?: boolean }> = {};
+  uniforms: Uniforms = {};
   /**
    * An array holding uniforms groups for configuring UBOs.
    *
@@ -302,9 +303,9 @@ export class ShaderMaterial extends Material {
     data.fragmentShader = this.fragmentShader;
     data.lights = this.lights;
     data.clipping = this.clipping;
-    const extensions: any = {};
+    const extensions: Record<string, boolean> = {};
     for (const key in this.extensions) {
-      if ((this.extensions as any)[key] === true) (extensions as any)[key] = true;
+      if ((this.extensions as Record<string, boolean>)[key] === true) extensions[key] = true;
     }
     if (Object.keys(extensions).length > 0) data.extensions = extensions;
     return data;
@@ -321,7 +322,7 @@ export class ShaderMaterial extends Material {
     if (json.uniforms !== undefined) {
       for (const name in json.uniforms) {
         const uniform = json.uniforms[name];
-        this.uniforms[name] = {} as ShaderMaterial["uniforms"][string];
+        this.uniforms[name] = {} as IUniform;
         switch (uniform.type) {
           case "t":
             this.uniforms[name].value = textures[uniform.value] || null;
@@ -355,7 +356,7 @@ export class ShaderMaterial extends Material {
     if (json.glslVersion !== undefined) this.glslVersion = json.glslVersion;
     if (json.extensions !== undefined) {
       for (const key in json.extensions) {
-        (this.extensions as any)[key] = json.extensions[key];
+        (this.extensions as Record<string, boolean>)[key] = json.extensions[key];
       }
     }
     if (json.lights !== undefined) this.lights = json.lights;

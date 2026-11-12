@@ -167,7 +167,7 @@ export class CubeCamera extends Object3D<PerspectiveCamera> {
       renderTarget.texture.mipmapsAutoUpdate = false;
       let reversedDepthBuffer = false;
       if (renderer.isWebGLRenderer === true) {
-        reversedDepthBuffer = (renderer as any).state.buffers.depth.getReversed();
+        reversedDepthBuffer = renderer.state.buffers.depth.getReversed();
       } else {
         reversedDepthBuffer = (renderer as any).reversedDepthBuffer;
       }

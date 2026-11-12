@@ -121,7 +121,7 @@ export class Points extends Object3D {
     //
     _inverseMatrix.copy(matrixWorld).invert();
     _ray.copy(raycaster.ray).applyMatrix4(_inverseMatrix);
-    const localThreshold = threshold / (((this as any).scale.x + (this as any).scale.y + (this as any).scale.z) / 3);
+    const localThreshold = threshold / ((this.scale.x + this.scale.y + this.scale.z) / 3);
     const localThresholdSq = localThreshold * localThreshold;
     const index = geometry.index;
     const attributes = geometry.attributes;
@@ -166,14 +166,14 @@ export class Points extends Object3D {
   }
 }
 function testPoint(
-  point?: any,
-  index?: any,
-  localThresholdSq?: any,
-  matrixWorld?: any,
-  raycaster?: any,
-  intersects?: any,
-  object?: any,
-) {
+  point: Vector3,
+  index: number,
+  localThresholdSq: number,
+  matrixWorld: Matrix4,
+  raycaster: Raycaster,
+  intersects: Intersection[],
+  object: Points,
+): void {
   const rayPointDistanceSq = _ray.distanceSqToPoint(point);
   if (rayPointDistanceSq < localThresholdSq) {
     const intersectPoint = new Vector3();

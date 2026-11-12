@@ -1,3 +1,4 @@
+import type { Uniforms } from "../../core/Uniform";
 import { Color } from "../../math/Color";
 import type { Texture } from "../../textures/Texture";
 import { phongShader } from "../../renderers/shaders/PhongShader";
@@ -29,7 +30,7 @@ void RE_Direct_Scattering(const in IncidentLight directLight, const in vec2 uv, 
 export const SubsurfaceScatteringShader = {
   name: "SubsurfaceScatteringShader",
   uniforms: {
-    ...(cloneUniforms(phongShader.uniforms) as Record<string, { value: unknown }>),
+    ...(cloneUniforms(phongShader.uniforms) as Uniforms<unknown>),
     thicknessMap: { value: null as Texture | null },
     thicknessColor: { value: new Color(0xffffff) },
     thicknessDistortion: { value: 0.1 },

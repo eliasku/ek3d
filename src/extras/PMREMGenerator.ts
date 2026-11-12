@@ -1,3 +1,4 @@
+import type { Uniforms } from "../core/Uniform";
 import type { Material } from "../materials/Material";
 import type { Object3D } from "../core/Object3D";
 import type { Texture } from "../textures/Texture";
@@ -354,7 +355,7 @@ function _createRenderTarget(size: number, generateMipmaps: boolean, depthBuffer
 }
 function _getMaterial(
   name: string,
-  uniforms: Record<string, { value: Texture | number | null }>,
+  uniforms: Uniforms<Texture | number | null>,
   fragmentShader: string,
 ): ShaderMaterial {
   return new ShaderMaterial({

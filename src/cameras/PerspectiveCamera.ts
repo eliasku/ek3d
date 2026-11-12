@@ -126,7 +126,7 @@ export class PerspectiveCamera extends Camera {
     this.aspect = aspect;
     this.updateProjectionMatrix();
   }
-  copy(source: any, recursive?: any): this {
+  copy(source: PerspectiveCamera, recursive?: boolean): this {
     super.copy(source, recursive);
     this.fov = source.fov;
     this.zoom = source.zoom;

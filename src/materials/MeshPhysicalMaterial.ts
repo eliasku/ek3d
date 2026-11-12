@@ -437,10 +437,10 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
     Object.defineProperty(this, "reflectivity", {
       enumerable: false,
       configurable: false,
-      get: function (this: any) {
+      get: function (this: MeshPhysicalMaterial) {
         return clamp((2.5 * (this.ior - 1)) / (this.ior + 1), 0, 1);
       },
-      set: function (this: any, reflectivity: number) {
+      set: function (this: MeshPhysicalMaterial, reflectivity: number) {
         this.ior = (1 + 0.4 * reflectivity) / (1 - 0.4 * reflectivity);
       },
     });

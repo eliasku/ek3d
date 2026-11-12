@@ -1,3 +1,4 @@
+import type { Uniforms } from "../core/Uniform";
 import { GL } from "../GL";
 import type { ArrayCamera } from "../cameras/ArrayCamera";
 import type { BufferGeometry } from "../core/BufferGeometry";
@@ -97,7 +98,7 @@ interface RenderList {
 export interface WebGLShaderDescriptor {
   vertexShader: string;
   fragmentShader: string;
-  uniforms: Record<string, { value: unknown }>;
+  uniforms: Uniforms<unknown>;
 }
 /** Renderer context settings and explicitly installed rendering features. */
 export interface WebGLRendererOptions {

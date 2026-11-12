@@ -1,3 +1,4 @@
+import type { IUniform, Uniforms } from "../../core/Uniform";
 import type { Material, MaterialProperties } from "../../materials/Material";
 import type { MeshBasicMaterial } from "../../materials/MeshBasicMaterial";
 import type { MeshLambertMaterial } from "../../materials/MeshLambertMaterial";
@@ -30,7 +31,7 @@ import { getUnlitUniformColorSpace } from "../shaders/UniformsUtils";
 import { Matrix3 } from "../../math/Matrix3";
 import { Matrix4 } from "../../math/Matrix4";
 
-export type MaterialUniforms = Record<string, { value: unknown }> & {
+export type MaterialUniforms = Uniforms<unknown> & {
   [
     name in
       | "color"
@@ -41,15 +42,13 @@ export type MaterialUniforms = Record<string, { value: unknown }> & {
       | "sheenColor"
       | "attenuationColor"
       | "specularColor"
-  ]?: { value: Color };
+  ]?: IUniform<Color>;
 } & {
-  [name in "normalScale" | "clearcoatNormalScale" | "transmissionSamplerSize" | "anisotropyVector"]?: {
-    value: Vector2;
-  };
+  [name in "normalScale" | "clearcoatNormalScale" | "transmissionSamplerSize" | "anisotropyVector"]?: IUniform<Vector2>;
 } & {
-  envMapRotation?: { value: Matrix3 };
-  referencePosition?: { value: Vector3 };
-  bumpScale?: { value: number };
+  envMapRotation?: IUniform<Matrix3>;
+  referencePosition?: IUniform<Vector3>;
+  bumpScale?: IUniform<number>;
 };
 
 export interface MaterialUniformsProperties {
@@ -70,7 +69,7 @@ export class WebGLMaterials {
     this.refreshMaterialUniforms = this.refreshMaterialUniforms.bind(this);
   }
 
-  private refreshTransformUniform(map: Texture, uniform: { value: unknown }) {
+  private refreshTransformUniform(map: Texture, uniform: IUniform<unknown>) {
     if (map.matrixAutoUpdate === true) {
       map.updateMatrix();
     }

@@ -41,8 +41,8 @@ export class GridHelper extends LineSegments<LineBasicMaterial> {
     const center = divisions / 2;
     const step = size / divisions;
     const halfSize = size / 2;
-    const vertices: any[] = [],
-      colors: any[] = [];
+    const vertices: number[] = [],
+      colors: number[] = [];
     for (let i = 0, j = 0, k = -halfSize; i <= divisions; i++, k += step) {
       vertices.push(-halfSize, 0, k, halfSize, 0, k);
       vertices.push(k, 0, -halfSize, k, 0, halfSize);

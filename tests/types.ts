@@ -1,6 +1,7 @@
 import { BatchedMesh } from "ek3d/objects/BatchedMesh";
 import type { BatchedMeshGeometryRange, BatchedMeshDrawRange, BatchedMeshSortFunction } from "ek3d/objects/BatchedMesh";
 import { LOD } from "ek3d/objects/LOD";
+import { ObjectLoader } from "ek3d/loaders/ObjectLoader";
 import type { LODLevel } from "ek3d/objects/LOD";
 import { Vector3 } from "ek3d/math/Vector3";
 import { Quaternion } from "ek3d/math/Quaternion";
@@ -81,6 +82,8 @@ import { WebGLRenderTarget } from "ek3d/renderers/WebGLRenderTarget";
 import { BufferAttribute, Float32BufferAttribute, Uint8ClampedBufferAttribute } from "ek3d/core/BufferAttribute";
 import { Light } from "ek3d/lights/Light";
 import { Group } from "ek3d/objects/Group";
+import { ArcballControls } from "ek3d/addons/controls/ArcballControls";
+import { TrackballControls } from "ek3d/addons/controls/TrackballControls";
 // @ts-expect-error The WebXR manager and its native type contracts are not published.
 import type {} from "ek3d/renderers/webxr/WebXRManager";
 // @ts-expect-error The WebXR controller subpath is not published.
@@ -225,7 +228,7 @@ import {
 } from "ek3d/animation/AnimationUtils";
 import type { NumericAnimationBuffer } from "ek3d/math/Interpolant";
 import { Bone } from "ek3d/objects/Bone";
-import { Skeleton } from "ek3d/objects/Skeleton";
+import { Skeleton, type SkeletonJSON } from "ek3d/objects/Skeleton";
 import { SkinnedMesh } from "ek3d/objects/SkinnedMesh";
 import { Interpolation, Loop } from "ek3d/constants";
 import { cloneUniforms } from "ek3d/renderers/shaders/UniformsUtils";
@@ -234,6 +237,8 @@ import { DotScreenPass } from "ek3d/addons/postprocessing/DotScreenPass";
 import { OutputPass } from "ek3d/addons/postprocessing/OutputPass";
 import { TexturePass } from "ek3d/addons/postprocessing/TexturePass";
 import { SavePass } from "ek3d/addons/postprocessing/SavePass";
+import { Ray } from "ek3d/math/Ray";
+import { CameraHelper } from "ek3d/helpers/CameraHelper";
 
 void [WebGPUCoordinateSystem, TimestampQuery];
 
@@ -1805,6 +1810,10 @@ const wrongBatchColor: Color = batch.getColorAt(0, new Vector4());
 batch.setVisibleAt(0, 1);
 // @ts-expect-error Custom sorts receive draw ranges, not numeric IDs.
 batch.setCustomSort((ids: number[]) => ids.reverse());
+// @ts-expect-error Custom sorting requires a callback or null.
+batch.setCustomSort();
+// @ts-expect-error Undefined is not a custom sort callback.
+batch.setCustomSort(undefined);
 batch.setCustomSort((list) => {
   // @ts-expect-error Custom sort depth is numeric.
   const depth: string = list[0].z;
@@ -2097,6 +2106,14 @@ skin.bind(animationSkeleton, new Matrix4());
 const skinnedClone: SkinnedMesh = skin.clone().copy(skin, true);
 const skinnedPosition: Vector3 = skin.applyBoneTransform(0, new Vector3());
 skin.getVertexPosition(0, new Vector3());
+const skeletonJSON: SkeletonJSON = animationSkeleton.toJSON();
+new Skeleton().fromJSON(skeletonJSON, { [animationBone.uuid]: animationBone });
+new Skeleton().fromJSON({ uuid: animationSkeleton.uuid, bones: [], boneInverses: [] }, {});
+animationSkeleton.toJSON().bones[0].toUpperCase();
+animationSkeleton.toJSON().boneInverses[0][0].toFixed();
+const loadedSkeletons = new ObjectLoader().parseSkeletons([skeletonJSON], animationBone);
+loadedSkeletons[animationSkeleton.uuid].update();
+new ObjectLoader().parseSkeletons(undefined, animationBone);
 
 // @ts-expect-error Numeric tracks reject string values.
 new NumberKeyframeTrack(".x", [0, 1], ["a", "b"]);
@@ -2132,6 +2149,18 @@ skin.bind(new Object3D());
 skin.applyBoneTransform(0, new Vector2());
 // @ts-expect-error Bone inverses are Matrix4 instances.
 new Skeleton([animationBone], [new Vector3()]);
+// @ts-expect-error Serialized bone references are UUID strings.
+new Skeleton().fromJSON({ uuid: "skeleton", bones: [animationBone], boneInverses: [] }, {});
+// @ts-expect-error Serialized inverse matrices contain numbers.
+new Skeleton().fromJSON({ uuid: "skeleton", bones: [], boneInverses: [["1"]] }, {});
+// @ts-expect-error Skeleton UUIDs are strings.
+animationSkeleton.toJSON().uuid.toFixed();
+// @ts-expect-error Serialized inverse matrix components are numeric.
+animationSkeleton.toJSON().boneInverses[0].push("1");
+// @ts-expect-error Skeleton lookups contain skeletons, not strings.
+loadedSkeletons[animationSkeleton.uuid].toUpperCase();
+// @ts-expect-error Skeleton parsing requires the object hierarchy.
+new ObjectLoader().parseSkeletons([skeletonJSON]);
 void [
   numericClone,
   booleanValues,
@@ -2155,6 +2184,28 @@ cameraChildren.add(new Object3D());
 cameraChildren.attach(new Object3D());
 // @ts-expect-error Recursive copying cannot introduce incompatible child objects.
 cameraChildren.copy(new Object3D<Mesh>());
+
+const lineChildren = new Group<Line<LineBasicMaterial>>();
+lineChildren.add(new Line(geometry, new LineBasicMaterial()));
+const clonedLineChildren = lineChildren.clone();
+clonedLineChildren.children[0].material.color.getHex();
+clonedLineChildren.children[0].add(new Object3D());
+// @ts-expect-error Specialized groups reject incompatible children.
+lineChildren.add(new Object3D());
+// @ts-expect-error Cloning preserves the group's child contract.
+clonedLineChildren.add(new Object3D());
+// @ts-expect-error Copying preserves the group's child contract.
+lineChildren.copy(new Group<Mesh<MeshBasicMaterial>>());
+const typedArcballControls = new ArcballControls(new PerspectiveCamera());
+typedArcballControls._gizmos.children[0].material.opacity.toFixed();
+// @ts-expect-error Arcball gizmos use a single line material.
+typedArcballControls._gizmos.children[0].material = [new LineBasicMaterial()];
+const typedTrackballControls = new TrackballControls(new PerspectiveCamera());
+typedTrackballControls._pointerPositions[1] = { x: 1, y: 2 };
+typedTrackballControls._pointerPositions[2] = new Vector2();
+typedTrackballControls._trackPointer({ pointerId: 1, pageX: 3, pageY: 4 });
+// @ts-expect-error Pointer tracking requires both page coordinates.
+typedTrackballControls._trackPointer({ pointerId: 1, pageY: 4 });
 
 const traversalRoot = new Object3D();
 traversalRoot.traverse((object) => {
@@ -2310,3 +2361,66 @@ const uniformVector2Output = new Vector2(1, 2).toArray(new Float32Array(2));
 uniformVector2Output.subarray(0, 1);
 const uniformMatrix3Output = new Matrix3().toArray(new Float32Array(9));
 uniformMatrix3Output.subarray(0, 1);
+
+const copiedPerspectiveCamera = new PerspectiveCamera().copy(new PerspectiveCamera(), false);
+const copiedOrthographicCamera = new OrthographicCamera().copy(new OrthographicCamera(), true);
+const copiedPointLight = new PointLight().copy(new PointLight(), false);
+const copiedHemisphereLight = new HemisphereLight().copy(new HemisphereLight(), true);
+const copiedScene = new Scene().copy(new Scene(), false);
+copiedPerspectiveCamera.fov.toFixed();
+copiedOrthographicCamera.left.toFixed();
+copiedPointLight.distance.toFixed();
+copiedHemisphereLight.groundColor.getHex();
+copiedScene.backgroundIntensity.toFixed();
+new CameraHelper(new Camera()).update();
+new CameraHelper(copiedPerspectiveCamera).update();
+new CameraHelper(copiedOrthographicCamera).update();
+const customOrthographicCamera = Object.assign(new Camera(), { isOrthographicCamera: true });
+new Raycaster().setFromCamera(new Vector2(), customOrthographicCamera);
+new Mesh(geometry, material).copy(new Mesh(geometry, material), false);
+new Mesh(geometry, material)._computeIntersections(new Raycaster(), [], new Ray());
+const componentVector = new Vector2().subVectors(new Vector3(3, 4, 5), { x: 1, y: 2 }).multiply(new Vector3(2, 3, 4));
+componentVector.x.toFixed();
+// @ts-expect-error Perspective camera copies require perspective projection fields.
+copiedPerspectiveCamera.copy(copiedOrthographicCamera);
+// @ts-expect-error Orthographic camera copies require orthographic projection fields.
+copiedOrthographicCamera.copy(copiedPerspectiveCamera);
+// @ts-expect-error Point light copies require point-light distance, decay and shadow state.
+copiedPointLight.copy(new Light());
+// @ts-expect-error Hemisphere light copies require a ground color.
+copiedHemisphereLight.copy(new Light());
+// @ts-expect-error Scene copies require scene background, environment and fog state.
+copiedScene.copy(new Object3D());
+// @ts-expect-error Camera recursion flags are boolean.
+copiedPerspectiveCamera.copy(new PerspectiveCamera(), "recursive");
+// @ts-expect-error Light recursion flags are boolean.
+copiedPointLight.copy(new PointLight(), 1);
+// @ts-expect-error Scene recursion flags are boolean.
+copiedScene.copy(new Scene(), "recursive");
+// @ts-expect-error Projection type flags are boolean.
+new Raycaster().setFromCamera(new Vector2(), Object.assign(new Camera(), { isOrthographicCamera: "yes" }));
+// @ts-expect-error Mesh copies require mesh geometry and material state.
+new Mesh(geometry, material).copy(new Object3D());
+// @ts-expect-error Mesh recursion flags are boolean.
+new Mesh(geometry, material).copy(new Mesh(geometry, material), "recursive");
+// @ts-expect-error Mesh intersection computation requires a raycaster.
+new Mesh(geometry, material)._computeIntersections({}, [], new Ray());
+// @ts-expect-error Component-wise subtraction requires numeric components.
+new Vector2().subVectors({ x: 1, y: "2" }, new Vector2());
+// @ts-expect-error Component-wise multiplication requires both components.
+new Vector2().multiply({ x: 1 });
+
+const singleMaterialCopy: Mesh<MeshBasicMaterial> = new Mesh<MeshBasicMaterial>(geometry, material).copy(
+  new Mesh<MeshBasicMaterial>(geometry, material),
+);
+const arrayMaterialCopy: Mesh<MeshBasicMaterial[]> = new Mesh<MeshBasicMaterial[]>(geometry, [material]).copy(
+  new Mesh<MeshBasicMaterial[]>(geometry, [material, material]),
+  false,
+);
+skin._computeIntersections(new Raycaster(), [], new Ray());
+// @ts-expect-error A single-material mesh cannot copy an array-material mesh.
+singleMaterialCopy.copy(arrayMaterialCopy);
+// @ts-expect-error Copies preserve the mesh's material type.
+singleMaterialCopy.copy(new Mesh<ShaderMaterial>(geometry, new ShaderMaterial()));
+// @ts-expect-error Skinned mesh intersection results are stored in an array.
+skin._computeIntersections(new Raycaster(), new Vector3(), new Ray());

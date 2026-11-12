@@ -1,3 +1,4 @@
+import type { Uniforms } from "../../core/Uniform";
 import { Wrapping, TextureType, TextureFilter, PixelFormat } from "../../constants";
 import { DataTexture } from "../../textures/DataTexture";
 import type { Texture } from "../../textures/Texture";
@@ -147,7 +148,7 @@ void main() {
     material.defines.resolution = `vec2( ${this.sizeX.toFixed(1)}, ${this.sizeY.toFixed(1)} )`;
   }
 
-  createShaderMaterial(fragmentShader: string, uniforms: Record<string, { value: unknown }> = {}): ShaderMaterial {
+  createShaderMaterial(fragmentShader: string, uniforms: Uniforms<unknown> = {}): ShaderMaterial {
     const material = new ShaderMaterial({
       name: "GPUComputationShader",
       uniforms,

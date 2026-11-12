@@ -573,7 +573,7 @@ export class TrackballControls<TObject extends TrackballCamera = TrackballCamera
     let position = this._pointerPositions[event.pointerId];
 
     if (position === undefined) {
-      position = new Vector2() as unknown as { x: number; y: number };
+      position = new Vector2();
       this._pointerPositions[event.pointerId] = position;
     }
 

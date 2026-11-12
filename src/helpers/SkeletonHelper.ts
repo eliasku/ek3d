@@ -51,8 +51,8 @@ export class SkeletonHelper extends LineSegments<LineBasicMaterial> {
   constructor(object: Object3D) {
     const bones = getBoneList(object);
     const geometry = new BufferGeometry();
-    const vertices: any[] = [];
-    const colors: any[] = [];
+    const vertices: number[] = [];
+    const colors: number[] = [];
     for (let i = 0; i < bones.length; i++) {
       const bone = bones[i];
       if (bone.parent && (bone.parent as Bone).isBone) {

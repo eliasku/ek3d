@@ -5,7 +5,7 @@ import type { Quaternion } from "../../math/Quaternion";
 import type { Vector2 } from "../../math/Vector2";
 import type { Vector3 } from "../../math/Vector3";
 import type { Vector4 } from "../../math/Vector4";
-import type { ShaderMaterial } from "../../materials/ShaderMaterial";
+import type { Uniforms } from "../../core/Uniform";
 import type { WebGLTextures } from "./WebGLTextures";
 import { GL } from "../../GL";
 import { CubeTexture } from "../../textures/CubeTexture";
@@ -859,12 +859,7 @@ export class WebGLUniforms {
     const v = (object as Record<string, unknown>)[name];
     if (v !== undefined) this.setValue(gl, name, v);
   }
-  static upload(
-    gl: WebGL2RenderingContext,
-    seq: UniformNode[],
-    values: ShaderMaterial["uniforms"],
-    textures?: WebGLTextures,
-  ): void {
+  static upload(gl: WebGL2RenderingContext, seq: UniformNode[], values: Uniforms, textures?: WebGLTextures): void {
     for (let i = 0, n = seq.length; i !== n; ++i) {
       const u = seq[i],
         v = values[u.id];

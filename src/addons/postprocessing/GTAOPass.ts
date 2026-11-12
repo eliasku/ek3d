@@ -205,7 +205,7 @@ export class GTAOPass extends Pass {
 
     this.gtaoMaterial = new ShaderMaterial({
       defines: { ...GTAOShader.defines },
-      uniforms: cloneUniforms(GTAOShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(GTAOShader.uniforms),
       vertexShader: GTAOShader.vertexShader,
       fragmentShader: GTAOShader.fragmentShader,
       blending: Blending.No,
@@ -223,7 +223,7 @@ export class GTAOPass extends Pass {
 
     this.pdMaterial = new ShaderMaterial({
       defines: { ...PoissonDenoiseShader.defines },
-      uniforms: cloneUniforms(PoissonDenoiseShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(PoissonDenoiseShader.uniforms),
       vertexShader: PoissonDenoiseShader.vertexShader,
       fragmentShader: PoissonDenoiseShader.fragmentShader,
       depthTest: false,
@@ -239,7 +239,7 @@ export class GTAOPass extends Pass {
 
     this.depthRenderMaterial = new ShaderMaterial({
       defines: { ...GTAODepthShader.defines },
-      uniforms: cloneUniforms(GTAODepthShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(GTAODepthShader.uniforms),
       vertexShader: GTAODepthShader.vertexShader,
       fragmentShader: GTAODepthShader.fragmentShader,
       blending: Blending.No,
@@ -248,7 +248,7 @@ export class GTAOPass extends Pass {
     this.depthRenderMaterial.uniforms!["cameraFar"].value = this.camera.far;
 
     this.copyMaterial = new ShaderMaterial({
-      uniforms: cloneUniforms(CopyShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(CopyShader.uniforms),
       vertexShader: CopyShader.vertexShader,
       fragmentShader: CopyShader.fragmentShader,
       transparent: true,
@@ -263,7 +263,7 @@ export class GTAOPass extends Pass {
     } as never);
 
     this.blendMaterial = new ShaderMaterial({
-      uniforms: cloneUniforms(GTAOBlendShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(GTAOBlendShader.uniforms),
       vertexShader: GTAOBlendShader.vertexShader,
       fragmentShader: GTAOBlendShader.fragmentShader,
       transparent: true,

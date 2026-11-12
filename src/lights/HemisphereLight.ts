@@ -47,7 +47,7 @@ export class HemisphereLight extends Light {
      */
     this.groundColor = new Color(groundColor);
   }
-  copy(source: any, recursive?: any): this {
+  copy(source: HemisphereLight, recursive?: boolean): this {
     super.copy(source, recursive);
     this.groundColor.copy(source.groundColor);
     return this;

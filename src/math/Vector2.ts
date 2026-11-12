@@ -254,7 +254,7 @@ export class Vector2 {
    * @param b - The second vector.
    * @return A reference to this vector.
    */
-  subVectors(a: Vector2, b: Vector2): Vector2 {
+  subVectors(a: Pick<Vector2, "x" | "y">, b: Pick<Vector2, "x" | "y">): Vector2 {
     this.x = a.x - b.x;
     this.y = a.y - b.y;
     return this;
@@ -265,7 +265,7 @@ export class Vector2 {
    * @param v - The vector to multiply.
    * @return A reference to this vector.
    */
-  multiply(v: Vector2): Vector2 {
+  multiply(v: Pick<Vector2, "x" | "y">): Vector2 {
     this.x *= v.x;
     this.y *= v.y;
     return this;

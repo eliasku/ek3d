@@ -2,6 +2,7 @@ import { GL } from "ek3d/GL";
 import { ShaderMaterial } from "ek3d/materials/ShaderMaterial";
 import type { ShaderMaterialParameters } from "ek3d/materials/ShaderMaterial";
 import { RawShaderMaterial } from "ek3d/materials/RawShaderMaterial";
+import type { IUniform, Uniforms } from "ek3d/core/Uniform";
 import { Uniform } from "ek3d/core/Uniform";
 import { WebGLRenderer } from "ek3d/renderers/WebGLRenderer";
 import { Vector3 } from "ek3d/math/Vector3";
@@ -11,6 +12,33 @@ import { Data3DTexture } from "ek3d/textures/Data3DTexture";
 import { DataArrayTexture } from "ek3d/textures/DataArrayTexture";
 import { CubeTexture } from "ek3d/textures/CubeTexture";
 import { GLSL } from "ek3d/constants";
+import { HalftonePass } from "ek3d/addons/postprocessing/HalftonePass";
+import { cloneUniforms } from "ek3d/renderers/shaders/UniformsUtils";
+
+const scalarUniform: IUniform<number> = { value: 1, needsUpdate: false };
+const textUniform: IUniform<string> = { value: "custom value" };
+const vectorUniform: IUniform<Vector3> = new Uniform(new Vector3());
+const textureUniform: IUniform<DataTexture | null> = { value: null };
+textureUniform.value = new DataTexture();
+const scalarUniforms: Uniforms<number> = { gain: scalarUniform };
+const textUniforms: Uniforms<string> = { label: textUniform };
+const clonedGain: number = cloneUniforms(scalarUniforms).gain.value;
+new ShaderMaterial({ uniforms: scalarUniforms });
+new ShaderMaterial({ uniforms: textUniforms });
+new HalftonePass({ radius: 4, disable: false, tDiffuse: new DataTexture() });
+// @ts-expect-error Numeric uniforms do not accept strings.
+scalarUniform.value = "1";
+// @ts-expect-error Typed uniform dictionaries retain their value types.
+scalarUniforms.gain = { value: "1" };
+// @ts-expect-error Uniform upload flags are boolean.
+scalarUniform.needsUpdate = 1;
+// @ts-expect-error Vector uniforms do not accept matrices.
+vectorUniform.value = new Matrix4();
+// @ts-expect-error Halftone radii are numeric.
+new HalftonePass({ radius: "4" });
+// @ts-expect-error Halftone disable flags are boolean.
+new HalftonePass({ disable: 1 });
+void [vectorUniform, textureUniform, clonedGain];
 
 declare const canvas: HTMLCanvasElement;
 const parameters: ShaderMaterialParameters = {

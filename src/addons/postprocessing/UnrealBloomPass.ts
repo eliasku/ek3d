@@ -1,3 +1,4 @@
+import type { Uniforms } from "../../core/Uniform";
 import { Blending, TextureType } from "../../constants";
 import { Color } from "../../math/Color";
 import { Vector2 } from "../../math/Vector2";
@@ -62,13 +63,13 @@ export class UnrealBloomPass extends Pass {
   renderTargetsVertical: WebGLRenderTarget[] = [];
   renderTargetBright: WebGLRenderTarget;
   nMips: number = 5;
-  highPassUniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+  highPassUniforms: Uniforms;
   materialHighPassFilter: ShaderMaterial;
   // gaussian blur materials
 
   separableBlurMaterials: ShaderMaterial[] = [];
   compositeMaterial: ShaderMaterial;
-  copyUniforms: Record<string, { value: any; needsUpdate?: boolean }>;
+  copyUniforms: Uniforms;
   blendMaterial: ShaderMaterial;
   bloomTintColors: Vector3[];
   _oldClearColor: Color;

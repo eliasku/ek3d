@@ -1,7 +1,7 @@
 import type { UniformsGroup } from "../../core/UniformsGroup";
 import type { WebGLRenderer } from "../WebGLRenderer";
 import type { Texture } from "../../textures/Texture";
-import type { ShaderMaterial } from "../../materials/ShaderMaterial";
+import type { Uniforms } from "../../core/Uniform";
 import type { Color } from "../../math/Color";
 import type { Matrix3 } from "../../math/Matrix3";
 import type { Matrix4 } from "../../math/Matrix4";
@@ -85,8 +85,8 @@ export function cloneUniforms<T extends Record<string, object> = Record<string, 
  * @param uniforms - An array of objects containing uniform definitions.
  * @return The merged uniforms.
  */
-export function mergeUniforms(uniforms: ShaderMaterial["uniforms"][]): ShaderMaterial["uniforms"] {
-  const merged: ShaderMaterial["uniforms"] = {};
+export function mergeUniforms(uniforms: Uniforms[]): Uniforms {
+  const merged: Uniforms = {};
   for (let u = 0; u < uniforms.length; u++) {
     const tmp = cloneUniforms(uniforms[u]);
     for (const p in tmp) {

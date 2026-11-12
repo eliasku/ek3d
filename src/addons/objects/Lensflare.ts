@@ -1,3 +1,4 @@
+import type { Uniforms } from "../../core/Uniform";
 import type { Camera } from "../../cameras/Camera";
 import type { Object3D } from "../../core/Object3D";
 import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
@@ -20,7 +21,7 @@ import type { Texture } from "../../textures/Texture";
 export class LensflareElement {
   static Shader: {
     name: string;
-    uniforms: Record<string, { value: null }>;
+    uniforms: Uniforms<null>;
     vertexShader: string;
     fragmentShader: string;
   } = {

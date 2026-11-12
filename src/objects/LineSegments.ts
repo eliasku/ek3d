@@ -39,7 +39,7 @@ export class LineSegments<TMaterial extends Material | Material[] = Material | M
     // we assume non-indexed geometry
     if (geometry.index === null) {
       const positionAttribute = geometry.attributes.position as BufferAttribute | InterleavedBufferAttribute;
-      const lineDistances: any[] = [];
+      const lineDistances: number[] = [];
       for (let i = 0, l = positionAttribute.count; i < l; i += 2) {
         _start.fromBufferAttribute(positionAttribute, i);
         _end.fromBufferAttribute(positionAttribute, i + 1);

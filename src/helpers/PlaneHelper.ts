@@ -79,8 +79,8 @@ export class PlaneHelper extends Line<LineBasicMaterial> {
     super.dispose();
     this.geometry.dispose();
     this.material.dispose();
-    (this.children[0] as Mesh & { material: MeshBasicMaterial } as any).geometry.dispose();
-    (this.children[0] as Mesh & { material: MeshBasicMaterial } as any).material.dispose();
+    (this.children[0] as Mesh & { material: MeshBasicMaterial }).geometry.dispose();
+    (this.children[0] as Mesh & { material: MeshBasicMaterial }).material.dispose();
   }
   clone(recursive: boolean = true): PlaneHelper {
     const helper = new PlaneHelper(this.plane, this.size).copy(this, false);

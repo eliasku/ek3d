@@ -195,7 +195,7 @@ export class SSAOPass extends Pass {
 
     this.ssaoMaterial = new ShaderMaterial({
       defines: { ...SSAOShader.defines },
-      uniforms: cloneUniforms(SSAOShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(SSAOShader.uniforms),
       vertexShader: SSAOShader.vertexShader,
       fragmentShader: SSAOShader.fragmentShader,
       blending: Blending.No,
@@ -223,7 +223,7 @@ export class SSAOPass extends Pass {
     // blur material
 
     this.blurMaterial = new ShaderMaterial({
-      uniforms: cloneUniforms(SSAOBlurShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(SSAOBlurShader.uniforms),
       vertexShader: SSAOBlurShader.vertexShader,
       fragmentShader: SSAOBlurShader.fragmentShader,
     } as never);
@@ -234,7 +234,7 @@ export class SSAOPass extends Pass {
 
     this.depthRenderMaterial = new ShaderMaterial({
       defines: { ...SSAODepthShader.defines },
-      uniforms: cloneUniforms(SSAODepthShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(SSAODepthShader.uniforms),
       vertexShader: SSAODepthShader.vertexShader,
       fragmentShader: SSAODepthShader.fragmentShader,
       blending: Blending.No,
@@ -246,7 +246,7 @@ export class SSAOPass extends Pass {
     // material for rendering the content of a render target
 
     this.copyMaterial = new ShaderMaterial({
-      uniforms: cloneUniforms(CopyShader.uniforms) as Record<string, { value: any; needsUpdate?: boolean }>,
+      uniforms: cloneUniforms(CopyShader.uniforms),
       vertexShader: CopyShader.vertexShader,
       fragmentShader: CopyShader.fragmentShader,
       transparent: true,
