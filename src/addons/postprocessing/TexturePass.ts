@@ -10,11 +10,18 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  * This pass can be used to render a texture over the entire screen.
  *
  * ```typescript
- * const texture = new TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' );
- * texture.colorSpace = ColorSpace.SRGB;
+ * import { TexturePass } from 'ek3d/addons/postprocessing/TexturePass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ * import { ColorSpace } from 'ek3d/constants';
+ * import { TextureLoader } from 'ek3d/loaders/TextureLoader';
  *
- * const texturePass = new TexturePass( texture );
- * composer.addPass( texturePass );
+ * function addImageBackground( composer: EffectComposer, url: string ): TexturePass {
+ *   const texture = new TextureLoader().load( url );
+ *   texture.colorSpace = ColorSpace.SRGB;
+ *   const texturePass = new TexturePass( texture );
+ *   composer.addPass( texturePass );
+ *   return texturePass;
+ * }
  * ```
  *
  */

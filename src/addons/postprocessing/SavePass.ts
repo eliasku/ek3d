@@ -10,8 +10,15 @@ import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
  * A pass that saves the contents of the current read buffer in a render target.
  *
  * ```typescript
- * const savePass = new SavePass( customRenderTarget );
- * composer.addPass( savePass );
+ * import { SavePass } from 'ek3d/addons/postprocessing/SavePass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ * import type { WebGLRenderTarget } from 'ek3d/renderers/WebGLRenderTarget';
+ *
+ * function addFrameCapture( composer: EffectComposer, customRenderTarget: WebGLRenderTarget ): SavePass {
+ *   const savePass = new SavePass( customRenderTarget );
+ *   composer.addPass( savePass );
+ *   return savePass;
+ * }
  * ```
  *
  */

@@ -9,8 +9,10 @@ import { Texture } from "./Texture";
  *
  * @augments Texture
  *
- * ```ts
- * const element = new HTMLDivElement();
+ * ```typescript
+ * import { HTMLTexture } from 'ek3d/textures/HTMLTexture';
+ *
+ * const element = document.createElement( 'div' );
  * const texture = new HTMLTexture( element );
  * ```
  *

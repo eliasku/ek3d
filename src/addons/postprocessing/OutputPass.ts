@@ -16,8 +16,14 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  * The tone mapping and color space settings are extracted from the renderer.
  *
  * ```typescript
- * const outputPass = new OutputPass();
- * composer.addPass( outputPass );
+ * import { OutputPass } from 'ek3d/addons/postprocessing/OutputPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ *
+ * function addOutput( composer: EffectComposer ): OutputPass {
+ *   const outputPass = new OutputPass();
+ *   composer.addPass( outputPass );
+ *   return outputPass;
+ * }
  * ```
  *
  */

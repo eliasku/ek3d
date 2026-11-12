@@ -2,7 +2,7 @@ import lightsParsBegin from "../../renderers/shaders/ShaderChunk/lights_pars_beg
 
 /** GLSL enhancements injected into built-in material shaders by CSM.
  *
- * ```ts
+ * ```typescript
  * import { CSMShader } from "ek3d/addons/csm/CSMShader";
  * ```
  */

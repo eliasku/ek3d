@@ -74,7 +74,7 @@ const pz = /*@__PURE__*/ CubicPoly();
 /**
  * A curve representing a Catmull-Rom spline.
  *
- * ```ts
+ * ```typescript
  * import { CatmullRomCurve3 } from 'ek3d/extras/curves/CatmullRomCurve3';
  * import { Vector3 } from 'ek3d/math/Vector3';
  * import { BufferGeometry } from 'ek3d/core/BufferGeometry';

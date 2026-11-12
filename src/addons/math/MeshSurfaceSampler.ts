@@ -32,7 +32,7 @@ function readAttribute(geometry: BufferGeometry, name: string): Attribute | unde
  * - {@link http://www.joesfer.com/?p=84}
  * - {@link https://stackoverflow.com/a/4322940/1314762}
  *
- * ```ts
+ * ```typescript
  * import { MeshSurfaceSampler } from 'ek3d/addons/math/MeshSurfaceSampler';
  * import { SphereGeometry } from 'ek3d/geometries/SphereGeometry';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

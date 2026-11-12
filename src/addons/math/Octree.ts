@@ -89,7 +89,7 @@ function lineToLineClosestPoints(
  * the player or other dynamic 3D objects.
  *
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { Capsule } from 'ek3d/addons/math/Capsule';
  * import { Octree } from 'ek3d/addons/math/Octree';

@@ -24,10 +24,17 @@ import type { WebGLRenderTarget as RT } from "../../renderers/WebGLRenderTarget"
  * Reference:
  * - [Bloom in Unreal Engine](https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/)
  *
- * ```ts
- * const resolution = new Vector2( window.innerWidth, window.innerHeight );
- * const bloomPass = new UnrealBloomPass( resolution, 1.5, 0.4, 0.85 );
- * composer.addPass( bloomPass );
+ * ```typescript
+ * import { UnrealBloomPass } from 'ek3d/addons/postprocessing/UnrealBloomPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ * import { Vector2 } from 'ek3d/math/Vector2';
+ *
+ * function addBloom( composer: EffectComposer ): UnrealBloomPass {
+ *   const resolution = new Vector2( window.innerWidth, window.innerHeight );
+ *   const bloomPass = new UnrealBloomPass( resolution, 1.5, 0.4, 0.85 );
+ *   composer.addPass( bloomPass );
+ *   return bloomPass;
+ * }
  * ```
  *
  */

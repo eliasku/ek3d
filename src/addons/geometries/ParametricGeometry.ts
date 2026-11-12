@@ -7,7 +7,7 @@ export type ParametricGeometryFunc = (u: number, v: number, target: Vector3) => 
 /**
  * Generates a geometry based on a parametric surface.
  *
- * ```ts
+ * ```typescript
  * import { ParametricGeometry } from 'ek3d/addons/geometries/ParametricGeometry';
  * import { klein } from 'ek3d/addons/geometries/ParametricFunctions';
  * import { MeshBasicMaterial } from 'ek3d/materials/MeshBasicMaterial';

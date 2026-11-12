@@ -59,7 +59,7 @@ before publishing assets, including on a free public website.
 
 ## Run
 
-Node `^22.18.0 || ^24.11.0 || >=26.0.0`; upstream source must be present at `upstream/three.js/src` for differential behavior tests, not for building or regenerating the maintained source.
+Node `^22.22.2 || ^24.15.0 || >=26.0.0` and npm 12.2.2; upstream source must be present at `upstream/three.js/src` for differential behavior tests, not for building or regenerating the maintained source.
 
 ```sh
 npm ci
@@ -67,6 +67,11 @@ npm run check
 npm test
 npm run dev
 ```
+
+OBJ and KTX2 tests use the retained assets in `public/examples/models/obj/walt/` and
+`public/examples/textures/ktx2/`. Synthetic cube, array and volume containers remain in
+`tests/fixtures/ktx2/`. Keep these assets available when running tests; the upstream checkout
+supplies reference implementations, not these model and texture fixtures.
 
 Production builds exclude `.ts` files from Vite's per-file Oxc transform so Rolldown can inline
 imported `const enum` values across modules, including workers. Development keeps the default
@@ -382,7 +387,7 @@ interaction, lifecycle or device matrix recorded in `.local/PLAN.md`.
 
 ## Development tooling
 
-The project pins Vite+ **1.4.0**. npm and the committed lockfile remain the installation contract; a global `vp` install is not required. The direct `vite` dependency and root `overrides` map Vite to `@voidzero-dev/vite-plus-core@1.4.0` in the current configuration.
+The project pins Vite+ **1.5.0** and npm **12.2.2**. npm and the committed lockfile remain the installation contract; a global `vp` install is not required. The direct `vite` dependency and root `overrides` map Vite to `@voidzero-dev/vite-plus-core@1.5.0` in the current configuration.
 
 Use `./node_modules/.bin/vp toolchain` to inspect the actual bundled engines. Reassess the dependency layout when upgrading Vite+, rather than assuming that different releases require identical aliases or overrides.
 

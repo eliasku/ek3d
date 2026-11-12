@@ -101,7 +101,7 @@ type Section = {
  *
  * Decodes splat geometry with optional packed spherical harmonics attributes.
  *
- * ```ts
+ * ```typescript
  * import { KSPLATLoader } from "ek3d/addons/loaders/KSPLATLoader";
  * const geometry = await new KSPLATLoader().loadAsync("model.ksplat");
  * ```

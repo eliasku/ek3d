@@ -11,9 +11,15 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
 /**
  * Pass for a glitch effect, based on the DigitalGlitch shader.
  *
- * ```ts
- * const glitchPass = new GlitchPass();
- * composer.addPass( glitchPass );
+ * ```typescript
+ * import { GlitchPass } from 'ek3d/addons/postprocessing/GlitchPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ *
+ * function addGlitch( composer: EffectComposer ): GlitchPass {
+ *   const glitchPass = new GlitchPass();
+ *   composer.addPass( glitchPass );
+ *   return glitchPass;
+ * }
  * ```
  *
  */

@@ -31,7 +31,9 @@ export interface SkyShader {
  *
  * ```typescript
  * import { Sky } from "ek3d/addons/objects/Sky";
+ * import { Scene } from 'ek3d/scenes/Scene';
  *
+ * const scene = new Scene();
  * const sky = new Sky();
  * sky.scale.setScalar( 10000 );
  * scene.add( sky );
@@ -40,11 +42,20 @@ export interface SkyShader {
  * It can be useful to hide the sun disc when generating an environment map to avoid artifacts
  *
  * ```typescript
- * // disable before rendering environment map
- * sky.material.uniforms["showSunDisc"].value = 0;
- * // ...
- * // re-enable before scene sky box rendering
- * sky.material.uniforms["showSunDisc"].value = 1;
+ * import type { Sky } from 'ek3d/addons/objects/Sky';
+ * import type { PMREMGenerator } from 'ek3d/extras/PMREMGenerator';
+ * import type { WebGLCubeRenderTarget } from 'ek3d/renderers/WebGLCubeRenderTarget';
+ *
+ * function createSkyEnvironment( sky: Sky, generator: PMREMGenerator ): WebGLCubeRenderTarget {
+ *   const showSunDisc = sky.material.uniforms.showSunDisc;
+ *   const previousValue = showSunDisc.value;
+ *   showSunDisc.value = 0;
+ *   try {
+ *     return generator.fromScene( sky );
+ *   } finally {
+ *     showSunDisc.value = previousValue;
+ *   }
+ * }
  * ```
  *
  * @augments Mesh

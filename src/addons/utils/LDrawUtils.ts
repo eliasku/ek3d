@@ -11,8 +11,13 @@ import { Group as GroupImpl } from "../../objects/Group";
 /**
  * Utility class for LDraw models.
  *
- * ```ts
- * model = LDrawUtils.mergeObject( model );
+ * ```typescript
+ * import { LDrawUtils } from 'ek3d/addons/utils/LDrawUtils';
+ * import type { Group } from 'ek3d/objects/Group';
+ *
+ * function mergeModel( model: Group ): Group {
+ *   return LDrawUtils.mergeObject( model );
+ * }
  * ```
  *
  */

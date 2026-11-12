@@ -1,8 +1,4 @@
-.agents/skills
-.codegraph/
 node_modules/
 dist/
-*.tgz
-.local
 .vitest/
 upstream/

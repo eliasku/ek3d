@@ -11,9 +11,20 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  * which lie in the masking area of this pass. Internally, the masking
  * is implemented with the stencil buffer.
  *
- * ```ts
- * const maskPass = new MaskPass( scene, camera );
- * composer.addPass( maskPass );
+ * ```typescript
+ * import { MaskPass } from 'ek3d/addons/postprocessing/MaskPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ * import type { Camera } from 'ek3d/cameras/Camera';
+ * import type { Scene } from 'ek3d/scenes/Scene';
+ *
+ * function addMask( composer: EffectComposer, scene: Scene, camera: Camera ): MaskPass {
+ *   // Enable stencil buffers before the composer's first render.
+ *   composer.renderTarget1.stencilBuffer = true;
+ *   composer.renderTarget2.stencilBuffer = true;
+ *   const maskPass = new MaskPass( scene, camera );
+ *   composer.addPass( maskPass );
+ *   return maskPass;
+ * }
  * ```
  *
  */
@@ -138,9 +149,15 @@ export class MaskPass extends Pass {
 /**
  * This pass can be used to clear a mask previously defined with {@link MaskPass}.
  *
- * ```ts
- * const clearPass = new ClearMaskPass();
- * composer.addPass( clearPass );
+ * ```typescript
+ * import { ClearMaskPass } from 'ek3d/addons/postprocessing/MaskPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ *
+ * function endMask( composer: EffectComposer ): ClearMaskPass {
+ *   const clearPass = new ClearMaskPass();
+ *   composer.addPass( clearPass );
+ *   return clearPass;
+ * }
  * ```
  *
  */

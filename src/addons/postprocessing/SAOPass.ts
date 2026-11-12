@@ -21,9 +21,17 @@ import type { WebGLRenderTarget as RT } from "../../renderers/WebGLRenderTarget"
  *
  * `SAOPass` provides better quality than {@link SSAOPass} but is also more expensive.
  *
- * ```ts
- * const saoPass = new SAOPass( scene, camera );
- * composer.addPass( saoPass );
+ * ```typescript
+ * import { SAOPass } from 'ek3d/addons/postprocessing/SAOPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ * import type { PerspectiveCamera } from 'ek3d/cameras/PerspectiveCamera';
+ * import type { Scene } from 'ek3d/scenes/Scene';
+ *
+ * function addSAO( composer: EffectComposer, scene: Scene, camera: PerspectiveCamera ): SAOPass {
+ *   const saoPass = new SAOPass( scene, camera );
+ *   composer.addPass( saoPass );
+ *   return saoPass;
+ * }
  * ```
  *
  */

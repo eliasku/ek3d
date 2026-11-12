@@ -58,7 +58,12 @@ interface JPEGSection {
  * - Non-JPEG image formats (not implemented)
  * - Primary image as an HDR image (not implemented)
  *
- * ```ts
+ * ```typescript
+ * import { UltraHDRLoader } from 'ek3d/addons/loaders/UltraHDRLoader';
+ * import { Mapping } from 'ek3d/constants';
+ * import { Scene } from 'ek3d/scenes/Scene';
+ *
+ * const scene = new Scene();
  * const loader = new UltraHDRLoader();
  * const texture = await loader.loadAsync( 'textures/equirectangular/ice_planet_close.jpg' );
  * texture.mapping = Mapping.EquirectangularReflection;

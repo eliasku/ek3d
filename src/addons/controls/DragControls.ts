@@ -36,21 +36,30 @@ const STATE = {
 /**
  * This class can be used to provide a drag'n'drop interaction.
  *
- * ```ts
- * const controls = new DragControls( objects, camera, renderer.domElement );
+ * ```typescript
+ * import { DragControls } from 'ek3d/addons/controls/DragControls';
+ * import type { Camera } from 'ek3d/cameras/Camera';
+ * import type { MeshStandardMaterial } from 'ek3d/materials/MeshStandardMaterial';
+ * import type { Mesh } from 'ek3d/objects/Mesh';
  *
- * // add event listener to highlight dragged objects
- * controls.addEventListener( 'dragstart', function ( event ) {
+ * function createDragControls(
+ *   objects: Mesh<MeshStandardMaterial>[],
+ *   camera: Camera,
+ *   element: HTMLElement
+ * ): DragControls {
+ *   const controls = new DragControls( objects, camera, element );
+ *   controls.recursive = false;
  *
- * 	event.object.material.emissive.set( 0xaaaaaa );
+ *   // Highlight only the meshes registered with these controls.
+ *   controls.addEventListener( 'dragstart', ( event: { object: Mesh<MeshStandardMaterial> } ) => {
+ *     event.object.material.emissive.set( 0xaaaaaa );
+ *   } );
+ *   controls.addEventListener( 'dragend', ( event: { object: Mesh<MeshStandardMaterial> } ) => {
+ *     event.object.material.emissive.set( 0x000000 );
+ *   } );
  *
- * } );
- *
- * controls.addEventListener( 'dragend', function ( event ) {
- *
- * 	event.object.material.emissive.set( 0x000000 );
- *
- * } );
+ *   return controls;
+ * }
  * ```
  *
  * @augments Controls

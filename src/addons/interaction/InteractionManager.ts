@@ -22,18 +22,23 @@ interface RendererLike {
  * their meshes. Because the elements are children of the canvas, the browser
  * dispatches pointer events to them natively.
  *
- * ```ts
- * const interactions = new InteractionManager();
- * interactions.connect( renderer, camera );
+ * ```typescript
+ * import { InteractionManager } from 'ek3d/addons/interaction/InteractionManager';
+ * import type { Camera } from 'ek3d/cameras/Camera';
+ * import type { Mesh } from 'ek3d/objects/Mesh';
+ * import type { WebGLRenderer } from 'ek3d/renderers/WebGLRenderer';
+ * import type { Scene } from 'ek3d/scenes/Scene';
  *
- * // Objects live anywhere in the scene graph
- * scene.add( mesh );
+ * function registerInteraction( renderer: WebGLRenderer, camera: Camera, scene: Scene, mesh: Mesh ): InteractionManager {
+ *   const interactions = new InteractionManager();
+ *   interactions.connect( renderer, camera );
  *
- * // Register for interaction separately
- * interactions.add( mesh );
- *
- * // In the animation loop
- * interactions.update();
+ *   // Scene placement and interaction registration are independent.
+ *   scene.add( mesh );
+ *   interactions.add( mesh );
+ *   interactions.update(); // Call once per frame before rendering.
+ *   return interactions;
+ * }
  * ```
  *
  */

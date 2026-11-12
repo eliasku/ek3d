@@ -4,7 +4,7 @@ import { createElementNS } from "../utils";
 /**
  * A loader for loading images. The class loads images with the HTML `Image` API.
  *
- * ```ts
+ * ```typescript
  * import { ImageLoader } from 'ek3d/loaders/ImageLoader';
  *
  * const loader = new ImageLoader();

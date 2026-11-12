@@ -17,23 +17,26 @@ import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
  *
  * This module can only be used with {@link WebGLRenderer}.
  *
- * ```ts
- * const composer = new EffectComposer( renderer );
+ * ```typescript
+ * import { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ * import { GlitchPass } from 'ek3d/addons/postprocessing/GlitchPass';
+ * import { OutputPass } from 'ek3d/addons/postprocessing/OutputPass';
+ * import { RenderPass } from 'ek3d/addons/postprocessing/RenderPass';
+ * import type { Camera } from 'ek3d/cameras/Camera';
+ * import type { WebGLRenderer } from 'ek3d/renderers/WebGLRenderer';
+ * import type { Scene } from 'ek3d/scenes/Scene';
  *
- * // adding some passes
- * const renderPass = new RenderPass( scene, camera );
- * composer.addPass( renderPass );
+ * function createPostprocessing( renderer: WebGLRenderer, scene: Scene, camera: Camera ): EffectComposer {
+ *   const composer = new EffectComposer( renderer );
+ *   composer.addPass( new RenderPass( scene, camera ) );
+ *   composer.addPass( new GlitchPass() );
+ *   composer.addPass( new OutputPass() );
  *
- * const glitchPass = new GlitchPass();
- * composer.addPass( glitchPass );
+ *   renderer.setAnimationLoop( () => {
+ *     composer.render(); // Instead of renderer.render().
+ *   } );
  *
- * const outputPass = new OutputPass()
- * composer.addPass( outputPass );
- *
- * function animate() {
- *
- * 	composer.render(); // instead of renderer.render()
- *
+ *   return composer;
  * }
  * ```
  *

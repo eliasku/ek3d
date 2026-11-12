@@ -55,10 +55,18 @@ export interface GTAOPassParameters {
  *
  * `GTAOPass` provides better quality than {@link SSAOPass} but is also more expensive.
  *
- * ```ts
- * const gtaoPass = new GTAOPass( scene, camera, width, height );
- * gtaoPass.output = GTAOPass.OUTPUT.Denoise;
- * composer.addPass( gtaoPass );
+ * ```typescript
+ * import { GTAOPass } from 'ek3d/addons/postprocessing/GTAOPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ * import type { PerspectiveCamera } from 'ek3d/cameras/PerspectiveCamera';
+ * import type { Scene } from 'ek3d/scenes/Scene';
+ *
+ * function addGTAO( composer: EffectComposer, scene: Scene, camera: PerspectiveCamera ): GTAOPass {
+ *   const gtaoPass = new GTAOPass( scene, camera );
+ *   gtaoPass.output = GTAOPass.OUTPUT.Denoise;
+ *   composer.addPass( gtaoPass ); // The composer supplies its render size.
+ *   return gtaoPass;
+ * }
  * ```
  *
  */

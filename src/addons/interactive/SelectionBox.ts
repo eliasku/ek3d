@@ -41,9 +41,18 @@ type SelectionCamera = PerspectiveCamera | OrthographicCamera;
  * This class can be used to select 3D objects in a scene with a selection box.
  * It is recommended to visualize the selected area with the help of {@link SelectionHelper}.
  *
- * ```ts
- * const selectionBox = new SelectionBox( camera, scene );
- * const selectedObjects = selectionBox.select( startPoint, endPoint );
+ * ```typescript
+ * import { SelectionBox } from 'ek3d/addons/interactive/SelectionBox';
+ * import type { PerspectiveCamera } from 'ek3d/cameras/PerspectiveCamera';
+ * import type { Object3D } from 'ek3d/core/Object3D';
+ * import { Vector3 } from 'ek3d/math/Vector3';
+ * import type { Scene } from 'ek3d/scenes/Scene';
+ *
+ * function selectCenter( camera: PerspectiveCamera, scene: Scene ): Object3D[] {
+ *   const selectionBox = new SelectionBox( camera, scene );
+ *   // Selection corners use normalized device coordinates.
+ *   return selectionBox.select( new Vector3( -0.5, 0.5, 0 ), new Vector3( 0.5, -0.5, 0 ) );
+ * }
  * ```
  */
 export class SelectionBox {

@@ -29,9 +29,17 @@ import type { Vector2 } from "../../math/Vector2";
  * {@link SAOPass} and {@link GTAOPass} produce a more advanced AO but are also
  * more expensive.
  *
- * ```ts
- * const ssaoPass = new SSAOPass( scene, camera, width, height );
- * composer.addPass( ssaoPass );
+ * ```typescript
+ * import { SSAOPass } from 'ek3d/addons/postprocessing/SSAOPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ * import type { PerspectiveCamera } from 'ek3d/cameras/PerspectiveCamera';
+ * import type { Scene } from 'ek3d/scenes/Scene';
+ *
+ * function addSSAO( composer: EffectComposer, scene: Scene, camera: PerspectiveCamera ): SSAOPass {
+ *   const ssaoPass = new SSAOPass( scene, camera );
+ *   composer.addPass( ssaoPass ); // The composer supplies its render size.
+ *   return ssaoPass;
+ * }
  * ```
  *
  */

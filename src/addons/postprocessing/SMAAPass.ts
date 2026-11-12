@@ -12,9 +12,15 @@ import type { WebGLRenderTarget as RT } from "../../renderers/WebGLRenderTarget"
  * A pass for applying SMAA. Unlike {@link FXAAPass}, `SMAAPass` operates in
  * `linear-srgb` so this pass must be executed before {@link OutputPass}.
  *
- * ```ts
- * const smaaPass = new SMAAPass();
- * composer.addPass( smaaPass );
+ * ```typescript
+ * import { SMAAPass } from 'ek3d/addons/postprocessing/SMAAPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ *
+ * function addSMAA( composer: EffectComposer ): SMAAPass {
+ *   const smaaPass = new SMAAPass();
+ *   composer.addPass( smaaPass ); // Add before OutputPass for linear input.
+ *   return smaaPass;
+ * }
  * ```
  *
  */

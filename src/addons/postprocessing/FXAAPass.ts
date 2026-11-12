@@ -4,9 +4,15 @@ import { ShaderPass } from "./ShaderPass";
 /**
  * A pass for applying FXAA.
  *
- * ```ts
- * const fxaaPass = new FXAAPass();
- * composer.addPass( fxaaPass );
+ * ```typescript
+ * import { FXAAPass } from 'ek3d/addons/postprocessing/FXAAPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ *
+ * function addFXAA( composer: EffectComposer ): FXAAPass {
+ *   const fxaaPass = new FXAAPass();
+ *   composer.addPass( fxaaPass ); // Add after OutputPass for sRGB input.
+ *   return fxaaPass;
+ * }
  * ```
  *
  */

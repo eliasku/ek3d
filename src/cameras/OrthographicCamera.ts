@@ -6,7 +6,7 @@ import { Camera } from "./Camera";
  * constant regardless of its distance from the camera. This can be useful
  * for rendering 2D scenes and UI elements, amongst other things.
  *
- * ```ts
+ * ```typescript
  * import { OrthographicCamera } from 'ek3d/cameras/OrthographicCamera';
  * import { Scene } from 'ek3d/scenes/Scene';
  *

@@ -1,9 +1,9 @@
-import { assert, test } from "vitest";
+import { assert, test } from "vite-plus/test";
 import * as Upstream from "../upstream/three.js/examples/jsm/libs/ktx-parse.module.js";
 import { read } from "../src/addons/loaders/KTX2Container";
 import fs from "node:fs";
 
-const dir = "upstream/three.js/examples/textures/ktx2/";
+const dir = "public/examples/textures/ktx2/";
 const files: string[] = fs.existsSync(dir)
   ? fs
       .readdirSync(dir)

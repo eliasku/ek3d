@@ -25,7 +25,6 @@
   <body>
     <div id="wrapper"><canvas id="scene"></canvas></div>
     <script id="computeShaderPosition" type="x-shader/x-fragment">
-
       #define delta ( 1.0 / 60.0 )
 
       void main() {
@@ -51,7 +50,6 @@
       }
     </script>
     <script id="computeShaderVelocity" type="x-shader/x-fragment">
-
       // For PI declaration:
       #include <common>
 
@@ -164,7 +162,6 @@
       }
     </script>
     <script type="x-shader/x-vertex" id="particleVertexShader">
-
       // For PI declaration:
       #include <common>
 
@@ -213,7 +210,6 @@
       }
     </script>
     <script type="x-shader/x-fragment" id="particleFragmentShader">
-
       varying vec4 vColor;
 
       void main() {

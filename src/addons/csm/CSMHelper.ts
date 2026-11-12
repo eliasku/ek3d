@@ -13,7 +13,7 @@ import type { CSM } from "./CSM";
 /**
  * A helper for visualizing the cascades of a CSM instance.
  *
- * ```ts
+ * ```typescript
  * import { CSMHelper } from "ek3d/addons/csm/CSMHelper";
  * ```
  */

@@ -166,9 +166,11 @@ function parseHeader(binaryData: ArrayBuffer): PCDHeader {
  * - intensity
  * - label
  *
- * ```ts
+ * ```typescript
  * import { PCDLoader } from "ek3d/addons/loaders/PCDLoader";
+ * import { Scene } from "ek3d/scenes/Scene";
  *
+ * const scene = new Scene();
  * const loader = new PCDLoader();
  * const points = await loader.loadAsync("models/pcd/binary/Zaghetto.pcd");
  * points.geometry.center(); // optional

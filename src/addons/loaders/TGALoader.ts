@@ -48,7 +48,7 @@ type RowWriter = (
 /**
  * A loader for the TGA texture format.
  *
- * ```ts
+ * ```typescript
  * import { TGALoader } from "ek3d/addons/loaders/TGALoader";
  * import { ColorSpace } from "ek3d/constants";
  *

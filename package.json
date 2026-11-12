@@ -41,14 +41,15 @@
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "typescript6": "npm:typescript@6.0.2",
-    "vite": "npm:@voidzero-dev/vite-plus-core@1.4.0",
-    "vite-plus": "1.4.0"
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.5.0",
+    "vite-plus": "1.5.0"
   },
   "overrides": {
-    "vite": "npm:@voidzero-dev/vite-plus-core@1.4.0"
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.5.0"
   },
+  "packageManager": "npm@12.2.2",
   "engines": {
-    "node": "^22.18.0 || ^24.11.0 || >=26.0.0"
+    "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
   },
   "allowScripts": {
     "esbuild": true

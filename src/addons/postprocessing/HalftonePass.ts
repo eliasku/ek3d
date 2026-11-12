@@ -8,21 +8,27 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
 /**
  * Pass for creating a RGB halftone effect.
  *
- * ```ts
- * const params = {
- * 	shape: 1,
- * 	radius: 4,
- * 	rotateR: Math.PI / 12,
- * 	rotateB: Math.PI / 12 * 2,
- * 	rotateG: Math.PI / 12 * 3,
- * 	scatter: 0,
- * 	blending: 1,
- * 	blendingMode: 1,
- * 	greyscale: false,
- * 	disable: false
- * };
- * const halftonePass = new HalftonePass( params );
- * composer.addPass( halftonePass );
+ * ```typescript
+ * import { HalftonePass } from 'ek3d/addons/postprocessing/HalftonePass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ *
+ * function addHalftone( composer: EffectComposer ): HalftonePass {
+ *   const params = {
+ *     shape: 1,
+ *     radius: 4,
+ *     rotateR: Math.PI / 12,
+ *     rotateB: Math.PI / 12 * 2,
+ *     rotateG: Math.PI / 12 * 3,
+ *     scatter: 0,
+ *     blending: 1,
+ *     blendingMode: 1,
+ *     greyscale: false,
+ *     disable: false
+ *   };
+ *   const halftonePass = new HalftonePass( params );
+ *   composer.addPass( halftonePass );
+ *   return halftonePass;
+ * }
  * ```
  *
  */

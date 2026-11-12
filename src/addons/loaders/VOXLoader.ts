@@ -425,12 +425,20 @@ export function buildData3DTexture(chunk: VOXChunk): Data3DTexture {
 /**
  * A loader for the VOX format.
  *
- * ```ts
- * import { VOXLoader } from "ek3d/addons/loaders/VOXLoader";
+ * ```typescript
+ * import { VOXLoader, buildMesh } from "ek3d/addons/loaders/VOXLoader";
+ * import { Scene } from "ek3d/scenes/Scene";
  *
+ * const scene = new Scene();
  * const loader = new VOXLoader();
  * const result = await loader.loadAsync("models/vox/monu10.vox");
- * if (result) scene.add(result.scene!.children[0]);
+ * if (result) {
+ *   if (result.scene) {
+ *     scene.add(result.scene);
+ *   } else {
+ *     for (const chunk of result.chunks) scene.add(buildMesh(chunk));
+ *   }
+ * }
  * ```
  */
 export class VOXLoader extends Loader<VOXResult | undefined, string> {

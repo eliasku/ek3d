@@ -22,9 +22,17 @@ export interface RenderPixelatedPassOptions {
 /**
  * A special type of render pass that produces a pixelated beauty pass.
  *
- * ```ts
- * const renderPixelatedPass = new RenderPixelatedPass( 6, scene, camera );
- * composer.addPass( renderPixelatedPass );
+ * ```typescript
+ * import { RenderPixelatedPass } from 'ek3d/addons/postprocessing/RenderPixelatedPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ * import type { Camera } from 'ek3d/cameras/Camera';
+ * import type { Scene } from 'ek3d/scenes/Scene';
+ *
+ * function addPixelation( composer: EffectComposer, scene: Scene, camera: Camera ): RenderPixelatedPass {
+ *   const renderPixelatedPass = new RenderPixelatedPass( 6, scene, camera );
+ *   composer.addPass( renderPixelatedPass );
+ *   return renderPixelatedPass;
+ * }
  * ```
  *
  */

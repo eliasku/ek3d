@@ -1484,11 +1484,20 @@ function createObject(
  * - !CATEGORY: Model/part category declarations.
  * - !KEYWORDS: Model/part keywords declarations.
  *
- * ```ts
- * const loader = new LDrawLoader();
- * loader.setConditionalLineMaterial( LDrawConditionalLineMaterial ); // the type of line material depends on the used renderer
- * const object = await loader.loadAsync( 'models/ldraw/officialLibrary/models/car.ldr_Packed.mpd' );
- * scene.add( object );
+ * ```typescript
+ * import { LDrawLoader } from 'ek3d/addons/loaders/LDrawLoader';
+ * import type { Scene } from 'ek3d/scenes/Scene';
+ *
+ * async function loadLDraw(
+ *   scene: Scene,
+ *   conditionalLineMaterial: Parameters<LDrawLoader["setConditionalLineMaterial"]>[0]
+ * ) {
+ *   const loader = new LDrawLoader();
+ *   loader.setConditionalLineMaterial( conditionalLineMaterial );
+ *   const object = await loader.loadAsync( 'models/ldraw/officialLibrary/models/car.ldr_Packed.mpd' );
+ *   scene.add( object );
+ *   return object;
+ * }
  * ```
  *
  * @augments Loader

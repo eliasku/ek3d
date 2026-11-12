@@ -78,7 +78,7 @@ export interface WaterOptions {
  * - [An implementation of water shader based on the flat mirror](https://home.adelphi.edu/~stemkoski/)
  * - [Water shader explanations in WebGL](http://29a.ch/slides/2012/webglwater/ )
  *
- * ```ts
+ * ```typescript
  * import { PlaneGeometry } from 'ek3d/geometries/PlaneGeometry';
  * import { Water } from 'ek3d/addons/objects/Water';
  * import { Scene } from 'ek3d/scenes/Scene';

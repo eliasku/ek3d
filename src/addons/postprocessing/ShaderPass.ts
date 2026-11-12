@@ -10,9 +10,16 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  * with a raw GLSL shader object. Useful for implementing custom
  * effects.
  *
- * ```ts
- * const fxaaPass = new ShaderPass( FXAAShader );
- * composer.addPass( fxaaPass );
+ * ```typescript
+ * import { ShaderPass } from 'ek3d/addons/postprocessing/ShaderPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ * import { FXAAShader } from 'ek3d/addons/shaders/FXAAShader';
+ *
+ * function addFXAAShader( composer: EffectComposer ): ShaderPass {
+ *   const fxaaPass = new ShaderPass( FXAAShader );
+ *   composer.addPass( fxaaPass );
+ *   return fxaaPass;
+ * }
  * ```
  *
  */

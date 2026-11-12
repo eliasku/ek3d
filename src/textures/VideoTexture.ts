@@ -3,7 +3,7 @@ import { Texture } from "./Texture";
 /**
  * A texture for use with a video.
  *
- * ```ts
+ * ```typescript
  * import { VideoTexture } from 'ek3d/textures/VideoTexture';
  *
  * // Assuming you have created an HTML video element with id="video".

@@ -13,9 +13,15 @@ import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
  * {@link https://github.com/mrdoob/three.js/blob/dev/examples/jsm/postprocessing/UnrealBloomPass.js | UnrealBloomPass}
  * produces a more advanced Bloom but is also more expensive.
  *
- * ```ts
- * const effectBloom = new BloomPass( 0.75 );
- * composer.addPass( effectBloom );
+ * ```typescript
+ * import { BloomPass } from 'ek3d/addons/postprocessing/BloomPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ *
+ * function addBloom( composer: EffectComposer ): BloomPass {
+ *   const effectBloom = new BloomPass( 0.75 );
+ *   composer.addPass( effectBloom );
+ *   return effectBloom;
+ * }
  * ```
  *
  */

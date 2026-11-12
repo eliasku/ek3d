@@ -17,12 +17,22 @@ import { Scene } from "../../scenes/Scene";
  * The implementation is based on the [EnvironmentScene](https://github.com/google/model-viewer/blob/master/packages/model-viewer/src/three-components/EnvironmentScene.ts)
  * component from the `model-viewer` project.
  *
- * ```ts
- * const environment = new RoomEnvironment();
- * const pmremGenerator = new PMREMGenerator( renderer );
+ * ```typescript
+ * import { RoomEnvironment } from 'ek3d/addons/environments/RoomEnvironment';
+ * import { PMREMGenerator } from 'ek3d/extras/PMREMGenerator';
+ * import type { WebGLRenderer } from 'ek3d/renderers/WebGLRenderer';
+ * import type { WebGLCubeRenderTarget } from 'ek3d/renderers/WebGLCubeRenderTarget';
+ * import type { Scene } from 'ek3d/scenes/Scene';
  *
- * const envMap = pmremGenerator.fromScene( environment ).texture;
- * scene.environment = envMap;
+ * function createRoomLighting( renderer: WebGLRenderer, scene: Scene ): WebGLCubeRenderTarget {
+ *   const environment = new RoomEnvironment();
+ *   const pmremGenerator = new PMREMGenerator( renderer );
+ *   const target = pmremGenerator.fromScene( environment );
+ *   scene.environment = target.texture;
+ *   environment.dispose();
+ *   pmremGenerator.dispose();
+ *   return target; // Dispose the target when the environment is no longer needed.
+ * }
  * ```
  *
  * @augments Scene

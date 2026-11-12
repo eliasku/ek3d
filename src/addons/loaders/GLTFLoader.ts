@@ -231,16 +231,22 @@ export interface GLTF {
  * - [KHR_animation_pointer](https://github.com/needle-tools/three-animation-pointer)
  * - [NEEDLE_progressive](https://github.com/needle-tools/gltf-progressive)
  *
- * ```ts
+ * ```typescript
+ * import { GLTFLoader } from 'ek3d/addons/loaders/GLTFLoader';
+ * import { DRACOLoader, DRACO_GLTF_CONFIG } from 'ek3d/addons/loaders/DRACOLoader';
+ * import { Scene } from 'ek3d/scenes/Scene';
+ *
+ * const scene = new Scene();
  * const loader = new GLTFLoader();
  *
  * // Optional: Provide a DRACOLoader instance to decode compressed mesh data
  * const dracoLoader = new DRACOLoader();
- * dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
+ * dracoLoader.setDecoderPath( DRACO_GLTF_CONFIG );
  * loader.setDRACOLoader( dracoLoader );
  *
  * const gltf = await loader.loadAsync( 'models/gltf/duck/duck.gltf' );
  * scene.add( gltf.scene );
+ * dracoLoader.dispose();
  * ```
  *
  */

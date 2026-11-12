@@ -11,12 +11,18 @@ import type { Texture } from "../../textures/Texture";
  * By default the object is centered at the camera, so it is often helpful to set
  * `skybox.position.y = height` to put the ground at the origin.
  *
- * ```ts
- * const height = 15, radius = 100;
+ * ```typescript
+ * import { GroundedSkybox } from 'ek3d/addons/objects/GroundedSkybox';
+ * import type { Scene } from 'ek3d/scenes/Scene';
+ * import type { Texture } from 'ek3d/textures/Texture';
  *
- * const skybox = new GroundedSkybox( envMap, height, radius );
- * skybox.position.y = height;
- * scene.add( skybox );
+ * function addGroundedSkybox( scene: Scene, envMap: Texture ): GroundedSkybox {
+ *   const height = 15, radius = 100;
+ *   const skybox = new GroundedSkybox( envMap, height, radius );
+ *   skybox.position.y = height;
+ *   scene.add( skybox );
+ *   return skybox;
+ * }
  * ```
  *
  * @augments Mesh

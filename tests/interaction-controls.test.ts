@@ -133,10 +133,7 @@ test("TrackballControls reset restores target position and zoom", () => {
 });
 
 test("OBJLoader merges faces, groups and vertex colors like upstream", () => {
-  const objText = readFileSync(
-    new URL("../upstream/three.js/examples/models/obj/walt/WaltHead.obj", import.meta.url),
-    "utf8",
-  );
+  const objText = readFileSync(new URL("../public/examples/models/obj/walt/WaltHead.obj", import.meta.url), "utf8");
   const container = new OBJLoader().parse(objText);
   assert.ok(container instanceof Group, "parse returns a group");
   assert.ok(container.children.length > 0, "the model has meshes");

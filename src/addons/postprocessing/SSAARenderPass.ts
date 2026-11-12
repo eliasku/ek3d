@@ -30,10 +30,18 @@ type CameraWithViewOffset = Camera & {
  *
  * This manual approach to SSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.
  *
- * ```ts
- * const ssaaRenderPass = new SSAARenderPass( scene, camera );
- * ssaaRenderPass.sampleLevel = 3;
- * composer.addPass( ssaaRenderPass );
+ * ```typescript
+ * import { SSAARenderPass } from 'ek3d/addons/postprocessing/SSAARenderPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ * import type { PerspectiveCamera } from 'ek3d/cameras/PerspectiveCamera';
+ * import type { Scene } from 'ek3d/scenes/Scene';
+ *
+ * function addSSAA( composer: EffectComposer, scene: Scene, camera: PerspectiveCamera ): SSAARenderPass {
+ *   const ssaaRenderPass = new SSAARenderPass( scene, camera );
+ *   ssaaRenderPass.sampleLevel = 3;
+ *   composer.addPass( ssaaRenderPass );
+ *   return ssaaRenderPass;
+ * }
  * ```
  *
  */

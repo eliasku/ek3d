@@ -277,14 +277,20 @@ function compactDirtyVertices(vertices: number[], vertexCount: number) {
 /**
  * Sculpts triangle meshes with adaptive topology.
  *
- * ```ts
+ * ```typescript
  * import { Sculptor } from 'ek3d/addons/misc/Sculptor';
- * // mesh, camera and renderer are supplied by the application.
- * const sculptor = new Sculptor( mesh, camera )
- * 	.setTool( 'inflate' )
- * 	.setSize( 75 )
- * 	.setStrength( 0.3 );
- * sculptor.connect( renderer.domElement );
+ * import type { Camera } from 'ek3d/cameras/Camera';
+ * import type { Material } from 'ek3d/materials/Material';
+ * import type { Mesh } from 'ek3d/objects/Mesh';
+ *
+ * function createSculptor( mesh: Mesh<Material>, camera: Camera, element: HTMLElement ): Sculptor {
+ *   const sculptor = new Sculptor( mesh, camera )
+ *     .setTool( 'inflate' )
+ *     .setSize( 75 )
+ *     .setStrength( 0.3 );
+ *   sculptor.connect( element );
+ *   return sculptor;
+ * }
  * ```
  *
  * Replaces `mesh.geometry` with a welded geometry containing positions, normals

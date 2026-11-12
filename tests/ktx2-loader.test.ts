@@ -1,4 +1,4 @@
-import { assert, test } from "vitest";
+import { assert, test } from "vite-plus/test";
 import { KTX2Loader } from "../src/addons/loaders/KTX2Loader";
 import { DataTexture } from "../src/textures/DataTexture";
 import { PixelFormat, TextureType, ColorSpace, TextureFilter } from "../src/constants";
@@ -6,7 +6,7 @@ import { read } from "../src/addons/loaders/KTX2Container";
 import type { KTX2Container } from "../src/addons/loaders/KTX2Container";
 import fs from "node:fs";
 
-const file = "upstream/three.js/examples/textures/ktx2/2d_rgba8.ktx2";
+const file = "public/examples/textures/ktx2/2d_rgba8.ktx2";
 
 test("KTX2Loader raw path creates a DataTexture with mipmaps and color space", async () => {
   const loader = new KTX2Loader();

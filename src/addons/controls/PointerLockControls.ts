@@ -28,21 +28,22 @@ const _PI_2 = Math.PI / 2;
  * The implementation of this class is based on the [Pointer Lock API](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API).
  * `PointerLockControls` is a perfect choice for first person 3D games.
  *
- * ```ts
- * const controls = new PointerLockControls( camera, document.body );
+ * ```typescript
+ * import { PointerLockControls } from 'ek3d/addons/controls/PointerLockControls';
+ * import type { Camera } from 'ek3d/cameras/Camera';
  *
- * // add event listener to show/hide a UI (e.g. the game's menu)
- * controls.addEventListener( 'lock', function () {
+ * function createPointerLockControls( camera: Camera, menu: HTMLElement ): PointerLockControls {
+ *   const controls = new PointerLockControls( camera, document.body );
  *
- * 	menu.style.display = 'none';
+ *   controls.addEventListener( 'lock', () => {
+ *     menu.style.display = 'none';
+ *   } );
+ *   controls.addEventListener( 'unlock', () => {
+ *     menu.style.display = 'block';
+ *   } );
  *
- * } );
- *
- * controls.addEventListener( 'unlock', function () {
- *
- * 	menu.style.display = 'block';
- *
- * } );
+ *   return controls;
+ * }
  * ```
  *
  * @augments Controls

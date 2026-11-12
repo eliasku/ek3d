@@ -6,7 +6,7 @@ import { Vector2 } from "../../math/Vector2";
 /**
  * Draws triangle contours, face numbers and vertex labels in UV space.
  *
- * ```ts
+ * ```typescript
  * import { SphereGeometry } from "ek3d/geometries/SphereGeometry";
  * import { UVsDebug } from "ek3d/addons/utils/UVsDebug";
  * document.body.appendChild(UVsDebug(new SphereGeometry()));

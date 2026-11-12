@@ -38,10 +38,25 @@ type OutlineObject = Mesh | Points | Sprite | Line | (LineSegments & { isLine2?:
 /**
  * A pass for rendering outlines around selected objects.
  *
- * ```ts
- * const resolution = new Vector2( window.innerWidth, window.innerHeight );
- * const outlinePass = new OutlinePass( resolution, scene, camera );
- * composer.addPass( outlinePass );
+ * ```typescript
+ * import { OutlinePass } from 'ek3d/addons/postprocessing/OutlinePass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ * import type { PerspectiveCamera } from 'ek3d/cameras/PerspectiveCamera';
+ * import type { Object3D } from 'ek3d/core/Object3D';
+ * import { Vector2 } from 'ek3d/math/Vector2';
+ * import type { Scene } from 'ek3d/scenes/Scene';
+ *
+ * function addOutlines(
+ *   composer: EffectComposer,
+ *   scene: Scene,
+ *   camera: PerspectiveCamera,
+ *   selectedObjects: Object3D[]
+ * ): OutlinePass {
+ *   const resolution = new Vector2( window.innerWidth, window.innerHeight );
+ *   const outlinePass = new OutlinePass( resolution, scene, camera, selectedObjects );
+ *   composer.addPass( outlinePass );
+ *   return outlinePass;
+ * }
  * ```
  *
  */

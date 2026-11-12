@@ -10,9 +10,15 @@ import type { WebGLRenderer } from "../../renderers/WebGLRenderer";
 /**
  * Pass for a basic after image effect.
  *
- * ```ts
- * const afterimagePass = new AfterimagePass( 0.9 );
- * composer.addPass( afterimagePass );
+ * ```typescript
+ * import { AfterimagePass } from 'ek3d/addons/postprocessing/AfterimagePass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ *
+ * function addAfterimage( composer: EffectComposer ): AfterimagePass {
+ *   const afterimagePass = new AfterimagePass( 0.9 );
+ *   composer.addPass( afterimagePass );
+ *   return afterimagePass;
+ * }
  * ```
  *
  */
@@ -35,8 +41,12 @@ export class AfterimagePass extends Pass {
     /**
      * The pass uniforms. Use this object if you want to update the
      * `damp` value at runtime.
-     * ```ts
-     * pass.uniforms.damp.value = 0.9;
+     * ```typescript
+     * import type { AfterimagePass } from 'ek3d/addons/postprocessing/AfterimagePass';
+     *
+     * function setDamping( pass: AfterimagePass ): void {
+     *   pass.uniforms.damp.value = 0.9;
+     * }
      * ```
      */
     this.uniforms = cloneUniforms(AfterimageShader.uniforms);

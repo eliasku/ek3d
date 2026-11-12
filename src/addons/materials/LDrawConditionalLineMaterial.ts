@@ -8,8 +8,16 @@ import { fog } from "../../renderers/shaders/UniformsLib";
  *
  * @augments ShaderMaterial
  *
- * ```ts
- * loader.setConditionalLineMaterial( LDrawConditionalLineMaterial );
+ * ```typescript
+ * import { LDrawLoader } from 'ek3d/addons/loaders/LDrawLoader';
+ * import { LDrawConditionalLineMaterial } from 'ek3d/addons/materials/LDrawConditionalLineMaterial';
+ *
+ * class ConditionalLineMaterial extends LDrawConditionalLineMaterial {
+ *   override userData: { code: string | null } = { code: null };
+ * }
+ *
+ * const loader = new LDrawLoader();
+ * loader.setConditionalLineMaterial( ConditionalLineMaterial );
  * ```
  *
  * @demo examples/webgl_loader_ldraw.html

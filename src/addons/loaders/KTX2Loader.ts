@@ -159,13 +159,13 @@ export interface ZSTDDecoderLike {
  * - [DFD](https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor)
  * - [BasisU HDR](https://github.com/BinomialLLC/basis_universal/wiki/UASTC-HDR-Texture-Specification-v1.0)
  *
- * ```ts
+ * ```typescript
  * import { KTX2Loader } from 'ek3d/addons/loaders/KTX2Loader';
  * import { WebGLRenderer } from 'ek3d/renderers/WebGLRenderer';
  *
- * const ktx2Loader = new KTX2Loader() .detectSupport( renderer );
- * ktx2Loader.setTranscoderPath( '/libs/basis/' );
- * const texture = ktx2Loader.loadAsync( 'textures/2d_rgba8.ktx2' );
+ * const renderer = new WebGLRenderer();
+ * const ktx2Loader = new KTX2Loader().detectSupport( renderer );
+ * const texture = await ktx2Loader.loadAsync( 'textures/2d_rgba8.ktx2' );
  * ```
  *
  */

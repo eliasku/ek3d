@@ -65,9 +65,16 @@ export interface LUTPassOptions {
 /**
  * Pass for color grading via lookup tables.
  *
- * ```ts
- * const lutPass = new LUTPass( { lut: lut.texture3D } );
- * composer.addPass( lutPass );
+ * ```typescript
+ * import { LUTPass } from 'ek3d/addons/postprocessing/LUTPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ * import type { Data3DTexture } from 'ek3d/textures/Data3DTexture';
+ *
+ * function addColorGrading( composer: EffectComposer, lut: Data3DTexture ): LUTPass {
+ *   const lutPass = new LUTPass( { lut } );
+ *   composer.addPass( lutPass );
+ *   return lutPass;
+ * }
  * ```
  *
  */

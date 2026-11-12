@@ -9,8 +9,14 @@ import type { WebGLRenderTarget } from "../../renderers/WebGLRenderTarget";
  * This pass can be used to create a film grain effect.
  *
  * ```typescript
- * const filmPass = new FilmPass();
- * composer.addPass( filmPass );
+ * import { FilmPass } from 'ek3d/addons/postprocessing/FilmPass';
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ *
+ * function addFilmGrain( composer: EffectComposer ): FilmPass {
+ *   const filmPass = new FilmPass();
+ *   composer.addPass( filmPass );
+ *   return filmPass;
+ * }
  * ```
  *
  */
@@ -33,8 +39,12 @@ export class FilmPass extends Pass {
      * The pass uniforms. Use this object if you want to update the
      * `intensity` or `grayscale` value at runtime.
      * ```typescript
-     * pass.uniforms.intensity.value = 0.25;
-     * pass.uniforms.grayscale.value = true;
+     * import type { FilmPass } from 'ek3d/addons/postprocessing/FilmPass';
+     *
+     * function updateFilmGrain( pass: FilmPass ): void {
+     *   pass.uniforms.intensity.value = 0.25;
+     *   pass.uniforms.grayscale.value = true;
+     * }
      * ```
      */
     this.uniforms = cloneUniforms(shader.uniforms);

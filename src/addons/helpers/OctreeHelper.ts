@@ -8,7 +8,7 @@ import type { Octree } from "../math/Octree";
 /**
  * A helper for visualizing an Octree.
  *
- * ```ts
+ * ```typescript
  * import { Scene } from 'ek3d/scenes/Scene';
  * import { Octree } from 'ek3d/addons/math/Octree';
  * import { OctreeHelper } from 'ek3d/addons/helpers/OctreeHelper';

@@ -45,7 +45,7 @@ const _up = new Vector3(0, 1, 0);
  *
  * Use with WebGLRenderer.
  *
- * ```ts
+ * ```typescript
  * import { CSM } from "ek3d/addons/csm/CSM";
  * ```
  */

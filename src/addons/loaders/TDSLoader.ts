@@ -20,9 +20,11 @@ type TDSMesh = Mesh<MeshPhongMaterial | MeshPhongMaterial[]>;
  *
  * Loads geometry with uv and materials basic properties with texture support.
  *
- * ```ts
+ * ```typescript
  * import { TDSLoader } from "ek3d/addons/loaders/TDSLoader";
+ * import { Scene } from "ek3d/scenes/Scene";
  *
+ * const scene = new Scene();
  * const loader = new TDSLoader();
  * loader.setResourcePath("models/3ds/portalgun/textures/");
  * const object = await loader.loadAsync("models/3ds/portalgun/portalgun.3ds");

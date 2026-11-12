@@ -26,13 +26,19 @@ export interface BokehPassOptions {
  *
  * ```typescript
  * import { BokehPass } from "ek3d/addons/postprocessing/BokehPass";
+ * import type { EffectComposer } from 'ek3d/addons/postprocessing/EffectComposer';
+ * import type { PerspectiveCamera } from 'ek3d/cameras/PerspectiveCamera';
+ * import type { Scene } from 'ek3d/scenes/Scene';
  *
- * const bokehPass = new BokehPass( scene, camera, {
- * 	focus: 500,
- * 	aperture: 5,
- * 	maxblur: 0.01
- * } );
- * composer.addPass( bokehPass );
+ * function addDepthOfField( composer: EffectComposer, scene: Scene, camera: PerspectiveCamera ): BokehPass {
+ *   const bokehPass = new BokehPass( scene, camera, {
+ *     focus: 500,
+ *     aperture: 5,
+ *     maxblur: 0.01
+ *   } );
+ *   composer.addPass( bokehPass );
+ *   return bokehPass;
+ * }
  * ```
  *
  */
@@ -114,9 +120,13 @@ export class BokehPass extends Pass {
      * `focus`, `aperture` or `maxblur` values at runtime.
      *
      * ```typescript
-     * bokehPass.uniforms.focus.value = 500;
-     * bokehPass.uniforms.aperture.value = 5;
-     * bokehPass.uniforms.maxblur.value = 0.01;
+     * import type { BokehPass } from 'ek3d/addons/postprocessing/BokehPass';
+     *
+     * function updateDepthOfField( bokehPass: BokehPass ): void {
+     *   bokehPass.uniforms.focus.value = 500;
+     *   bokehPass.uniforms.aperture.value = 5;
+     *   bokehPass.uniforms.maxblur.value = 0.01;
+     * }
      * ```
      */
     this.uniforms = bokehUniforms;
