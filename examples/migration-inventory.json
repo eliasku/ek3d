@@ -4,7 +4,8 @@
   "synchronization": {
     "commit": "2c916de7ad5a7995e345509fbcf8ee5ae161c05c",
     "report": "../UPSTREAM_SYNC.md",
-    "note": "Extracted records and counts retain the original upstream snapshot below."
+    "note": "Extracted records and counts retain the original upstream snapshot below.",
+    "scope_policy": "Prepared web/game asset loaders only; current user exclusions are recorded in migration-scope.json."
   },
   "upstream": {
     "repo": "three.js",

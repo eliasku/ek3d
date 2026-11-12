@@ -191,8 +191,6 @@ export class AnimationClip {
    * sequences of a geometry, trying to sort morph target names into
    * animation-group-based patterns like "Walk_001, Walk_002, Run_001, Run_002...".
    *
-   * See {@link MD2Loader#parse} as an example for how the method should be used.
-   *
    * @static
    * @param morphTargets - A sequence of morph targets.
    * @param fps - The Frames-Per-Second value.

@@ -42,8 +42,18 @@ renderer.render(scene, camera);
 
 The port includes controls, loaders, exporters, audio and WebGL postprocessing.
 It also includes tools for geometry, animation, water and reflections.
-It does not include the full Three.js addon catalog.
-WebGPU, TSL, WebXR, StereoCamera and LEGO/LDraw are not included.
+The following upstream features are intentionally excluded:
+
+- WebGPU, TSL, WebXR, StereoCamera and LEGO/LDraw.
+- CAD/manufacturing/scientific importers: Rhino 3DM, AMF, 3MF, GCode, PDB, NRRD, VTK, PCD, XYZ and STL; the IFC example/runtime.
+- Legacy/interchange model importers: LWO, 3DS/TDS, MD2, MDD, VRML, Collada/KMZ, FBX, OBJ/MTL and USD/USDZ.
+- MaterialX utilities and KTX1/PVR, TGA/TIFF, IES and JPEG XL loaders.
+
+Asset loading targets prepared web/game content, with glTF/GLB models and **KTX2/DDS** compressed textures.
+Exclusions include format-specific helpers, dependent examples and exclusive resources, without conversion.
+Independent exporters and shared rendering utilities remain supported.
+Future upstream syncs must preserve these exclusions; the persistent module/page rules are in
+[migration-scope.json](examples/migration-scope.json).
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, commands, API details and checks.
 

@@ -4,13 +4,10 @@ import { FlyControls } from "../src/addons/controls/FlyControls";
 import { FirstPersonControls } from "../src/addons/controls/FirstPersonControls";
 import { TrackballControls } from "../src/addons/controls/TrackballControls";
 import { ArcballControls } from "../src/addons/controls/ArcballControls";
-import { OBJLoader } from "../src/addons/loaders/OBJLoader";
 import { HDRLoader } from "../src/addons/loaders/HDRLoader";
 import { PerspectiveCamera } from "../src/cameras/PerspectiveCamera";
 import { OrthographicCamera } from "../src/cameras/OrthographicCamera";
 import { Vector3 } from "../src/math/Vector3";
-import { Group } from "../src/objects/Group";
-import { readFileSync } from "node:fs";
 
 function close(actual: number, expected: number, message: string, epsilon = 1e-9): void {
   assert.ok(Math.abs(actual - expected) <= epsilon, `${message}: ${actual} vs ${expected}`);
@@ -130,35 +127,6 @@ test("TrackballControls reset restores target position and zoom", () => {
   controls.reset();
   close(ortho.zoom, 2, "reset restores the zoom", 1e-9);
   close(ortho.position.z, 500, "reset restores the position", 1e-9);
-});
-
-test("OBJLoader merges faces, groups and vertex colors like upstream", () => {
-  const objText = readFileSync(new URL("../public/examples/models/obj/walt/WaltHead.obj", import.meta.url), "utf8");
-  const container = new OBJLoader().parse(objText);
-  assert.ok(container instanceof Group, "parse returns a group");
-  assert.ok(container.children.length > 0, "the model has meshes");
-});
-
-test("OBJLoader parses mixed geometry types into distinct objects", () => {
-  const sample = [
-    "# comment",
-    "o head",
-    "v 0 0 0",
-    "v 1 0 0",
-    "v 0 1 0",
-    "v 0 0 1",
-    "vn 0 0 1",
-    "vt 0.5 0.5",
-    "f 1/1/1 2/1/1 3/1/1",
-    "l 1 2",
-    "p 4",
-  ].join("\n");
-  const container = new OBJLoader().parse(sample);
-  // One object: the `p` statement switches the object type, so face data and point merge upstream.
-  assert.equal(container.children.length, 1, "the single o object is emitted once");
-  const head = container.children[0] as any;
-  assert.ok(head.geometry.attributes.position.count >= 1, "positions resolved");
-  assert.equal(head.geometry.attributes.uv.count, 3, "uvs resolved per vertex");
 });
 
 test("HDRLoader parses an RGBE header and pixel payload", async () => {

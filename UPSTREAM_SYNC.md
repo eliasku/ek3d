@@ -63,10 +63,10 @@ Five new browser fixtures are registered in the existing smoke runner. The packa
 
 | Current upstream inventory | Total | Native ports | Excluded |
 | -------------------------- | ----: | -----------: | -------: |
-| Addon modules              |   501 |          282 |      219 |
-| HTML pages                 |   622 |          328 |      294 |
+| Addon modules              |   501 |          237 |      264 |
+| HTML pages                 |   622 |          290 |      332 |
 
-There are no pending approved ports. The retained native VDB page brings the native upstream-derived page total to 329.
+There are no pending approved ports. The retained native VDB page brings the native upstream-derived page total to 291.
 
 New excluded modules are `RayTracedRadiosity`, `MeshletDrawingPipeline`, `VisibilityBufferDrawingPipeline` and `MeshletGeometryUtils`. Upstream removes the already-excluded `VXGIIrradiance`, `RecurrentDenoiseNode` and `TemporalReprojectNode`. New WebGPU color-grading, VDB, instance-material and meshlet pages remain excluded. Removed WebGPU rasterizer/proxy pages do not affect native pages. Detailed additions/removals are recorded in `examples/migration-scope.json`.
 
@@ -74,7 +74,40 @@ The current totals include the 2026-11-12 user exclusion of LEGO/LDraw: its load
 line materials, utilities, example and local model assets are outside the port. The LDraw
 adaptation and verification recorded here describe the earlier synchronization, not retained support.
 
-## Verification
+## Prepared web/game asset scope
+
+The 2026-11-12 user cutover removes non-core model/domain importers, MaterialX utilities,
+KTX1/PVR, TIFF/TGA and IES/JXL. It removes 50 native source files and 38 dependent example
+pages with their exclusive resources, without converting or replacing assets.
+KTX2/DDS compressed textures, glTF/GLB, retained game/effect loaders, exporters and shared
+codecs/rendering utilities remain supported. GPU compressed-format targets remain available
+to KTX2; this is not a renderer-capability removal.
+
+Current inventory totals include these 45 additional upstream-module exclusions.
+Extracted upstream paths and line counts retain their original provenance.
+These exclusions are permanent across future upstream revisions, including renamed or replacement
+implementations of the same formats. Apply the rules and module/page statuses in
+[`examples/migration-scope.json`](examples/migration-scope.json) before filtering each new upstream
+diff; do not restore excluded helpers, examples or exclusive resources without an explicit user decision.
+The synchronization verification below predates this asset-scope cutover.
+
+### Cutover verification
+
+- Targeted formatting and warning-free lint passed; `npm run typecheck` passed.
+- Focused behavior/package-graph checks passed: nine files, 27 tests, including retained DDS,
+  KTX2, HDR cube, controls, NURBS, Kelvin and morph blending contracts.
+- `npm run package:check` passed packed-source resolution, strict consumer types, production
+  example compilation and dependency isolation. The temporary consumer was removed.
+- The standard builtin browser showed DDS textures, KTX2 samples and the retained ZIP-backed
+  array texture. KTX2 reported 15 supported samples and three unsupported native GPU formats.
+  The gallery omitted all 38 removed pages; both retained glTF export checks passed.
+  No uncaught page errors were recorded. The verification tab and development server were closed.
+- `npm run docs:llms` regenerated the module index for 686 retained source modules.
+
+The full test suite, browser/device matrix and conversion fidelity were not checked.
+Removed public import paths have no compatibility aliases; no assets were converted.
+
+## Synchronization verification
 
 - `npm run typecheck`: passed.
 - Targeted behavior suite: 23 files, 108 tests passed. Coverage includes animation, geometry, light/material copies, batching, fat lines, LUTs, VRML, LDraw, Collada, marching cubes/landing, controls, glTF export, postprocessing, probe grids, depth capabilities and package contracts.

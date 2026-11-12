@@ -3,11 +3,10 @@ import { LoadingManager } from "ek3d/loaders/LoadingManager";
 import { Mesh } from "ek3d/objects/Mesh";
 import { MeshBasicMaterial } from "ek3d/materials/MeshBasicMaterial";
 import { BufferGeometry } from "ek3d/core/BufferGeometry";
-import { BufferAttribute, Float32BufferAttribute } from "ek3d/core/BufferAttribute";
+import { Float32BufferAttribute } from "ek3d/core/BufferAttribute";
 import { Texture } from "ek3d/textures/Texture";
 import { CubeTexture } from "ek3d/textures/CubeTexture";
 import type { Object3D } from "ek3d/core/Object3D";
-import { ColladaLoader } from "ek3d/addons/loaders/ColladaLoader";
 import { GLTFExporter } from "ek3d/addons/exporters/GLTFExporter";
 import { MeshPhysicalMaterial } from "ek3d/materials/MeshPhysicalMaterial";
 
@@ -147,44 +146,6 @@ export async function objectLoaderBrowserChecks(): Promise<{ checks: string[] }>
 }
 
 export async function verifyAddonAssetContracts(): Promise<{ checks: string[] }> {
-  const collada = new ColladaLoader().parse(`
-    <COLLADA version="1.4.1">
-      <asset><unit meter="1"/><up_axis>Y_UP</up_axis></asset>
-      <library_geometries><geometry id="geometry"><mesh>
-        <source id="positions"><float_array id="positions-array" count="15">0 0 0 1 0 0 1 1 0 0 1 0 -1 0 0</float_array>
-          <technique_common><accessor source="#positions-array" count="5" stride="3">
-            <param name="X" type="float"/><param name="Y" type="float"/><param name="Z" type="float"/>
-          </accessor></technique_common>
-        </source>
-        <vertices id="vertices"><input semantic="POSITION" source="#positions"/></vertices>
-        <polygons count="2"><input semantic="VERTEX" source="#vertices" offset="0"/>
-          <p>0 1 2</p><p>0 2 3 4</p>
-        </polygons>
-      </mesh></geometry></library_geometries>
-      <library_visual_scenes><visual_scene id="scene">
-        <node id="node"><instance_geometry url="#geometry"/></node>
-      </visual_scene></library_visual_scenes>
-      <scene><instance_visual_scene url="#scene"/></scene>
-    </COLLADA>`);
-  assert(collada !== null, "Collada XML must parse");
-  const meshes: Mesh[] = [];
-  collada.scene.traverse((object) => {
-    if (object instanceof Mesh) meshes.push(object);
-  });
-  assert(meshes.length === 1, "Collada polygons must create one mesh");
-  try {
-    const positions = meshes[0].geometry.getAttribute("position");
-    assert(positions instanceof BufferAttribute, "Collada must produce CPU position data");
-    assert(positions.count === 9, "Collada must retain the triangle and triangulate the quad");
-    assert(positions.getX(1) === 1 && positions.getY(1) === 0, "Collada must retain the first polygon");
-    assert(positions.getX(8) === -1, "Collada must retain the last polygon");
-  } finally {
-    for (const mesh of meshes) {
-      mesh.geometry.dispose();
-      for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) material.dispose();
-    }
-  }
-
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = 1;
   const context = canvas.getContext("2d");
@@ -241,10 +202,6 @@ export async function verifyAddonAssetContracts(): Promise<{ checks: string[] }>
     texture.dispose();
   }
   return {
-    checks: [
-      "Collada multiple polygons",
-      "glTF sheen intensity and color ownership",
-      "anisotropy UV channel and transform",
-    ],
+    checks: ["glTF sheen intensity and color ownership", "anisotropy UV channel and transform"],
   };
 }

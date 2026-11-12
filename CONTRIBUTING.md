@@ -19,6 +19,11 @@ The latest [synchronization report](UPSTREAM_SYNC.md) records the filtered delta
 and verification. Migration inventory records retain their original extraction commit; their
 `synchronization` metadata links the current baseline and scope delta without rewriting provenance.
 
+Before every upstream sync, apply the persistent rules and module/page exclusion statuses in
+[`examples/migration-scope.json`](examples/migration-scope.json). Do not reset them from a fresh
+inventory or restore excluded formats, helpers, dependent examples or exclusive resources without
+an explicit user decision. The inventory is provenance, not approval to reintroduce a feature.
+
 The library is distributed as uncompiled TypeScript source: `exports` maps package subpaths to `src/**/*.ts`, so consumers compile it with their own bundler. No compiled library output is checked in.
 
 Run `npm run docs:llms` after changing the README or maintained source. The TypeScript generator
@@ -31,8 +36,8 @@ Generation uses only local package metadata, the README and maintained source. I
 read the upstream checkout, generated HTML docs or TSL guides, and makes no network requests.
 
 Stateful renderer, physics and utility factories are now classes at the same module paths.
-Class names describe their instances: `Assets`, `CustomShaders`, `ArchiveResolver` and `MatcapScene`.
-Construct them with `new`, including `new AmmoPhysics(runtime)` and `new ArchiveResolver(files)`.
+Class names describe their instances: `Assets`, `CustomShaders` and `MatcapScene`.
+Construct them with `new`, including `new AmmoPhysics(runtime)`.
 Plain-data factories remain functions.
 Renderer `createBackground`, `createEnvironments`, `createShadowMap` and `createOutput` options
 take constructors; custom implementations must be constructible. Detached-safe methods and
@@ -67,6 +72,7 @@ before publishing assets, including on a free public website.
 - **No WebXR or WebGPU backend**, disabled manager or compatibility shim. Session/controller lifecycles, native XR types, backend-specific branches and their examples are outside the package.
 - **No `StereoCamera` or stereo example/picking mode.** Stereoscopic applications are excluded; ordinary perspective, orthographic, array and cube cameras remain. The former `ek3d/cameras/StereoCamera` import is intentionally removed without a compatibility shim.
 - **No LEGO/LDraw format support.** `LDrawLoader`, `LDrawConditionalLineMaterial`, `LDrawUtils`, the `webgl_loader_ldraw` example and its assets are explicitly excluded from the upstream port. Their former addon import paths are removed without compatibility shims.
+- **Prepared web/game assets, not a universal importer.** Use glTF/GLB for prepared models and KTX2/DDS for compressed textures. CAD/manufacturing/scientific loaders, legacy model importers, FBX/OBJ/MTL/USD/MaterialX, TIFF/TGA, KTX1/PVR and IES/JXL are excluded. Dependent examples and exclusive resources are removed without conversion; exporters and shared rendering utilities remain independent.
 - **Keep the code relevant to the application:** raw TypeScript, direct imports from defining modules and explicit subsystems. Functional coverage and correctness take priority over recurring bundle-size comparisons.
 
 **WebGL-only cutover (D.0):** the earlier WebXR implementation and shared WebGPU-only APIs have been removed. This intentionally breaks clients of `createXR`, `renderer.xr`, XR module subpaths and WebGPU-only members. Ordinary WebGL, reversed-depth math and external GPU-resource ownership remain. The checked-in upstream reference is unchanged.
@@ -82,10 +88,10 @@ npm test
 npm run dev
 ```
 
-OBJ and KTX2 tests use the retained assets in `public/examples/models/obj/walt/` and
-`public/examples/textures/ktx2/`. Synthetic cube, array and volume containers remain in
-`tests/fixtures/ktx2/`. Keep these assets available when running tests; the upstream checkout
-supplies reference implementations, not these model and texture fixtures.
+KTX2 tests use the retained assets in `public/examples/textures/ktx2/`.
+Synthetic cube, array and volume containers remain in `tests/fixtures/ktx2/`.
+Keep these assets available when running tests; the upstream checkout supplies reference implementations,
+not these texture fixtures.
 
 Production builds exclude `.ts` files from Vite's per-file Oxc transform so Rolldown can inline
 imported `const enum` values across modules, including workers. Development keeps the default
@@ -95,45 +101,19 @@ per-file transform. No custom enum plugin is needed; the installed-package check
 shader material before initializing `Mesh`. `/examples/webgl_animation_walk.html` registers
 both depth and distance shaders for directional-light and point-light shadows.
 
-`/examples/webgl_loader_xyz.html` loads and rotates the local 201-point helix using
-`ek3d/addons/loaders/XYZLoader` and explicit `PointsMaterial` shader composition.
-The loader supports XYZ and XYZRGB rows, converting byte sRGB colors to working-space colors.
-Comments and unsupported row widths are ignored, matching upstream. Use a consistent row layout
-within each file; mixed colored/uncolored rows retain upstream's unequal attribute counts.
-The page handles resize, load errors and late responses after disposal. Data attribution and
-the LGPL license are retained in `public/examples/`.
-
-`/examples/webgl_loader_gcode.html` loads three local toolpaths with
-`ek3d/addons/loaders/GCodeLoader`, explicit `LineBasicMaterial` shader composition,
-OrbitControls and a lil-gui asset selector. The loader preserves upstream linear moves,
-absolute/relative positioning, extrusion overrides, position resets and `splitLayer`.
-Arc and unsupported commands are ignored. Switching assets rejects stale responses;
-page disposal releases model geometries, shared materials and controls.
-
-`/examples/webgl_loader_obj.html` loads the local male02 OBJ with its MTL materials and textures.
-Import `MTLLoader` from `ek3d/addons/loaders/MTLLoader`, then pass its material creator to
-`OBJLoader.setMaterials()`. Texture handlers use the same loading manager and must return a texture.
-MTL preserves Phong colors, map transforms, bump/displacement options and transparency precedence.
-
 `/examples/webgl_loader_imagebitmap.html` compares three image uploads with three flipped bitmap
 uploads. Bitmaps close after GPU upload; disposal cancels scheduled loads and closes unused bitmaps.
 It uses `Texture` with `needsUpdate` instead of the canvas-only `CanvasTexture` TypeScript contract.
 
-`BVHLoader` and `MDDLoader` expose typed skeleton/clip and morph-target/clip results from their
-canonical addon loader paths. `/examples/webgl_loader_bvh.html` plays the local pirouette with a
-skeleton helper; `/examples/webgl_loader_mdd.html` plays four cube morph targets. Both use the
-existing animation mixer, preserve back/forward-cache restores and release playback on disposal.
+`BVHLoader` exposes typed skeleton/clip results from its canonical addon loader path.
+`/examples/webgl_loader_bvh.html` plays the local pirouette with a skeleton helper and releases playback on disposal.
+`VOXLoader` exposes chunk data, scene graphs, greedy meshes and 3D textures.
+Its local example is `/examples/webgl_loader_vox.html`.
 
-`PCDLoader`, `TDSLoader` and `VOXLoader` have local examples at `/examples/webgl_loader_pcd.html`,
-`/examples/webgl_loader_3ds.html` and `/examples/webgl_loader_vox.html`. PCD supports ASCII, binary
-and LZF-compressed clouds; its GUI selects all four local samples. TDS preserves Phong materials,
-texture maps and mesh transforms. VOX exposes chunk data, scene graphs, greedy meshes and 3D textures.
-
-`DDSLoader`, `KTXLoader`, `PVRLoader` and `TGALoader` have corresponding
-`webgl_loader_texture_{dds,ktx,pvrtc,tga}` pages. Native compressed formats are capability-gated:
-unsupported maps are skipped with a visible explanation, not substituted. Malformed compressed
-data rejects `loadAsync()` and reaches `load()` error callbacks. TGA supports indexed, RGB and
-greyscale images, RLE and all four image origins.
+`DDSLoader` and `KTX2Loader` load GPU-compressed textures through
+`webgl_loader_texture_dds` and `webgl_loader_texture_ktx2`.
+Native compressed formats are capability-gated; unsupported maps receive a visible explanation.
+Malformed DDS data rejects `loadAsync()` and reaches `load()` error callbacks.
 
 The glTF loader pages now include anisotropy, AVIF, GPU instancing, iridescence and material variants.
 HDR and UltraHDR texture pages expose exposure and format controls; the KTX2 page compares 18 local
@@ -155,21 +135,8 @@ curves, separate/interleaved point attributes, integer shader attributes and att
 vertices. `/examples/webgl_geometry_cube.html` uses the local crate texture. These pages keep
 upstream geometry sizes, explicit shader composition, resize and page-disposal handling.
 
-`AMFLoader` and `ThreeMFLoader` use a consumer-provided `setZipRuntime({ unzipSync })` decoder.
-The canonical 3MF import is `ek3d/addons/loaders/3MFLoader`, exporting `ThreeMFLoader`.
-The AMF page loads the local rook; the 3MF pages provide seven selectable Consortium samples
-and the textured truck. Shared model resources use the existing deduplicating disposal helper.
-
-`MD2Loader` produces geometry with named morph clips. `MD2Character`, `MD2CharacterComplex`
-and `MorphBlendMesh` preserve weapon synchronization, playback and movement/animation blending.
-The two MD2 pages load local Ratamahatta and Ogro assets; the control page uses `Gyroscope`
-camera following and `SunLight` cascaded shadows. Model and LUT redistribution permissions
-remain a publication prerequisite, recorded in the asset README.
-
 `HDRCubeTextureLoader` loads six RGBE faces and forwards face parse errors through the loader
-error callback and loading manager. `TIFFLoader` takes a consumer-supplied `TIFFRuntime` in its
-constructor. The TIFF and HDR environment examples use local UTIF and texture resources.
-The cube reflection/refraction pages retain the upstream models and environment maps.
+error callback and loading manager. HDR environment examples use local texture resources.
 Humus cubemap notices require written approval for commercial distribution; review these
 asset terms before publication.
 
@@ -193,23 +160,16 @@ under the `ShaderMaterial` key. Supply their `#include` dependencies through `sh
 The RTT and float-readback pages explicitly supply `colorspace_fragment`; the keyframe page
 keeps the Sky and PMREM shaders separate from its standard-material shader.
 
-The following bulk batch adds 53 pages for animation blending, convex/teapot/decal geometry,
-splines, lighting and probes, shadow techniques, advanced postprocessing, volume/array textures,
-uniform buffers and performance comparisons. `NRRDLoader` takes an optional `NRRDGzipDecoder`
-as its second constructor argument; inject `{ gunzipSync }` for gzip data. `Volume` and
-`VolumeSlice` retain CPU slicing and repaint controls. `SVGStroke` exposes the extracted SVG
-stroke tessellator without claiming a complete `SVGLoader` port. Geometry, probe, shadow and
-sorting helpers use their defining addon paths. Godrays remains pending because its upstream
-third-party effects need a separate runtime integration. Full-page interactions remain deferred
-to the combined verification pass; `.local/PLAN.md` records the exercised subset.
+The animation and effects pages cover blending, convex/teapot/decal geometry, splines, lighting
+and probes, shadow techniques, postprocessing, volume/array textures and uniform buffers.
+`SVGStroke` exposes the extracted SVG stroke tessellator. Geometry, probe, shadow and sorting
+helpers use their defining addon paths. Full-page interactions remain separate from type and build checks.
 
-The next batch adds fat lines and raycasting, curve/edge/tessellation modifiers, PMREM comparisons,
-portals, progressive GI, GPU picking, physical materials, video, molecular geometry, UV previews,
-wide-gamut output, procedural surfaces and GPU simulations. Addons keep their defining import paths,
-including `ek3d/addons/lines/Line2`, `ek3d/addons/modifiers/CurveModifier` and
-`ek3d/addons/misc/GPUComputationRenderer`. `VTKLoader` accepts `{ unzlibSync }` as its second
-constructor argument for compressed XML. `PDBLoader` returns atom/bond geometry and atom metadata;
-its canvas example omits the excluded CSS label renderer. `UVsDebug` draws triangle UV contours,
+Other examples cover fat lines and raycasting, curve/edge/tessellation modifiers, PMREM comparisons,
+portals, progressive GI, GPU picking, physical materials, video, UV previews, wide-gamut output,
+procedural surfaces and GPU simulations. Addons keep their defining import paths, including
+`ek3d/addons/lines/Line2`, `ek3d/addons/modifiers/CurveModifier` and
+`ek3d/addons/misc/GPUComputationRenderer`. `UVsDebug` draws triangle UV contours,
 face numbers and vertex labels. `WebGL` exposes WebGL 2 and drawing-buffer color-space probes;
 these do not establish display hardware gamut. Video examples surface permission/playback errors
 and release media tracks on disposal. Lensflare disposal also releases its element textures,
@@ -218,26 +178,22 @@ matching upstream; do not reuse those textures after disposal.
 The main `webgl_loader_gltf` catalog remains pending: its live Khronos catalog and referenced
 models require a licensed local snapshot. Existing local glTF examples remain available.
 
-The next loader batch adds `/examples/webgl_loader_3dm.html`, `webgl_loader_ifc.html`,
-`webgl_loader_vdb.html`, `webgl_modifier_subdivision.html` and `webgl_morphtargets_webcam.html`.
-`Rhino3dmLoader` uses `setLibraryPath()` for consumer-owned rhino3dm JavaScript/WASM;
-`setZlibDecoder()` supplies compressed EXR decoding for embedded environments.
-`LWOLoader` and its LWO2/LWO3 parser chain need no vendor runtime.
+The retained loader/effects examples include `webgl_loader_vdb.html`,
+`webgl_modifier_subdivision.html` and `webgl_morphtargets_webcam.html`.
 The package-owned `VDBLoader` port takes an optional `{ unzlibSync }` runtime as its
 second constructor argument; `setGridNames()` selects grids before dense texture creation.
 Its supported value types and compression follow three-vdb-loader 0.3.0, not every OpenVDB file.
 The package-owned `LoopSubdivision` port uses the canonical
 `ek3d/addons/modifiers/LoopSubdivision` path and preserves three-subdivide 1.1.5's options.
-IFC and webcam pages load local web-ifc and MediaPipe resources without package dependencies.
+The webcam page loads local MediaPipe resources without package dependencies.
 Webcam tracking requires a secure context, camera permission and a supported GPU delegate.
 Asset notices and unresolved publication rights are recorded in the adjacent asset README.
 
-The remaining standalone addon batch includes lofts, animation paths, texture/view helpers,
-outline rendering, morph playback, tube painting, coaster geometry, color/scene utilities,
-UV unwrapping and MaterialX archive/interface parsing. `InteractiveGroup` supports browser
-pointer/mouse interaction only; XR controllers remain excluded. `ViewHelper` uses WebGL.
-`unwrapUVs(root, potpack, options)` and `readMtlxArchive(buffer, zipRuntime)` take caller-owned
-runtimes. MaterialX parsing and validation do not install the excluded TSL material backend.
+The remaining standalone addon set includes lofts, animation paths, texture/view helpers,
+outline rendering, morph playback, tube painting, coaster geometry, color/scene utilities
+and UV unwrapping. `InteractiveGroup` supports browser pointer/mouse interaction only;
+XR controllers remain excluded. `ViewHelper` uses WebGL.
+`unwrapUVs(root, potpack, options)` takes a caller-owned atlas-packing runtime.
 `RectAreaLightUniformsLib.init()` returns LTC inputs for the renderer's `ltcTextures` option;
 it does not register global uniforms. Packed geometry requires consumer shader decoding.
 `SceneOptimizer.toBatchedMesh()` destructively replaces compatible static meshes; source
@@ -251,8 +207,7 @@ with `setDepthTexture()`. The separate `postprocessing` package is not a depende
 The retained vendor license is in `GodraysShaders.ts`; example-model publication rights
 remain unresolved.
 
-`/examples/webgl_raycaster_bvh.html` uses the maintained three-mesh-bvh 0.9.10 raycaster
-closure and the existing local bunny model. Import `MeshBVH` from
+The maintained mesh-bvh raycaster is independent of model-format loaders. Import `MeshBVH` from
 `ek3d/addons/math/bvh/core/MeshBVH` and `BVHHelper` from
 `ek3d/addons/math/bvh/objects/BVHHelper`. Direct `raycastObject3D()` integration needs no
 prototype patch or second runtime. Optional extension methods and local structural types
@@ -330,21 +285,21 @@ Pages: `/examples/misc_controls_map.html` (keys **1**/**2** toggle `zoomToCursor
 
 `tests/controls.test.ts` covers MapControls presets and no-element no-op panning, PointerLockControls movement and disabled behavior, DragControls state wiring without fake dispatches, and TransformControls attach/detach/mirror/reset boundaries. Real pointer capture, hover cursors, axis picking and dragging are verified through the standard browser tool on the pages during porting.
 
-### Arcball, Trackball, Fly, FirstPerson controls and OBJ/HDR loaders
+### Arcball, Trackball, Fly, FirstPerson controls and HDR loading
 
 Iteration nine completes the controls set. `ek3d/addons/controls/TrackballControls` orbits without keeping the camera's `up` vector (keys A/S/D switch rotate/zoom/pan, `handleResize()` feeds screen metrics, `multiTouchRoll` reads two-finger twist). `ek3d/addons/controls/ArcballControls` implements the virtual trackball FSA with default mouse actions (CTRL+drag or right-drag pan, left-drag rotate, wheel zoom, Shift+wheel FOV vertigo), pointer-count input states for touch, double-tap focus animations, z-rotate, `copyState()`/`pasteState()` through the clipboard, `setStateFromJSON()` for programmatic round-trips, and `setCamera()` for runtime camera swaps. `ek3d/addons/controls/FlyControls` maps WASD/R/F/QE plus arrow keys to movement and roll with an optional `dragToLook` mode; its upstream demo page is a WebGPU page and stays excluded, so the module ships without a page here. `ek3d/addons/controls/FirstPersonControls` is the damped variant: velocity lerps toward the key/pointer target, `heightSpeed` scales forward speed with altitude, and `constrainVertical` remaps the look bounds.
 
-The arcball page loads its model and environment through the ported `ek3d/addons/loaders/OBJLoader` and `ek3d/addons/loaders/HDRLoader`. OBJLoader parses `v/vn/vt/f/l/p` records, smooth-shading groups, vertex colors and multi-material groups; the returned `OBJGroup` carries `materialLibraries`. HDRLoader decodes RGBE (RLE and flat) into half-float or float data textures; both loaders were differentially verified against upstream across the repository's OBJ models and all twelve `.hdr` fixtures.
+`HDRLoader` decodes RGBE (RLE and flat) into half-float or float data textures.
 
-Pages: `/examples/misc_controls_trackball.html` and `/examples/misc_controls_arcball.html` expose the same toggles through the ported lil-gui panel (camera swap, `multiTouchRoll`, focus/grid/cursor zoom/near-far adjust, scale factor, gizmo visibility, copy/paste/reset state). `/examples/webgl_geometry_terrain.html` and `/examples/webgl_geometry_minecraft.html` (first-person flight with drag look and WASD). `/examples/misc_controls_fly.html` re-creates the earth fly-through that upstream renders with WebGPU: same scene and controls, `EffectComposer` + `FilmPass` instead of the TSL film node.
+Pages: `/examples/misc_controls_trackball.html` exposes camera and multi-touch-roll controls through lil-gui. `/examples/webgl_geometry_terrain.html` and `/examples/webgl_geometry_minecraft.html` provide first-person flight with drag look and WASD. `/examples/misc_controls_fly.html` uses `EffectComposer` and `FilmPass` without the excluded WebGPU backend.
 
-`tests/interaction-controls.test.ts` covers Fly movement and roll, FirstPerson damped convergence and latitude clamping, Trackball orbit radius preservation and reset, Arcball JSON state round-trips and the upstream seven mouse actions, plus OBJ parsing and an HDR payload check. Model-to-model identity runs in the differential Node harness; interactive dragging runs in the standard browser tool on the pages.
+`tests/interaction-controls.test.ts` covers Fly movement and roll, FirstPerson damped convergence and latitude clamping, Trackball orbit radius preservation and reset, Arcball JSON state round-trips and the upstream seven mouse actions, plus an HDR payload check.
 
 ### lil-gui and Stats
 
 The vendored utility libraries live in `src/addons/libs/` as real maintained TypeScript. `ek3d/addons/libs/lil-gui/GUI` is the lil-gui panel (0.21+ DOM contract: `.lil-gui`, `controller/name/widget` rows, body classes `lil-gui-dragging`/`lil-gui-vertical`); its default stylesheet is injected once per page unless `injectStyles: false`. Controllers read `object[property]` dynamically — pass any object with the property you want to tweak (a camera, a material, a plain params object). `ek3d/addons/libs/Stats` replaces the closure-based stats.js with a `Stats`/`StatsPanel` class pair; append `stats.dom` yourself and call `update()` per frame.
 
-Pages wire the real GUI instead of keyboard replacements: `/examples/misc_controls_trackball.html` (use-orthographic and multi-touch-roll checkboxes), `/examples/misc_controls_arcball.html` (Choose Camera dropdown plus the twenty-row Arcball parameters/Animations folders with copy/paste/reset buttons), `/examples/webgl_tonemapping.html` (Tone Mapping folder with the eight modes and an exposure slider that hides when mapping is off, Background folder with blurriness/intensity), and `/examples/webgl_materials_envmaps_groundprojected.html` (Grounded checkbox that swaps the skybox for the flat equirect background). `tests/browser-lil-gui.ts` (`verifyLilGui` in the browser smoke) checks widget interactions — checkbox, function button, select, number text input with snapping and clamping, slider drag mapping, string input, four color formats, save/load round-trip, onChange plumbing and destroy — in a real DOM.
+Pages wire the real GUI instead of keyboard replacements: `/examples/misc_controls_trackball.html` (use-orthographic and multi-touch-roll checkboxes), `/examples/webgl_tonemapping.html` (tone mapping, exposure and background controls), and `/examples/webgl_materials_envmaps_groundprojected.html` (ground projection). `tests/browser-lil-gui.ts` checks widget interactions, value snapping, colors, save/load, change handlers and disposal in a real DOM.
 
 ### Draco and UltraHDR loaders, Sky family and the demo browser
 
@@ -358,22 +313,18 @@ Pages: `/examples/webgl_loader_draco.html` (bunny), `/examples/webgl_animation_k
 
 Resolution scale keeps the iframe centered and fitted to its container. At 2, its viewport has twice the width and height; at 0.5, half. This scales the entire example, including its UI, rather than changing renderer pixel ratio alone. Browser controls stay outside the iframe and do not cover example controls.
 
-### STL and PLY loaders
+### PLY loader
 
-Import `STLLoader` from `ek3d/addons/loaders/STLLoader` or `PLYLoader` from `ek3d/addons/loaders/PLYLoader`. Both support `parse()` for ASCII strings or binary `ArrayBuffer` data, and `load()`/`loadAsync()` through a loading manager without an external decoder.
+Import `PLYLoader` from `ek3d/addons/loaders/PLYLoader`. It supports `parse()` for ASCII strings
+or binary `ArrayBuffer` data and `load()`/`loadAsync()` without an external decoder.
+PLY preserves ASCII, little- and big-endian binary input, vertex and face colors/UVs,
+triangle/quad faces, property-name remapping and custom attributes.
+`/examples/webgl_loader_ply.html` uses local upstream models. Provenance is recorded in
+`public/examples/README.md`; parser tests use synthetic data and require no network.
 
-STL preserves non-indexed facets, normals, groups for multiple ASCII solids and Magics binary vertex colors/alpha. PLY preserves ASCII, little- and big-endian binary input, vertex and face colors/UVs, triangle/quad faces, property-name remapping and custom attributes.
+### SVG, lighting, workers and audio
 
-The corresponding `/examples/webgl_loader_stl.html` and `/examples/webgl_loader_ply.html` pages use local upstream models, animated cameras, fog, directional shadows and Stats. Model provenance is recorded in `public/examples/README.md`. Parser regression tests use synthetic data and require no network.
-
-### Collada, SVG, VRML, lighting, workers and audio
-
-`ColladaLoader` exposes parsed libraries, scene animations and kinematics. Its four local
-examples cover static scenes, robot joints, skinning and KMZ archives. Configure KMZ with
-`new KMZLoader(manager).setZipRuntime({ unzipSync })`; the ZIP implementation stays outside
-the package. `SVGLoader` provides paths, styles, gradients, fill/stroke materials and stroke
-tessellation. `VRMLLoader` takes a consumer-supplied Chevrotain-compatible runtime as its
-first constructor argument. Its example loads the licensed runtime locally.
+`SVGLoader` provides paths, styles, gradients, fill/stroke materials and stroke tessellation.
 
 `CCDIKSolver` supports constrained bone-chain solving and a disposable helper.
 `CSM.setupMaterial()` injects cascaded directional shadows into explicitly composed material
@@ -1049,16 +1000,16 @@ Bundle-size comparisons are not a recurring development or acceptance step; depe
 
 Actual Safari/Apple devices, mobile GPUs, HDR display presentation and hosted CI execution require separate evidence. Completing the implementation plan does not establish these results or full upstream parity.
 
-## Priority addons: HDR/EXR, FBX, geometry and planar surfaces
+## Priority addons: HDR/EXR, geometry and planar surfaces
 
-Use defining-module imports: `ek3d/addons/loaders/EXRLoader`, `FBXLoader` and `HDRLoader`,
+Use defining-module imports: `ek3d/addons/loaders/EXRLoader` and `HDRLoader`,
 `ek3d/addons/math/MeshSurfaceSampler`, `ek3d/addons/modifiers/SimplifyModifier`,
 `ek3d/addons/objects/Reflector`, `Refractor`, `Water`, `Water2`, and
 `ek3d/addons/interactive/HTMLMesh`. `Water2` retains the upstream export name `Water`.
 RGBE files use `HDRLoader`; the deprecated upstream `RGBELoader` alias is intentionally absent.
 `WaterMesh`/`Water2Mesh` require excluded WebGPU/TSL APIs and are not compatibility aliases for the WebGL objects.
 
-EXR and binary FBX parsing remain synchronous. Supply a runtime with
+EXR parsing remains synchronous. Supply a runtime with
 `unzlibSync(data: Uint8Array): Uint8Array` through `loader.setZlibDecoder(runtime)` before parsing
 zlib-compressed blocks. Formats that do not need zlib work without it. The examples fetch
 `/examples/libs/fflate.module.js`, import the downloaded source through a temporary Blob URL,
@@ -1068,12 +1019,7 @@ not package-source imports or npm runtime dependencies.
 `EXRLoader` preserves compression, part selection, output format and half/float decoding.
 Its parsed `header` is structured metadata; `HDRLoader.parse().header` remains a string.
 `DataTextureData.header` therefore accepts either a string or a metadata record.
-FBX includes ASCII/binary geometry, skinning, morphs, animation, cameras/lights and NURBS curves;
-`NURBSCurve` and its math utilities are available at their defining addon paths.
-The FBX example sets the texture resource path to each selected model's directory, including
-the nested Archer and Warrior assets.
-`Head_69.fbx` references `ALPHA.png`, which is absent from the pinned upstream assets;
-its unsupported 3ds Max material maps are not replaced with substitute textures.
+`NURBSCurve` and its math utilities remain available at their defining addon paths.
 
 The scene comparison example supplies its DFG lookup texture and background system explicitly.
 The depth and framebuffer texture examples also select their required basic and sprite shaders.
@@ -1095,16 +1041,7 @@ New pages appear in `/examples/examples.html`. Each uses local resources, resize
 and pagehide cleanup. Unexercised codec/device combinations are listed in the coverage
 sections above; the full release browser matrix remains a separate gate.
 
-## USD, photometry, physics and sculpting addons
-
-`USDLoader` supports USDA, USDC and USDZ through its defining addon path.
-Inject `setZipRuntime({ unzipSync })` for USDZ archives; standalone layers need no ZIP runtime.
-The deprecated `USDZLoader` alias is intentionally absent. The local USDZ example uses
-the same external fflate runtime as the other archive examples.
-
-`IESLoader` produces normalized red-channel photometric textures in half-float, float or byte form.
-External tilt files remain unsupported. `JXLLoader` requires native JPEG XL decoding and HDR
-Canvas2D support (`srgb-linear`, float16 storage/readback and `globalHDRHeadroom`); it has no LDR fallback.
+## Physics and sculpting addons
 
 `new AmmoPhysics(initializedRuntime)` takes an initialized consumer-provided Ammo runtime. Its `dispose()` stops simulation
 and releases owned Bullet objects, not mesh geometry or materials. Six Ammo pages use the local

@@ -16,17 +16,12 @@ The curve modifier examples bundle `examples/fonts/helvetiker_regular.typeface.j
 
 `textures/minecraft/atlas.png` comes from the Painterly Pack (http://painterlypack.net/), as referenced by upstream's `painterlypack.txt`.
 
-`models/obj/*` assets (cerberus, female02, male02, walt, tree, ninja) are the unmodified upstream example models.
-
 `models/gltf/DispersionTest.glb`, `models/gltf/SheenChair.glb`, `models/gltf/coffeemat.glb`, `models/gltf/facecap.glb`, `models/gltf/DragonDispersion.glb`, `textures/edge3.jpg` and `textures/lottie/24017-lottie-logo-animation.json` are the unmodified upstream example assets. The Lottie JSON is the LottieFiles sample [#24017 lottie logo animation](https://lottiefiles.com/24017-lottie-logo-animation), served by upstream three.js examples.
 
 `libs/basis/*` (Binomial LLC, Apache-2.0) and `examples/libs/meshopt_decoder.module.js` (meshoptimizer, MIT) are the unmodified upstream vendor decoder runtimes, served as assets like the Draco decoders; the package source carries no vendor code.
 
-`models/stl/ascii/slotted_disk.stl`, `models/stl/binary/{pr2_head_pan,pr2_head_tilt,colored}.stl`,
-`models/ply/ascii/dolphins.ply` and `models/ply/binary/Lucy100k.ply` are copied unmodified from the
-pinned three.js examples. Upstream credits the STL loader example to
-[Alec Leeper](https://github.com/aleeper), the PR2 head to
-[pr2_description](https://www.ros.org/wiki/pr2_description), and the PLY example/data to
+`models/ply/ascii/dolphins.ply` and `models/ply/binary/Lucy100k.ply` are copied unmodified
+from the pinned three.js examples. Upstream credits the PLY example/data to
 [Wei Meng](https://github.com/menway) and
 [John Burkardt](https://people.sc.fsu.edu/~jburkardt/data/ply/ply.html).
 The upstream three.js MIT notice is retained in `models/THREE-LICENSE.txt`.
@@ -36,10 +31,6 @@ The upstream three.js MIT notice is retained in `models/THREE-LICENSE.txt`.
 `libs/fflate-LICENSE.txt`). Examples load it as a resource and explicitly inject its zlib decoder.
 `libs/meshopt_simplifier.module.js` is the unmodified meshoptimizer runtime by Arseny Kapoulkine
 (MIT notice in `libs/meshopt_simplifier-LICENSE.txt`). Neither runtime is bundled into package source.
-
-`models/fbx/**` is copied unmodified from the pinned upstream example assets, including the
-Mixamo character/animation credited by `webgl_loader_fbx`. The source README declares `nurbs.fbx`
-CC0; that README is retained. The subsurface bunny example credits Shaochun Lin for art support.
 
 `models/gltf/Flower/*` is Kenney's Nature Pack model (CC0 1.0; upstream README retained).
 `models/gltf/LeePerrySmith/*` contains Lee Perry-Smith's head scan and normal map
@@ -54,28 +45,15 @@ the porcelain matcap and its attribution text are retained alongside it.
 `textures/water/Water_{1_M_Normal,2_M_Normal,1_M_Flow}.jpg` are unmodified upstream water textures.
 The pinned checkout supplies no separate per-texture notice; the repository MIT notice is retained.
 
-`models/xyz/helix_201.xyz` is John Burkardt's 201-point helix, copied unmodified from
-the pinned three.js checkout. The [XYZ data page](https://people.math.sc.edu/Burkardt/data/xyz/xyz.html)
-licenses the data under GNU LGPL; `models/xyz/COPYING.LESSER` contains LGPL 2.1.
-The data file is the editable source and is served locally with the example.
-
-`models/gcode/{benchy,test_m82,test_m83}.gcode` are unmodified pinned upstream toolpaths.
-The upstream MIT notice is retained in `models/THREE-LICENSE.txt`.
-The boat is [#3DBenchy](https://www.3dbenchy.com/) by Creative Tools, designed by Daniel Norée;
-its [current license is CC0 1.0](https://www.3dbenchy.com/license/).
-
-`models/obj/male02/*` includes the OBJ, MTL and three textures from the pinned upstream checkout.
-The retained `readme.txt` credits Reallusion iClone and links the original Google 3D Warehouse author.
 `textures/planets/earth_atmos_2048.jpg`, also used by the ImageBitmap comparison, is the unmodified
 upstream Earth texture.
 
-`models/bvh/pirouette.bvh` and `models/mdd/cube.mdd` are unmodified pinned upstream assets.
+`models/bvh/pirouette.bvh` is an unmodified pinned upstream asset.
 Upstream credits the [CMU Graphics Lab Motion Capture Database](http://mocap.cs.cmu.edu/)
 for the BVH motion capture. The MIT notice is retained in `models/THREE-LICENSE.txt`.
 
-`models/pcd/{ascii,binary,binary_compressed}/*`, `models/3ds/portalgun/*` and `models/vox/monu10.vox`
-are unmodified pinned upstream assets. The 3DS example supplies the separate `textures/normal.jpg`
-normal map. Upstream links [MagicaVoxel](https://ephtracy.github.io/) for the VOX sample.
+`models/vox/monu10.vox` is an unmodified pinned upstream asset.
+Upstream links [MagicaVoxel](https://ephtracy.github.io/) for the VOX sample.
 The MIT notice is retained in `models/THREE-LICENSE.txt`.
 
 `models/gltf/{AnisotropyBarnLamp,IridescenceLamp}.glb`, `models/gltf/AVIFTest/forest_house.glb`,
@@ -89,13 +67,11 @@ textures. Quarry and Spruit Sunrise are [Poly Haven](https://polyhaven.com/) env
 `libs/zstddec.module.js` is the unmodified ZSTD decoder used by the HDR KTX2 sample.
 Its wrapper and embedded Zstandard notices are retained in `libs/zstddec-LICENSE.txt`.
 
-`textures/compressed/*.{dds,ktx,pvr}` (30 files), `textures/wave_normals_24bit_uncompressed.dds`,
-`textures/crate_color8.tga` and `textures/crate_grey8.tga` are unmodified pinned upstream example
-assets. Upstream credits the leaf/`disturb` texture to
+`textures/compressed/*.dds` and `textures/wave_normals_24bit_uncompressed.dds` are
+unmodified pinned upstream example assets. Upstream credits the leaf/`disturb` texture to
 [lauris71](https://opengameart.org/node/10505) and the explosion texture to
-[bart](https://opengameart.org/node/7728); the remaining compressed samples and the TGA crate
-textures ship without separate per-file notices. The MIT notice is retained in
-`models/THREE-LICENSE.txt`.
+[bart](https://opengameart.org/node/7728); the remaining compressed samples ship without
+separate per-file notices. The MIT notice is retained in `models/THREE-LICENSE.txt`.
 
 `textures/crate.gif`, `textures/floors/FloorsCheckerboard_S_Diffuse.jpg` and
 `textures/terrain/grasslight-big.jpg` are unmodified pinned upstream example textures.
@@ -111,30 +87,17 @@ The CUBE headers credit RocketStock (2017); the 3DL header credits Presetpro.com
 (2018). The upstream page also credits FreePresets.com. The pinned directory supplies no
 separate LUT redistribution license; provenance is not a grant of additional rights.
 
-`models/md2/ogro/**` and `models/md2/ratamahatta/**` are unmodified pinned upstream model assets.
-The retained `Ogro.txt` credits Magarnigal (model), Ogro_Fix (skins) and Deranged (additional skin).
-The pinned Ratamahatta directory contains no attribution notice. Neither directory supplies
-explicit redistribution terms; resolve these model permissions before publishing the assets.
-
-`models/3mf/{cube_gears,facecolors,multipletextures,pyramid,spinal implant,variable voronoi,vertexcolors}.3mf`
-are the pinned 3MF Consortium samples. Their upstream attribution README and BSD-2-Clause license
-are retained. `models/3mf/truck.3mf` and `models/amf/rook.amf` are pinned upstream example models
-without asset-specific license notices; the adjacent three.js MIT notices do not establish
-separate model permissions. Resolve those permissions before publishing the assets.
-
 `textures/{square-outline-textured.png,water.jpg}` and
 `textures/sprites/{circle,disc,spark1}.png` are unmodified pinned upstream assets used by the
 BufferGeometry and interactive point/voxel examples. The pinned checkout provides no separate
 per-image redistribution notices; the three.js MIT notice is retained in `models/THREE-LICENSE.txt`.
 
-`textures/tiff/*`, `textures/cube/pisa{HDR,}/**`, `models/obj/walt/WaltHead.obj` and
-`models/ply/binary/Lucy100k.ply` are unmodified pinned upstream assets. The upstream examples
-credit David OReilly for WaltHead and the Stanford 3D Scanning Repository for Lucy.
-Pisa is Paul Debevec's light-probe image. These credits do not add redistribution rights.
+`textures/cube/pisa{HDR,}/**` and `models/ply/binary/Lucy100k.ply` are unmodified
+pinned upstream assets. The upstream examples credit the Stanford 3D Scanning Repository
+for Lucy. Pisa is Paul Debevec's light-probe image.
+These credits do not add redistribution rights.
 `textures/cube/{SwedishRoyalCastle,Park3Med}/**` are by Emil Persson (Humus); their retained
 `readme.txt` files require written approval for commercial distribution.
-`vendor/utif.module.js` is the pinned UTIF runtime by Photopea, with its MIT notice retained
-in `vendor/UTIF-LICENSE.txt`. Examples inject it into `TIFFLoader`; package source does not bundle it.
 
 `models/gltf/Horse.glb` is the pinned upstream horse, credited to Mirada's _Rome_ project.
 The checkout supplies no asset-specific redistribution license; resolve permissions before
@@ -148,15 +111,13 @@ The pinned checkout does not supply separate redistribution terms for these imag
 
 The material examples also use pinned upstream `models/gltf/Nefertiti/`, whose retained README
 specifies CC BY-NC, and `textures/cube/Bridge2/`, whose retained Humus notice requires written
-approval for commercial distribution. Keep the adjacent Lee Perry-Smith, ninja displacement,
-scratched-gold, lensflare and font notices. The Walt/ninja models, Angus cubemap, sprite images,
-hardwood and lava textures ship without explicit asset-specific redistribution terms;
-upstream provenance and an adjacent code license do not establish those rights.
+approval for commercial distribution. Keep the adjacent Lee Perry-Smith, scratched-gold,
+lensflare and font notices. The Angus cubemap, sprite images, hardwood and lava textures
+ship without explicit asset-specific redistribution terms; upstream provenance and an
+adjacent code license do not establish those rights.
 
 The point and sprite pages use unmodified pinned `textures/sprites/{ball,disc,spark1,snowflake1,
-snowflake2,snowflake3,snowflake4,snowflake5}.png`, `textures/{sprite0,sprite1,sprite2}.png` and
-`models/obj/female02/female02.obj`. The retained model README identifies Reallusion iClone
-and its 3D Warehouse source but does not state a redistribution license.
+snowflake2,snowflake3,snowflake4,snowflake5}.png` and `textures/{sprite0,sprite1,sprite2}.png`.
 `fonts/helvetiker_bold.typeface.json` retains the existing Helvetiker font notices.
 
 ## Animation, lighting, geometry and volume batch
@@ -169,9 +130,9 @@ All files below are copied unmodified from the pinned three.js examples.
 - `models/gltf/{Flamingo,Stork,Parrot}.glb`: Mirada's _Rome_ models. As with the Horse,
   the pinned tree does not establish asset-specific redistribution rights.
 - `models/gltf/dungeon_warkarma.glb`, `models/json/{pressure,suzanne_buffergeometry}.json`,
-  `models/obj/tree.obj`, `models/vox/menger.vox`, `textures/{tri_pattern,disturb}.jpg`,
-  `textures/{checker,colors}.png`, hardwood/brick maps, Earth maps, `lobe.hdr` and the
-  checkerboard floor maps retain upstream provenance. No blanket asset license is inferred.
+  `models/vox/menger.vox`, `textures/disturb.jpg`, `textures/{checker,colors}.png`,
+  hardwood/brick maps, Earth maps, `lobe.hdr` and the checkerboard floor maps retain
+  upstream provenance. No blanket asset license is inferred.
 - `textures/equirectangular/royal_esplanade_2k.hdr.jpg` is the upstream Royal Esplanade
   environment. Review its original image terms before publication.
 - `textures/cube/pisa/{px,nx,py,ny,pz,nz}.png` is Paul Debevec's Pisa light probe.
@@ -179,20 +140,15 @@ All files below are copied unmodified from the pinned three.js examples.
 - `fonts/MPLUSRounded1c/` retains the M PLUS Rounded font's `OFL.txt`.
   Decal textures retain their adjacent `LICENSE.TXT` and Lee Perry-Smith attribution.
 - `textures/3d/head256x256x109.zip` retains its adjacent head-dataset notice and copyright.
-  `models/nrrd/stent.nrrd` retains its public-domain provenance notice.
-  Upstream lists the provenance of `models/nrrd/I.nrrd` as unknown.
 - `textures/spiritedaway.ktx2` contains Studio Ghibli imagery; no separate
-  redistribution permission was found. `textures/cm_{gray,viridis}.png` retain upstream
-  provenance. These resources must not be publicly distributed without applicable rights.
+  redistribution permission was found. This resource must not be publicly distributed
+  without applicable rights.
 
 The existing local fflate and Basis runtimes serve the new archive/volume examples.
 They are injected explicitly and remain outside the package source.
 
-## Lines, materials, simulation and molecular batch
+## Lines, materials and simulation batch
 
-- `models/pdb/*.pdb` are the seventeen pinned molecular samples. Some files credit
-  Chemical Structure Services, A. W. Maverick or Marvin; no asset-specific redistribution
-  license was found. Confirm permission before publication.
 - `textures/{pano.mp4,pano.webm,kinect.mp4,kinect.webm,sintel.mp4,sintel.ogv}` and
   `models/gltf/{DragonAttenuation,duck}.glb` are unmodified pinned assets.
   The retained `textures/kinect.nfo` records freenect/ffmpeg provenance, not a content license.
@@ -205,23 +161,12 @@ They are injected explicitly and remain outside the package source.
   Humus notice. Existing font, Ferrari, Lee Perry-Smith, UV-grid, HDR and Draco resources
   keep their previously recorded notices and publication caveats.
 
-## Collada, vector scenes, lighting, workers and audio batch
+## Vector scenes, lighting, workers and audio batch
 
-- `models/collada/elf/` is Elf Girl by halloween; `models/collada/stormtrooper/`
-  is Dancing Stormtrooper by StrykerDoesAnimation. The upstream pages identify both as
-  CC BY. Preserve author credit and review the original distribution terms.
-  `models/collada/abb_irb52_7_120.dae` comes from `rdiankov/collada_robots`;
-  repository provenance alone does not establish model-specific redistribution rights.
-- `models/kmz/Box.kmz` retains `Readme.txt`, attributing the Box model to
-  Khronos glTF-Sample-Models. `models/svg/` contains the unmodified pinned SVG samples.
+- `models/svg/` contains the unmodified pinned SVG samples.
   No blanket license is inferred for individual artwork.
-- `models/vrml/` contains all sixteen pinned chooser models and `map.gif`.
-  Four model headers cite the Web3D license retained in `WEB3D-LICENSE.txt`;
-  review the remaining models' individual terms before publication.
-- `libs/chevrotain.module.min.js` is Chevrotain 9.0.1, Apache-2.0, including
-  regexp-to-ast 0.5.0, MIT. Both license texts are adjacent.
-  `libs/potpack.module.js` retains its ISC license header.
-  These are example resources injected into addons, not package dependencies.
+- `libs/potpack.module.js` retains its ISC license header.
+  This is an example resource injected into addons, not a package dependency.
 - `models/gltf/kira.glb` is identified as CC0 by the upstream IK page.
   `BoomBox.glb` retains the CC0 Public / Microsoft for Everything notice in
   `BoomBox-LICENSE.txt`. RobotExpressive retains its CC0 README.
@@ -239,11 +184,8 @@ They are injected explicitly and remain outside the package source.
 
 Non-commercial use does not waive attribution, share-alike or permission requirements.
 
-## USD, probe grids, Ammo and prefiltered environments
+## Probe grids, Ammo and prefiltered environments
 
-- `models/usdz/saeukkang.usdz` is copied from the pinned three.js checkout.
-  No asset-specific attribution or redistribution license was established. Resolve permission
-  before publishing this model.
 - `models/gltf/Sponza/` comes from Khronos glTF-Sample-Assets revision
   `8f492390ddc7a2ae221a1369ef560589cf8c70fb`, preserving all 71 glTF payload files.
   The retained README credits Crytek and Frank Meinl. Model files use the
@@ -262,17 +204,8 @@ Non-commercial use does not waive attribution, share-alike or permission require
 
 The sculpt addon source embeds the complete SculptGL MIT notice for Stéphane Ginier.
 
-## Rhino, IFC, VDB, subdivision and webcam
+## VDB, subdivision and webcam
 
-- `libs/rhino3dm/` contains the unmodified rhino3dm 8.32.1 JavaScript/WASM runtime
-  and its MIT license. `models/3dm/Rhino_Logo.3dm` is copied from the pinned upstream
-  checkout; model-specific redistribution rights remain unresolved.
-- `libs/web-ifc/` contains web-ifc 0.0.77 browser JavaScript, single-threaded WASM
-  and its MPL-2.0 license, from the npm tarball with SHA-1
-  `5f4b3913c1e42f721c2c031f85633d75dadc0545`.
-  Source: https://github.com/ThatOpen/engine_web-ifc/tree/f26c4beef0a668ebdb180d2b95a94097a1e21cef.
-  `models/ifc/rac_advanced_sample_project.ifc` is the unchanged pinned upstream
-  example model; its asset-specific redistribution terms were not established.
 - `models/vdb/PROVENANCE.txt` pins the exact OpenVDB smoke sample and its SHA-256.
   The adjacent website CC BY 4.0 license does not establish model-specific rights.
   Resolve publication permission before hosting the sample.
@@ -303,10 +236,8 @@ The sculpt addon source embeds the complete SculptGL MIT notice for Stéphane Gi
 The godrays page reuses the pinned `models/gltf/godrays_demo.glb`; no asset-specific
 redistribution license was found. Review permission before public hosting.
 The three-good-godrays 0.12.0 zlib license and altered-source notice are retained in
-`src/addons/postprocessing/GodraysShaders.ts`. The BVH raycaster reuses the existing
-Stanford bunny FBX. The three-mesh-bvh 0.9.10 MIT notice is retained in
+`src/addons/postprocessing/GodraysShaders.ts`. The three-mesh-bvh 0.9.10 MIT notice is retained in
 `src/addons/math/bvh/core/Constants.ts`. Neither port imports another Three.js runtime.
-MaterialX 1.39.5 interface metadata retains its Apache-2.0 license in the root `LICENSE`.
 
 ## CSG, batch LOD and G-code
 

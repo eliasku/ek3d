@@ -1,7 +1,9 @@
-import type { ThreeMFZipRuntime } from "ek3d/addons/loaders/3MFLoader";
+interface ZipRuntime {
+  unzipSync(data: Uint8Array): Record<string, Uint8Array>;
+}
 
 /** Loads the example-owned fflate runtime without bundling it in the package. */
-export async function loadZipRuntime(): Promise<ThreeMFZipRuntime> {
+export async function loadZipRuntime(): Promise<ZipRuntime> {
   const response = await fetch("/examples/libs/fflate.module.js");
   if (!response.ok) throw new Error(`Unable to load fflate: HTTP ${response.status}`);
   const url = URL.createObjectURL(new Blob([await response.text()], { type: "text/javascript" }));
@@ -16,7 +18,7 @@ export async function loadZipRuntime(): Promise<ThreeMFZipRuntime> {
     ) {
       throw new Error("fflate runtime must export unzipSync");
     }
-    return runtime as ThreeMFZipRuntime;
+    return runtime as ZipRuntime;
   } finally {
     URL.revokeObjectURL(url);
   }

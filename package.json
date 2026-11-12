@@ -1,6 +1,6 @@
 {
   "name": "ek3d",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "WebGL-focused, source-first TypeScript port of Three.js with explicit composition",
   "license": "MIT",
   "author": "Ilya Kuzmichev <eliasku.games@gmail.com>",

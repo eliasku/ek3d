@@ -32,7 +32,7 @@ const _ray = /*@__PURE__*/ new Ray();
  * vertex to a certain extend.
  *
  * Typically skinned meshes are not created manually but loaders like {@link GLTFLoader}
- * or {@link FBXLoader } import respective models.
+ * import respective models.
  *
  * @demo scenes/bones-browser.html
  */

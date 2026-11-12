@@ -762,7 +762,7 @@ function setValueStructured(
 
 class StructuredUniform {
   id: string | number;
-  declare type?: undefined;
+  type?: undefined;
   seq: UniformNode[] = [];
   map: Record<string | number, UniformNode> = {};
   setValue: (gl: WebGL2RenderingContext, value: any, textures?: WebGLTextures) => void = setValueStructured;
